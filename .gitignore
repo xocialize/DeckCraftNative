@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager / Xcode
+.build/
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# Test data and the oracle corpus live outside git (README: DECKCRAFT_FIXTURES)
+DeckCraftNative-Fixtures/

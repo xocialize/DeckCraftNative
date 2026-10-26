@@ -1,0 +1,13 @@
+# A table, two charts and SmartArt, with transitions between them.
+slide.new={"layout":"titleOnly","title":"Table"}
+insert.table={"rows":4,"cols":3,"rect":[60,120,840,300]}
+transition.set={"kind":"fade"}
+slide.new={"layout":"titleOnly","title":"Column chart"}
+insert.chart={"type":"column","rect":[60,120,840,380],"categories":["Q1","Q2","Q3","Q4"],"series":[{"name":"North","values":[3,5,4,6]},{"name":"South","values":[2,4,5,3]}]}
+transition.set={"kind":"push"}
+slide.new={"layout":"titleOnly","title":"Pie chart"}
+insert.chart={"type":"pie","rect":[180,120,600,380],"categories":["A","B","C"],"series":[{"name":"Share","values":[50,30,20]}]}
+transition.set={"kind":"wipe"}
+slide.new={"layout":"titleOnly","title":"SmartArt"}
+insert.smartArt={"kind":"process","items":["Plan","Build","Ship"]}
+transition.set={"kind":"morph"}

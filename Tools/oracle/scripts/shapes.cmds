@@ -1,0 +1,13 @@
+# Preset shapes, fills and outlines on a blank slide.
+slide.new={"layout":"blank"}
+shape.insert={"preset":"rect","rect":[60,60,200,120],"text":"Solid"}
+shape.fill={"color":"#2E86DE"}
+shape.insert={"preset":"ellipse","rect":[300,60,200,120],"text":"Gradient"}
+shape.fill={"gradient":{"stops":[[0,"#FF6B6B"],[1,"#FFD93D"]],"angle":45}}
+shape.insert={"preset":"star5","rect":[540,40,160,160]}
+shape.fill={"gradient":{"stops":[[0,"#FFFFFF"],[1,"#8854D0"]],"kind":"radial"}}
+shape.insert={"preset":"roundRect","rect":[60,260,240,140],"text":"Half transparent"}
+shape.fill={"color":"#10AC84","transparency":0.5}
+shape.insert={"preset":"rightArrow","rect":[340,280,260,100]}
+shape.insert={"preset":"triangle","rect":[640,260,200,160]}
+shape.fill={"none":true}

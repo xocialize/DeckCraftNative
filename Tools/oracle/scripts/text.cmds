@@ -1,0 +1,7 @@
+# Placeholder text, bullets, a text box with mixed formatting.
+slide.new={"layout":"titleAndContent","title":"Text layout","body":"First point\nSecond point\nThird point that is long enough to wrap across the width of the placeholder"}
+insert.textBox={"rect":[520,380,380,120],"text":"A text box set in 28 pt bold"}
+format.size={"size":28}
+format.bold={"on":true}
+slide.new={"layout":"twoContent","title":"Two columns"}
+slide.new={"layout":"sectionHeader","title":"Section header","body":"A subtitle under it"}
