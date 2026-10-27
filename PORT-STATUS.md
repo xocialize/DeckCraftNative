@@ -309,8 +309,9 @@ reasons are in [PLAN.md](PLAN.md) §3.
   - The release carries the notarized DMG and its `.sha256`. An anonymous download matches the checksum and passes
     Gatekeeper.
   - The update checker reads this repo's releases and answers "up to date" from the shipped build.
-- **Not done.** Translations. Spotlight end to end (above). The licence of this repository's own code (the user's
-  call).
+- **Licence.** The repository's own code is MIT OR Apache-2.0, like deckcraft's (`LICENSE-MIT`, `LICENSE-APACHE`,
+  `NOTICE`; the user's decision, 2026-10-27).
+- **Not done.** Translations. Spotlight end to end (above).
 - **Parallel work.** Release and Updates, Extensions, Intents and Strings were each built by a separate session. The
   catalog infrastructure, the fonts and licences in the bundle, integration, the final notarized build and
   EVALUATION.md were done here.

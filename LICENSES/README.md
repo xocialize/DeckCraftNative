@@ -6,4 +6,5 @@ option. Its licence texts and NOTICE are kept here verbatim (`deckcraft/`), as b
 file names its source file and licence in its header. The ArtCraft name and marks are not covered by those
 licences (`deckcraft/NOTICE`) and DeckCraftNative uses none of them.
 
-Other third-party material shipped in the app is listed in `../ATTRIBUTION.md`.
+DeckCraftNative's own code is under the same terms, MIT OR Apache-2.0 (`../LICENSE-MIT`, `../LICENSE-APACHE`,
+`../NOTICE`). Other third-party material shipped in the app is listed in `../ATTRIBUTION.md`.

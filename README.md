@@ -41,6 +41,11 @@ deck it has the info JSON, every slide rendered, the deck converted to `.pptx`, 
 `.pptx` read back in, and three frames of each transition. Regenerating it gives byte-identical output.
 Tests find it through `DCTestSupport.Fixtures`, and skip cleanly when it's absent.
 
+## Licence
+
+DeckCraftNative is dual-licensed under the [MIT License](LICENSE-MIT) or the [Apache License 2.0](LICENSE-APACHE),
+at your option, like the deckcraft code it ports. See [NOTICE](NOTICE).
+
 ## Attribution
 
 deckcraft: © 2026 ArtCraft Team and the DeckCraft contributors, MIT OR Apache-2.0. Every ported file

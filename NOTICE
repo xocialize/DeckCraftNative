@@ -1,0 +1,13 @@
+DeckCraftNative
+Copyright (c) 2026 Dustin Nielson.
+Licensed under the MIT License or the Apache License, Version 2.0, at your option
+(LICENSE-MIT, LICENSE-APACHE).
+
+DeckCraftNative is a native macOS port of DeckCraft (https://github.com/storytold/deckcraft),
+Copyright (c) 2026 ArtCraft Team and the DeckCraft contributors, used under the MIT License or the
+Apache License, Version 2.0. DeckCraft's licence texts and NOTICE are in LICENSES/deckcraft/; every
+ported file names its source file and licence in its header. DeckCraftNative is not made, sponsored
+or endorsed by the ArtCraft Team, and uses none of the ArtCraft marks.
+
+Third-party material shipped in the app (fonts, the app icon, Swift packages) is listed in
+ATTRIBUTION.md and, with each licence text, in the app's Acknowledgements.txt.
