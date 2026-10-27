@@ -1,0 +1,20 @@
+# in: review.deckcraft
+# Notes, sections, comments and hidden slides as the slide commands see them.
+document.inspect
+slide.inspect={"index":0}
+slide.inspect={"index":1}
+slide.inspect={"index":2}
+slide.notes={"text":"Opening notes.\nA new second paragraph.","index":0}
+slide.inspect={"index":0}
+section.add={"name":"Late","at":2}
+section.move={"index":0,"to":2}
+section.rename={"index":1,"name":"Renamed"}
+slide.duplicate={"index":1}
+slide.selectSlides={"indices":[1,2]}
+slide.hide
+slide.hide
+slide.layout={"layout":"blank"}
+edit.undo
+slide.delete
+document.inspect
+file.info

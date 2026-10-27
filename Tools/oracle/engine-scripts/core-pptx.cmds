@@ -1,0 +1,19 @@
+# in: content.pptx
+# A PowerPoint file opened through file.open: tables, charts and SmartArt read from PPTX, inspected and copied.
+document.inspect
+file.info
+slide.inspect={"index":0}
+slide.inspect={"index":1}
+slide.inspect={"index":2}
+slide.inspect={"index":3}
+slide.go={"index":1}
+edit.selectAll
+edit.copy
+slide.go={"index":3}
+edit.paste
+edit.duplicate
+slide.duplicate={"index":2}
+slide.layout={"layout":"title","index":0}
+slide.move={"from":4,"to":0}
+file.properties={"comments":"Read from PPTX"}
+document.inspect

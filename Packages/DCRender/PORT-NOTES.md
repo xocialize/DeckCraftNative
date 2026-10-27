@@ -1,8 +1,8 @@
 # DCRender — port notes
 
 Port of deckcraft `crates/render` and `crates/pdf` at the pin in `Tools/oracle/pin.env`, onto CoreGraphics.
-Status: **Wave 2**. Morph, transitions and animation frames (`morph_path.rs`, `morph_text.rs`,
-`transition.rs`) belong to Wave 4.
+Status: **Wave 2**, with transitions and Morph (`transition.rs`, `morph_path.rs`, `morph_text.rs` and
+`render_blend`) added in Wave 4. See "Transitions and Morph" below.
 
 ## How it draws
 
@@ -80,6 +80,9 @@ the renderer itself draws as pixels (pictures, metafiles) keeps the detail the d
 | `colr.rs` | not ported (CoreText draws colour glyphs) |
 | vello_cpu `RenderContext` | `Canvas.swift`, `DisplayList.swift` |
 | `crates/pdf/src/lib.rs` | `PDF.swift` (plan, layout, writer), `PDFExport.swift` (export) |
+| `transition.rs`, `render_blend` and `Renderer::blend` in `lib.rs` | `Transition.swift` |
+| `morph_path.rs` | `MorphPath.swift` |
+| `morph_text.rs` | `MorphText.swift` |
 
 ## Parity
 
@@ -126,3 +129,81 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
 - Pattern fills sample their tile in Swift (bilinear, as vello does), because CoreGraphics area-averages
   sub-pixel cells into other colours.
 - The image cache is keyed by the media bytes' storage plus the exact adjustments, not by a hash.
+
+## Transitions and Morph (Wave 4)
+
+These sit on DCAnim, which computes the transition layers, meshes and Morph frames.
+
+### What's here
+
+- **The CPU compositor.** `compositeTransition(old, new, parts, layers)` draws DCAnim's `transitionFrame` over
+  black: every layer's `layerMesh` triangles, sampled bilinearly from premultiplied RGBA8 and blended source-over.
+  The arithmetic is deckcraft's: f64 edge functions with its pixel-centre nudge, then f32 sampling and blending.
+  `SlideParts` holds the background and content renders of both slides (`renderSlidePart`) for the transitions
+  that move contents over backgrounds (`usesSlideParts`).
+  - `renderTransition(pres, index, t, opts)` gives one frame. It is the headless twin of the show's Metal
+    compositor, which draws the same meshes.
+  - DCRender re-exports `Layer`, `Source`, `transitionFrame`, `transitionLayers` and `usesSlideParts`, as
+    deckcraft-render re-exports them.
+- **Morph frames.** `renderBlend(pres, old, new, mix, shapes, text, paths, opts)` does what `render_blend` does:
+  1. it cross-fades the two backdrops;
+  2. it draws DCAnim's `MorphFrame` shapes, each resolved against its own slide;
+  3. it draws text pairs (`TextMorph`) by words or characters (`MorphTextDraw`);
+  4. it morphs outlines (`PathMorph`): DCGeometry's `GeometryMorph`, with a fade per sub-path for fills and lines
+     only one side has.
+  `renderTransition` uses it for Morph, as deckcraft does.
+- **Changes to `Render.swift`.** Outline morphs reach into the shape renderer, as in the Rust, so Wave 4 added
+  three things there:
+  - the `paths` and `morphs` the `Renderer` keeps;
+  - the morph-aware geometry at the top of `geometryShape`;
+  - a per-sub-path `fade` passed to `fillGeometry`, the fill overlay and `drawOutline`. These pass the opacity the
+    Wave 2 code already took as `1`.
+
+  Nothing changes for a shape that isn't morphing.
+
+### Divergences
+
+- **The outline-morph cache is shared.** deckcraft keeps aligned outlines in each thread's long-lived renderer. A
+  `Renderer` here lives for one frame, so `MorphPathCache.shared` keeps them across frames, under a lock, swept at
+  the end of each `blend` as in the Rust. It is capped at 256 entries.
+- **No panic guard.** `render_blend` and `render_slide_part` catch panics and draw a blank or the new slide.
+  Swift has no unwinding. The ported code checks its input instead (indices, sizes, non-finite numbers).
+- **Unchecked pointers, checked indices.** The compositor's per-pixel loop reads and writes through unsafe buffer
+  pointers, but checks every index against the buffer first. Unoptimised, Swift's generic conversions and SIMD
+  subscripts made it about twice as slow.
+
+### Parity
+
+- **The compositor is bit-identical to deckcraft-render's `composite_transition`** (`CompositeVectorTests`). The
+  test covers 3,720 frames: every transition and option at 5 times, composited from generated images with and
+  without an old slide and with and without slide parts. The anim-vectors tool writes the hashes
+  (DCAnim/PORT-NOTES.md).
+- **Frames against the oracle's PNGs** (`TransitionParityTests`):
+  - all 45 transition frames of the corpus (sample, content and motion decks, at 0.25, 0.5 and 0.75, scale 2),
+    Morph included;
+  - 112 frames of `Tools/oracle/engine-scripts/transitions.cmds`: every transition kind on slides with their own
+    backgrounds and contents, and Morph by objects, words and characters. Drawn by anim-vectors/run.sh with
+    `render-transition --width 640`, at 0.35 and 0.65.
+
+  Measured 2026-10-26 (SSIMULACRA2, and the largest share of pixels more than 8 levels apart):
+
+  | Deck | Frames | Min | Mean | Differing ≤ |
+  |---|---:|---:|---:|---:|
+  | sample | 24 | 90.2 | 91.9 | 0.56% |
+  | content | 12 | 90.6 | 93.6 | 0.13% |
+  | motion | 9 | 91.1 | 94.7 | 0.08% |
+  | transitions | 112 | 89.0 | 92.6 | 0.47% |
+
+  The floors are 88 for the corpus and 87 for the transitions deck. The Morph frames score 89.9–93.6; its words and
+  characters frames score 89.9–93.2. As with slides, the rest is anti-aliasing: the compositing itself is exact.
+  Run it in release:
+
+  ```bash
+  swift test -c release -Xswiftc -enable-testing --filter TransitionParityTests --scratch-path .build-anim-rel
+  ```
+
+  The report is `.build-parity/transition-parity/report-<deck>.json`.
+- **Tests.** All 6 in-file tests of `transition.rs` are ported (`TransitionRenderTests`): compositing, the
+  PowerPoint probes, every transition starting old and ending new, and dynamic content. So are the 6 Morph tests of
+  `tests.rs` that Wave 2 skipped: `render_blend` ends and backdrops, text tokens, text and path morph ends, fill
+  fades, and aligning once per transition.

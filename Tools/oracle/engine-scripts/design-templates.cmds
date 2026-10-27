@@ -1,0 +1,57 @@
+# The Design tab on every template's starter deck (templates.rs + cmd/design.rs): theme, variant, fonts,
+# slide size and header & footer applied to each, the last one saved.
+file.new={"template":"Briefing"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Briefing","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+file.new={"template":"Lesson"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Lesson","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+file.new={"template":"Pitch"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Pitch","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+file.new={"template":"Field Notes"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Field Notes","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+file.new={"template":"Quarterly"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Quarterly","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+file.new={"template":"Evening Talk"}
+design.variants
+design.variant={"index":2}
+design.theme={"name":"Slate"}
+design.fonts={"name":"Talk","major":"Lato"}
+design.slideSize={"preset":"standard"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Evening Talk","hideOnTitle":true}
+design.ideas={"slide":1}
+slide.inspect={"index":1}
+document.inspect

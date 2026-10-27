@@ -1,0 +1,25 @@
+# Insert › Zoom (cmd/zoom.rs): slide, section and summary zooms as linked pictures of their targets, Return to
+# Zoom, the summary slide, layouts of one to many tiles; the refusals last.
+slide.new={"title":"Intro"}
+slide.new={"title":"Plan"}
+slide.new={"title":"Budget\nand more"}
+slide.new={"title":"Risks"}
+slide.new
+slide.go={"index":0}
+insert.zoom={"slides":[2]}
+insert.zoom={"slides":[1,2,3,3,5],"returnToZoom":true}
+section.add={"name":"Start","at":0}
+section.add={"name":"Money","at":3}
+insert.zoom={"kind":"section","sections":[1]}
+insert.zoom={"kind":"section","sections":[0,1],"returnToZoom":false}
+slide.inspect
+insert.zoom={"kind":"summary","slides":[3,1]}
+slide.inspect
+insert.zoom={"kind":"summary"}
+design.slideSize={"w":720,"h":540}
+insert.zoom={"slides":[0,1,2,3,4,5,6]}
+slide.inspect
+!insert.zoom={"slides":[42]}
+!insert.zoom={"kind":"slide"}
+!insert.zoom={"kind":"section","sections":[5]}
+!insert.zoom={"kind":"tile","slides":[1]}

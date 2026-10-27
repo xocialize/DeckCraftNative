@@ -1,0 +1,103 @@
+# in: sample.deckcraft
+# Editing text in place: entering and leaving text, typing, caret moves, selections, deletion, AutoCorrect,
+# smart quotes, automatic lists, the input method and Replace Fonts (cmd/text.rs).
+text.edit={"id":258}
+text.get
+text.move={"to":"start"}
+text.move={"to":"wordRight","extend":true}
+text.insert={"text":"Southern"}
+text.move={"to":"end"}
+text.insert={"text":" tour"}
+text.delete
+text.delete={"dir":"wordBackward"}
+text.move={"to":"left"}
+text.move={"to":"right","extend":true}
+text.move={"to":"left"}
+text.move={"to":"wordLeft"}
+text.move={"to":"paraStart"}
+text.move={"to":"paraEnd","extend":true}
+text.move={"to":"paraUp"}
+text.move={"to":"paraDown"}
+text.move={"to":"start","extend":true}
+text.selectWord={"at":[0,3]}
+text.selectParagraph
+text.selectAll
+text.insert={"text":"teh"}
+text.insert={"text":" "}
+text.insert={"text":"quick (c) "}
+text.insert={"text":"1st"}
+text.insert={"text":" "}
+text.insert={"text":"\""}
+text.insert={"text":"x"}
+text.insert={"text":"\""}
+text.insert={"text":" seperate"}
+text.insert={"text":","}
+text.insert={"text":" "}
+text.insert={"text":"monday"}
+text.insert={"text":"."}
+text.insert={"text":" wow..."}
+text.insert={"text":" "}
+text.insert={"text":"THe"}
+text.insert={"text":" "}
+text.insert={"text":"cAPS"}
+text.insert={"text":" "}
+text.insert={"text":"1/2"}
+text.insert={"text":" "}
+text.get
+text.autocorrect
+text.autocorrect={"add":["dc","DeckCraft"],"remove":"teh","days":false}
+text.insert={"text":" dc"}
+text.insert={"text":" "}
+text.insert={"text":" teh"}
+text.insert={"text":" "}
+text.autocorrect={"remove":"dc","add":["  xx  ","yy"]}
+text.get
+text.insert={"text":"\n"}
+text.insert={"text":"*"}
+text.insert={"text":" "}
+text.insert={"text":"first"}
+text.insert={"text":"\n"}
+text.insert={"text":"1"}
+text.insert={"text":"."}
+text.insert={"text":" "}
+text.delete
+text.get
+text.insert={"text":"line\u000bbreak"}
+text.compose={"text":"にほ","active":[0,2]}
+text.compose={"text":"日本","active":[0,1]}
+text.commit={"text":"日本語"}
+text.compose={"text":"x"}
+text.compose={"text":""}
+text.commit={"text":"!"}
+text.deleteSurrounding={"before":1,"after":0}
+text.select={"anchor":[0,0],"caret":[0,3]}
+text.deleteSurrounding={"before":0,"after":2,"bytes":true}
+text.move={"to":"start"}
+text.delete={"dir":"forward"}
+text.delete={"dir":"wordForward"}
+text.get
+text.exit
+text.set={"id":259,"text":"Line one\n\tIndented two\nThree مرحبا"}
+text.get={"id":259}
+text.edit={"id":259,"at":[1,0]}
+text.delete
+text.get
+text.exit
+font.used
+font.replace={"from":"inter","to":"Lato"}
+font.used
+font.replace={"from":"Nope Sans","to":"Lato"}
+edit.undo
+text.edit={"notes":true}
+text.insert={"text":"Speaker notes typed here"}
+text.exit
+text.edit={"id":260}
+text.insert={"text":"Band"}
+text.exit
+text.edit={"id":260,"at":[0,2]}
+text.selectWord
+text.insert={"text":"لا"}
+text.get
+edit.undo
+edit.undo
+text.exit

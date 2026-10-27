@@ -11,6 +11,11 @@
 #   oracle.sh text-vectors       write deckcraft-text's layouts of the corpus to $DECKCRAFT_FIXTURES/text/
 #   oracle.sh display-vectors    write Rust's `{}` of the json-vectors floats to $DECKCRAFT_FIXTURES/json/display-*.txt
 #   oracle.sh pptx-vectors       write deckcraft-pptx's xml, opc and support-module output to $DECKCRAFT_FIXTURES/pptx/
+#   oracle.sh media-vectors      write deckcraft-media's probe and decode results to $DECKCRAFT_FIXTURES/media/
+#   oracle.sh engine-vectors [NAME…]  run engine-scripts/*.cmds (or the named ones) with --print: each command's
+#                                answer and the final deck, in $DECKCRAFT_FIXTURES/engine/
+#   oracle.sh anim-vectors       write deckcraft-anim's and the transition compositor's output, and transition frames
+#                                of engine/transitions.deckcraft, to $DECKCRAFT_FIXTURES/anim/
 #   oracle.sh path               print the binary's path
 #
 # Environment (defaults in brackets):
@@ -156,6 +161,61 @@ cmd_pptx_vectors() {
   $here/pptx-vectors/run.sh
 }
 
+# deckcraft-media's probe and decode results over generated media and mutations, for DCMedia's parity test.
+# The inputs come from DCMediaTests (DCMEDIA_WRITE_INPUTS=1): write them first.
+cmd_media_vectors() {
+  $here/media-vectors/run.sh
+}
+
+# deckcraft-anim (timelines, show state machine, transition layers and meshes, Morph, paths, easing) and the
+# transition compositor over the corpus and generated cases, for DCAnim's and DCRender's bit-exact tests; and
+# deckcraft's frames of every transition kind, for TransitionParityTests. Run `engine-vectors transitions` first.
+cmd_anim_vectors() {
+  $here/anim-vectors/run.sh
+}
+
+# The engine's command answers and resulting decks, for DCEngine's script parity. Each script in
+# engine-scripts/ is one run (`--in` a corpus deck when its first line is `# in: <deck>`, else a new
+# presentation), so scripts can be added and regenerated one at a time. Writes <name>.results.txt (one
+# `id → json` line per command, as --print prints it) and <name>.deckcraft.
+cmd_engine_vectors() {
+  check_binary
+  [[ -d $DECKCRAFT_FIXTURES ]] || die "no fixtures repository at $DECKCRAFT_FIXTURES"
+  local out=$DECKCRAFT_FIXTURES/engine scripts=$here/engine-scripts
+  mkdir -p $out
+  local names=("$@")
+  (( $#names )) || names=($scripts/*.cmds(N:t:r))
+  local name script args line first input err
+  local -a refusals
+  for name in $names; do
+    script=$scripts/$name.cmds
+    [[ -f $script ]] || die "no script $script"
+    args=()
+    first=$(head -1 $script)
+    if [[ $first == '# in: '* ]]; then
+      input=$DECKCRAFT_FIXTURES/oracle/$short/decks/${first#\# in: }
+      [[ -f $input ]] || die "$name: no deck $input"
+      args+=(--in $input)
+    fi
+    refusals=()
+    while IFS= read -r line; do
+      [[ -z $line || $line == \#* ]] && continue
+      if [[ $line == '!'* ]]; then
+        # An error case (`!id=json`): run it after the commands before it, and record its error. The main run
+        # leaves it out (a refused command changes nothing).
+        if err=$($bin run $args --cmd ${line#!} 2>&1 >/dev/null); then die "$name: \`${line#!}\` was expected to fail"; fi
+        refusals+=("${line#!}"$'\t'"${err#deckcraft-cli: }")
+        continue
+      fi
+      args+=(--cmd $line)
+    done < $script
+    $bin run $args --print --save $out/$name.deckcraft > $out/$name.results.txt || die "$name failed (see $out/$name.results.txt)"
+    if (( $#refusals )); then print -rl -- $refusals > $out/$name.errors.txt; else rm -f $out/$name.errors.txt; fi
+  done
+  (cd $out && find . -type f ! -name SHA256SUMS | LC_ALL=C sort | xargs shasum -a 256 > SHA256SUMS)
+  print "oracle: engine vectors at $out ($#names scripts)"
+}
+
 case ${1:-} in
   build) cmd_build ;;
   geom-vectors) cmd_geom_vectors ;;
@@ -163,9 +223,12 @@ case ${1:-} in
   text-vectors) cmd_text_vectors ;;
   display-vectors) cmd_display_vectors ;;
   pptx-vectors) cmd_pptx_vectors ;;
+  engine-vectors) shift; cmd_engine_vectors "$@" ;;
+  media-vectors) cmd_media_vectors ;;
+  anim-vectors) cmd_anim_vectors ;;
   json-vectors) cmd_json_vectors ;;
   cli) shift; cli "$@" ;;
   corpus) cmd_corpus ;;
   path) print -r -- $bin ;;
-  *) sed -n '2,17p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
+  *) sed -n '2,19p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
 esac

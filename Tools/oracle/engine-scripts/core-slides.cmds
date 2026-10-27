@@ -1,0 +1,48 @@
+# Slides, layouts, sections, notes, navigation and inspection: cmd/slide.rs and cmd/inspect.rs.
+slide.new={"layout":"titleAndContent","title":"Agenda","body":"One\n\tTwo\n\t\tThree\nFour"}
+slide.new={"layout":"twoContent","title":"Compare"}
+slide.new={"layout":"sectionHeader","title":"Part two","at":1}
+slide.new={"layout":"comparison","title":"Either or"}
+slide.new={"layout":"pictureWithCaption","title":"A picture","body":"Caption text"}
+slide.new
+slide.duplicate={"index":1}
+slide.move={"from":0,"to":3}
+slide.hide={"index":2}
+slide.hide={"index":2,"hidden":true}
+slide.rename={"name":"Renamed","index":1}
+slide.notes={"text":"Speaker notes\nSecond line","index":0}
+slide.notes={"text":"Speaker notes\nSecond line, edited","index":0}
+section.add={"name":"Intro","at":0}
+section.add={"name":"Middle","at":2}
+section.add={"at":4}
+section.rename={"index":1,"name":"Core"}
+section.move={"index":1,"to":0}
+slide.layout={"layout":"comparison","index":2}
+slide.layout={"layout":"Title Only","index":3}
+slide.reset={"index":2}
+slide.go={"index":1}
+slide.next
+slide.previous
+slide.last
+slide.first
+slide.selectSlides={"indices":[0,2]}
+slide.selectRange={"to":3}
+slide.selectRange={"to":5}
+slide.selectRange={"from":4,"to":1,"add":true}
+slide.go={"index":2}
+slide.fromOutline={"text":"Outline A\n\tpoint one\n\tpoint two\nOutline B"}
+slide.fromOutline={"text":"# Heading\n- bullet one\n- bullet two\n\n# Second\nplain","markdown":true}
+document.inspect
+slide.inspect={"index":1}
+slide.inspect={"index":4}
+file.info
+section.remove={"index":0}
+slide.delete={"index":0}
+section.removeAll
+edit.undo
+edit.undo
+edit.redo
+slide.delete={"ids":[999999]}
+file.properties={"title":"Core script","author":"DeckCraft","company":"Mountain"}
+file.info
+document.inspect

@@ -1,0 +1,130 @@
+# Insert tab (cmd/insert.rs): shapes, the shape and icon galleries, icons, text boxes, tables, charts and their
+# editing, WordArt, action buttons, Action Settings, links and fields; the refusals last.
+shape.presets
+insert.icons
+slide.new={"layout":"blank"}
+shape.insert
+shape.insert={"preset":"roundRect","rect":[100,100,200,100],"text":"Hi"}
+shape.insert={"preset":"ellipse","rect":[10,20,30,40],"flip":"hv"}
+shape.insert={"preset":"star5","adj":[30000],"text":"Two\nlines"}
+shape.insert={"preset":"rightArrow","rect":[300,300,120,60],"flip":"v"}
+shape.insert={"preset":"line","rect":[50,400,200,0]}
+shape.insert={"preset":"straightConnector1","rect":[50,420,200,10]}
+shape.insert={"preset":"bentConnector3","rect":[50,440,200,40]}
+shape.insert={"preset":"triangle","rect":[-60,300,120,80]}
+shape.insert={"preset":"chevron","rect":[400,100,80,40],"text":""}
+slide.inspect
+insert.icon={"name":"star"}
+insert.icon={"name":"arrow-right","rect":[200,200,96,96]}
+insert.icon={"name":"Arrow up","rect":[0,0,10,30]}
+insert.icon={"name":"arrow_down","rect":[600,10,500,300]}
+insert.icon={"name":"heart","rect":[20,20,1,1]}
+insert.icon={"name":"refresh-cw"}
+insert.icon={"name":"undo-2"}
+slide.new={"layout":"blank"}
+insert.textBox
+text.insert={"text":"typed into a new box"}
+text.exit
+insert.textBox={"rect":[100,100,300,50],"text":"A text box"}
+insert.textBox={"rect":[100,200,0,0],"text":"click to create grows sideways"}
+insert.textBox={"rect":[100,300,200,20],"text":"line one\nline two\nline three"}
+insert.wordArt
+insert.wordArt={"text":"Bold accent","style":1}
+insert.wordArt={"text":"Outlined","style":2}
+insert.wordArt={"text":"Style three","style":3}
+insert.wordArt={"text":"Style five","style":5}
+slide.inspect
+slide.new={"layout":"blank"}
+insert.table
+insert.table={"rows":3,"cols":4,"data":[["a","b","c"],["d",1,"f"],["g"]]}
+insert.table={"rows":0,"cols":500,"rect":[10,10,400,100]}
+insert.chart
+insert.chart={"type":"pie","title":"Share","categories":["A","B",3],"series":[{"name":"S","values":[1,2,null]}]}
+insert.chart={"type":"stacked-bar","rect":[20,20,300,200]}
+insert.chart={"type":"Box Whisker"}
+insert.chart={"type":"waterfall","series":[{"values":[5,-2,3]},{"name":"x"}]}
+chart.type={"type":"line"}
+chart.type={"type":"doughnut"}
+chart.type={"type":"histogram"}
+chart.data={"categories":["Q1","Q2"],"levels":[["H1","H1"],["Y"]],"series":[{"name":"One","values":[4,5]},{"name":"Two","values":[1]}]}
+chart.options={"title":"Totals","legend":"t","dataLabels":true,"gridlines":false,"palette":"colorful2"}
+chart.options={"binCount":5}
+chart.options={"binSize":2.5}
+chart.options={"binCount":null,"binSize":null}
+chart.options={"binCount":5000}
+chart.options={"subtotals":[3,1,1,99],"upDownBars":true,"quartiles":"Inclusive"}
+chart.options={"textColor":"#FF0000"}
+chart.options={"textColor":"accent2"}
+chart.options={"textColor":null,"title":null,"legend":null}
+slide.inspect
+slide.new={"layout":"blank"}
+insert.actionButton
+insert.actionButton={"kind":"back"}
+insert.actionButton={"kind":"forward","rect":[10,10,40,40]}
+insert.actionButton={"kind":"beginning"}
+insert.actionButton={"kind":"end"}
+insert.actionButton={"kind":"home"}
+insert.actionButton={"kind":"information"}
+insert.actionButton={"kind":"return"}
+insert.actionButton={"kind":"movie"}
+insert.actionButton={"kind":"document"}
+insert.actionButton={"kind":"sound"}
+insert.actionButton={"kind":"help"}
+insert.actionButton={"kind":"previous"}
+insert.actionButton={"kind":"next"}
+shape.insert={"preset":"rect","rect":[0,0,50,50]}
+shape.action={"action":"slide","slide":0,"highlight":false}
+shape.action={"on":"hover","action":"url","url":"https://example.com","tooltip":"tip"}
+shape.action={"action":"next"}
+shape.action={"action":"previous"}
+shape.action={"action":"first"}
+shape.action={"action":"last"}
+shape.action={"action":"lastViewed"}
+shape.action={"action":"endShow"}
+shape.action={"action":"playMedia"}
+shape.action={"action":"program","path":"/Applications/Calculator.app"}
+shape.action={"on":"over","action":"none"}
+shape.action={"action":"none"}
+insert.hyperlink={"url":"https://example.org","tooltip":"go","highlightClick":true}
+insert.hyperlink={"slide":1}
+insert.hyperlink={"slide":0,"text":"start"}
+insert.hyperlink={"url":"mailto:a@b.org"}
+slide.inspect
+slide.go={"index":0}
+text.edit={"id":258}
+text.insert={"text":"See "}
+insert.hyperlink={"url":"https://example.org"}
+text.insert={"text":" and "}
+insert.hyperlink={"url":"mailto:a@b.org"}
+text.insert={"text":" "}
+insert.hyperlink={"slide":2,"text":"slide three"}
+insert.symbol={"text":"€Ω"}
+insert.slideNumber
+text.exit
+insert.slideNumber
+insert.dateTime
+slide.inspect
+!shape.insert={"preset":"notAShape"}
+!insert.icon={}
+!insert.icon={"name":"not-an-icon"}
+!insert.icon={"name":"star","rect":[0,0,0.5,10]}
+!insert.symbol={"text":"x"}
+!insert.symbol={}
+!insert.hyperlink={}
+!insert.hyperlink={"slide":99}
+!shape.action={"action":"slide","slide":99}
+!shape.action={"action":"url"}
+!shape.action={"action":"url","url":"  "}
+!shape.action={"action":"customShow","show":"nope"}
+!shape.action={"on":"drag","action":"next"}
+!shape.action={"action":"jump"}
+!shape.action={"action":"slide"}
+!chart.type={"type":"bar"}
+!chart.options={"binSize":-1}
+!chart.options={"textColor":"reddish"}
+!insert.dateTime={"format":"datetime14"}
+!insert.dateTime={"format":null}
+!insert.dateTime={"update":"yes"}
+!insert.dateTime={"language":"de-DE"}
+!insert.dateTime={"language":""}
+!insert.dateTime={"format":"datetime2","language":"fr-FR"}

@@ -1,0 +1,30 @@
+# Selection, clipboard, duplicate, delete, undo and redo: cmd/edit.rs and cmd/selection.rs.
+slide.new={"layout":"titleAndContent","title":"Clipboard","body":"Body text\n\tSecond level"}
+edit.selectAll
+edit.copy
+edit.paste
+edit.paste
+edit.duplicate
+edit.duplicate
+edit.undo
+edit.redo
+selection.hideAll
+selection.showAll
+edit.selectAll
+shape.inspect
+edit.deselect
+edit.selectAll={"scope":"slides"}
+edit.copy={"scope":"slides"}
+edit.paste
+slide.go={"index":0}
+edit.deselect
+edit.selectAll
+edit.cut
+edit.undo
+edit.delete
+slide.inspect
+edit.undo
+edit.undo
+edit.undo
+edit.redo
+document.inspect

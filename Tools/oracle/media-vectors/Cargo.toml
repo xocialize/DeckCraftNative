@@ -1,0 +1,20 @@
+[package]
+name = "media-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Runs deckcraft-media's probe_headers, probe, audio::decode and VideoDecoder over generated media files and deterministic mutations of them, and writes what they return, so DCMedia can be checked against them."
+
+# deckcraft-media from the pinned checkout, with deckcraft's own dependencies at the versions its
+# Cargo.lock pins (that lockfile seeds this one).
+[dependencies]
+deckcraft-media = { path = "../../../../deckcraft/crates/media" }
+
+# deckcraft's release profile.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 16
+debug = 0
+
+[workspace]

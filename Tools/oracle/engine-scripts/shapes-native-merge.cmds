@@ -1,0 +1,63 @@
+# in: shapes.deckcraft
+# Merge Shapes (cmd/merge.rs). CoreGraphics' path booleans stand in for i_overlay, so the outlines are
+# compared by area and box, not by path text: ShapesScriptTests compares this script, EngineScriptTests
+# leaves it out.
+slide.go={"index":1}
+shape.move={"x":200,"ids":[262]}
+shape.move={"x":380,"y":100,"ids":[263]}
+shape.move={"x":500,"y":250,"ids":[266]}
+shape.move={"x":200,"y":150,"ids":[264]}
+shape.rotate={"deg":20,"ids":[265]}
+shape.merge={"op":"union","ids":[261,262]}
+shape.inspect={"id":267}
+shape.merge={"op":"combine","ids":[263,264]}
+shape.inspect={"id":268}
+slide.inspect={"index":1}
+edit.undo
+edit.undo
+shape.merge={"op":"intersect","ids":[262,263]}
+edit.undo
+shape.merge={"op":"intersect","ids":[261,262,264]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"subtract","ids":[264,265,266]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"subtract","ids":[262,261,264]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"fragment","ids":[262,263]}
+shape.inspect={"id":267}
+shape.inspect={"id":268}
+edit.undo
+shape.merge={"op":"fragment","ids":[261,262,264]}
+shape.inspect={"id":267}
+shape.inspect={"id":268}
+shape.inspect={"id":269}
+shape.inspect={"id":270}
+shape.inspect={"id":271}
+shape.inspect={"id":272}
+shape.inspect={"id":273}
+edit.undo
+shape.merge={"op":"combine","ids":[261,262,264]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"UNION","ids":[264,265]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"union","ids":[265,266]}
+shape.inspect={"id":267}
+edit.undo
+shape.merge={"op":"subtract","ids":[261,266]}
+slide.inspect={"index":1}
+edit.select={"ids":[262,263,264]}
+shape.merge={"op":"fragment"}
+slide.inspect={"index":1}
+edit.selectAll
+shape.merge={"op":"union"}
+shape.inspect={"id":273}
+slide.inspect={"index":1}
+# Refusals.
+!shape.merge={"op":"xor","ids":[273,265]}
+!shape.merge={"op":"union","ids":[273]}
+!shape.merge={"op":"union","ids":[273,9999]}

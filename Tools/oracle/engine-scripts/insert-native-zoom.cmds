@@ -1,0 +1,11 @@
+# Insert › Zoom's pictures (cmd/zoom.rs) are slides rendered to PNG: ImageIO writes them, so their bytes differ
+# from deckcraft's; InsertNativeScriptTests compares them by pixel size.
+slide.new={"title":"Intro"}
+slide.new={"title":"Plan"}
+section.add={"name":"Start","at":0}
+section.add={"name":"Later","at":2}
+slide.go={"index":0}
+insert.zoom={"slides":[1]}
+insert.zoom={"kind":"section","sections":[1]}
+insert.zoom={"kind":"summary"}
+document.inspect

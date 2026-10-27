@@ -1,0 +1,34 @@
+# in: effects.deckcraft
+# Connectors, connection sites, freeforms and Ink to Shape (cmd/shape.rs).
+slide.go={"index":1}
+shape.sites={"id":261}
+shape.sites={"id":262}
+shape.sites={"id":265}
+shape.connect={"from":261,"to":262,"id":265}
+shape.inspect={"id":265}
+shape.move={"dx":30,"dy":100,"ids":[262]}
+shape.inspect={"id":265}
+shape.connect={"from":263,"to":266,"fromSite":2,"toSite":0,"id":265}
+shape.connect={"from":263,"to":266,"fromSite":99,"id":265}
+shape.inspect={"id":265}
+shape.connect={"from":261,"to":267}
+shape.connect={"from":264,"to":266,"preset":"bentConnector3"}
+shape.connect={"from":264,"to":261,"preset":"curvedConnector3","toSite":1}
+slide.inspect={"index":1}
+shape.freeform={"points":[[100,100],[200,120],[150,220]],"closed":true}
+shape.freeform={"points":[[300,300],[400,300],[400,400]]}
+shape.freeform={"points":[[500,100],[550,50],[600,100],[650,50]],"smooth":true}
+shape.freeform={"points":[[500,100],[550,50],[600,100],[650,50]],"smooth":true,"closed":true}
+shape.freeform={"points":[[10.123,10.456],[20.0049,30.995],["x",1],[40,-0.001]],"closed":true}
+shape.freeform={"points":[[1,1],[1,1]]}
+slide.inspect={"index":1}
+draw.inkToShape
+# Refusals.
+!shape.connect={"from":261}
+!shape.connect={"from":261,"to":277}
+!shape.connect={"from":261,"to":262,"id":263}
+!shape.connect={"from":261,"to":262,"preset":"rect"}
+!shape.sites={}
+!shape.sites={"id":9999}
+!shape.freeform={"points":[[1,1]]}
+!shape.freeform={}

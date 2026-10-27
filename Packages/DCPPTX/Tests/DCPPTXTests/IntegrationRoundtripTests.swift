@@ -1243,7 +1243,7 @@ extension IntegrationRoundtripTests {
     // Built without the engine: `transition.set fade` and `transition.sound {data, name: chime.wav}` set
     // the first slide's transition and embed the sound (content type `audio/wav`, as the engine's
     // `content_type` names a RIFF/WAVE file). The command's own results (`playable`, No Sound, the
-    // refusal of a file that isn't audio) need DCEngine (wave 4).
+    // refusal of a file that isn't audio) are tested in DCEngineTests (TransitionCommandTests).
     @Test func transitionSoundIsSetSavedAndRemoved() throws {
         var doc = newPresentation(nil)
         tailSetTransition(&doc, 0, "fade")
@@ -1253,14 +1253,6 @@ extension IntegrationRoundtripTests {
         doc.slides[0].transition?.sound = m
         doc.slides[0].transition?.stopSound = false
         doc.slides[0].transition?.soundLoop = false
-        #if DCENGINE
-        let b64 = Data(IT.wav(800)).base64EncodedString()
-        var s = Session.withNew()
-        try s.execute("transition.set", ["kind": "fade"])
-        let r = try s.execute("transition.sound", ["data": b64, "name": "chime.wav"])
-        #expect(r["playable"] == true, "\(r)")
-        let doc = s.doc().doc
-        #endif
         let set = try #require(doc.slides[0].transition?.sound, "sound set")
         #expect(doc.media(set)?.name == "chime.wav")
         let bytes = try PPTX.export(doc)
@@ -1269,12 +1261,6 @@ extension IntegrationRoundtripTests {
         #expect(t.kind == "fade")
         let saved = try #require(t.sound, "sound survives the save")
         #expect(back.media(saved)?.data.count == IT.wav(800).count)
-        #if DCENGINE
-        try s.execute("transition.sound", ["none": true])
-        #expect(s.doc().doc.slides[0].transition.map { $0.sound == nil } ?? false)
-        let notAudio = Data("hello, not a sound".utf8).base64EncodedString()
-        #expect(throws: (any Error).self) { try s.execute("transition.sound", ["data": notAudio, "name": "notes.txt"]) }
-        #endif
     }
 
     /// Built-in transition sounds, Loop Until Next Sound and [Stop Previous Sound] are set, saved as
@@ -1284,7 +1270,7 @@ extension IntegrationRoundtripTests {
     // gives them (the built-in Chime as `Chime.wav`, looping on slide 1; again on slide 2; Stop Previous
     // Sound on slide 3). The engine's built-in sound bytes are its own; any WAV stands in for them here.
     // Embedding a built-in sound once, turning the loop off alone and refusing an unknown built-in are
-    // the command's and need DCEngine (wave 4).
+    // the command's, tested in DCEngineTests (TransitionCommandTests).
     @Test func transitionSoundOptionsRoundTrip() throws {
         var doc = newPresentation(nil)
         let layout = layoutOfKind(doc, .titleAndContent) ?? LayoutId.default
@@ -1317,13 +1303,6 @@ extension IntegrationRoundtripTests {
         #expect(t[0].sound != nil && t[0].soundLoop && !t[0].stopSound)
         #expect(t[1].sound != nil && !t[1].soundLoop)
         #expect(t[2].sound == nil && t[2].stopSound, "\(t[2])")
-        #if DCENGINE
-        // Turning the loop off alone keeps the sound.
-        try s.execute("transition.sound", ["loop": false, "index": 0])
-        let t0 = try #require(s.doc().doc.slides[0].transition)
-        #expect(t0.sound != nil && !t0.soundLoop)
-        #expect(throws: (any Error).self) { try s.execute("transition.sound", ["builtin": "foghorn"]) }
-        #endif
     }
 
     // Rust: it/roundtrip.rs::literal_line_ends_in_run_text_read_as_breaks_and_survive_save
@@ -1556,113 +1535,6 @@ extension IntegrationRoundtripTests {
         }
     }
 
-    /// Home › New Slide › Reuse Slides: slides from another .pptx land after the current slide with
-    /// their pictures (fresh media ids, same bytes) and animations on the renumbered shapes. By
-    /// default they take a destination layout; Keep Source Formatting brings the source master.
-    // Rust: it/roundtrip.rs::reuse_slides_from_another_presentation
-    // `slide.reuse` is the engine's: it merges another deck's slides, media and masters.
-    @Test(.disabled("needs DCEngine (wave 4)")) func reuseSlidesFromAnotherPresentation() throws {
-        let pic = IT.png(8, 8, (10, 200, 30))
-        let red = IT.png(4, 4, (200, 0, 0))
-        _ = (pic, red)
-        #if DCENGINE
-        let b64 = { (d: [UInt8]) in Data(d).base64EncodedString() }
-        // Source: three slides, a picture with an animation on the second.
-        var src = Session.withNew()
-        try src.execute("slide.new", [:])
-        try src.execute("insert.picture", ["data": b64(pic), "name": "green.png"])
-        try src.execute("animation.add", ["effect": "fade"])
-        try src.execute("slide.new", [:])
-        let srcBytes = try PPTX.export(src.doc().doc)
-
-        var s = Session.withNew()
-        // Media ids in the two decks overlap; the destination's own picture must stay its own.
-        try s.execute("insert.picture", ["data": b64(red), "name": "red.png"])
-        var r = try s.execute("slide.reuse", ["data": b64(srcBytes), "name": "src.pptx", "slides": [1]])
-        #expect(r["slides"] == 1, "\(r)")
-        var doc = s.doc().doc
-        #expect(doc.slides.count == 2)
-        #expect(s.doc().selection.slide == 1, "the reused slide is selected")
-        func pictures(_ sl: Slide) -> [MediaId] {
-            var v: [MediaId] = []
-            walk(sl.shapes) { sh, _ in
-                if case .picture(let fill) = sh.kind { v.append(fill.media) }
-            }
-            return v
-        }
-        let mine = pictures(doc.slides[0])
-        let reused = pictures(doc.slides[1])
-        #expect(doc.media(mine[0])?.data == red, "own picture untouched")
-        #expect(doc.media(reused[0])?.data == pic, "reused picture copied")
-        let anim = doc.slides[1].animations[0]
-        #expect(doc.slides[1].shapes.contains { $0.id == anim.shape }, "animation follows its shape")
-        #expect(doc.layout(doc.slides[1].layout) != nil, "uses a destination layout")
-        #expect(doc.masters.count == 1)
-        // The result saves and reopens.
-        let back = try IT.round(doc)
-        #expect(back.slides.count == 2)
-
-        // Keep Source Formatting: every slide, and the source master comes along.
-        r = try s.execute("slide.reuse", ["data": b64(srcBytes), "name": "src.pptx", "keepFormatting": true, "at": 0])
-        #expect(r["slides"] == 3)
-        doc = s.doc().doc
-        #expect(doc.slides.count == 5)
-        #expect(doc.masters.count == 2)
-        for sl in doc.slides[..<3] {
-            #expect(doc.layout(sl.layout)?.master.id == doc.masters[1].id, "source master")
-        }
-        // One undo removes the whole reuse.
-        try s.execute("edit.undo", [:])
-        #expect(s.doc().doc.slides.count == 2)
-        #expect(throws: (any Error).self) { try s.execute("slide.reuse", ["data": b64(srcBytes), "name": "src.pptx", "slides": [7]]) }
-        #expect(throws: (any Error).self) { try s.execute("slide.reuse", ["data": b64([0, 159, 146, 150]), "name": "x.bin"]) }
-        #endif
-    }
-
-    /// Picture Format › Compress Pictures: a big picture shown small is downsampled, its original
-    /// goes when nothing else uses it, the saved file shrinks, a copy that wasn't compressed keeps
-    /// the original, and undo brings everything back.
-    // Rust: it/roundtrip.rs::compress_pictures_shrinks_the_file_and_keeps_shared_originals
-    // `picture.compress` (downsampling, sharing, undo) is the engine's.
-    @Test(.disabled("needs DCEngine (wave 4)")) func compressPicturesShrinksTheFileAndKeepsSharedOriginals() throws {
-        // A noisy 1600 × 1600 picture (doesn't compress away on its own).
-        let big = IT.pngFrom(1600, 1600) { x, y in
-            (UInt8(truncatingIfNeeded: x * 31 % 251), UInt8(truncatingIfNeeded: y * 17 % 253), UInt8(truncatingIfNeeded: (x * y) % 255))
-        }
-        _ = big
-        #if DCENGINE
-        let b64 = { (d: [UInt8]) in Data(d).base64EncodedString() }
-        var s = Session.withNew()
-        try s.execute("insert.picture", ["data": b64(big), "name": "noise.png"])
-        try s.execute("shape.resize", ["w": 144, "h": 144])
-        let sizeBefore = try PPTX.export(s.doc().doc).count
-        let r = try s.execute("picture.compress", ["ppi": 150])
-        #expect(r["pictures"] == 1, "\(r)")
-        var doc = s.doc().doc
-        #expect(doc.media.count == 1, "the original is gone")
-        let size = try #require(IT.imageSize(doc.media[0].data))
-        #expect(size == (300, 300), "2 in at 150 ppi")
-        let sizeAfter = try PPTX.export(doc).count
-        #expect(sizeAfter * 4 < sizeBefore, "\(sizeBefore) → \(sizeAfter)")
-        try s.execute("edit.undo", [:])
-        #expect(s.doc().doc.media[0].data.count == big.count, "undo restores the original")
-
-        // A duplicate that isn't compressed still needs the original.
-        try s.execute("edit.duplicate", [:])
-        let copy = s.doc().selection.shapes
-        let first = s.doc().doc.slides[0].shapes.map(\.id).filter { !copy.contains($0) }
-        try s.execute("picture.compress", ["ppi": 150, "ids": [first.last!.rawValue]])
-        doc = s.doc().doc
-        #expect(doc.media.count == 2)
-        #expect(doc.media.contains { $0.data.count == big.count }, "the copy keeps the original")
-        // All pictures: the copy gets compressed too, and the original goes.
-        try s.execute("picture.compress", ["ppi": 150, "all": true])
-        doc = s.doc().doc
-        #expect(doc.media.allSatisfy { $0.data.count < big.count / 4 })
-        #expect(throws: (any Error).self) { try s.execute("picture.compress", ["ppi": 5, "all": true]) }
-        #endif
-    }
-
     /// #203: SmartArt we can't draw kept its XML but lost its diagram parts on save.
     // Rust: it/roundtrip.rs::smartart_without_a_drawing_keeps_its_parts
     @Test func smartartWithoutADrawingKeepsItsParts() throws {
@@ -1730,64 +1602,5 @@ extension IntegrationRoundtripTests {
         #expect(keptXML.has("<p:pic>") && !keptXML.has("spid"), "\(keptXML)")
         #expect(preview != nil, "the preview picture is kept")
         #expect(kept.contains { $0.b.hasSuffix("/oleObject") }, "the embedding is kept: \(kept)")
-    }
-
-    /// Insert › Zoom: slide, section and summary zooms are linked pictures of their targets, with
-    /// Return to Zoom on section and summary zooms; a summary zoom makes its own slide; all of it is
-    /// one undo step and saves as linked pictures.
-    // Rust: it/roundtrip.rs::zoom_inserts_linked_slide_pictures
-    // `insert.zoom` (rendering the target slides, summary slides, undo) is the engine's.
-    @Test(.disabled("needs DCEngine (wave 4)")) func zoomInsertsLinkedSlidePictures() throws {
-        #if DCENGINE
-        var s = Session.withNew()
-        for t in ["Intro", "Plan", "Budget", "Risks"] {
-            try s.execute("slide.new", ["title": t])
-        }
-        // Slides: 0 title, 1 Intro, 2 Plan, 3 Budget, 4 Risks.
-        try s.execute("slide.go", ["index": 0])
-        let r = try s.execute("insert.zoom", ["slides": [2]])
-        #expect(r["returnToZoom"] == false)
-        var doc = s.doc().doc
-        let zoom = try #require(doc.slides[0].shapes.first { $0.name.hasPrefix("Slide Zoom") }, "slide zoom")
-        let link = try #require(zoom.click)
-        #expect(link.action == .slide(slide: doc.slides[2].id))
-        #expect(link.zoomReturn == nil)
-        #expect(link.tooltip == "Plan")
-        guard case .picture(let fill) = zoom.kind else { Issue.record("not a picture"); return }
-        #expect(doc.media(fill.media)?.data.starts(with: [0x89, 0x50, 0x4E, 0x47]) == true)
-
-        // Section zoom: back after the section's last slide.
-        try s.execute("section.add", ["name": "Start", "at": 0])
-        try s.execute("section.add", ["name": "Money", "at": 3])
-        doc = s.doc().doc
-        let money = try #require(doc.sections.firstIndex { $0.name == "Money" })
-        try s.execute("slide.go", ["index": 0])
-        try s.execute("insert.zoom", ["kind": "section", "sections": [money]])
-        doc = s.doc().doc
-        let sec = try #require(doc.slides[0].shapes.first { $0.name.hasPrefix("Section Zoom") })
-        let last = try #require(doc.sections[money].slides.last)
-        #expect(sec.click?.zoomReturn == last)
-
-        // Summary zoom on slides 1 and 3: a new slide in front, parts 1–2 and 3–4.
-        let before = doc.slides.count
-        try s.execute("insert.zoom", ["kind": "summary", "slides": [1, 3]])
-        doc = s.doc().doc
-        #expect(doc.slides.count == before + 1)
-        let sum = doc.slides[1]
-        #expect(sum.title.has("Summary"))
-        let tiles = sum.shapes.compactMap(\.click)
-        #expect(tiles.count == 2)
-        #expect(tiles[0].zoomReturn == doc.slides[3].id, "part one runs to the slide before part two")
-        #expect(tiles[1].zoomReturn == doc.slides.last?.id)
-        try s.execute("edit.undo", [:])
-        #expect(s.doc().doc.slides.count == before, "one undo step")
-
-        // Saved as linked pictures.
-        let back = try IT.round(s.doc().doc)
-        let z = try #require(back.slides[0].shapes.first { if case .picture = $0.kind { return $0.click != nil }; return false })
-        if case .slide = z.click?.action {} else { Issue.record("not a slide link") }
-        #expect(throws: (any Error).self) { try s.execute("insert.zoom", ["slides": [42]]) }
-        #expect(throws: (any Error).self) { try s.execute("insert.zoom", ["kind": "slide"]) }
-        #endif
     }
 }

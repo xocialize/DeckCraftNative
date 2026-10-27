@@ -145,6 +145,64 @@ reasons are in [PLAN.md](PLAN.md) §3.
 - **Parallel work.** The support modules, then `read/` and `write/` side by side, then the integration tests
   were each ported by a separate session. The corpus, validation and parity tests were done here.
 
+## Wave 4: engine and automation (done 2026-10-27)
+
+- **Code.** About 37,500 lines of Swift source and 18,600 lines of tests:
+  - DCEngine 24,500 (tests 12,300);
+  - DCMedia 5,700 (1,800);
+  - DCAnim 4,000 (2,300);
+  - DCAutomation 2,000 (900);
+  - dccli 1,200 (1,300);
+  - Morph and transitions in DCRender.
+- **Tests.** 1,645 in all, every one green and warning-free; Wave 4 added 734.
+  - **DCEngine: 495.** Every in-file `#[test]` of the command modules, `tests.rs`, `engine/tests/`, and the
+    soak (`soak_tests.rs`: 1,600 random commands over a big deck, with undo/redo and save/reopen checked).
+  - **DCAnim: 102**, all 94 Rust tests plus bit-exact parity with deckcraft-anim.
+  - **DCMedia: 62.**
+  - **DCAutomation: 34** (every mcp `#[test]` and `backend.rs`'s) and **dccli: 31** (201 parameterised cases).
+  - **Skipped: 1**, a VP8 decode test with no clip in the fixtures. **Known issues: 3**, the two pointer steps
+    of mcp's `agent_builds_a_deck` and one PDF page (below).
+- **Parity with the oracle:**
+  - **Registry.** All 330 commands, with deckcraft's ids, labels, menus, shortcuts and parameters, in its order.
+  - **Engine scripts.** 38 scripts give deckcraft's answers, refusals and `.deckcraft`, byte for byte, across
+    every command family and from saved decks and `.pptx` files. 6 more (`*-native-*`) differ where a native
+    framework does the work (ImageIO pictures, CoreGraphics Merge Shapes, spelling) and are compared
+    structurally, by pixels or by area.
+  - **dccli.** `commands`, all 330 `describe`s, help, version and 72 bad invocations are byte-identical; every
+    script's `--print` output and deck, `info`, and `convert` to and from `.pptx` and to `.md` are identical.
+    PNG renders score ≥ 94.6 SSIMULACRA2, transition frames ≥ 92.8, PDF pages ≥ 95.1 but one.
+  - **MCP.** A 36-line agent session gets deckcraft's replies, byte for byte, except saved-file sizes;
+    `mcp --connect` and the control channel match it against a fake app.
+  - **DCAnim** easing, motion paths, timelines, the show state machine, transition layers, meshes and Morph
+    frames are bit-identical (`oracle.sh anim-vectors`); transition renders score ≥ 88.
+  - **DCMedia** header probes match deckcraft-media on generated, CC0 and mutated media (`oracle.sh
+    media-vectors`), since their results are stored in documents.
+- **Native in place of ports** (the decision below):
+  - Merge Shapes on CoreGraphics path booleans; the worst relative area difference is 2.2e-16.
+  - Spelling through a Hunspell dictionary when one is installed, else NSSpellChecker, else deckcraft's list.
+  - Decoding on AVFoundation, VideoToolbox and AudioToolbox. media-bridge's codec gate decides what plays,
+    and its factory covers MPEG-1/2. VP8 and VP9 go through a decoder the app registers.
+  - PNG, JPEG and GIF bytes from ImageIO.
+- **Divergences.**
+  - **Undo memory.** 5–13 steps kept under the cap, where deckcraft keeps 5–11: Swift counts equal slides as
+    shared, Rust only literally shared ones.
+  - **No panic guard.** Swift can't catch a trap, so a command that traps isn't rolled back; the soak is the
+    check that none does.
+  - **One PDF page.** Page 3 of the effects deck scores 74.3. The vector PDF keeps an 8 px gradient picture at
+    its own size, and Preview magnifies it in blocks; raster renders are smoothed.
+- **Not ported, for Wave 5.** `tools.rs`' pointer handling (about 1,900 lines: hit testing, drags, snapping,
+  freeform and ink) belongs with the canvas; MCP's `pointer` tool and `ui.pointer` answer an error until then.
+  Also `control_server.rs` (the app's TCP server) and the screenshot encoder.
+- **Fixed on the way:**
+  - The engine runs on 32 MiB threads in MCP and the control channel, so deeply nested groups don't overflow.
+  - ImageIO labels a GIF with a frame-delay block `GIF87a`; the header now says `GIF89a`.
+- **Upstream.** deckcraft `origin/main` is 62 commits past the pin. In the Wave 4 crates they only split or move
+  files (`tools.rs`, `cmd/{shape,text,smartart,insert,format,design}.rs`, media's player tests) and change one
+  test helper. The pin stays at `27009cd9`.
+- **Parallel work.** DCAnim and DCMedia, then the engine core, then four command groups (text, shapes, design,
+  insert) side by side, then automation, were each ported by a separate session. Integration, the soak and the
+  status were done here.
+
 ## Crates
 
 | deckcraft crate | Rust lines | Disposition | Target | Wave | Status |
@@ -156,15 +214,15 @@ reasons are in [PLAN.md](PLAN.md) §3.
 | metafile | 7,172 | Port | DCMetafile | 2 | **done** — 113 tests; bit-identical to the oracle on 325 cases |
 | fonts | 3,173 | Replace (CoreText); port the substitution table | DCText | 2 | **done** — with text |
 | text | 5,452 | Combine: CoreText plus the ported layout policy | DCText | 2 | **done** — 110 tests; line breaks identical on the corpus |
-| render | 13,813 | Port onto CoreGraphics | DCRender | 2 | **done** apart from Morph and transitions (Wave 4) — 212 tests; SSIMULACRA2 ≥ 90.6 on every corpus slide |
+| render | 13,813 | Port onto CoreGraphics | DCRender | 2, 4 | **done** — 225 tests; SSIMULACRA2 ≥ 89.2 on every corpus slide; Morph and transitions added in Wave 4 |
 | pdf | 1,310 | Replace (CGPDFContext) | DCRender | 2 | **done** — vector slides, real-text layer |
 | pptx | 19,837 | Port | DCPPTX | 3 | **done** — 193 tests; import and export byte-identical to the oracle, schema-valid |
-| anim | 6,036 | Port; Metal compositing | DCAnim | 4 | not started |
-| media | 2,974 | Replace (AVFoundation, media-bridge) | DCMedia | 4 | not started |
-| h264, hevc, vp9, av1, opus, ogg, bitstream, isobmff, matroska | 51,691 | Replace (VideoToolbox, media-bridge, matroska-swift) | DCMedia | 4 | — |
-| engine | 40,266 | Port | DCEngine | 4 | not started |
-| mcp | 1,689 | Port (swift-sdk) | DCAutomation | 4 | not started |
-| apps/deckcraft-cli | 1,432 | Port | dccli | 4 | a placeholder that exits 64 |
+| anim | 6,036 | Port; compositing in DCRender | DCAnim | 4 | **done** — 102 tests; easing, motion paths, timelines, the show state machine, transition layers and Morph frames bit-identical to the oracle ([PORT-NOTES](Packages/DCAnim/PORT-NOTES.md)) |
+| media | 2,974 | Replace (AVFoundation, media-bridge) | DCMedia | 4 | **done** — 62 tests; header probes identical to the oracle (they're stored in documents); decode on AVFoundation, VideoToolbox and media-bridge ([PORT-NOTES](Packages/DCMedia/PORT-NOTES.md)) |
+| h264, hevc, vp9, av1, opus, ogg, bitstream, isobmff, matroska | 51,691 | Replace (VideoToolbox, media-bridge, matroska-swift) | DCMedia | 4 | **replaced** — container parsing ported where the probes need it; decoding is native. VP8 and VP9 go through a decoder the app registers (Wave 5 decides on vpx-swift) |
+| engine | 40,266 | Port | DCEngine | 4 | **done** but the pointer (`tools.rs`, Wave 5) — 495 tests; all 330 commands registered as deckcraft declares them; 44 engine scripts give deckcraft's answers and decks ([PORT-NOTES](Packages/DCEngine/PORT-NOTES.md)) |
+| mcp | 1,689 | Port (swift-sdk) | DCAutomation | 4 | **done** but the pointer (`Session::pointer` is Wave 5's) — every `#[test]` ported; MCP replies byte-identical to the oracle; control.rs ported for the methods that need no window ([PORT-NOTES](Packages/DCAutomation/PORT-NOTES.md)) |
+| apps/deckcraft-cli | 1,432 | Port | dccli | 4 | **done** — every subcommand; commands, describe, help, errors, scripts, info and convert identical to the oracle ([PORT-NOTES](Packages/DCAutomation/PORT-NOTES.md#dccli)) |
 | ui-egui, apps/deckcraft | 44,551 | Rewrite (AppKit, SwiftUI) | app | 5 | not started |
 | apps/deckcraft-web | 227 | Drop | — | — | — |
 | xtask | 1,489 | Drop; scripts where needed | Tools | — | — |
@@ -181,6 +239,10 @@ reasons are in [PLAN.md](PLAN.md) §3.
   at the export's dpi.
 - 2026-10-26: render parity is SSIMULACRA2 against the oracle's PNGs, with a floor of 88 per slide, measured
   in release.
+- 2026-10-26: native frameworks over ported third-party libraries, unless there's a good reason. Merge
+  Shapes uses CoreGraphics' path boolean operations, not a port of `i_overlay` (about 43k lines with its
+  helper crates). Its outlines aren't byte-identical to deckcraft's, so they are checked by area and render.
+  Values stored in documents, such as media probe results, stay exact ports.
 - 2026-10-26: PPTX parity is byte-identical parts on export and a byte-identical model on import, over the
   oracle corpus. Written packages also validate against the ECMA-376 Transitional schemas, after markup
   compatibility. The zip container may differ: DCZip stores a part that wouldn't shrink.

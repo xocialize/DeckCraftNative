@@ -1,0 +1,15 @@
+# Slides, shapes, selection, text, undo and redo: the engine core.
+slide.new={"layout":"titleOnly","title":"Basics"}
+shape.insert={"preset":"roundRect","rect":[80,160,320,120],"text":"Revenue"}
+format.size={"size":28}
+format.bold={"on":true}
+shape.insert={"preset":"ellipse","rect":[460,160,200,200]}
+shape.fill={"color":"#2E86DE"}
+edit.undo
+edit.redo
+edit.selectAll
+arrange.group
+slide.duplicate
+slide.go={"index":0}
+slide.layout={"layout":"titleAndContent"}
+file.info

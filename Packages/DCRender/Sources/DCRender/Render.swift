@@ -2,7 +2,8 @@
 // effects, pictures, media, ink, groups, tables, charts) and text, onto a `Canvas`. Port of deckcraft
 // crates/render/src/lib.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 //
-// Not yet here (Wave 4, with DCAnim): Morph frames (`render_blend`, path and text morphs) and transitions.
+// Morph frames (`render_blend`) and transitions are in Transition.swift, MorphPath.swift and MorphText.swift; the
+// renderer's part of an outline morph (`paths`, `morphs`, the per-sub-path fades) is here, as in the Rust.
 import DCColor
 import DCCore
 import DCGeometry
@@ -219,6 +220,10 @@ final class Renderer {
     var renderWork = 0
     /// Visits spent on outer-shadow silhouette passes, kept apart.
     var shadowWork = 0
+    /// Outlines morphing in the frame being drawn by `blend`.
+    var paths: [PathMorph] = []
+    /// Their aligned outlines, kept from frame to frame.
+    let morphs = MorphPathCache.shared
 
     func canvas(_ pres: Presentation, _ opts: RenderOpts) -> (Canvas?, Affine) {
         let (w, h) = outputSize(pres, opts)
@@ -516,8 +521,11 @@ final class Renderer {
 
     /// Fill the filled sub-paths of `geo` (a `w` × `h` shape placed by `m`) with `fl`: `useBgFill` shows
     /// the slide background through the shape and `grpFill` the group's fill.
-    func fillGeometry(_ c: Canvas, _ f: Frame, _ rctx: Resolve.Ctx, _ fl: Fill, _ fillPh: Rgba?, _ geo: Preset.Geometry, _ w: Double, _ h: Double, _ m: Affine) {
-        for sp in geo.paths where sp.fill != .none {
+    func fillGeometry(
+        _ c: Canvas, _ f: Frame, _ rctx: Resolve.Ctx, _ fl: Fill, _ fillPh: Rgba?, _ geo: Preset.Geometry, _ w: Double, _ h: Double, _ m: Affine,
+        _ fade: (Int) -> Morph.Fade = { _ in noFade }
+    ) {
+        for (i, sp) in geo.paths.enumerated() where sp.fill != .none && fade(i).fill > 0 {
             c.setTransform(m)
             c.setFillRule(sp.evenOdd ? .evenOdd : .nonZero)
             switch (fl, bg) {
@@ -525,22 +533,28 @@ final class Renderer {
                 // `useBgFill`: the slide's background, laid out on the slide, shows through the shape.
                 let slide = Rect(0, 0, f.pres.slideSize.width, f.pres.slideSize.height)
                 let path = transformed(sp.path, b.view.inverse * m)
-                PaintFill.fillPath(c, rctx, b.fill, b.ph, path, slide, b.view, sp.fill, 1, f.pres)
+                PaintFill.fillPath(c, rctx, b.fill, b.ph, path, slide, b.view, sp.fill, fade(i).fill, f.pres)
             case (.group, _):
                 // `grpFill`: the group's fill, laid out over the whole group.
                 if let g = groupFill, Swift.abs(g.m.determinant) > 1e-12 {
                     let path = transformed(sp.path, g.m.inverse * m)
-                    PaintFill.fillPath(c, rctx, g.fill, nil, path, g.box, g.m, sp.fill, 1, f.pres)
+                    PaintFill.fillPath(c, rctx, g.fill, nil, path, g.box, g.m, sp.fill, fade(i).fill, f.pres)
                 }
             default:
-                PaintFill.fillPath(c, rctx, fl, fillPh, sp.path, Rect(0, 0, w, h), m, sp.fill, 1, f.pres)
+                PaintFill.fillPath(c, rctx, fl, fillPh, sp.path, Rect(0, 0, w, h), m, sp.fill, fade(i).fill, f.pres)
             }
             c.setFillRule(.nonZero)
         }
     }
 
     func geometryShape(_ c: Canvas, _ f: Frame, _ rctx: Resolve.Ctx, _ s: Shape, _ m: Affine, _ w: Double, _ h: Double, _ st: ShapeState, _ depth: Int) {
-        let geo = scaledGeometry(s, m, depth, w, h)
+        // A morphing outline (`blend`): the geometry between two, with a fade per sub-path.
+        let (geo, fades): (Preset.Geometry, [Morph.Fade]) = if let pm = paths.first(where: { $0.id == s.id }) {
+            morphs.geometry(pm, s, w, h)
+        } else {
+            (scaledGeometry(s, m, depth, w, h), [])
+        }
+        func fade(_ i: Int) -> Morph.Fade { fades.at(i) ?? noFade }
         var (fill, fillPh) = Resolve.fill(rctx, s)
         let (resolvedLine, linePh) = Resolve.line(rctx, s)
         let (effects, fxPh) = Resolve.effects(rctx, s)
@@ -606,7 +620,7 @@ final class Renderer {
         switch s.kind {
         case .picture(let pf):
             // The picture's own fill shows behind its transparent pixels, as in PowerPoint.
-            if let own = s.fill, !own.isNone, let fl = fill { fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m) }
+            if let own = s.fill, !own.isNone, let fl = fill { fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m, fade) }
             c.setTransform(m)
             c.pushClipLayer(outline)
             let t = f.opts.gifTimes.first { $0.0 == s.id }?.1
@@ -614,7 +628,7 @@ final class Renderer {
             c.popLayer()
         case .opaque(_, let preview?, _, _):
             // An object deckcraft doesn't model: its preview picture, stretched over the frame.
-            if let own = s.fill, !own.isNone, let fl = fill { fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m) }
+            if let own = s.fill, !own.isNone, let fl = fill { fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m, fade) }
             c.setTransform(m)
             PaintFill.picture(c, f.pres, PictureFill(media: preview), Rect(0, 0, w, h), m, nil)
         case .media(let mc):
@@ -631,7 +645,7 @@ final class Renderer {
             if !mc.video || mc.poster == nil { PaintFill.mediaGlyph(c, mc.video, bounds) }
         default:
             if let fl = fill, !(emptyPh && f.opts.edit && s.fill == nil && s.line == nil && s.style == nil) {
-                fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m)
+                fillGeometry(c, f, rctx, fl, fillPh, geo, w, h, m, fade)
             }
         }
         // `a:fillOverlay`: a fill blended over the shape's fill, inside the filled outline, under the line.
@@ -643,10 +657,10 @@ final class Renderer {
             case "lighten": .lighten
             default: .normal
             }
-            for sp in geo.paths where sp.fill != .none {
+            for (i, sp) in geo.paths.enumerated() where sp.fill != .none && fade(i).fill > 0 {
                 c.setTransform(m)
                 c.pushLayer(clip: sp.path, blend: BlendMode(mix, .srcOver))
-                PaintFill.fillPath(c, rctx, ov.fill, fxPh, sp.path, Rect(0, 0, w, h), m, .norm, 1, f.pres)
+                PaintFill.fillPath(c, rctx, ov.fill, fxPh, sp.path, Rect(0, 0, w, h), m, .norm, fade(i).fill, f.pres)
                 c.popLayer()
             }
         }
@@ -669,7 +683,7 @@ final class Renderer {
         }
         // Outline.
         if let lf = line.fill, !lf.isNone {
-            drawOutline(c, rctx, s, geo, line, linePh, effects, isPic, outline, m, w, h, depth)
+            drawOutline(c, rctx, s, geo, line, linePh, effects, isPic, outline, m, w, h, depth, fade)
         }
         if let r = soft {
             // Feather: the shape (fill and line) fades to nothing at its outline. Measured on PowerPoint's
@@ -722,7 +736,7 @@ final class Renderer {
 
     private func drawOutline(
         _ c: Canvas, _ rctx: Resolve.Ctx, _ s: Shape, _ geo: Preset.Geometry, _ resolvedLine: Line, _ linePh: Rgba?, _ effects: Effects?,
-        _ isPic: Bool, _ outline: BezPath, _ m: Affine, _ w: Double, _ h: Double, _ depth: Int
+        _ isPic: Bool, _ outline: BezPath, _ m: Affine, _ w: Double, _ h: Double, _ depth: Int, _ fade: (Int) -> Morph.Fade
     ) {
         var line = resolvedLine
         let lw0 = (line.width ?? 0.75).rustMax(0)
@@ -762,12 +776,12 @@ final class Renderer {
             lw = lw0 * 2
         }
         let firstStroked = geo.paths.firstIndex { $0.stroke }
-        for (i, sp) in geo.paths.enumerated() where sp.stroke {
+        for (i, sp) in geo.paths.enumerated() where sp.stroke && fade(i).stroke > 0 {
             var path = rel == .identity ? sp.path : transformed(sp.path, rel)
             // The line stops inside its arrowheads, so a wide line doesn't poke out of them.
             let whole = path
             if i == firstStroked, trims != (0.0, 0.0) { path = trimEnds(path, trims.0, trims.1) }
-            strokeLine(c, rctx, line, linePh, path, whole, base, lw, 1)
+            strokeLine(c, rctx, line, linePh, path, whole, base, lw, fade(i).stroke)
         }
         if ends { arrowheads(c, rctx, line, linePh, geo, rel, base, lw) }
         if outside != nil { c.popLayer() }
@@ -898,6 +912,9 @@ final class Renderer {
         }
     }
 }
+
+/// No fade: a sub-path drawn fully (shapes that aren't morphing).
+let noFade = Morph.Fade(fill: 1, stroke: 1)
 
 /// A shape's outline as it casts a shadow: its line, that line's placeholder colour and opacity, and the
 /// space it is stroked in (see `Renderer.lineSpace`).

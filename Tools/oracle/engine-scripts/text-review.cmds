@@ -1,0 +1,74 @@
+# in: sample.deckcraft
+# The Review tab and Slide Show requests: comments, accessibility, the thesaurus, Insert Synonym, Set Up
+# Slide Show and custom shows (cmd/review.rs, thesaurus.rs).
+comment.add={"text":"Check this title","x":40,"y":30}
+comment.add={"text":"On the band","id":260}
+comment.reply={"index":0,"text":"Done"}
+comment.reply={"index":0}
+comment.resolve={"index":0}
+comment.resolve={"index":1,"resolved":false}
+comment.list
+slide.go={"index":3}
+comment.add={"text":"Third slide"}
+comment.next
+comment.prev
+comment.next={"slide":0,"index":1}
+comment.prev={"slide":3,"index":0}
+comment.prev={"slide":0,"index":1}
+comment.list={"slide":0}
+comment.list={"slide":9}
+comment.delete={"index":1}
+comment.list={"slide":0}
+review.accessibility
+review.thesaurus={"word":"Goals"}
+review.thesaurus={"word":"improved"}
+review.thesaurus={"word":"GROWING"}
+review.thesaurus={"word":"“change,”"}
+review.thesaurus={"word":"zzxq"}
+review.thesaurus
+slide.go={"index":1}
+text.edit={"id":263,"at":[0,6]}
+review.thesaurus
+review.replaceWord={"with":"knowledge"}
+text.select={"anchor":[0,13],"caret":[0,18]}
+review.thesaurus
+review.replaceWord={"with":"stellar"}
+text.get
+text.exit
+show.setup={"type":"kiosk"}
+show.setup={"loop":false,"from":2,"to":4,"useTimings":false,"showMediaControls":false,"noNarration":true,"noAnimation":true}
+show.customShow={"name":"Short","slides":[0,2,4,99]}
+show.customShow={"name":"Long","slides":[0,1,2,3,4,5]}
+show.setup={"custom":"Short"}
+show.setup={"all":true}
+show.setup={"type":"browsed","custom":"Long","from":1,"to":2}
+show.setup={"custom":""}
+show.customShow={"name":"Short","delete":true}
+show.fromStart
+show.fromCurrent
+comment.delete={"all":true}
+comment.list
+slide.go={"index":2}
+comment.delete
+!comment.next={}
+!comment.add={}
+!comment.reply={"text":"x"}
+!comment.reply={"index":5,"text":"x"}
+!comment.resolve={"index":5}
+!comment.delete={"index":-1}
+!comment.delete={"index":"2"}
+!comment.delete={"index":1.5}
+!review.replaceWord={"with":"x"}
+!review.accept={"all":true}
+!review.reject={"all":true}
+!review.endCompare={}
+!review.revisions={}
+!review.compare={}
+!review.compare={"data":"!!"}
+!review.compare={"name":"x.bin","data":"AAAA"}
+!show.customShow={}
+!review.spellingChange={"word":"x","to":"y"}
+!review.spellingChange={"to":"y","all":true}
+!review.spellingChange={"word":"x","all":true}
+!review.spellingChange={"shape":258,"para":0,"start":0,"word":"Zzz","to":"y"}
+!review.addToDictionary={}

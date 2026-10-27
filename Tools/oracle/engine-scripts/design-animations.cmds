@@ -1,0 +1,37 @@
+# Animations tab and Animation Pane: set, add, every class and option form, timing, triggers, reorder,
+# remove, clear and the Animation Painter (cmd/animation.rs).
+animation.list
+slide.new={"layout":"titleAndContent","title":"Animated","body":"One\nTwo\nThree"}
+animation.add={"effect":"fly","option":"fromBottomLeft","ids":[261]}
+animation.add={"effect":"fade","class":"exit","start":"after","duration":900000,"delay":250,"ids":[261,262]}
+animation.add={"effect":"spin","class":"emphasis","ids":[262]}
+animation.add={"effect":"growShrink","class":"emph","ids":[262]}
+animation.add={"effect":"arcs","class":"path","option":"up","ids":[261]}
+animation.add={"effect":"turns","class":"motion","option":"left","ids":[262]}
+animation.add={"effect":"heart","class":"motionPath","ids":[262]}
+animation.add={"effect":"wipe","option":"Top","start":"withPrevious","ids":[262]}
+animation.get
+animation.set={"effect":"zoom","ids":[262]}
+animation.get
+animation.timing={"index":0,"start":"afterPrevious","duration":1200,"delay":100,"repeat":3,"rewind":true,"trigger":262}
+animation.timing={"ids":[262],"repeat":99999999999,"trigger":null}
+animation.options={"index":0,"option":"left","textBuild":"byWord"}
+animation.options={"ids":[262],"option":"fromTop","textBuild":"byParagraph"}
+animation.options={"index":3,"option":"right"}
+animation.move={"index":0,"to":99}
+animation.move={"index":2,"to":0}
+animation.get
+animation.remove={"index":1}
+animation.painter={"id":261}
+animation.painterApply={"ids":[262]}
+animation.painter={"id":262,"sticky":true}
+slide.go={"index":0}
+animation.painterApply={"ids":[258]}
+animation.painterApply={"ids":[259]}
+animation.get
+animation.get={"slide":1}
+animation.remove={"ids":[258]}
+animation.set={"effect":"pulse","class":"emphasis","ids":[259]}
+animation.get
+animation.clear={"index":1}
+animation.get={"slide":1}

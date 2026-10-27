@@ -1,0 +1,17 @@
+# in: effects.deckcraft
+# Merge Shapes with text: a text box with no fill and no outline merges as its letters (cmd/merge.rs). Native
+# booleans, so ShapesScriptTests compares it by area.
+slide.go={"index":2}
+arrange.ungroup={"ids":[277]}
+shape.inspect={"id":274}
+shape.merge={"op":"intersect","ids":[271,274]}
+shape.inspect={"id":278}
+edit.undo
+shape.merge={"op":"union","ids":[274,272]}
+shape.inspect={"id":278}
+edit.undo
+shape.merge={"op":"subtract","ids":[272,274]}
+shape.inspect={"id":278}
+edit.undo
+shape.merge={"op":"fragment","ids":[275,276]}
+slide.inspect={"index":2}

@@ -1,0 +1,18 @@
+# Insert › Photo Album with frames, grayscale, brightness and contrast (they run shape.line and picture.adjust,
+# so this script waits for those), and Edit Photo Album reading them back.
+insert.photoAlbum={"pictures":[{"data":"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGO4o6GBFTEMLQkAe3tLAfuiUfAAAAAASUVORK5CYII=","name":"a.png"}],"frame":"rect"}
+insert.photoAlbum={"pictures":[{"data":"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGO4o6GBFTEMLQkAe3tLAfuiUfAAAAAASUVORK5CYII=","name":"b.png"},{"data":"iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAAMElEQVR4nO3NIQ0AAAgAMEKg6R+FEIShAwrx7f7RVWeZcxZisVgsFovFYrFYLP4bL4F8wv3dS3xVAAAAAElFTkSuQmCC","name":"c.png"}],"frame":"Rounded Rectangle","layout":"2"}
+insert.photoAlbum={"pictures":[{"data":"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGO4o6GBFTEMLQkAe3tLAfuiUfAAAAAASUVORK5CYII=","name":"d.png","brightness":0.2,"contrast":-0.1,"rot":90}],"frame":"simple","grayscale":true,"theme":"Harbor"}
+insert.photoAlbum={"pictures":[{"data":"iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAAMElEQVR4nO3NIQ0AAAgAMEKg6R+FEIShAwrx7f7RVWeZcxZisVgsFovFYrFYLP4bL4F8wv3dS3xVAAAAAElFTkSuQmCC","name":"e.png","brightness":-1,"contrast":1}],"frame":"none","captions":true}
+document.inspect
+slide.go={"index":2}
+insert.photoAlbumEdit
+slide.go={"index":3}
+insert.photoAlbumEdit
+insert.photoAlbumEdit={"pictures":[{"data":"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGO4o6GBFTEMLQkAe3tLAfuiUfAAAAAASUVORK5CYII=","name":"d2.png"}],"frame":"white","layout":"4title"}
+document.inspect
+slide.go={"index":1}
+edit.selectAll
+shape.line={"width":3,"color":"#00FF00"}
+picture.adjust={"brightness":0.5}
+insert.photoAlbumEdit

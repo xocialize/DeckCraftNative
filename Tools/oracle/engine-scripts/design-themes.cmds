@@ -1,0 +1,37 @@
+# Design tab: themes, variants, colours, fonts, effects, slide size, header & footer (cmd/design.rs).
+design.themes
+design.theme={"name":"harbor"}
+design.variants
+design.variant={"index":1}
+design.variants
+design.variant={"index":3}
+design.colors={"name":"Ocean"}
+design.colors={"colors":{"accent1":"#123456","hlink":"ABCDEF"}}
+design.colors={"name":"Brand","colors":{"dk2":"#202020"}}
+design.colors={"name":"Brand","colors":{"dk2":"#202020"}}
+design.fonts={"name":"classic"}
+design.fonts={"major":" Lato "}
+design.fonts={"minor":"Roboto"}
+design.fonts={"name":"Talk","major":"Inter","minor":"Nunito Sans"}
+design.effects={"name":"soft"}
+design.effects={"name":"Glow"}
+design.colors
+design.fonts
+slide.new={"layout":"titleAndContent","title":"Scaled","body":"Body text"}
+design.slideSize={"preset":"standard"}
+design.slideSize={"preset":"a4","orientation":"portrait","scale":"maximize"}
+design.slideSize={"w":800,"h":600,"scale":"none"}
+design.slideSize={"w":20000,"h":10,"orientation":"landscape"}
+design.slideSize={"preset":"widescreen"}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Confidential","date":true,"dateText":"1 May 2026"}
+slide.inspect
+design.headerFooter={"footerText":"Public","dateText":"2 May 2026","all":false}
+slide.inspect
+design.headerFooter={"hideOnTitle":true}
+slide.inspect={"index":0}
+design.headerFooter={"slideNumber":false,"date":false}
+slide.inspect
+design.hideBackgroundGraphics={"hide":true}
+design.hideBackgroundGraphics
+design.theme={"name":"Nocturne"}
+slide.inspect

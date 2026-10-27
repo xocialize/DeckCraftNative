@@ -1,0 +1,22 @@
+# in: sample.deckcraft
+# Review ▸ Spelling, the dictionary and Rescan Installed Fonts: answers a native framework gives (the Mac's
+# spell checker, CoreText's font catalog), compared structurally; under deckcraft's own checker alone
+# (Hunspell dictionaries, else its list of common misspellings) the spelling answers are deckcraft's
+# (cmd/review.rs, spell.rs; TextNativeScriptTests).
+review.dictionary
+review.dictionary={"lang":"zz-NONE"}
+slide.go={"index":1}
+text.set={"id":263,"text":"Teh science: solar wind meets the the magnetosphere\nWhere and when to see it untill dawn\nRecieve the the light"}
+review.spelling
+review.spelling={"ignore":["TEH","untill"]}
+review.spelling={"lang":"zz-NONE"}
+review.spellingChange={"shape":263,"word":"Teh","to":"The"}
+review.spellingChange={"shape":263,"para":0,"start":29,"word":" the","to":""}
+review.spellingChange={"word":"untill","to":"until","all":true}
+review.spellingChange={"word":"the","to":"a","all":true}
+review.spellingChange={"word":"nothing","to":"x","all":true}
+review.spelling
+edit.select={"ids":[263]}
+format.language={"noProof":true}
+review.spelling
+font.rescan

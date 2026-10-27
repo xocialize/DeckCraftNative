@@ -1,0 +1,34 @@
+# Transitions tab: every option of transition.set, Effect Options, Timing, Sound (built-in, loop, stop,
+# none) and Apply To All (cmd/transition.rs).
+transition.list
+slide.new={"layout":"titleOnly","title":"Two"}
+slide.new={"layout":"titleOnly","title":"Three"}
+transition.set={"kind":"PUSH","option":"l","duration":800}
+transition.set={"kind":"morph","index":0}
+transition.set={"kind":"vortex","duration":99999,"index":1}
+transition.options={"option":"r","index":1}
+transition.options={"option":"horz","index":0}
+transition.timing={"duration":1500,"onClick":false,"after":3000,"index":2}
+transition.timing={"after":-5,"index":2}
+transition.timing={"after":999999999,"index":1}
+transition.timing={"after":null,"index":1}
+transition.sound={"builtin":"chime","loop":true,"index":0}
+transition.sound={"builtin":"Chime","index":1}
+transition.sound={"builtin":"laser","index":2}
+transition.sound={"loop":true,"index":1}
+transition.sound={"loop":false,"index":0}
+transition.sound={"stopPrevious":true,"index":2}
+transition.sound={"none":true,"index":1}
+transition.sound={"data":"UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSADAAAAADUGKwylEWoWSxogHcsePB9uHmocQxkbFRwQdwpoBC7+BPgs8uLsWujE5ETi8+Df4AniZeTa50bsfPFF92j9pAO8CXAPhxTNGBUcPx40H+oeZR20GvMWRxLgDPcGxgCO+o30AO8i6iLmKuNZ4cHgZ+FG40rmVOo878/01PoMATwHIQ2AEiMX2Rp9HfQeMB8tHvYbohhSFDMPeAleAyH9Afc98RDsrudE5PXh2eD74Fri5+SJ6BrtbPJJ+HT+rwS6ClgQTxVtGYccfh4+H78eBh0lGjkWahHqC+8Fuv+G+ZTzIe5l6Y/lx+Ip4cbgouG04+bmGesh8Mv13vsZAkAIEw5WE9QXXxvSHRUfGh/jHXob+BeDE0UOdwhSAhb8AfZS8EPrCOfM47DhyeAg4bPiceU+6fPtYPNO+YH/uAW1CzsRERYGGvEctB4/H4oenhyOGXgViBDvCuYErf6A+J/yR+2u6APlbOIC4dXg5uEq5Irn5OsL8cv26fwlA0IJAQ8nFH8Y3BseHiwf/B6QHfYaSBeuElQNcwdFAQz7BPVs733qauZc43PhweBO4RXjAub56dHuWPRW+o0AvwatDBkSzBaXGlId4h43H00eLhzvGLIUog/yCdwDoP18967xcuz+54DkGeLk4O3gMuKo5DXotez68c739f0wBEIK6w/xFCIZUhxhHjof1R40HWoakhbTEV8MbAY4AAP6CfSK7r3p0+X14j/hwuCF4X/jm+a76rTvU/Vg+5oBxQehDfESgRcgG6sdBh8mHwcetRtJGOUTtg7xCNEClPx69sHwo+tW5wTk0OHP4A7hiOIu5efoi+3s8tL4Av86BT8L0BC2Fb4ZwBycHj8fpB7QHNYZ1BX0EGYLZAUs//z4E/Ou7QTpROWW4hThzeDF4fHjPOeD65zwUvZq/KYCyAiRDsUTLxiiG/sdIh8LH7gdNRudFxMTxw3uB8QBift79djv2uq05pDjj+HE4Dfh5eK85aDpZ+7i89n5DgBDBjgMsBF0FlMaJR3OHjwfax5kHDsZERUPEGoKWgQf/vb3IPLW7FHoveQ/4g==","name":"beep.wav","loop":true}
+document.inspect
+slide.selectSlides={"indices":[0,1]}
+transition.set={"kind":"wipe"}
+transition.timing={"duration":250}
+slide.go={"index":2}
+transition.set={"kind":"none"}
+slide.inspect={"index":2}
+slide.go={"index":1}
+transition.applyAll
+transition.set={"kind":"none","index":0}
+transition.set={"kind":"fade","option":"throughBlack","index":0}
+transition.timing={"onClick":true,"index":0}

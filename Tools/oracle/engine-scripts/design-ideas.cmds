@@ -1,0 +1,23 @@
+# Design Ideas: the ideas offered for text and picture slides and every arrangement (cmd/ideas.rs), and
+# Picture Format › Remove Background (cmd/background.rs).
+design.ideas
+slide.new={"layout":"titleAndContent","title":"Harbour at dawn","body":"One\nTwo\nThree"}
+design.ideas
+design.applyIdea={"id":"titleColumn"}
+slide.inspect
+design.applyIdea={"id":"centred"}
+design.applyIdea={"id":"titleBottom"}
+slide.inspect
+slide.new={"layout":"titleOnly","title":"Pictured"}
+insert.picture={"data":"iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR42mM4ISf3X+6E3H8GObkT/3/9+vUfAEpKCfeNqo0bAAAAAElFTkSuQmCC","name":"dots.png"}
+design.ideas
+design.applyIdea={"id":"fullBleed"}
+slide.inspect
+design.applyIdea={"id":"fullBleed"}
+design.applyIdea={"id":"pictureLeft"}
+slide.inspect
+design.applyIdea={"id":"pictureRight","slide":2}
+design.applyIdea={"id":"framed"}
+slide.inspect
+design.ideas={"slide":1}
+design.ideas={"slide":9}

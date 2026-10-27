@@ -1,0 +1,25 @@
+# File menu: templates, new presentations, windows, properties, revert and close (cmd/file.rs).
+file.templates
+file.new={"template":"Pitch"}
+document.inspect
+slide.inspect={"index":3}
+file.info
+window.next
+file.info
+window.next={"index":1}
+file.properties={"subject":"Pitch deck","keywords":"quiet, inbox"}
+slide.new={"layout":"blank"}
+file.revert
+file.info
+file.new={"theme":"Harbor","size":[800,600]}
+document.inspect
+file.new={"blank":true,"size":[720,540]}
+document.inspect
+slide.new
+file.new={"template":"field notes"}
+slide.inspect={"index":1}
+file.close
+file.info
+window.next={"index":0}
+slide.new={"layout":"title","title":"Back in the first","body":"Seeded from a template"}
+document.inspect

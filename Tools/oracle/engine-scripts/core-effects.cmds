@@ -1,0 +1,26 @@
+# in: effects.deckcraft
+# Pictures, groups and effects: inspection, and pictures copied within and across presentations (media ids).
+document.inspect
+slide.inspect={"index":1}
+slide.inspect={"index":2}
+slide.go={"index":1}
+edit.selectAll
+edit.copy
+file.new
+edit.paste
+document.inspect
+window.next={"index":0}
+slide.go={"index":2}
+edit.paste
+edit.selectAll={"scope":"slides"}
+edit.copy={"scope":"slides"}
+window.next={"index":1}
+edit.paste
+document.inspect
+window.next={"index":0}
+slide.go={"index":1}
+edit.selectAll
+edit.delete
+edit.undo
+edit.deselect
+document.inspect

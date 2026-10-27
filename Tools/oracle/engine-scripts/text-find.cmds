@@ -1,0 +1,22 @@
+# in: sample.deckcraft
+# Home ▸ Editing: Find and Replace across shapes, groups, table cells and notes (cmd/find.rs).
+text.find={"text":"aurora"}
+text.find={"text":"Aurora","matchCase":true}
+text.find={"text":"f/2","wholeWords":true}
+text.find={"text":"manual"}
+text.find={"text":"a"}
+text.find={"text":"–"}
+text.replace={"text":"aurora","with":"Aurora Borealis","at":{"slide":0,"shape":259,"cell":null,"para":0,"start":20}}
+text.find={"text":"aurora"}
+text.replace={"text":"Manual","with":"Hand"}
+text.replace={"text":"on a","with":"at a","matchCase":true,"wholeWords":true}
+text.replace={"text":"Aurora","with":"","wholeWords":true}
+text.find={"text":"Hand"}
+slide.notes={"text":"Look north after midnight.\nNorthern lights again.","index":2}
+text.find={"text":"north"}
+text.replace={"text":"north","with":"south","matchCase":true}
+text.find={"text":"south"}
+!text.find={}
+!text.replace={"text":"zzzzqqq","with":"x"}
+!text.replace={"text":"Hand","with":"x","at":{"slide":5}}
+!text.replace={"text":"Hand","with":"x","at":{"slide":0,"para":0,"start":0}}

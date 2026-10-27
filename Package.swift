@@ -49,6 +49,10 @@ let package = Package(
     dependencies: [
         // SSIMULACRA2 for render parity (DCTestSupport only): media-bridge's dependency-free metric core.
         .package(url: "https://github.com/xocialize/media-bridge.git", from: "0.40.0"),
+        // The official MCP Swift SDK (DCAutomation), at the version PhotoCraftNative uses.
+        .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.1"),
+        // dccli's subcommands.
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0"),
     ],
     targets: [
         // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
@@ -83,7 +87,12 @@ let package = Package(
         .testTarget(name: "DCTextTests", dependencies: ["DCText", "DCModel", "DCGeometry", "DCColor", "DCCore", "DCTestSupport"], path: tests("DCText", "DCTextTests")),
 
         // MARK: DCAnim — timeline, show state machine, transition frames, Morph (deckcraft-anim). Wave 4.
-        .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry"], path: sources("DCAnim", "DCAnim")),
+        .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore"], path: sources("DCAnim", "DCAnim")),
+        .testTarget(
+            name: "DCAnimTests",
+            dependencies: ["DCAnim", "DCModel", "DCGeometry", "DCColor", "DCCore", "DCFormat", "DCTestSupport"],
+            path: tests("DCAnim", "DCAnimTests")
+        ),
 
         // MARK: DCFormat — `.deckcraft` (zip + JSON + media), outline text, RTF (deckcraft-format). Wave 1.
         .target(name: "DCFormat", dependencies: ["DCCore", "DCZip", "DCModel"], path: sources("DCFormat", "DCFormat")),
@@ -91,7 +100,12 @@ let package = Package(
 
         // MARK: DCMedia — AVFoundation and media-bridge in place of deckcraft-media and its codec
         // crates. Wave 4.
-        .target(name: "DCMedia", path: sources("DCMedia", "DCMedia")),
+        .target(
+            name: "DCMedia",
+            dependencies: ["DCCore", .product(name: "MediaImport", package: "media-bridge")],
+            path: sources("DCMedia", "DCMedia")
+        ),
+        .testTarget(name: "DCMediaTests", dependencies: ["DCMedia", "DCCore", "DCTestSupport"], path: tests("DCMedia", "DCMediaTests")),
 
         // MARK: DCRender — the CoreGraphics slide renderer, PDF through CGPDFContext, Metal transition
         // compositing (deckcraft-render, -pdf). Wave 2.
@@ -118,14 +132,43 @@ let package = Package(
         // sample deck (deckcraft-engine). Wave 4.
         .target(
             name: "DCEngine",
-            dependencies: ["DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia"],
+            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip"],
             path: sources("DCEngine", "DCEngine")
+        ),
+        .testTarget(
+            name: "DCEngineTests",
+            dependencies: ["DCEngine", "DCAnim", "DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCTestSupport"],
+            path: tests("DCEngine", "DCEngineTests")
         ),
 
         // MARK: DCAutomation — the JSON control channel and the MCP server (deckcraft-mcp,
         // ui-egui's control.rs). Wave 4.
-        .target(name: "DCAutomation", dependencies: ["DCEngine", "DCRender"], path: sources("DCAutomation", "DCAutomation")),
-        .executableTarget(name: "dccli", dependencies: ["DCEngine", "DCAutomation"], path: "Apps/dccli"),
+        .target(
+            name: "DCAutomation",
+            dependencies: ["DCEngine", "DCRender", "DCModel", "DCGeometry", "DCColor", "DCCore", .product(name: "MCP", package: "swift-sdk")],
+            path: sources("DCAutomation", "DCAutomation")
+        ),
+        .testTarget(
+            name: "DCAutomationTests",
+            dependencies: ["DCAutomation", "DCEngine", "DCCore", "DCTestSupport", .product(name: "MCP", package: "swift-sdk")],
+            path: tests("DCAutomation", "DCAutomationTests")
+        ),
+        .executableTarget(
+            name: "dccli",
+            dependencies: [
+                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCModel", "DCCore",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ],
+            path: "Apps/dccli"
+        ),
+        .testTarget(
+            name: "dccliTests",
+            dependencies: [
+                "dccli", "DCAutomation", "DCEngine", "DCRender", "DCModel", "DCCore", "DCZip", "DCTestSupport",
+                .product(name: "MCP", package: "swift-sdk"),
+            ],
+            path: "Apps/dccliTests"
+        ),
 
         // MARK: DCTestSupport — the fixtures root and the upstream pin, for every test target.
         .target(

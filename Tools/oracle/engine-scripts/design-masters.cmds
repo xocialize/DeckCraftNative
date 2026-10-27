@@ -1,0 +1,39 @@
+# Slide Master, Handout Master and Notes Master views: layouts, placeholders, Preserve (cmd/design.rs).
+slide.new={"layout":"titleAndContent","title":"Content"}
+view.slideMaster
+view.slideMaster={"master":0}
+master.preserve
+master.preserve={"preserve":true}
+view.slideMaster={"master":0,"layout":6}
+master.insertLayout={"name":"Quote"}
+master.insertPlaceholder={"kind":"picture","rect":[100,120,300,200]}
+master.insertPlaceholder={"kind":"text"}
+master.insertPlaceholder
+master.placeholders={"footers":false}
+master.placeholders={"title":false,"footers":true}
+master.placeholders={"title":true}
+master.renameLayout={"name":"Pull Quote"}
+master.renameLayout={"master":0,"layout":0,"name":"Opening"}
+master.preserve={"preserve":false}
+master.insertLayout
+master.deleteLayout
+master.deleteLayout={"layout":3}
+view.slideMaster={"master":0}
+master.placeholders={"title":false}
+master.placeholders={"title":true,"footers":true}
+master.insertLayout={"name":"After master"}
+view.closeMaster
+document.inspect
+view.handoutMaster
+handout.placeholders={"footer":false,"date":false}
+handout.placeholders={"footer":true,"header":true}
+design.background={"color":"#EEEEEE"}
+view.handoutMaster
+view.closeMaster
+view.notesMaster
+notes.placeholders={"header":false,"slideImage":false}
+notes.placeholders={"slideImage":true,"pageNumber":false}
+design.background={"style":2}
+view.notesMaster
+view.closeMaster
+slide.inspect

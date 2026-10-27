@@ -1,0 +1,37 @@
+# Format Background: colours, styles, gradients, patterns, pictures and their options, transparency,
+# Apply to All, Reset and copying a slide's background to the others (cmd/design.rs).
+slide.new={"layout":"titleOnly","title":"Two"}
+slide.new={"layout":"blank"}
+slide.go={"index":0}
+design.background={"color":"#1F3864"}
+design.background={"color":"#1F3864"}
+design.background={"color":"accent2","transparency":0.3,"index":1}
+design.background={"transparency":0.5,"index":1}
+design.background={"style":7,"index":2}
+design.background={"style":42}
+slide.inspect={"index":2}
+design.background={"gradient":{"stops":[[0,"#FF0000"],[1,"accent1"]],"angle":45}}
+design.background={"pattern":{"preset":"dkDnDiag","fg":"#00FF00"}}
+design.background={"pattern":{}}
+design.background={"picture":"iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR42mM4ISf3X+6E3H8GObkT/3/9+vUfAEpKCfeNqo0bAAAAAElFTkSuQmCC","name":"dots.png","transparency":0.25}
+design.background={"pictureProps":{"stretch":[0.1,-0.2,0.5,5]}}
+design.background={"pictureProps":{"tile":true,"offsetX":12,"offsetY":-3,"scaleX":0.5,"scaleY":50,"align":"ctr","mirror":"xy","rotateWithShape":false}}
+design.background={"pictureProps":{"align":"bogus","offsetX":"nope"}}
+design.background={"transparency":0}
+slide.inspect
+design.background={"copy":true}
+design.background={"copy":true}
+design.background={"color":"#0D0D0D","all":true}
+design.background={"color":"#0D0D0D","all":true}
+slide.new={"layout":"titleAndContent","title":"Inherits"}
+slide.inspect
+design.background={"reset":true,"all":true}
+slide.inspect={"index":1}
+design.background={"reset":true,"index":0}
+view.slideMaster={"master":0}
+design.background={"color":"#334455"}
+view.slideMaster={"master":0,"layout":1}
+design.background={"style":3}
+design.background={"reset":true}
+view.closeMaster
+slide.inspect={"index":2}
