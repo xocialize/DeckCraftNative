@@ -137,7 +137,7 @@ public enum ShortestFloat {
 
     /// The significant digits (no leading or trailing zeros) and the power of ten of the last one;
     /// nil digits for zero.
-    private static func decompose(_ description: String) -> (digits: [Character]?, exponent: Int) {
+    static func decompose(_ description: String) -> (digits: [Character]?, exponent: Int) {
         var mantissa = Substring(description)
         var exponent = 0
         if let e = description.firstIndex(where: { $0 == "e" || $0 == "E" }) {

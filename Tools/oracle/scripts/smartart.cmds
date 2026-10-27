@@ -1,0 +1,15 @@
+# SmartArt of every family, with nested levels, styles and colours.
+slide.new={"layout":"titleOnly","title":"List"}
+insert.smartArt={"kind":"list","items":["Alpha","Beta","Gamma"]}
+smartArt.style={"style":"intense"}
+slide.new={"layout":"titleOnly","title":"Cycle"}
+insert.smartArt={"kind":"cycle","items":["Plan","Do","Check","Act"]}
+smartArt.colors={"colors":"colorful"}
+slide.new={"layout":"titleOnly","title":"Hierarchy"}
+insert.smartArt={"kind":"hierarchy","items":["Chief"]}
+smartArt.setNodes={"nodes":[{"text":"Chief","level":0},{"text":"Left","level":1},{"text":"Right","level":1},{"text":"Leaf","level":2}]}
+slide.new={"layout":"titleOnly","title":"Pyramid and matrix"}
+insert.smartArt={"kind":"pyramid","items":["Base","Middle","Top"]}
+slide.new={"layout":"titleOnly","title":"Matrix"}
+insert.smartArt={"kind":"matrix","items":["One","Two","Three","Four"]}
+smartArt.layout={"kind":"chevron"}

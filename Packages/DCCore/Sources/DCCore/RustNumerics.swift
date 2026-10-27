@@ -59,6 +59,10 @@ extension Double {
         return self < other ? self : other
     }
 
+    /// Rust's `f64::signum`: ±1 by the sign bit (so ±0 give ±1), NaN for NaN.
+    @inlinable
+    public var rustSignum: Double { isNaN ? .nan : (sign == .minus ? -1.0 : 1.0) }
+
     /// Rust's `f64::to_radians`.
     @inlinable
     public var toRadians: Double { self * (Double.pi / 180.0) }

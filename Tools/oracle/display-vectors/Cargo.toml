@@ -1,0 +1,11 @@
+[package]
+name = "display-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Writes Rust's `Display` (`format!(\"{}\", v)`) of the json-vectors floats, so DCCore's `rustDisplay` can be checked against it."
+
+# No dependencies: `Display` for floats is core's.
+[dependencies]
+
+[workspace]

@@ -78,3 +78,44 @@ public func rustTrimEnd(_ s: Substring) -> Substring {
     guard let end = s.lastIndex(where: { !ws($0) }) else { return s[s.startIndex ..< s.startIndex] }
     return s[...end]
 }
+
+/// Rust's `str::parse::<f64>()`: an optional sign, then `inf`, `infinity` or `nan` (any case), or
+/// digits with an optional `.` and fraction (at least one digit in all) and an optional exponent
+/// (`e`/`E`, optional sign, at least one digit). Nothing else: no whitespace, hex, `_` or `nan(…)`,
+/// which Swift's `Double(_:)` would accept. Correctly rounded; overflow gives ±infinity.
+public func rustParseF64(_ s: some StringProtocol) -> Double? {
+    guard rustFloatSyntax(s.utf8) else { return nil }
+    return Double(String(s))
+}
+
+/// Rust's `str::parse::<f32>()`, with `rustParseF64`'s grammar.
+public func rustParseF32(_ s: some StringProtocol) -> Float? {
+    guard rustFloatSyntax(s.utf8) else { return nil }
+    return Float(String(s))
+}
+
+/// Does `u` match core's float grammar (`dec2flt`)?
+func rustFloatSyntax(_ u: some Collection<UInt8>) -> Bool {
+    var b = Array(u)
+    if let f = b.first, f == UInt8(ascii: "+") || f == UInt8(ascii: "-") { b.removeFirst() }
+    if b.isEmpty { return false }
+    let lower = String(decoding: b.map { $0 >= 0x41 && $0 <= 0x5A ? $0 + 32 : $0 }, as: UTF8.self)
+    if lower == "inf" || lower == "infinity" || lower == "nan" { return true }
+    var i = 0
+    func isDigit(_ x: UInt8) -> Bool { x >= 0x30 && x <= 0x39 }
+    var digits = 0
+    while i < b.count, isDigit(b[i]) { i += 1; digits += 1 }
+    if i < b.count, b[i] == UInt8(ascii: ".") {
+        i += 1
+        while i < b.count, isDigit(b[i]) { i += 1; digits += 1 }
+    }
+    if digits == 0 { return false }
+    if i < b.count, b[i] == UInt8(ascii: "e") || b[i] == UInt8(ascii: "E") {
+        i += 1
+        if i < b.count, b[i] == UInt8(ascii: "+") || b[i] == UInt8(ascii: "-") { i += 1 }
+        var exp = 0
+        while i < b.count, isDigit(b[i]) { i += 1; exp += 1 }
+        if exp == 0 { return false }
+    }
+    return i == b.count
+}

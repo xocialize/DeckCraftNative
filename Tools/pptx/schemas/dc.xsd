@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A stand-in for the DCMI dc.xsd that opc-coreProperties.xsd imports from dublincore.org (validation runs
+     offline): the fifteen Dublin Core elements, each any text with any attributes, as SimpleLiteral is. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://purl.org/dc/elements/1.1/"
+    xmlns="http://purl.org/dc/elements/1.1/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:complexType name="SimpleLiteral" mixed="true">
+    <xs:complexContent mixed="true"><xs:restriction base="xs:anyType"><xs:sequence/><xs:anyAttribute processContents="lax"/></xs:restriction></xs:complexContent>
+  </xs:complexType>
+  <xs:element name="any" type="SimpleLiteral" abstract="true"/>
+  <xs:element name="title" substitutionGroup="any"/>
+  <xs:element name="creator" substitutionGroup="any"/>
+  <xs:element name="subject" substitutionGroup="any"/>
+  <xs:element name="description" substitutionGroup="any"/>
+  <xs:element name="publisher" substitutionGroup="any"/>
+  <xs:element name="contributor" substitutionGroup="any"/>
+  <xs:element name="date" substitutionGroup="any"/>
+  <xs:element name="type" substitutionGroup="any"/>
+  <xs:element name="format" substitutionGroup="any"/>
+  <xs:element name="identifier" substitutionGroup="any"/>
+  <xs:element name="source" substitutionGroup="any"/>
+  <xs:element name="language" substitutionGroup="any"/>
+  <xs:element name="relation" substitutionGroup="any"/>
+  <xs:element name="coverage" substitutionGroup="any"/>
+  <xs:element name="rights" substitutionGroup="any"/>
+</xs:schema>

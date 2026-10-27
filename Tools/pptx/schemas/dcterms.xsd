@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A stand-in for the DCMI dcterms.xsd (see dc.xsd): the terms core properties use, and W3CDTF, the
+     xsi:type created and modified carry, as a W3C date-time string. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://purl.org/dc/terms/"
+    xmlns="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="dc.xsd"/>
+  <xs:element name="created" substitutionGroup="dc:any"/>
+  <xs:element name="modified" substitutionGroup="dc:any"/>
+  <xs:element name="issued" substitutionGroup="dc:any"/>
+  <xs:element name="abstract" substitutionGroup="dc:any"/>
+  <xs:complexType name="W3CDTF">
+    <xs:simpleContent>
+      <xs:restriction base="dc:SimpleLiteral">
+        <xs:simpleType>
+          <xs:union memberTypes="xs:gYear xs:gYearMonth xs:date xs:dateTime"/>
+        </xs:simpleType>
+      </xs:restriction>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

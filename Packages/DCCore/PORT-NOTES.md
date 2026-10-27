@@ -1,7 +1,7 @@
 # DCCore — port notes
 
 DCCore holds what every package needs in order to behave like its Rust original. Upstream has no crate like
-it: it stands in for serde, serde_json and Rust's numeric and string semantics. It has 14 tests.
+it: it stands in for serde, serde_json and Rust's numeric and string semantics. It has 20 tests.
 
 ## JSON (serde_json 1.0.154, zmij 1.0.23)
 
@@ -19,5 +19,20 @@ it: it stands in for serde, serde_json and Rust's numeric and string semantics. 
 
 | File | Holds |
 |---|---|
-| `RustNumerics.swift` | `init(rustCast:)`, which saturates and maps NaN to 0, as `as` does; `clamped`, which keeps NaN; `rem` (Rust `%`); `rustMin`/`rustMax`, which ignore NaN; `toRadians`/`toDegrees`; `Collection.at` (Rust `get`) |
-| `RustStrings.swift` | `rustTrim` (and the start/end variants), `rustLines`, `rustASCIILowercase`, `rustLowercase` (with final sigma), `rustUppercase`, `rustEqual` (scalar for scalar), `rustFixed` (`{:.N}`) |
+| `RustNumerics.swift` | `init(rustCast:)`, which saturates and maps NaN to 0, as `as` does; `clamped`, which keeps NaN; `rem` (Rust `%`); `rustMin`/`rustMax`, which ignore NaN; `toRadians`/`toDegrees`; `rustSignum` (`f64::signum`); `Collection.at` (Rust `get`) |
+| `RustStrings.swift` | `rustTrim` (and the start/end variants), `rustLines`, `rustASCIILowercase`, `rustLowercase` (with final sigma), `rustUppercase`, `rustEqual` (scalar for scalar), `rustFixed` (`{:.N}`), `rustParseF64`/`rustParseF32` (`str::parse`: core's float grammar, which Swift's `Double(_:)` widens with hex, `nan(…)` and more) |
+| `RustDisplay.swift` | `RustDisplayable` / `rustDisplay`: `format!("{}", v)` for floats, integers, strings, bools and characters; `rustHex` (`{:0NX}`) |
+
+## Rust's `Display` for floats
+
+`format!("{}", v)` is the shortest round-trip digits in plain decimal: no exponent at any magnitude,
+`1` for `1.0`, `-0` for `-0.0`, `NaN`, `inf`. deckcraft-pptx writes every number in its XML this way.
+`rustDisplay` builds the layout from Swift's shortest digits, with one fix: when the exact value is
+the midpoint of two shortest candidates, Swift takes the even one and core's Dragon4 takes the larger
+(`format_shortest` rounds up when `2·mant >= scale`). An exact integer test spots that midpoint, a
+`Double(_:)` read-back confirms the larger candidate, and the larger is taken.
+
+**Measured:** 222,470 f64 and 107,720 f32 values, every one equal to Rust's `{}`
+(`DECKCRAFT_FIXTURES/json/display-*.txt`, written by `Tools/oracle/display-vectors/run.sh` from
+json-vectors' inputs). Without the fix, the values with such a tie differ: Swift's digits give
+`1658206780088562.2` where Rust prints `1658206780088562.3`.

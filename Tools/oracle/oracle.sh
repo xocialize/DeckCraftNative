@@ -9,6 +9,8 @@
 #   oracle.sh geom-vectors       write deckcraft-geom's preset, warp and Morph output to $DECKCRAFT_FIXTURES/geom/
 #   oracle.sh metafile-vectors   write deckcraft-metafile's parse, placement and pixels to $DECKCRAFT_FIXTURES/metafile/
 #   oracle.sh text-vectors       write deckcraft-text's layouts of the corpus to $DECKCRAFT_FIXTURES/text/
+#   oracle.sh display-vectors    write Rust's `{}` of the json-vectors floats to $DECKCRAFT_FIXTURES/json/display-*.txt
+#   oracle.sh pptx-vectors       write deckcraft-pptx's xml, opc and support-module output to $DECKCRAFT_FIXTURES/pptx/
 #   oracle.sh path               print the binary's path
 #
 # Environment (defaults in brackets):
@@ -143,11 +145,24 @@ cmd_text_vectors() {
   $here/text-vectors/run.sh
 }
 
+# Rust's float Display (`format!("{}", v)`), for DCCore's `rustDisplay`.
+cmd_display_vectors() {
+  $here/display-vectors/run.sh
+}
+
+# deckcraft-pptx's own modules run over the corpus and generated inputs, for DCPPTX's foundation tests.
+# Rerun after `corpus`: corpus.txt covers every corpus package.
+cmd_pptx_vectors() {
+  $here/pptx-vectors/run.sh
+}
+
 case ${1:-} in
   build) cmd_build ;;
   geom-vectors) cmd_geom_vectors ;;
   metafile-vectors) cmd_metafile_vectors ;;
   text-vectors) cmd_text_vectors ;;
+  display-vectors) cmd_display_vectors ;;
+  pptx-vectors) cmd_pptx_vectors ;;
   json-vectors) cmd_json_vectors ;;
   cli) shift; cli "$@" ;;
   corpus) cmd_corpus ;;

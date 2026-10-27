@@ -1,0 +1,19 @@
+# Animations of every class with timings and text builds, and transitions with options and sounds.
+slide.new={"layout":"titleOnly","title":"Entrance"}
+insert.textBox={"rect":[60,140,600,200],"text":"One\nTwo\nThree"}
+animation.add={"effect":"fly","class":"entrance","option":"fromLeft","start":"onClick","duration":500}
+animation.options={"textBuild":"byParagraph"}
+transition.set={"kind":"push","option":"fromRight","duration":800}
+slide.new={"layout":"blank"}
+shape.insert={"preset":"rect","rect":[60,60,200,120],"text":"Pulse"}
+animation.add={"effect":"pulse","class":"emphasis","start":"afterPrevious","delay":250}
+shape.insert={"preset":"ellipse","rect":[320,60,200,120],"text":"Gone"}
+animation.add={"effect":"fadeOut","class":"exit","start":"withPrevious"}
+animation.timing={"repeat":2,"rewind":true}
+shape.insert={"preset":"star5","rect":[600,60,160,160]}
+animation.add={"effect":"spin","class":"emphasis"}
+transition.set={"kind":"wipe","option":"fromTop"}
+transition.timing={"after":3000,"onClick":true}
+transition.sound={"builtin":"chime"}
+slide.new={"layout":"title","title":"Fade","body":"Last"}
+transition.set={"kind":"fade","duration":1200}

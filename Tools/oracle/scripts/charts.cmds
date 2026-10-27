@@ -1,0 +1,23 @@
+# Every chart family the model knows, with titles, legends, labels and options.
+slide.new={"layout":"titleOnly","title":"Stacked and percent"}
+insert.chart={"type":"stackedColumn","rect":[40,110,420,380],"categories":["Q1","Q2","Q3"],"series":[{"name":"A","values":[3,5,4]},{"name":"B","values":[2,4,5]}]}
+chart.options={"title":"Stacked","legend":"b","dataLabels":true}
+insert.chart={"type":"percentBar","rect":[500,110,420,380],"categories":["Q1","Q2","Q3"],"series":[{"name":"A","values":[3,5,4]},{"name":"B","values":[2,4,5]}]}
+chart.options={"legend":"r","gridlines":false}
+slide.new={"layout":"titleOnly","title":"Lines and areas"}
+insert.chart={"type":"lineMarkers","rect":[40,110,420,380],"categories":["Jan","Feb","Mar","Apr"],"series":[{"name":"Sales","values":[10,14,9,17]},{"name":"Costs","values":[8,9,11,10]}]}
+insert.chart={"type":"stackedArea","rect":[500,110,420,380],"categories":["Jan","Feb","Mar","Apr"],"series":[{"name":"X","values":[1,3,2,4]},{"name":"Y","values":[2,2,3,1]}]}
+slide.new={"layout":"titleOnly","title":"Scatter, bubble, radar"}
+insert.chart={"type":"scatter","rect":[30,110,290,380],"categories":["1","2","3","4"],"series":[{"name":"Points","values":[2,4,3,5]}]}
+insert.chart={"type":"doughnut","rect":[340,110,290,380],"categories":["A","B","C"],"series":[{"name":"Share","values":[5,3,2]}]}
+insert.chart={"type":"radar","rect":[650,110,290,380],"categories":["Speed","Cost","Range","Comfort","Safety"],"series":[{"name":"Car","values":[4,3,5,2,4]}]}
+slide.new={"layout":"titleOnly","title":"Waterfall, funnel, treemap"}
+insert.chart={"type":"waterfall","rect":[30,110,290,380],"categories":["Start","Up","Down","End"],"series":[{"name":"Flow","values":[10,4,-3,11]}]}
+chart.options={"subtotals":[3]}
+insert.chart={"type":"funnel","rect":[340,110,290,380],"categories":["Leads","Calls","Deals"],"series":[{"name":"Pipeline","values":[100,40,12]}]}
+insert.chart={"type":"treemap","rect":[650,110,290,380],"categories":["North","South","East","West"],"series":[{"name":"Sales","values":[7,4,3,2]}]}
+slide.new={"layout":"titleOnly","title":"Histogram and box"}
+insert.chart={"type":"histogram","rect":[40,110,420,380],"categories":["a","b","c","d","e","f","g","h"],"series":[{"name":"Values","values":[1,2,2,3,3,3,4,5]}]}
+chart.options={"binCount":4}
+insert.chart={"type":"boxWhisker","rect":[500,110,420,380],"categories":["a","b","c","d","e","f"],"series":[{"name":"Spread","values":[2,4,4,5,7,9]}]}
+chart.options={"quartiles":"inclusive"}

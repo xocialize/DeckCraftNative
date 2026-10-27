@@ -1,0 +1,21 @@
+# Notes, sections, comments, hidden slides, links, action buttons, footers and styled tables.
+slide.new={"layout":"title","title":"Review deck","body":"With notes and comments"}
+slide.notes={"text":"Opening notes.\nSecond paragraph of notes."}
+comment.add={"text":"Check the title","x":100,"y":80}
+comment.reply={"index":0,"text":"Done"}
+section.add={"name":"Intro","at":0}
+slide.new={"layout":"titleOnly","title":"Links"}
+insert.textBox={"rect":[60,140,500,60],"text":"Visit the site"}
+insert.hyperlink={"url":"https://example.com/","tooltip":"Example"}
+insert.actionButton={"kind":"forward","rect":[820,440,80,60]}
+section.add={"name":"Body","at":1}
+slide.new={"layout":"titleOnly","title":"Styled table"}
+insert.table={"rows":4,"cols":4,"rect":[60,120,840,300]}
+table.style={"style":"medium2-accent1"}
+table.options={"bandedColumns":true,"firstColumn":true}
+table.merge={"from":[1,1],"to":[2,2]}
+table.borders={"which":"outside","color":"#C00000","width":2}
+slide.new={"layout":"titleOnly","title":"Hidden"}
+slide.hide={"hidden":true}
+design.headerFooter={"slideNumber":true,"footer":true,"footerText":"Oracle corpus","date":true,"dateText":"26 October 2026"}
+file.properties={"title":"Review deck","author":"Oracle","subject":"Corpus","keywords":"pptx review"}

@@ -107,7 +107,12 @@ let package = Package(
         ),
 
         // MARK: DCPPTX — PPTX read and write from ECMA-376 (deckcraft-pptx). Wave 3.
-        .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor"], path: sources("DCPPTX", "DCPPTX")),
+        .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),
+        .testTarget(
+            name: "DCPPTXTests",
+            dependencies: ["DCPPTX", "DCModel", "DCFormat", "DCRender", "DCGeometry", "DCColor", "DCZip", "DCCore", "DCTestSupport"],
+            path: tests("DCPPTX", "DCPPTXTests")
+        ),
 
         // MARK: DCEngine — Session, history, the command registry, tools, keys, AutoRecover, the
         // sample deck (deckcraft-engine). Wave 4.

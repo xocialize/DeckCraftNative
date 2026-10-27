@@ -304,7 +304,7 @@ public final class Canvas {
         ctx.saveGState()
         defer { ctx.restoreGState() }
         ctx.concatenate(Self.cg(transform))
-        Self.paintArea(ctx, area, evenOdd: evenOdd, paint, paintTransform)
+        Self.paintArea(ctx, area, evenOdd: evenOdd, paint, paintTransform, raster: true)
     }
 
     public func strokePath(_ path: BezPath) {
@@ -340,7 +340,9 @@ public final class Canvas {
     }
 
     /// Fills `area` (user space, already under the transform) with `paint`, mapped by `paintTransform`.
-    static func paintArea(_ ctx: CGContext, _ area: CGPath, evenOdd: Bool, _ paint: Paint, _ paintTransform: Affine) {
+    /// `raster`: drawing into a bitmap, where a strongly magnified picture is enlarged exactly first
+    /// (`Upscale`).
+    static func paintArea(_ ctx: CGContext, _ area: CGPath, evenOdd: Bool, _ paint: Paint, _ paintTransform: Affine, raster: Bool = false) {
         switch paint {
         case .solid(let c, let alpha):
             ctx.setFillColor(Self.cgColor(c, alpha))
@@ -368,17 +370,18 @@ public final class Canvas {
             ctx.concatenate(Self.cg(paintTransform))
             ctx.setAlpha(alpha.clamped(0, 1))
             ctx.interpolationQuality = quality == .low ? .none : quality == .medium ? .medium : .high
-            drawImage(ctx, img, xe, ye)
+            drawImage(ctx, img, xe, ye, magnify: raster && quality != .low)
         }
     }
 
-    private static func drawImage(_ ctx: CGContext, _ img: CGImage, _ xe: Extend, _ ye: Extend) {
+    private static func drawImage(_ ctx: CGContext, _ img: CGImage, _ xe: Extend, _ ye: Extend, magnify: Bool = false) {
         let w = CGFloat(img.width), h = CGFloat(img.height)
         if xe == .pad && ye == .pad {
+            let drawn = magnify ? Upscale.factor(img, ctx.ctm).flatMap { Upscale.bilinear(img, $0) } ?? img : img
             ctx.saveGState()
             ctx.translateBy(x: 0, y: h)
             ctx.scaleBy(x: 1, y: -1)
-            ctx.draw(img, in: CGRect(x: 0, y: 0, width: w, height: h))
+            ctx.draw(drawn, in: CGRect(x: 0, y: 0, width: w, height: h))
             ctx.restoreGState()
             return
         }

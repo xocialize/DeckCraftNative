@@ -105,6 +105,46 @@ reasons are in [PLAN.md](PLAN.md) §3.
 - **Parallel work.** Four sessions ported metafile, fonts and text, render primitives, and tables, charts and
   3-D in the same tree. The renderer core, PDF and integration were done here.
 
+## Wave 3: PPTX (done 2026-10-26)
+
+- **Code.** About 12,000 lines of Swift source and 8,200 lines of tests in DCPPTX, plus Rust's float
+  `Display` in DCCore (`rustDisplay`).
+- **Tests.** 911 in all, every one green and warning-free; Wave 3 added 199.
+  - **DCPPTX: 193.** Every in-file Rust test (33 in the support modules, 18 in `read/`, 6 in `write/`) and all
+    119 integration tests (`tests/it` and `chart_data_labels.rs`), plus oracle tests.
+  - **Skipped for DCEngine (Wave 4): 4.** They need `slide.reuse`, `picture.compress`, `insert.zoom` and the
+    engine's encrypted-file message. Two transition-sound tests are ported apart from the checks only a command
+    can make.
+  - **DCCore: 6 new**, for `rustDisplay` and Rust float parsing.
+- **Parity with the oracle**, over the 9 corpus decks:
+  - **Import is byte-identical.** Swift reading deckcraft's `.pptx` gives deckcraft's model, to the byte of the
+    `presentation` JSON, with media and chart entries the same.
+  - **Export is byte-identical.** Every part Swift writes equals deckcraft's: 458 parts. 13 more decks were
+    also compared once against `deckcraft-cli`, all 1,028 parts identical: kept charts with workbooks, OLE,
+    ink, 3-D models, embedded fonts, tags, decks without masters, and two real PowerPoint files read by
+    deckcraft.
+  - **deckcraft reads Swift's packages** back to the model it reads from its own.
+  - **Support modules:**
+    - the XML parser on 30,207 inputs (parse or error);
+    - every corpus part re-serialised;
+    - 3,134 escapes;
+    - 60,697 calls into opc, cfb, png, maps, custgeom, tables and dgm (`oracle.sh pptx-vectors`).
+  - **`rustDisplay` matches Rust's `{}`** on all 330,190 floats (`oracle.sh display-vectors`).
+- **Validation.** Every part Swift writes, and every part deckcraft writes, validates against the ECMA-376 5th
+  edition Transitional schemas (`Tools/pptx/validate.sh`). Markup compatibility (Part 3) is applied first.
+  Office extension parts (modern comments, chartEx, SmartArt drawings) have no ECMA schema and are skipped.
+  deckcraft makes no such check.
+- **Corpus.** Wave 3 added five scripted decks (charts, SmartArt, effects, motion, review), taking the corpus
+  to 9 decks and 90 rendered slides. The effects deck found a renderer bug: CoreGraphics quantises the
+  weights it uses to magnify an image, so a stretched picture showed soft blocks, and the slide scored 57.4.
+  It now scores 89.2.
+- **Fixed on the way:** files nested about 11 groups deep overflowed a Swift concurrency thread's stack, so
+  import and export now run on a 32 MiB thread, as deckcraft's do on Rust's larger stacks.
+- **Upstream.** deckcraft `origin/main` is 62 commits past the pin. The ones in ported crates (geom, format,
+  fonts, text, render, pptx) only split or move files, and their diffs are moves. The pin stays at `27009cd9`.
+- **Parallel work.** The support modules, then `read/` and `write/` side by side, then the integration tests
+  were each ported by a separate session. The corpus, validation and parity tests were done here.
+
 ## Crates
 
 | deckcraft crate | Rust lines | Disposition | Target | Wave | Status |
@@ -118,7 +158,7 @@ reasons are in [PLAN.md](PLAN.md) §3.
 | text | 5,452 | Combine: CoreText plus the ported layout policy | DCText | 2 | **done** — 110 tests; line breaks identical on the corpus |
 | render | 13,813 | Port onto CoreGraphics | DCRender | 2 | **done** apart from Morph and transitions (Wave 4) — 212 tests; SSIMULACRA2 ≥ 90.6 on every corpus slide |
 | pdf | 1,310 | Replace (CGPDFContext) | DCRender | 2 | **done** — vector slides, real-text layer |
-| pptx | 19,837 | Port | DCPPTX | 3 | not started |
+| pptx | 19,837 | Port | DCPPTX | 3 | **done** — 193 tests; import and export byte-identical to the oracle, schema-valid |
 | anim | 6,036 | Port; Metal compositing | DCAnim | 4 | not started |
 | media | 2,974 | Replace (AVFoundation, media-bridge) | DCMedia | 4 | not started |
 | h264, hevc, vp9, av1, opus, ogg, bitstream, isobmff, matroska | 51,691 | Replace (VideoToolbox, media-bridge, matroska-swift) | DCMedia | 4 | — |
@@ -141,5 +181,10 @@ reasons are in [PLAN.md](PLAN.md) §3.
   at the export's dpi.
 - 2026-10-26: render parity is SSIMULACRA2 against the oracle's PNGs, with a floor of 88 per slide, measured
   in release.
+- 2026-10-26: PPTX parity is byte-identical parts on export and a byte-identical model on import, over the
+  oracle corpus. Written packages also validate against the ECMA-376 Transitional schemas, after markup
+  compatibility. The zip container may differ: DCZip stores a part that wouldn't shrink.
+- 2026-10-26: the XML parser is hand-written over bytes, as quick-xml reads. Foundation's `XMLParser` is
+  stricter and refuses parts deckcraft reads.
 - 2026-10-26: the oracle builds from source with Homebrew's `rustup`. The release binary (v0.11.1) is 112
   commits behind the pin.

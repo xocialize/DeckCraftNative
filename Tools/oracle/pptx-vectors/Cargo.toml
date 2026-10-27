@@ -1,0 +1,20 @@
+[package]
+name = "pptx-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Runs deckcraft-pptx's foundation modules (xml, opc, cfb, png, maps, custgeom, tables, dgm), compiled in from the pinned checkout, over the oracle corpus and generated inputs, and writes what they return, so DCPPTX can be checked against them."
+
+# The modules are private to deckcraft-pptx, so they are compiled into this tool from the checkout's
+# sources (`#[path]`), with deckcraft's own dependencies at the versions its Cargo.lock pins (that
+# lockfile seeds this one).
+[dependencies]
+deckcraft-model = { path = "../../../../deckcraft/crates/model" }
+deckcraft-geom = { path = "../../../../deckcraft/crates/geom" }
+deckcraft-color = { path = "../../../../deckcraft/crates/color" }
+quick-xml = "=0.41.0"
+zip = { version = "=3.0.0", default-features = false, features = ["deflate"] }
+thiserror = "2"
+log = "0.4"
+
+[workspace]

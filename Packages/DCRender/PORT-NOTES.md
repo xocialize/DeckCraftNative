@@ -88,7 +88,8 @@ the renderer itself draws as pixels (pictures, metafiles) keeps the detail the d
 `.build-parity/render-parity/report-<deck>.json`. Slides within 20 points of the threshold also leave both
 PNGs there, so they can be compared side by side.
 
-Measured 2026-10-26 over the 38 slides of the 8 corpus decks (4 decks and their `.pptx` round trips):
+Measured 2026-10-26 over the 90 slides of the 18 corpus decks: 9 decks and their `.pptx` round trips. Wave 3
+added the charts, SmartArt, effects, motion and review decks.
 
 | Deck | Slides | SSIMULACRA2 min | Mean |
 |---|---:|---:|---:|
@@ -96,9 +97,19 @@ Measured 2026-10-26 over the 38 slides of the 8 corpus decks (4 decks and their 
 | content | 5 | 90.6 | 94.1 |
 | shapes | 2 | 91.6 | 95.8 |
 | text | 4 | 92.1 | 94.6 |
+| charts | 6 | 89.8 | 92.5 |
+| smartart | 6 | 91.3 | 94.1 |
+| effects | 3 | 89.2 | 93.4 |
+| motion | 4 | 91.1 | 94.7 |
+| review | 5 | 92.8 | 93.9 |
 
-The `.from-pptx` copies score the same as their originals. At most 0.56% of a slide's pixels differ by more
-than 8 levels: anti-aliasing and text edges. The test's floor is 88.
+The `.from-pptx` copies score the same as their originals. Text and edge anti-aliasing account for most of the
+remaining difference. The test's floor is 88.
+
+The effects deck first scored 57.4 on its picture slide. It stretches an 8 px picture across hundreds of
+pixels. CoreGraphics quantises its interpolation weights to about eighths of a source pixel, which showed as
+soft blocks. The raster canvas now enlarges a picture magnified 2× or more with exact bilinear sampling
+(`Upscale.swift`) before drawing it.
 
 Run it in release, since SSIMULACRA2 in a debug build takes minutes per deck:
 
@@ -110,6 +121,8 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
 
 - Anti-aliasing, the image filters (vImage and CoreGraphics interpolation) and Gaussian blur differ from
   vello at the pixel level. Pixel tests keep the Rust tolerances except where noted at the test.
+- Pictures magnified 2× or more are enlarged by exact bilinear sampling before CoreGraphics draws them
+  (`Upscale`); PDF output keeps the original image.
 - Pattern fills sample their tile in Swift (bilinear, as vello does), because CoreGraphics area-averages
   sub-pixel cells into other colours.
 - The image cache is keyed by the media bytes' storage plus the exact adjustments, not by a hash.
