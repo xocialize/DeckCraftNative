@@ -1,0 +1,12 @@
+[package]
+name = "json-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Writes serde_json's output for generated floats and strings, so DCCore's writer can be checked against it."
+
+# The versions deckcraft's Cargo.lock pins at the oracle commit.
+[dependencies]
+serde_json = { version = "=1.0.154", features = ["float_roundtrip"] }
+
+[workspace]

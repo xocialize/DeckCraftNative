@@ -23,6 +23,8 @@ let package = Package(
     platforms: [.macOS(.v26)],
     products: [
         // L0
+        .library(name: "DCCore", targets: ["DCCore"]),
+        .library(name: "DCZip", targets: ["DCZip"]),
         .library(name: "DCGeometry", targets: ["DCGeometry"]),
         .library(name: "DCColor", targets: ["DCColor"]),
         .library(name: "DCMetafile", targets: ["DCMetafile"]),
@@ -44,17 +46,30 @@ let package = Package(
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
     targets: [
+        // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
+        // Rust's numeric semantics (saturating casts, NaN-propagating clamp). Every package builds on it.
+        .target(name: "DCCore", path: sources("DCCore", "DCCore")),
+        .testTarget(name: "DCCoreTests", dependencies: ["DCCore", "DCTestSupport"], path: tests("DCCore", "DCCoreTests")),
+
+        // MARK: DCZip — ZIP (ZIP64 included) and raw DEFLATE through Apple's Compression framework, from
+        // PhotoCraftNative. Used by DCFormat and DCPPTX.
+        .target(name: "DCZip", path: sources("DCZip", "DCZip")),
+        .testTarget(name: "DCZipTests", dependencies: ["DCZip"], path: tests("DCZip", "DCZipTests")),
+
         // MARK: DCFoundation — EMU/pt units, transforms, preset shapes, warps (deckcraft-geom);
         // RGB/HSL and DrawingML colour transforms (deckcraft-color). Wave 1.
-        .target(name: "DCGeometry", path: sources("DCFoundation", "DCGeometry")),
-        .target(name: "DCColor", path: sources("DCFoundation", "DCColor")),
+        .target(name: "DCGeometry", dependencies: ["DCCore"], path: sources("DCFoundation", "DCGeometry")),
+        .testTarget(name: "DCGeometryTests", dependencies: ["DCGeometry", "DCCore", "DCTestSupport"], path: tests("DCFoundation", "DCGeometryTests")),
+        .target(name: "DCColor", dependencies: ["DCCore"], path: sources("DCFoundation", "DCColor")),
+        .testTarget(name: "DCColorTests", dependencies: ["DCColor", "DCCore"], path: tests("DCFoundation", "DCColorTests")),
 
         // MARK: DCMetafile — EMF, EMF+ and WMF read into a neutral vector model (deckcraft-metafile). Wave 2.
         .target(name: "DCMetafile", path: sources("DCMetafile", "DCMetafile")),
 
         // MARK: DCModel — presentation, masters, layouts, slides, shapes, text, tables, charts,
         // animations, placeholder inheritance (deckcraft-model). Wave 1.
-        .target(name: "DCModel", dependencies: ["DCGeometry", "DCColor"], path: sources("DCModel", "DCModel")),
+        .target(name: "DCModel", dependencies: ["DCCore", "DCGeometry", "DCColor"], path: sources("DCModel", "DCModel")),
+        .testTarget(name: "DCModelTests", dependencies: ["DCModel", "DCCore", "DCGeometry", "DCColor", "DCTestSupport"], path: tests("DCModel", "DCModelTests")),
 
         // MARK: DCText — CoreText layout under deckcraft's autofit, bullets, columns, caret and field
         // rules; the font substitutes (deckcraft-text, -fonts). Wave 2.
@@ -64,7 +79,8 @@ let package = Package(
         .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry"], path: sources("DCAnim", "DCAnim")),
 
         // MARK: DCFormat — `.deckcraft` (zip + JSON + media), outline text, RTF (deckcraft-format). Wave 1.
-        .target(name: "DCFormat", dependencies: ["DCModel"], path: sources("DCFormat", "DCFormat")),
+        .target(name: "DCFormat", dependencies: ["DCCore", "DCZip", "DCModel"], path: sources("DCFormat", "DCFormat")),
+        .testTarget(name: "DCFormatTests", dependencies: ["DCFormat", "DCModel", "DCCore", "DCZip", "DCTestSupport"], path: tests("DCFormat", "DCFormatTests")),
 
         // MARK: DCMedia — AVFoundation and media-bridge in place of deckcraft-media and its codec
         // crates. Wave 4.

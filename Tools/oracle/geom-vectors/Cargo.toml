@@ -1,0 +1,12 @@
+[package]
+name = "geom-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Writes deckcraft-geom's outputs (presets, warps, morphs, squircles) as bit patterns, so DCGeometry can be checked against them."
+
+[dependencies]
+deckcraft-geom = { path = "../../../../deckcraft/crates/geom" }
+kurbo = "=0.13.1"
+
+[workspace]

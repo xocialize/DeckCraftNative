@@ -18,7 +18,8 @@ crate is in [PORT-STATUS.md](PORT-STATUS.md).
 swift build && swift test        # from the repository root
 ```
 
-To build or test one target: `swift build --target DCModel`, `swift test --filter DCModelTests`. The app
+Wave 1 is done: DCCore, DCZip, DCGeometry, DCColor, DCModel and DCFormat, with 259 tests. Status per crate is in
+[PORT-STATUS.md](PORT-STATUS.md). To build or test one target: `swift build --target DCModel`, `swift test --filter DCModelTests`. The app
 is its own Xcode target, which arrives in wave 5.
 
 ## The Rust oracle
@@ -31,6 +32,8 @@ out at their pins, and Rust (`brew install rustup`).
 Tools/oracle/oracle.sh build     # cargo build, output in ~/Library/Caches/DeckCraftNative/cargo-target
 Tools/oracle/oracle.sh corpus    # writes ../DeckCraftNative-Fixtures/oracle/<pin>/
 Tools/oracle/oracle.sh cli render deck.deckcraft --all out/
+Tools/oracle/oracle.sh json-vectors    # serde_json's float/string output, for DCCore's writer tests
+Tools/oracle/oracle.sh geom-vectors    # deckcraft-geom's output, for DCGeometry's bit-exact tests
 ```
 
 The corpus holds the built-in sample deck plus one deck per `Tools/oracle/scripts/*.cmds`. For each

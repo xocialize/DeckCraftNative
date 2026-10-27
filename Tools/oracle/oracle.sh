@@ -5,6 +5,8 @@
 #   oracle.sh build              check both checkouts are clean at the pin, then build deckcraft-cli
 #   oracle.sh cli ARGS...        run the pinned deckcraft-cli
 #   oracle.sh corpus             regenerate $DECKCRAFT_FIXTURES/oracle/<pin>/ from the sample deck and scripts/*.cmds
+#   oracle.sh json-vectors       write serde_json's output for generated floats and strings to $DECKCRAFT_FIXTURES/json/
+#   oracle.sh geom-vectors       write deckcraft-geom's preset, warp and Morph output to $DECKCRAFT_FIXTURES/geom/
 #   oracle.sh path               print the binary's path
 #
 # Environment (defaults in brackets):
@@ -113,10 +115,25 @@ cmd_corpus() {
   print "oracle: corpus at $out ($(find $out -type f | wc -l | tr -d ' ') files, $(du -sh $out | cut -f1))"
 }
 
+# serde_json's float and string output, at the versions deckcraft's Cargo.lock pins, for DCCore's writer tests.
+cmd_json_vectors() {
+  [[ -d $DECKCRAFT_FIXTURES ]] || die "no fixtures repository at $DECKCRAFT_FIXTURES"
+  (cd $here/json-vectors && cargo run -q --release -- $DECKCRAFT_FIXTURES/json)
+}
+
+# deckcraft-geom's output, built from the pinned checkout, for DCGeometry's bit-exact parity tests.
+cmd_geom_vectors() {
+  check_checkout $DECKCRAFT_SRC $DECKCRAFT_COMMIT deckcraft
+  [[ -d $DECKCRAFT_FIXTURES ]] || die "no fixtures repository at $DECKCRAFT_FIXTURES"
+  (cd $here/geom-vectors && cargo run -q --release -- $DECKCRAFT_FIXTURES/geom)
+}
+
 case ${1:-} in
   build) cmd_build ;;
+  geom-vectors) cmd_geom_vectors ;;
+  json-vectors) cmd_json_vectors ;;
   cli) shift; cli "$@" ;;
   corpus) cmd_corpus ;;
   path) print -r -- $bin ;;
-  *) sed -n '2,15p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
+  *) sed -n '2,17p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
 esac

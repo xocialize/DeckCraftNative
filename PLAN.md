@@ -178,7 +178,7 @@ Each wave ends with green tests, a `PORT-STATUS.md` update and a re-sync to upst
 | Wave | Scope | Done when |
 |---|---|---|
 | **0. Scaffold and oracles** | Repo and `Package.swift`; a fixtures repo; the Rust oracle runnable (`rustup` + `cargo build -p deckcraft-cli`, or the release binary); craft-fonts checked out; generate the reference corpus from DeckCraft's sample deck and its test decks | `swift build` is green; `Tools/oracle render <deck>` produces reference PNGs |
-| **1. Foundation** | `DCGeometry`, `DCColor`, `DCModel` (with `resolve`), `DCFormat` | All of geom's, color's, model's and format's tests pass; every `.deckcraft` the oracle writes round-trips byte-equal through Swift |
+| **1. Foundation** (done 2026-10-26) | `DCCore` (serde-compatible JSON, Rust semantics), `DCZip`, `DCGeometry`, `DCColor`, `DCModel` (with `resolve`), `DCFormat` | All of geom's, color's, model's and format's tests pass; every `.deckcraft` the oracle writes loads and re-saves to byte-identical `presentation.json`, and the Rust app opens what Swift writes |
 | **2. Text and render** | `DCText`, `DCRender` (fills, outlines, effects, pictures, tables, charts), `DCMetafile`, PDF export | The sample deck and test decks render within threshold of the oracle; the PDF has vector shapes and selectable text |
 | **3. PPTX** | `DCPPTX` read and write, `Opaque` round-trip, charts, SmartArt, timing tree | pptx's tests (7,085 lines) pass; oracle-written `.pptx` → Swift → `.pptx` keeps every part; Swift-written files open in the Rust app |
 | **4. Engine and automation** | `DCEngine` (Session, history, all 328 commands, tools, keys, AutoRecover, the sample deck), `DCAnim`, `DCMedia`, `dccli`, MCP, control channel | Engine tests pass; the same command scripts give the same `.deckcraft` in both apps; `dccli mcp` passes mcp's tests |
@@ -225,7 +225,32 @@ Mac-specific.
    PixelAgencyEditor), such as a Marquee or MVS show tool? This decides whether `DCEngine` must be ready as an
    embeddable product early.
 
-## 11. Risks
+## 11. Source material beyond deckcraft
+
+Two collections were added on 2026-10-26. Both are reference material, used under the same clean-room rules
+as ECMA-376: implement from the documents, never copy their text into code or docs.
+
+- **`../OfficeFileFormatsProtocols`**: 24 of Microsoft's published Open Specifications (PDF), covered by the
+  Open Specification Promise. The ones that matter here:
+  - **[MS-PPT]** is the legacy binary `.ppt`, which deckcraft has no reader for (its `docs/gaps.md` lists it).
+  - **[MS-ODRAW]** is the drawing layer inside `.ppt`.
+  - **[MS-OFFCRYPTO]** covers password-protected `.pptx`, which deckcraft can't open either.
+  - **[MS-OSHARED]** holds the structures those three share.
+
+  These belong in a wave after the app (Wave 7 or later), as a `DCPPT` reader that produces DCModel, and a
+  decryption step in front of DCPPTX. EMF/WMF ([MS-EMF], [MS-WMF], [MS-EMFPLUS]) aren't in the folder;
+  DCMetafile ports deckcraft's reader in Wave 2.
+- **`../pptx-swift-main`**: PPTXKit (MIT), about 8k lines of Swift. It is a read-only PPTX viewer built on
+  ZIPFoundation, much narrower than deckcraft's `pptx` crate, which reads, writes and round-trips unknown parts.
+  DCPPTX ports deckcraft's crate, not this one. What's useful in it:
+  - **`specifications/`** has the ECMA-376 5th-edition PDFs and the XSD and RELAX NG schemas. Wave 3 validates
+    every `.pptx` DCPPTX writes against the Transitional XSDs with `xmllint`, a check deckcraft doesn't make.
+  - **Its CoreGraphics renderer and UIKit/SwiftUI views** are prior art for Waves 2 and 5.
+  - **Two caveats.** It carries ECMA's `presetShapeDefinitions.xml`, which deckcraft deliberately doesn't use
+    (its preset geometry is its own, and our oracle compares against deckcraft's). And `sample_2.pptx` is of
+    unknown origin, so it never enters the fixtures.
+
+## 12. Risks
 
 - **Text metrics.** Autofit and line breaks drive layout everywhere, and CoreText differs from HarfRust plus UAX #14
   on edge cases. Mitigation: port the policy layer and its tests first, and measure against the oracle before
