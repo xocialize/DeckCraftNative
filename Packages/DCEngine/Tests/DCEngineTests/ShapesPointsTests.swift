@@ -1,13 +1,9 @@
 // DCEngineTests — Edit Points: the freeform conversion, moved, added and deleted points, point and segment
 // types, handles, and open and closed outlines.
 // Ports the Edit Points tests of deckcraft crates/engine/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and
-// the DeckCraft contributors). The tests that drag, click or right-click with the pointer
-// (`edit_points_with_the_pointer_and_curves`, `…_escape_cancels_a_point_or_handle_drag`,
-// `…_handle_drag_modifiers_set_the_point_type`, `…_escape_takes_back_the_point_type_of_a_modifier_drag`,
-// `…_remembered_point_type_follows_undo_redo_and_its_shape`, `…_right_click_picks_the_point_or_the_segment`,
-// `…_right_click_on_a_handle_keeps_the_picked_vertex`) need `Session.pointer` (tools.rs, not ported);
-// `…_right_click_records_the_place_on_the_segment` is ported on `segmentAt`, the hit test the right click
-// uses.
+// the DeckCraft contributors). The tests that drag, click or right-click with the pointer are in
+// PointerPointsTests.swift, apart from `edit_points_types_and_handles` and
+// `edit_points_right_click_records_the_place_on_the_segment`, whole here.
 import DCCore
 @testable import DCEngine
 import DCGeometry
@@ -104,7 +100,7 @@ struct ShapesPointsTests {
         #expect(PointsCommands.parse("C 1 2 3").isEmpty)
     }
 
-    // tests.rs edit_points_types_and_handles (the last part drags a handle with the pointer: not ported)
+    // tests.rs edit_points_types_and_handles
     @Test(.enabled(if: ported("shape.insert")))
     func editPointsTypesAndHandles() throws {
         let s = session()
@@ -145,6 +141,21 @@ struct ShapesPointsTests {
         #expect(((try #require(h.0) - h.2) - (hi0 - v0)).hypot < 1e-6)
         #expect(type1() == "corner")
         #expect(s.fails("shape.pointType", #"{"index": 1, "type": "wobbly"}"#))
+        // With the pointer: click a vertex to show its handles, drag one (one undo step).
+        s.run("shape.pointType", #"{"index": 2, "type": "smooth"}"#)
+        let h2 = try #require(handles(s, id, 2))
+        let ho2 = try #require(h2.1)
+        s.ptr(.down, h2.2.x, h2.2.y, tol: 0)
+        s.ptr(.up, h2.2.x, h2.2.y, tol: 0)
+        #expect(s.tool.editVertex.map { $0 == (0, 2) } == true)
+        s.ptr(.down, ho2.x, ho2.y, tol: 0)
+        s.ptr(.drag, ho2.x + 20, ho2.y + 20, tol: 0)
+        s.ptr(.up, ho2.x + 20, ho2.y + 20, tol: 0)
+        let moved = try #require(handles(s, id, 2)?.1)
+        #expect((moved - (ho2 + Vec2(20, 20))).hypot < 1e-3, "\(moved)")
+        s.run("edit.undo")
+        let back = try #require(handles(s, id, 2)?.1)
+        #expect((back - ho2).hypot < 1e-3)
     }
 
     // tests.rs edit_points_straight_and_curved_segments
@@ -262,15 +273,16 @@ struct ShapesPointsTests {
         #expect(s.tool.vertexKind == nil)
     }
 
-    /// The place on a segment a right click picks (`segmentAt`) is where Add Point puts the point.
-    // tests.rs edit_points_right_click_records_the_place_on_the_segment, on the hit test the click uses
+    /// A right click on a segment records where on it the click was, for Add Point.
+    // tests.rs edit_points_right_click_records_the_place_on_the_segment
     @Test(.enabled(if: ported("shape.insert")))
     func editPointsRightClickRecordsThePlaceOnTheSegment() throws {
         let s = session()
         rect(s)
         func pick(_ x: Double, _ y: Double) -> (Int, Int, Double)? {
-            guard let id = s.tool.editPoints, let sh = s.st.shape(id) else { return nil }
-            return PointsCommands.segmentAt(s.st.doc, s.st.selection, sh, Point(x, y), 4)
+            s.ptr(.contextClick, x, y)
+            guard let (path, seg) = s.tool.editSegment, let t = s.tool.editSegmentT else { return nil }
+            return (path, seg, t)
         }
         // A quarter of the way along the top edge, which ends at point 1.
         let (path, seg, t) = try #require(pick(150, 100))

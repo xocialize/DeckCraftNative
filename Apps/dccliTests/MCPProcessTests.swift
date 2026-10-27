@@ -7,7 +7,6 @@ import DCEngine
 import Darwin
 import Foundation
 import MCP
-import Synchronization
 import System
 import Testing
 
@@ -42,70 +41,16 @@ func toolText(_ line: String) -> JSON {
 
 func isToolError(_ line: String) -> Bool { (try? JSONParser.parse(line))?.get("result")?.get("isError") == true }
 
-/// A fake DeckCraft app on a loopback control port: each request line answered by a control channel over a
-/// headless session, as the app's control server answers it.
-final class FakeApp: @unchecked Sendable {
-    let fd: Int32
-    let port: UInt16
+/// A fake DeckCraft app on a loopback control port: the app's own control server, its requests answered by a
+/// control channel over a headless session.
+final class FakeApp: Sendable {
     let channel = ControlChannel(HeadlessControlHost(Session.withNew()))
-    private let stopped = Mutex(false)
+    let server: ControlServer
+    var port: UInt16 { server.port }
 
-    init() throws {
-        let fd = socket(AF_INET, SOCK_STREAM, 0)
-        var on: Int32 = 1
-        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, socklen_t(MemoryLayout<Int32>.size))
-        var addr = sockaddr_in()
-        addr.sin_family = sa_family_t(AF_INET)
-        addr.sin_addr.s_addr = inet_addr("127.0.0.1")
-        let bound = withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } }
-        guard bound == 0, listen(fd, 16) == 0 else {
-            close(fd)
-            throw IOFailure.current
-        }
-        var len = socklen_t(MemoryLayout<sockaddr_in>.size)
-        _ = withUnsafeMutablePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &len) } }
-        self.fd = fd
-        port = UInt16(bigEndian: addr.sin_port)
-        let t = Thread { [self] in serve() }
-        t.start()
-    }
+    init() throws { server = try channel.serve() }
 
-    func stop() {
-        stopped.withLock { $0 = true }
-        shutdown(fd, SHUT_RDWR)
-        close(fd)
-    }
-
-    private func serve() {
-        while !stopped.withLock({ $0 }) {
-            let c = accept(fd, nil, nil)
-            if c < 0 { return }
-            var on: Int32 = 1
-            setsockopt(c, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
-            let t = Thread { [self] in connection(c) }
-            t.start()
-        }
-    }
-
-    private func connection(_ c: Int32) {
-        defer { close(c) }
-        var buffer: [UInt8] = []
-        while true {
-            while let i = buffer.firstIndex(of: 0x0A) {
-                let line = Array(buffer[..<i])
-                buffer.removeFirst(i + 1)
-                let req = (try? JSONParser.parse(line)) ?? .null
-                var reply = channel.call(req.get("method")?.asStr ?? "", req.get("params") ?? .null)
-                reply.set("id", req.get("id") ?? .null)
-                let out = Array((reply.display + "\n").utf8)
-                _ = out.withUnsafeBytes { send(c, $0.baseAddress, $0.count, 0) }
-            }
-            var chunk = [UInt8](repeating: 0, count: 65536)
-            let n = chunk.withUnsafeMutableBytes { recv(c, $0.baseAddress, $0.count, 0) }
-            if n <= 0 { return }
-            buffer.append(contentsOf: chunk[0 ..< n])
-        }
-    }
+    func stop() { server.stop() }
 }
 
 @Suite("dccli mcp, end to end", .enabled(if: Binaries.haveDccli, "dccli isn't built"))
@@ -319,7 +264,7 @@ struct MCPProcessTests {
         #expect(toolText(out[2]).display.contains("star5"), "\(out[2].prefix(400))")
         #expect(isToolError(out[3]), "the fake app has no window: \(out[3])")
         #expect(toolText(out[4]).get("headless") == true)
-        #expect(isToolError(out[5]))
+        #expect(!isToolError(out[5]) && toolText(out[5]).get("result") == ["hit": .null], "the pointer drives the app's session: \(out[5])")
         // The fake app's session holds what the agent made.
         let doc = app.channel.call("document.inspect", .emptyObject)
         #expect(doc.get("ok") == true)

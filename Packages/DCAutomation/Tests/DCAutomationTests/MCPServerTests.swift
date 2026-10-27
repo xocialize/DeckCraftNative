@@ -74,21 +74,15 @@ struct MCPServerTests {
         let shape = await tool(s, "add_shape", j(#"{"preset": "roundRect", "x": 600, "y": 300, "w": 200, "h": 100, "text": "Goal", "fill": "accent2"}"#))
         let sid = shape.get("id")?.asU64 ?? 0
         await tool(s, "run_command", ["command": "shape.rotate", "params": ["id": .integer(sid), "deg": 10]])
-        // Drag the shape with the pointer. deckcraft's Session::pointer isn't ported yet (DCEngine leaves it to
-        // the app's canvas, Wave 5): the drag is refused, and the box doesn't move.
-        let drag = j(#"{"events": [{"kind": "down", "x": 700, "y": 350}, {"kind": "drag", "x": 650, "y": 330}, {"kind": "up", "x": 650, "y": 330}]}"#)
-        await withKnownIssue("Session.pointer is not ported (Wave 5)") {
-            await tool(s, "pointer", drag)
-        }
+        // Drag the shape with the pointer.
+        await tool(s, "pointer", j(#"{"events": [{"kind": "down", "x": 700, "y": 350}, {"kind": "drag", "x": 650, "y": 330}, {"kind": "up", "x": 650, "y": 330}]}"#))
         await tool(s, "insert_chart", j(#"{"type": "pie", "categories": ["A", "B"], "series": [{"name": "S", "values": [3, 5]}]}"#))
         let sl = await tool(s, "inspect_slide", .emptyObject)
         #expect(sl.get("title") == "Highlights")
         let goal = shapes(sl).first { $0.get("id")?.asU64 == sid } ?? .null
         #expect(goal.get("text") == "Goal")
         #expect(goal.get("rotation")?.asF64 == 10.0)
-        withKnownIssue("Session.pointer is not ported (Wave 5): the shape stays where it was put") {
-            #expect((goal.get("box")?.at(0)?.asF64 ?? 600) < 600.0, "moved left: \(goal.display)")
-        }
+        #expect((goal.get("box")?.at(0)?.asF64 ?? 600) < 600.0, "moved left: \(goal.display)")
         #expect(shapes(sl).contains { $0.get("kind") == "chart" })
         let doc = await tool(s, "inspect_document", .emptyObject)
         #expect(doc.get("slides")?.asArray?.count == 2)

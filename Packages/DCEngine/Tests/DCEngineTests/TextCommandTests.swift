@@ -9,8 +9,8 @@
 //   `new_slide_body_tabs_match_text_set`: ported by the core (EditTests, SlideTests).
 // - tests.rs `click_into_placeholder_starts_editing`, `right_click_in_edited_text_keeps_the_text_selection`,
 //   `dragging_the_frame_of_edited_text_moves_the_box`, `frame_of_rotated_edited_text_follows_the_rotation`,
-//   `a_shape_in_front_of_edited_text_takes_the_click`: they drive `Session::pointer` (tools.rs), not ported.
-//   `ime_composition_is_kept_by_a_key_a_click_or_another_command` is ported without its two pointer steps.
+//   `a_shape_in_front_of_edited_text_takes_the_click`: they drive `Session.pointer`, so they are in
+//   PointerTests.swift.
 // - tests.rs `header_footer_fixed_date_is_the_slides_own_text` (design.headerFooter, insert.dateTime) and
 //   `smartart_text_pane_edits_regenerate_the_diagram` (insert.smartArt) belong to the design and insert
 //   groups' commands.
@@ -656,8 +656,7 @@ struct TextIMETests {
         #expect(s.st.history.undo.count == undo0 + 1)
     }
 
-    // tests.rs ime_composition_is_kept_by_a_key_a_click_or_another_command (without its pointer steps:
-    // `Session::pointer` is not ported)
+    // tests.rs ime_composition_is_kept_by_a_key_a_click_or_another_command
     @Test func imeCompositionIsKeptByAKeyAClickOrAnotherCommand() throws {
         let s = session()
         let title = titleId(s)
@@ -669,8 +668,10 @@ struct TextIMETests {
         #expect(titleText(s) == "안")
         #expect(s.st.history.undo.count == undo0 + 1)
         _ = try s.composeText("녕", nil)
-        s.run("text.exit")
-        #expect(s.st.composition == nil, "leaving the text settles it")
+        s.ptr(.move, 5, 5, tol: 4)
+        #expect(s.st.composition != nil, "hovering keeps composing")
+        s.ptr(.down, 5, 5, tol: 4)
+        #expect(s.st.composition == nil, "a click settles it")
         #expect(titleText(s) == "안녕")
         s.run("text.edit", "{\"id\": \(title)}")
         _ = try s.composeText("하", nil)

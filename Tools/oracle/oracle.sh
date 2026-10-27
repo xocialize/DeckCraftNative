@@ -16,6 +16,8 @@
 #                                answer and the final deck, in $DECKCRAFT_FIXTURES/engine/
 #   oracle.sh anim-vectors       write deckcraft-anim's and the transition compositor's output, and transition frames
 #                                of engine/transitions.deckcraft, to $DECKCRAFT_FIXTURES/anim/
+#   oracle.sh pointer-vectors [NAME…]  run pointer-sessions/*.jsonl (or the named ones) through `mcp`: every reply
+#                                and the saved deck, in $DECKCRAFT_FIXTURES/pointer/
 #   oracle.sh path               print the binary's path
 #
 # Environment (defaults in brackets):
@@ -216,6 +218,31 @@ cmd_engine_vectors() {
   print "oracle: engine vectors at $out ($#names scripts)"
 }
 
+# The MCP server's replies to pointer sessions, for dccli's pointer parity (PointerParityTests). Each
+# pointer-sessions/<name>.jsonl is one `mcp` run, JSON-RPC lines in; `@OUT@` in a line is the deck it saves,
+# written as <name>.deckcraft, and in <name>.replies.txt (one reply per line) that path is `@OUT@` again.
+cmd_pointer_vectors() {
+  check_binary
+  [[ -d $DECKCRAFT_FIXTURES ]] || die "no fixtures repository at $DECKCRAFT_FIXTURES"
+  local out=$DECKCRAFT_FIXTURES/pointer sessions=$here/pointer-sessions
+  mkdir -p $out
+  local names=("$@")
+  (( $#names )) || names=($sessions/*.jsonl(N:t:r))
+  local name session deck text replies
+  for name in $names; do
+    session=$sessions/$name.jsonl
+    [[ -f $session ]] || die "no session $session"
+    deck=$out/$name.deckcraft
+    rm -f $deck
+    text=$(<$session)
+    replies=$(print -r -- ${text//@OUT@/$deck} | $bin mcp) || die "$name: mcp failed"
+    print -r -- ${replies//$deck/@OUT@} > $out/$name.replies.txt
+    [[ -f $deck ]] || die "$name: the session saved no deck"
+  done
+  (cd $out && find . -type f ! -name SHA256SUMS | LC_ALL=C sort | xargs shasum -a 256 > SHA256SUMS)
+  print "oracle: pointer vectors at $out ($#names sessions)"
+}
+
 case ${1:-} in
   build) cmd_build ;;
   geom-vectors) cmd_geom_vectors ;;
@@ -226,9 +253,10 @@ case ${1:-} in
   engine-vectors) shift; cmd_engine_vectors "$@" ;;
   media-vectors) cmd_media_vectors ;;
   anim-vectors) cmd_anim_vectors ;;
+  pointer-vectors) shift; cmd_pointer_vectors "$@" ;;
   json-vectors) cmd_json_vectors ;;
   cli) shift; cli "$@" ;;
   corpus) cmd_corpus ;;
   path) print -r -- $bin ;;
-  *) sed -n '2,19p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
+  *) sed -n '2,21p' $0 | sed 's/^# \{0,1\}//'; exit 64 ;;
 esac

@@ -2,19 +2,11 @@
 // crates/engine/src/drawtable.rs and crates/engine/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
 //
-// Not ported (they drive the canvas through `Session::pointer` / `hit_test`, tools.rs, which no Wave 4
-// module ports; see PORT-NOTES "Not ported"):
-// - tests.rs `double_click_in_table_uses_grown_row_heights`, `double_click_in_a_cell_selects_the_word_clicked`,
-//   `clicks_while_editing_a_cell_move_the_caret_between_cells`,
-//   `pressing_a_table_outside_its_cells_with_a_range_selected_moves_the_table`,
-//   `a_click_in_a_selected_table_enters_the_clicked_cell`, `dragging_column_borders_resizes_columns`,
-//   `dragging_a_row_border_sets_the_row_height`, `dragging_a_border_while_editing_a_cell_keeps_editing`.
-// Ported in part (their pointer steps left out, the rest kept; each says so):
-// - `grown_table_frame_covers_its_drawn_rows` (not the hit test), `table_borders_are_hit_where_they_are_drawn`
-//   and `rotated_tables_hit_the_cell_under_the_pointer` (through `TableFrame.borderAt` / `cellAt`, which the
-//   pointer code calls), `dragging_across_cells_selects_a_range_of_cells` (the range made with
-//   `table.selectCells` instead of a drag), `tables_with_a_file_defined_style_edit_and_resize` (not the clicks
-//   and the border drag).
+// The tests of tests.rs that drive the canvas through `Session.pointer` (tools.rs) are in
+// PointerTableTests.swift; the ones below that also click or drag (`grown_table_frame_covers_its_drawn_rows`,
+// `dragging_across_cells_selects_a_range_of_cells`, `table_borders_are_hit_where_they_are_drawn`,
+// `rotated_tables_hit_the_cell_under_the_pointer`, `tables_with_a_file_defined_style_edit_and_resize`) are
+// whole, pointer steps included.
 import DCColor
 import DCCore
 @testable import DCEngine
@@ -139,7 +131,7 @@ struct DrawTableTests {
 
 @Suite("Table commands")
 struct TableCommandTests {
-    /// tests.rs `grown_table_frame_covers_its_drawn_rows` (without its hit test: `hit_test` is tools.rs).
+    /// tests.rs `grown_table_frame_covers_its_drawn_rows`.
     @Test func grownTableFrameCoversItsDrawnRows() throws {
         let s = session()
         let id = insertTable(s, 3, 2, [100, 100, 400, 120], [["a", "b"], ["c", "d"], ["e", "f"]])
@@ -151,6 +143,8 @@ struct TableCommandTests {
         #expect(drawn > 12, "rows should grow: \(drawn)")
         let x = Cmd.xfrmOf(st.doc, st.selection, sh)
         #expect(abs(x.h - drawn) < 1e-6, "frame \(x.h) vs drawn \(drawn)")
+        let belowStored = Point(120, 100 + drawn - 2)
+        if case .shape? = s.hitTest(belowStored, 1) {} else { Issue.record("no hit: \(String(describing: s.hitTest(belowStored, 1)))") }
     }
 
     /// tests.rs `cell_text_is_laid_out_where_the_cell_draws_it`.
@@ -187,15 +181,25 @@ struct TableCommandTests {
         #expect(s.st.shape(id) == nil, "the table is deleted")
     }
 
-    /// tests.rs `dragging_across_cells_selects_a_range_of_cells`, with the range made by `table.selectCells`
-    /// where the Rust test drags the pointer (tools.rs); the keys, formatting, Delete and Cut are as there.
+    /// tests.rs `dragging_across_cells_selects_a_range_of_cells`.
     @Test func draggingAcrossCellsSelectsARangeOfCells() {
         let s = session()
         let id = tableAt(s, [100, 100, 100], [["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]])
         func range(_ a: (Int, Int), _ b: (Int, Int)) -> CellRange { CellRange(id, TextPoint(a.0, a.1), TextPoint(b.0, b.1)) }
-        s.run("table.selectCells", "{\"id\": \(id.rawValue), \"from\": [0, 0], \"to\": [2, 1]}")
+        // The middle of cell (r, c): the table's top-left is (100, 100), rows are 40 pt high.
+        func drag(_ kind: PointerKind, _ r: Int, _ c: Int) { s.ptr(kind, 150 + 100 * Double(c), 120 + 40 * Double(r)) }
+        s.run("text.edit", "{\"id\": \(id.rawValue), \"cell\": [0, 0]}")
+        drag(.down, 0, 0)
+        drag(.drag, 1, 1)
+        #expect(cells(s) == range((0, 0), (1, 1)), "leaving the cell selects whole cells")
+        #expect(textSel(s) == nil)
+        #expect(s.st.selection.shapes == [id])
+        // Back in the cell the drag started in, it selects text there again.
+        drag(.drag, 0, 0)
+        #expect(cells(s) == nil && textSel(s)?.cell == TextPoint(0, 0))
+        drag(.drag, 2, 1)
+        drag(.up, 2, 1)
         #expect(cells(s) == range((0, 0), (2, 1)))
-        #expect(s.st.selection.shapes == [id] && textSel(s) == nil)
         // Shift+arrow moves the range's far corner.
         let shift = Mods(shift: true)
         _ = try? s.key("ArrowRight", shift)
@@ -227,13 +231,21 @@ struct TableCommandTests {
         #expect(tableOf(s, id).cell(1, 1)?.text.text == "")
         #expect(tableOf(s, id).cell(2, 1)?.text.text == "h")
         s.run("edit.undo")
+        // A click in the table puts the caret in the clicked cell and ends the range.
+        drag(.down, 2, 2)
+        drag(.up, 2, 2)
+        #expect(cells(s) == nil && textSel(s)?.cell == TextPoint(2, 2))
         // A range that reaches into a merged cell takes all of it.
         s.run("table.merge", "{\"id\": \(id.rawValue), \"from\": [0, 1], \"to\": [0, 2]}")
-        s.run("table.selectCells", "{\"id\": \(id.rawValue), \"from\": [1, 0], \"to\": [0, 1]}")
+        s.run("text.edit", "{\"id\": \(id.rawValue), \"cell\": [1, 0]}")
+        drag(.down, 1, 0)
+        drag(.drag, 0, 1)
+        drag(.up, 0, 1)
         #expect(cells(s) == range((1, 0), (0, 1)))
         func selected() -> ((Int, Int), (Int, Int))? { TableCommands.selectedRange(cells(s), id, tableOf(s, id)) }
         #expect(selected().map { $0.0 == (0, 0) && $0.1 == (1, 2) } == true)
-        // Shift+arrow keeps the cell the range started from.
+        // Shift+arrow keeps the cell the range started from: Shift+Down moves the end to row 1, so the range
+        // no longer includes the merged cell in row 0.
         _ = try? s.key("ArrowDown", shift)
         #expect(selected().map { $0.0 == (1, 0) && $0.1 == (1, 1) } == true)
         // Cut of a cell a merge covers takes the whole merged cell, and clears what it copied.
@@ -285,26 +297,25 @@ struct TableCommandTests {
         #expect((textSel(s)?.caret.char ?? .max) < down.char)
     }
 
-    /// tests.rs `table_borders_are_hit_where_they_are_drawn`, through `TableFrame.borderAt`, which the
-    /// pointer's hit test calls (the hover and the plain-shape hits are tools.rs).
+    /// tests.rs `table_borders_are_hit_where_they_are_drawn`.
     @Test func tableBordersAreHitWhereTheyAreDrawn() throws {
         let s = session()
         let id = tableAt(s, [100, 100, 100], [["a", "b", "c"], ["d", "e", "f"]])
-        func hit(_ x: Double, _ y: Double) throws -> TableFrame.Border? {
-            let st = s.st
-            let sh = try #require(st.shape(id))
-            let f = try #require(TableCommands.tableFrame(st, sh))
-            return f.borderAt(f.local(Point(x, y)), 3)
-        }
-        #expect(try hit(201, 125) == .column(0))
-        #expect(try hit(400, 125) == .column(2), "the right edge")
-        #expect(try hit(150, 139) == .row(0))
-        #expect(try hit(150, 181) == .row(1), "the bottom edge")
-        #expect(try hit(150, 125) == nil)
+        func hit(_ x: Double, _ y: Double) -> Hit? { s.hitTest(Point(x, y), 3) }
+        func isShape(_ h: Hit?) -> Bool { if case .shape? = h { true } else { false } }
+        #expect(hit(201, 125) == .tableColumn(id: id, col: 0))
+        #expect(hit(400, 125) == .tableColumn(id: id, col: 2), "the right edge")
+        #expect(hit(150, 139) == .tableRow(id: id, row: 0))
+        #expect(hit(150, 181) == .tableRow(id: id, row: 1), "the bottom edge")
+        #expect(isShape(hit(100, 125)), "the left edge moves the table")
+        #expect(isShape(hit(150, 125)))
+        // Hovering a border shows it (the UI picks the resize cursor from the hover).
+        s.ptr(.move, 300, 170)
+        #expect(s.tool.hover == .tableColumn(id: id, col: 1))
         // A border inside a merged cell isn't there.
         s.run("table.merge", "{\"id\": \(id.rawValue), \"from\": [0, 0], \"to\": [0, 1]}")
-        #expect(try hit(200, 120) == nil)
-        #expect(try hit(200, 160) == .column(0))
+        #expect(isShape(hit(200, 120)))
+        #expect(hit(200, 160) == .tableColumn(id: id, col: 0))
     }
 
     /// tests.rs `column_width_can_keep_the_table_width`.
@@ -320,9 +331,8 @@ struct TableCommandTests {
         #expect(s.st.shape(id)?.xfrm?.w == 100 + (200 - TableCommands.minColumnWidth) + 80)
     }
 
-    /// tests.rs `rotated_tables_hit_the_cell_under_the_pointer`, through `TableFrame.cellAt` (the double
-    /// click is tools.rs).
-    @Test(.enabled(if: ported("shape.rotate"))) func rotatedTablesHitTheCellUnderThePointer() throws {
+    /// tests.rs `rotated_tables_hit_the_cell_under_the_pointer`.
+    @Test func rotatedTablesHitTheCellUnderThePointer() throws {
         let s = session()
         let id = tableAt(s, [100, 100], [["a", "b"], ["c", "d"]])
         s.run("shape.rotate", "{\"ids\": [\(id.rawValue)], \"deg\": 90}")
@@ -330,7 +340,8 @@ struct TableCommandTests {
         let sh = try #require(st.shape(id))
         let f = try #require(TableCommands.tableFrame(st, sh))
         let p = f.affine * Point(150, 60)
-        #expect(f.cellAt(f.local(p)).map { $0 == (1, 1) } == true)
+        s.ptr(.doubleClick, p.x, p.y)
+        #expect(textSel(s)?.cell == TextPoint(1, 1))
     }
 
     /// tests.rs `tab_moves_between_cells_skipping_merged_ones`.
@@ -483,8 +494,8 @@ struct TableCommandTests {
         }
     }
 
-    /// tests.rs `tables_with_a_file_defined_style_edit_and_resize`, up to its clicks and border drag (tools.rs):
-    /// the header is laid out in the file style's weight.
+    /// tests.rs `tables_with_a_file_defined_style_edit_and_resize`: the header is laid out in the file style's
+    /// weight, and clicks and a border drag land where the cells are drawn.
     @Test func tablesWithAFileDefinedStyleEditAndResize() throws {
         let s = session()
         let id = tableAt(s, [200, 200], [["Hello world", "b"], ["c", "d"]])
@@ -533,5 +544,20 @@ struct TableCommandTests {
             #expect(abs(p.x - builtIn.x) > 0.5, "the header is laid out in the file style's (regular) weight: \(p) vs \(builtIn)")
         }
         s.run("text.exit")
+        s.run("edit.deselect")
+        // A double-click selects the word drawn there.
+        s.ptr(.doubleClick, p.x, p.y)
+        let t = try #require(textSel(s))
+        #expect(t.cell == TextPoint(0, 0) && sameRange(orderedOf(t), ((0, 6), (0, 11))))
+        // A click in another cell moves the caret there.
+        s.clickAt(400, 160)
+        #expect(textSel(s)?.cell == TextPoint(1, 1))
+        // Border drag, while editing: the columns resize, editing goes on.
+        s.ptr(.down, 300, 120)
+        s.ptr(.drag, 320, 120)
+        s.ptr(.drag, 330, 121)
+        s.ptr(.up, 330, 121)
+        #expect(tableOf(s, id).cols == [230, 170])
+        #expect(textSel(s)?.cell == TextPoint(1, 1))
     }
 }

@@ -4,7 +4,8 @@ Port of deckcraft `crates/engine` at the pin in `Tools/oracle/pin.env`. **Status
 first step): the Session, history, the command registry and its shared helpers, and the `file`, `edit`, `slide`,
 `selection` and `inspect` command modules, with keys, AutoRecover, the automation roots, media references, fonts,
 sounds, templates, GIF export and the sample deck. The other 24 command modules are ported next, in parallel, on
-top of this core (see [Registry layout](#registry-layout)).
+top of this core (see [Registry layout](#registry-layout)). The pointer (`tools.rs`) followed at the start of Wave 5,
+for the app's canvas: see [Pointer](#pointer-wave-5-toolsrs).
 
 - **Code:** about 7,500 lines of Swift in `Sources/DCEngine`, 3,300 lines of tests.
 - **Tests:** 180 in 19 suites, all green: 140 run today, and 40 (among them the suites "Text keys" and "Selection
@@ -28,7 +29,7 @@ top of this core (see [Registry layout](#registry-layout)).
 | `cmd/<module>.rs` (24 more) | `Cmd<Module>.swift` | `<Module>Commands`, empty until its agent ports it |
 | `guard.rs` | `Guard.swift` | see Divergences |
 | `connect.rs` | `Connect.swift` | `Session.edit` reroutes glued connectors |
-| `tools.rs` | `Tools.swift` | the data types and `line_xfrm` only; see [Not ported](#not-ported) |
+| `tools.rs` | `Tools.swift`, `ToolsPointer.swift`, `ToolsHit.swift`, `ToolsGeometry.swift` | the pointer (Wave 5); see [Pointer](#pointer-wave-5-toolsrs) |
 | `compare.rs` | `Compare.swift` | the data types only (`DocState` holds a `Compare`); the review agent ports the rest into this file |
 | `io.rs` | `IO.swift` | POSIX: atomic write through a `.saving` sibling, permissions kept |
 | `file_access.rs` | `FileAccess.swift` | `AutomationRoots`, `FileAccess.confine` / `unconfined` / `confineProcess` |
@@ -220,9 +221,9 @@ succeed.
   pictures, effects, hyperlinks, IME, Edit Points, spelling, …), `guides_tests.rs` (arrange.rs),
   `ruler_tests.rs` (format.rs), and `soak_tests.rs` (`SoakTests.swift`: four seeded 400-step soaks and the
   undo-drain test; `DECKCRAFT_SOAK_STEPS` and `DECKCRAFT_SOAK_SEED` run a long one).
-- **Not portable:** `tests_keys.rs`' `home_end_and_ctrl_home_end` (needs `text::layout_for`, the text agent's)
-  and its Format Painter pointer tests, and the pointer tests of `tests.rs` and `selection_tests.rs` (they need
-  `Session::pointer`; see Not ported). `guard.rs`' two panic tests (see Divergences).
+- **Not portable:** `guard.rs`' two panic tests (see Divergences). (`tests_keys.rs`' `home_end_and_ctrl_home_end`
+  is the text group's, in TextCommandTests; the pointer tests of `tests.rs`, `selection_tests.rs`,
+  `tests_keys.rs` and `guides_tests.rs` are ported with the pointer, see [Pointer](#pointer-wave-5-toolsrs).)
 - **Running them:** `swift test --filter DCEngineTests --scratch-path .build-engine`. The test bundle links every
   test target, so a parallel session's broken target stops the run; while DCMediaTests didn't build, the tests
   were run from a scratch copy of the manifest without it, over the same sources.
@@ -259,16 +260,9 @@ succeed.
 - **Names on paste** are kept in a `Set<String>`, which equates canonically equivalent strings where Rust's
   `HashSet` compares bytes. It only matters for names that differ in Unicode normalisation alone.
 
-## Not ported
-
-- **`tools.rs`'s pointer handling** (`Session::pointer`, hit testing, drags, snapping, freeform and ink drawing,
-  table borders; about 1,900 lines). No command module or script needs it and none of the four groups owns it:
-  it belongs with the app's canvas (Wave 5). Its data types are in `Tools.swift`, and `Session.key` handles
-  Escape and Enter for drags and freeforms through them.
-
 ## Lower-layer changes
 
-None.
+None in the core. The pointer added one, see [Pointer](#pointer-wave-5-toolsrs).
 
 ## Text group (Wave 4): text, format, find, table, review
 
@@ -373,8 +367,8 @@ and suggests its own corrections), the same answer keys — and every other answ
 23 of them wait for other groups' commands (`shape.insert`, `insert.textBox`, `insert.table`,
 `insert.hyperlink`, `insert.chart`, `design.theme`, `shape.rotate`…) through `.enabled(if: ported(…))`; with a
 private stand-in `shape.insert` / `insert.textBox` all but those needing `insert.hyperlink`, `insert.table`,
-`insert.chart`, `design.theme` and `shape.*` pass. Not ported: the tests that drive `Session::pointer`
-(listed at the top of each file), `header_footer_fixed_date_is_the_slides_own_text` and
+`insert.chart`, `design.theme` and `shape.*` pass. The tests that drive `Session.pointer` came with the pointer
+(Wave 5; listed at the top of each file); not ported: `header_footer_fixed_date_is_the_slides_own_text` and
 `smartart_text_pane_edits_regenerate_the_diagram` (the design and insert groups' commands), and the PPTX half of
 `editing_shrink_text_stores_the_layout_scale`.
 
@@ -463,8 +457,8 @@ another vertex.
 
 - Merge Shapes' path text (above).
 - Artistic effects' PNG bytes, and their pixels for a JPEG original (above).
-- **`shape.rotate`'s gestures** use `Session.begin` / `commitNamed`, written here: tools.rs's pointer handling
-  isn't ported (core "Not ported").
+- **`shape.rotate`'s gestures** use `Session.begin` / `commitNamed`, written here before the pointer was ported;
+  the pointer (ToolsPointer.swift) uses the same two.
 - **Gradient stops** are sorted with a stable sort that orders −0 before +0, as `total_cmp` does.
 
 ### Core-file edits
@@ -484,17 +478,10 @@ group's command (`shape.insert`, `insert.picture`, `insert.textBox`, `insert.tab
 build, because the shape-tree walks (`findShape`, `walk`…) recurse once per level, as deckcraft's do and as
 `cargo test`'s 2 MB threads allow. The app's main thread has 8 MB.
 
-Not ported, because they drive `Session::pointer` (tools.rs, not ported): `edit_points_with_the_pointer_and_curves`,
-`edit_points_escape_cancels_a_point_or_handle_drag`, `edit_points_handle_drag_modifiers_set_the_point_type`,
-`edit_points_escape_takes_back_the_point_type_of_a_modifier_drag`,
-`edit_points_remembered_point_type_follows_undo_redo_and_its_shape`,
-`edit_points_right_click_picks_the_point_or_the_segment`, `edit_points_right_click_on_a_handle_keeps_the_picked_vertex`,
-the pointer half of `edit_points_types_and_handles` and of `freeform_tools_and_command`,
-`drag_a_guide_drop_it_off_the_slide_and_snap_shapes_to_it`, `rotated_tables_hit_the_cell_under_the_pointer`,
-`clicks_in_flipped_shapes_hit_the_text_where_it_is_drawn`, `double_click_edits_text_inside_group`,
-`resizing_a_flipped_box_snaps_the_dragged_edge` and `a_shape_in_front_of_edited_text_takes_the_click`.
-`edit_points_right_click_records_the_place_on_the_segment` is ported on `segmentAt`, the hit test behind the
-click. The Selection pane tests of selection_tests.rs that use these commands were ported by the core
+The tests that drive `Session.pointer` came with the pointer (Wave 5): `edit_points_types_and_handles` and
+`edit_points_right_click_records_the_place_on_the_segment` are whole in ShapesPointsTests, the others are in
+PointerPointsTests, PointerShapeTests and PointerSnapTests (see [Pointer](#pointer-wave-5-toolsrs)).
+The Selection pane tests of selection_tests.rs that use these commands were ported by the core
 (MiscTests).
 
 ### Lower-layer changes
@@ -635,3 +622,95 @@ None. (`DCPPTXTests/IntegrationRoundtripTests.swift`: the three disabled engine 
 ### Lower-layer changes
 
 None.
+
+## Pointer (Wave 5): tools.rs
+
+`Session.pointer(_:)` and everything in `tools.rs` it needs: hit testing (handles, adjust and WordArt handles,
+Edit Points vertices and handles, the frame of edited text, tables' borders, groups, ink, lines), the tool state
+machine, every drag (move, Alt-duplicate, resize, line ends with glue, rotate, adjust, WordArt warp, Edit Points
+vertices and handles with their modifiers, marquee, drawing guides, table borders, text selection across table
+cells), smart guides and grid snapping, connectors drawn between sites, freeform, curve and scribble drawing,
+ink with pressure and the eraser, Draw Table's pencil and eraser (on `DrawTable`), double, triple and right clicks,
+and the Format and Animation Painters on click. The app's canvas and automation (`ui.pointer`, the MCP `pointer`
+tool, through `drivePointer` in DCAutomation's `Headless.swift`) call it.
+
+### File map
+
+| Rust (`crates/engine/src/tools.rs`) | Swift (`Sources/DCEngine`) | Notes |
+|---|---|---|
+| types, `set_tool`, `cancel_point_drag`, `finish_freeform`, `line_xfrm` | `Tools.swift` | as before (Wave 4), header updated |
+| `pointer`, `down`, `drag`, `up`, `double_click`, `context_click`, `place_caret`, `edit_text_at`, `begin_table_border`, `glue_at`, `update_sites`, `set_xfrm`, `set_xfrm_cmd`, `execute_dup_in_place`, `ink_sample`, `add_ink`, `erase_at`, `commit`, the painters' helpers | `ToolsPointer.swift` | `Session.pointer`; `begin` / `commit_named` stay in `CmdShape.swift`, where `shape.rotate` put them |
+| `hit_test`, `guide_at`, `box_handles`, `wordart_handles`, `hit_shape`, `text_member_at`, `member_at`, `shape_in_front`, `edited_box`, `edit_zone`, `in_table_cell`, `is_text_first`, `text_pos`, `table_rows` | `ToolsHit.swift` | `Session.hitTest`, `guideAt`; `Tools.*`; `Hit.toJSON` (serde's `tag = "kind"`) |
+| `resize_box`, `constrain_45`, `contains_rect`, `snap_rect`, `snap_edges`, `snap_resize`, `set_warp_adj` | `ToolsGeometry.swift` | |
+| in-file tests; the pointer tests of `tests.rs`, `cmd/selection_tests.rs`, `tests_keys.rs`, `cmd/guides_tests.rs` | `Tests/DCEngineTests/Pointer*.swift` and, completed in place, `TableCommandTests`, `ShapesPointsTests`, `TextCommandTests` | see Tests |
+
+### Tests
+
+56 Rust tests, each under its name in camelCase with a comment naming its source: `tools.rs`' 2, 45 of `tests.rs`,
+`selection_tests.rs`' `locked_objects_are_picked_on_the_canvas_but_not_dragged`, `guides_tests.rs`'
+`drag_a_guide_drop_it_off_the_slide_and_snap_shapes_to_it` and `tests_keys.rs`' 7 Format Painter tests (in the
+"Text keys" suite, whose helpers they share).
+
+- `PointerTests.swift` (30): the in-file tests, drawing, moving, snapping, connectors, freeforms, ink, guides,
+  right clicks, the frame of edited text, WordArt, shapes off the slide.
+- `PointerTableTests.swift` (9), `PointerPointsTests.swift` (7), `PointerTextTests.swift` (8).
+- Completed in place, their pointer steps added back (they were ported without them in Wave 4):
+  `grownTableFrameCoversItsDrawnRows`, `draggingAcrossCellsSelectsARangeOfCells`,
+  `tableBordersAreHitWhereTheyAreDrawn`, `rotatedTablesHitTheCellUnderThePointer`,
+  `tablesWithAFileDefinedStyleEditAndResize` (TableCommandTests), `editPointsTypesAndHandles`,
+  `editPointsRightClickRecordsThePlaceOnTheSegment` (ShapesPointsTests, now on a real right click),
+  `imeCompositionIsKeptByAKeyAClickOrAnotherCommand` (TextCommandTests). `freeformToolsAndCommand` keeps its
+  command half in ShapesCommandTests; the whole test is PointerShapeTests'.
+- Six more for what the Rust tests only reach through the UI: hostile events (non-finite coordinates,
+  tolerances and pressures, every kind with no document), the eraser and the highlighter, drawing modifiers and
+  sticky tools, rotation and Alt-duplicate and Shift-marquees, moves that snap to shapes and the grid, and Draw
+  Table's pencil and eraser.
+- `PointerSupport.swift`: `pev`, `Session.ptr` (`s.pointer(ev).unwrap()`), `exec`, `clickAt`, `dragGesture`,
+  `boxOf`, `inspectBox`.
+
+### Oracle parity
+
+Seven sessions in `Tools/oracle/pointer-sessions/` (JSON-RPC lines for `mcp`: a presentation, pointer events of
+every kind, tool and drag, smart guides and the grid on, Cmd to turn snapping off, Shift, Alt and their pairs,
+pressures, Escape and Enter, then `save_presentation` to `@OUT@`). `Tools/oracle/oracle.sh pointer-vectors` runs
+them through deckcraft-cli's `mcp` and keeps every reply and the deck in `$DECKCRAFT_FIXTURES/pointer/`; dccliTests'
+`PointerParityTests` runs them through `dccli mcp` and compares every reply (a saved file's `bytes`, DCZip's
+deflate, masked) and the deck's `presentation` member byte for byte. Each down, drag and up is its own `pointer`
+call, so every `{hit}`, `{caret}`, `{selected}` and command answer, and the selection after it, is compared.
+
+| Session | What it drives | Pointer calls | Replies | `presentation.json` | Status |
+|---|---|---:|---:|---:|---|
+| `shapes` | drawing (Shift, Alt, clicks), hover, moves (snapping, Cmd, Shift, Alt), every resize handle, aspect, from the centre, flips, snapped edges, rotation (Shift), multiple selection, adjust handles (callout tail), marquees, right, double and triple clicks, locked shapes | 271 | 331 | 116,940 B | **identical** |
+| `lines` | connectors drawn site to site, bent and curved connectors, 45° lines, line ends dragged and glued, glued shapes moved, connectors unglued | 81 | 108 | 118,191 B | **identical** |
+| `text` | placeholders, caret clicks, Shift-extend, drag-select, double and triple clicks, the frame of edited text (hover, drag, click), handles over the frame, plain shapes, flipped and rotated text, group members, the text box tool, the Format Painter | 104 | 142 | 122,586 B | **identical** |
+| `tables` | entering cells, Shift-clicks across cells, cell ranges by drag, presses outside the cells, double and triple clicks in cells, column and row borders (hover, drag, edges, while editing), rotated tables, Draw Table's pencil and eraser | 113 | 146 | 125,903 B | **identical** |
+| `freeform` | freeform polygons (rubber band, close on the start, double click), curves (Enter, Escape, one point), scribbles open and closed, pen pressure (clamped), mouse ink, highlighter, eraser | 103 | 125 | 117,166 B | **identical** |
+| `points` | Edit Points: vertex drags, Esc mid-drag, handles with Alt, Shift and Ctrl, Esc after a modifier, Ctrl-click delete and add, right clicks on points, segments and handles, leaving Edit Points | 60 | 90 | 113,824 B | **identical** |
+| `wordart` | WordArt warp handles: hover, drag, one and two adjusts, undo and redo, while editing the text | 28 | 43 | 112,967 B | **identical** |
+
+To add a session: write `Tools/oracle/pointer-sessions/<name>.jsonl`, run `Tools/oracle/oracle.sh pointer-vectors
+<name>`, and run `swift test --filter PointerParityTests`.
+
+### Divergences
+
+None measured: every reply and deck of the sessions above is deckcraft's. Written differently, with no
+difference a session or test shows:
+
+- **Never crash.** `memberAt` (a double click's search for the text member of a group) stops at 64 levels of
+  nesting, as the model's own walks do (deckcraft recurses unbounded; files never hold deeper groups), and
+  `Tools.setWarpAdj` refuses a negative adjust index (Rust's is a `usize`).
+- **f32 and f64 arithmetic** follow Rust: `f64::max`/`min` are `rustMax`/`rustMin`, a sum of `f64`s starts at
+  −0.0 as Rust's `Sum` does, `constrain_45`'s cosine and sine come from one `__sincos_stret` call (Rust's release
+  build merges the pair), and pressures are clamped as `f32`.
+
+### Lower-layer changes
+
+- **DCGeometry `KurboWinding.swift`** (new, 100 lines): kurbo 0.13.1's `Shape::winding` for `BezPath` and
+  `PathSeg::winding` (with `solve_monotonic_for_y`), which `hit_shape` fills unfilled outlines by. It uses
+  DCGeometry's internal `kurboSegments`, `solveQuadratic` and `solveCubic`, so it lives there.
+
+### Core-file edits (additive)
+
+- `Tools.swift`: the header comment.
+- DCAutomation: `drivePointer` calls `Session.pointer` (its PORT-NOTES).
+

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Not sandboxed yet: the control server listens on loopback and AutoRecover writes beside documents.
+     Wave 6 (ship) decides the sandbox and its entitlements. -->
+<plist version="1.0">
+<dict/>
+</plist>

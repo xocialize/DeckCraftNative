@@ -4,8 +4,9 @@
 // so other repos can depend on this one by URL (SwiftPM can't consume a package from a repo's subfolder).
 //
 // Targets keep their sources at `Packages/<package>/{Sources,Tests}/<target>` and follow deckcraft's
-// crate layers (PLAN.md §3–4): a target depends only on lower layers, and nothing here imports AppKit
-// or SwiftUI — the app is its own Xcode target (wave 5). Ports deckcraft (MIT OR Apache-2.0,
+// crate layers (PLAN.md §3–4): a target depends only on lower layers, and nothing below the app layer
+// imports AppKit or SwiftUI. The app's code is the `DCApp` library (L7) so it builds and tests with
+// `swift test`; `Apps/DeckCraftNative` is a thin Xcode wrapper around it, and `DeckCraftDev` runs it unbundled. Ports deckcraft (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors); every ported file names its source and licence.
 //
 // Fleet packages come by versioned URL in the wave that needs them: media-bridge's MediaMeasureCore
@@ -43,6 +44,10 @@ let package = Package(
         .library(name: "DCEngine", targets: ["DCEngine"]),
         .library(name: "DCAutomation", targets: ["DCAutomation"]),
         .executable(name: "dccli", targets: ["dccli"]),
+        // L7: the app. DCAppModel is its window-free state and UI commands; DCApp is AppKit and SwiftUI.
+        .library(name: "DCAppModel", targets: ["DCAppModel"]),
+        .library(name: "DCApp", targets: ["DCApp"]),
+        .executable(name: "DeckCraftDev", targets: ["DeckCraftDev"]),
         // Tests' access to the fixtures and the upstream pin
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
@@ -53,6 +58,8 @@ let package = Package(
         .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.12.1"),
         // dccli's subcommands.
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0"),
+        // The fleet's design vocabulary (AB-D-0042): tokens and shared components for the app's UI.
+        .package(url: "https://github.com/xocialize/DesignScaffold.git", from: "0.25.0"),
     ],
     targets: [
         // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
@@ -169,6 +176,39 @@ let package = Package(
             ],
             path: "Apps/dccliTests"
         ),
+
+        // MARK: DCAppModel — the app's state without a window (ui-egui's SlideApp logic): UiState, the UI-only
+        // commands, the menu tree, the palette, and routing between them and the engine. No AppKit. Wave 5.
+        .target(
+            name: "DCAppModel",
+            dependencies: ["DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCFormat", "DCModel", "DCText", "DCGeometry", "DCColor", "DCCore"],
+            path: sources("DCApp", "DCAppModel")
+        ),
+        .testTarget(
+            name: "DCAppModelTests",
+            dependencies: ["DCAppModel", "DCEngine", "DCAutomation", "DCModel", "DCCore", "DCTestSupport"],
+            path: tests("DCApp", "DCAppModelTests")
+        ),
+
+        // MARK: DCApp — the Mac app: NSDocument windows, the canvas, navigator and inspector, menus and toolbar,
+        // the slide show, the control server's host (ui-egui, apps/deckcraft). Wave 5.
+        .target(
+            name: "DCApp",
+            dependencies: [
+                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore",
+                .product(name: "DesignScaffold", package: "DesignScaffold"),
+                .product(name: "DesignScaffoldPicker", package: "DesignScaffold"),
+            ],
+            path: sources("DCApp", "DCApp")
+        ),
+        .testTarget(
+            name: "DCAppTests",
+            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport"],
+            path: tests("DCApp", "DCAppTests")
+        ),
+        // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev
+        // --control 4242 --sample`). The Xcode wrapper has the same one-line entry point.
+        .executableTarget(name: "DeckCraftDev", dependencies: ["DCApp"], path: "Apps/DeckCraftDev"),
 
         // MARK: DCTestSupport — the fixtures root and the upstream pin, for every test target.
         .target(

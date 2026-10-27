@@ -334,7 +334,8 @@ struct ShapeFormatTests {
         #expect(start == nil && end != nil)
     }
 
-    // tests.rs freeform_tools_and_command (the command; the drawing tools need the pointer, not ported)
+    // tests.rs freeform_tools_and_command, the command half and a curve through four points (the drawing
+    // tools' half is PointerShapeTests' `freeformToolsAndCommand`)
     @Test(.enabled(if: ported("shape.insert")))
     func freeformToolsAndCommand() {
         let s = session()

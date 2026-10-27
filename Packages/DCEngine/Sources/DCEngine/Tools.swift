@@ -1,10 +1,8 @@
-// DCEngine — pointer tools: the tool state the Session holds, and the pieces of tools.rs the rest of the
-// engine calls. Port of the data types and helpers of deckcraft crates/engine/src/tools.rs (MIT OR
-// Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-//
-// The gesture handling itself (`Session::pointer`, hit testing, drags, snapping; about 1,900 lines) is
-// not ported in Wave 4's core: no command module or script needs it, and it belongs with the app's canvas
-// (Wave 5). `Drag` is here so the state and Escape/Enter handling in `keys.rs` keep their shape.
+// DCEngine — pointer tools: the tool state the Session holds, the drag in progress, and the pieces of
+// tools.rs the rest of the engine calls (`set_tool`, `cancel_point_drag`, `finish_freeform`, `line_xfrm`).
+// Port of the data types and helpers of deckcraft crates/engine/src/tools.rs (MIT OR Apache-2.0, © ArtCraft
+// Team and the DeckCraft contributors). The gestures are in ToolsPointer.swift, hit testing in
+// ToolsHit.swift, and resizing and snapping in ToolsGeometry.swift.
 import DCColor
 import DCCore
 import DCGeometry

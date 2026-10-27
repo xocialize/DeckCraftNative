@@ -90,18 +90,16 @@ public enum ControlInput {
     }
 }
 
-/// Feeds one pointer event to the session's active tool (deckcraft `Session::pointer`).
-///
-/// deckcraft's pointer handling (tools.rs: hit testing, drags, snapping, drawing; about 1,900 lines) is not
-/// ported yet: DCEngine left it for the app's canvas (Wave 5; see its PORT-NOTES, "Not ported"). Until it
-/// is, a gesture is refused with this message, and the control channel and MCP `pointer` tool answer that
-/// error. This is the one place to connect `Session.pointer` when it lands.
+/// Feeds one pointer event to the session's active tool (deckcraft `Session::pointer`); an engine error
+/// becomes the request's error, as `e.to_string()` does in deckcraft. The control channel's `ui.pointer` and
+/// the MCP `pointer` tool both come through here.
 func drivePointer(_ s: Session, _ ev: PointerEvent) throws(AutomationError) -> JSON {
-    throw AutomationError(pointerNotPorted)
+    do throws(EngineError) {
+        return try s.pointer(ev)
+    } catch {
+        throw AutomationError(error.description)
+    }
 }
-
-/// Why `ui.pointer` is refused (see `drivePointer`).
-public let pointerNotPorted = "pointer gestures are not ported yet (deckcraft's Session::pointer, tools.rs; DCEngine leaves it to the app's canvas, Wave 5)"
 
 /// Headless backend: a `Session` rendering slides on the CPU. Confined to one thread at a time.
 public final class Headless: Backend {

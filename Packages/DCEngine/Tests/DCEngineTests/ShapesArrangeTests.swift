@@ -1,8 +1,8 @@
 // DCEngineTests — Arrange: group and ungroup, nesting depth, align and distribute, and the drawing guides.
 // Ports the arrange tests of deckcraft crates/engine/src/tests.rs and cmd/guides_tests.rs (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors). The Selection pane's ordering tests are in MiscTests.
-// guides_tests.rs' `drag_a_guide_drop_it_off_the_slide_and_snap_shapes_to_it` needs `Session.pointer`
-// (tools.rs, not ported).
+// guides_tests.rs' `drag_a_guide_drop_it_off_the_slide_and_snap_shapes_to_it` drives the pointer, so it is in
+// PointerTests.swift.
 import DCCore
 @testable import DCEngine
 import DCFormat

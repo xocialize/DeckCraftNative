@@ -10,7 +10,7 @@ shape: the two rules, one root `Package.swift`, packages that follow the crate l
 
 | Question | Answer |
 |---|---|
-| Where it lives | `research/DeckCraftNative`, next to PhotoCraftNative; GitHub remote under `xocialize` (not created yet) |
+| Where it lives | `research/DeckCraftNative`, next to PhotoCraftNative; GitHub remote [`xocialize/DeckCraftNative`](https://github.com/xocialize/DeckCraftNative) (private, created 2026-10-27); the fixtures repo stays local, as PhotoCraftNative's does |
 | Platforms | macOS 26+, Apple Silicon only. Engine packages stay free of AppKit so iPadOS can follow later |
 | UI | A Mac-native app that keeps PowerPoint's verbs: menu bar, toolbar, inspector sidebar and slide navigator (a Keynote-like layout), all generated from the command registry. **The ribbon is dropped** |
 
@@ -182,7 +182,7 @@ Each wave ends with green tests, a `PORT-STATUS.md` update and a re-sync to upst
 | **2. Text and render** (done 2026-10-26) | `DCText`, `DCRender` (fills, outlines, effects, pictures, tables, charts), `DCMetafile`, PDF export | The sample deck and test decks render within threshold of the oracle; the PDF has vector shapes and selectable text |
 | **3. PPTX** (done 2026-10-26) | `DCPPTX` read and write, `Opaque` round-trip, charts, SmartArt, timing tree | pptx's tests (7,085 lines) pass; oracle-written `.pptx` → Swift → `.pptx` keeps every part; Swift-written files open in the Rust app |
 | **4. Engine and automation** (done 2026-10-27) | `DCEngine` (Session, history, all 328 commands, tools, keys, AutoRecover, the sample deck), `DCAnim`, `DCMedia`, `dccli`, MCP, control channel | Engine tests pass; the same command scripts give the same `.deckcraft` in both apps; `dccli mcp` passes mcp's tests |
-| **5. The app** | Document app (`NSDocument`), slide navigator, canvas with handles, smart guides and text editing, inspector panes, menus and toolbar from the registry, the dialogs, the slide show and presenter view on the second display, printing, pasteboard, String Catalogs | The six alpha-gate workflows DeckCraft defines (build, open and save `.pptx`, present, tables and charts, share as PDF, review) work end to end in the app; screenshots are checked through the control channel |
+| **5. The app** (done 2026-10-27; String Catalogs open) | Document app (`NSDocument`), slide navigator, canvas with handles, smart guides and text editing, inspector panes, menus and toolbar from the registry, the dialogs, the slide show and presenter view on the second display, printing, pasteboard, String Catalogs | The six alpha-gate workflows DeckCraft defines (build, open and save `.pptx`, present, tables and charts, share as PDF, review) work end to end in the app; screenshots are checked through the control channel |
 | **6. Ship** | Signing, notarisation, an update channel, Quick Look extensions, App Intents and Shortcuts, Spotlight importer | A notarised build; `EVALUATION.md` lists what isn't native yet |
 
 Waves 1–3 split cleanly across parallel sessions, one package each, like PhotoCraftNative's crate-by-crate runs. The

@@ -190,9 +190,11 @@ reasons are in [PLAN.md](PLAN.md) §3.
     check that none does.
   - **One PDF page.** Page 3 of the effects deck scores 74.3. The vector PDF keeps an 8 px gradient picture at
     its own size, and Preview magnifies it in blocks; raster renders are smoothed.
-- **Not ported, for Wave 5.** `tools.rs`' pointer handling (about 1,900 lines: hit testing, drags, snapping,
-  freeform and ink) belongs with the canvas; MCP's `pointer` tool and `ui.pointer` answer an error until then.
-  Also `control_server.rs` (the app's TCP server) and the screenshot encoder.
+- **Not ported, for Wave 5.** The screenshot encoder. (`tools.rs`' pointer handling, about 1,900 lines of hit
+  testing, drags, snapping, freeform and ink, landed in DCEngine at the start of Wave 5: `Session.pointer`, which
+  MCP's `pointer` tool and `ui.pointer` now drive, its 56 Rust tests ported and 7 MCP pointer sessions identical to
+  the oracle's.) (`control_server.rs`, the app's TCP server, landed in DCAutomation at the start of
+  Wave 5: `ControlServer`, its 14 tests ported.)
 - **Fixed on the way:**
   - The engine runs on 32 MiB threads in MCP and the control channel, so deeply nested groups don't overflow.
   - ImageIO labels a GIF with a frame-delay block `GIF87a`; the header now says `GIF89a`.
@@ -202,6 +204,61 @@ reasons are in [PLAN.md](PLAN.md) §3.
 - **Parallel work.** DCAnim and DCMedia, then the engine core, then four command groups (text, shapes, design,
   insert) side by side, then automation, were each ported by a separate session. Integration, the soak and the
   status were done here.
+
+## Wave 5: the app (done 2026-10-27)
+
+- **Code.** About 22,500 lines of Swift source and 7,000 lines of tests in `Packages/DCApp`:
+  - DCAppModel 9,800, the app's state with no AppKit, so it is testable without a window;
+  - DCApp 12,700, AppKit, SwiftUI and Metal.
+  - By area (app + model): Canvas 3,200, Inspector 5,000, Dialogs 4,300, Show 4,300, Views 3,850,
+    Automation 380, plus the core.
+  - Also `Apps/DeckCraftNative`, a thin Xcode app with deckcraft's document types, and `Apps/DeckCraftDev`,
+    the same app from SwiftPM.
+  - The engine gained deckcraft's pointer (`tools.rs`: about 1,560 lines of Swift).
+  - DCAutomation gained the loopback control server (`control_server.rs`).
+- **The app.** The Mac way: menu bar, toolbar, slide navigator, canvas and inspector, with no ribbon
+  (PLAN.md "Decided").
+  - NSDocument windows over one shared engine session.
+  - The canvas: handles, smart guides, drawing, and in-place text editing through `NSTextInputClient`.
+  - Five inspector tabs carry the ribbon's and task panes' controls (the ribbon map is in DCApp's PORT-NOTES).
+  - Deckcraft's dialogs are sheets; Export, New from template, Settings, the palette, Find and Replace.
+  - The show is composited in Metal, with the presenter view on the second display.
+  - Slide Sorter, Outline and Notes Page views; printing through `NSPrintOperation`; the pasteboard with
+    other apps.
+  - Every action is a registry command (`AppModel.run`). The design vocabulary is DesignScaffold's (AB-D-0042).
+- **Tests.** 2,050 in all, every one green and warning-free; Wave 5 added 405.
+  - **DCApp: 331** (DCAppModelTests 255, DCAppTests 76). All 62 of `lib.rs`' tests are triaged: 41 ported,
+    21 egui-only. So are the per-file tests of every area: `show.rs` 27/27, `media.rs` 7/7, `ime_tests.rs`,
+    `canvas.rs`, the dialogs, backstage, sorter, panes and more. Each area's notes list what doesn't apply.
+  - **DCEngine: 549**, with 56 of deckcraft's pointer tests and 8 earlier tests completed.
+  - **DCAutomation: 52**, with all 14 of `control_server.rs`' tests.
+- **The alpha gate** (deckcraft `docs/roadmap.md`), run in the app through the control channel with a
+  screenshot of every step (`Tools/app/alpha-gate.sh`): **18 of 18 checks pass.**
+  1. build a deck, save, close, reopen;
+  2. open a `.pptx`, edit it, save it back as `.pptx`;
+  3. the show and presenter view;
+  4. a table, a chart with edited data, and SmartArt;
+  5. PDF of slides, notes and handouts, PNG, and print to PDF;
+  6. a comment with a reply, resolved; spelling.
+- **Parity.**
+  - **Pointer.** Seven MCP pointer sessions (760 pointer calls) give deckcraft's replies and decks, byte for byte.
+  - **Show.** The Metal compositor matches DCRender's CPU compositor to within 0.054% of pixels on every
+    non-Morph frame. Against deckcraft's frames it scores 88.9–100 SSIMULACRA2.
+  - **Release.** Render and transition parity pass in release.
+- **Native in place of ports.** `NSTextInputClient`, `NSSpellChecker`, `NSPrintOperation` (deckcraft had no
+  printing: gap #6), `NSPasteboard`, `NSScreen` (presenter view on the second display: gap #9), the menu bar
+  (gap #13), NSDocument, ScreenCaptureKit for the control channel's screenshots, Metal for the show.
+- **PowerPoint.** Installed 2026-10-27 as a black-box oracle (PLAN.md §10). Its first finding: decks with
+  charts written by deckcraft, and so by DCPPTX, open with PowerPoint's repair prompt. Decks without
+  charts open cleanly. It is a deckcraft writer bug, carried over byte for byte, to be fixed in DCPPTX on
+  its own branch.
+- **Not done.** String Catalogs: the Xcode target emits localisable strings, but there is no catalog yet.
+  The window and update-channel items are Wave 6's.
+- **Upstream.** deckcraft `origin/main` is 62 commits past the pin. The 34 in `ui-egui` and `apps/deckcraft`
+  only split or move files. The pin stays at `27009cd9`.
+- **Parallel work.** The pointer and the control server, then five areas (Canvas, Inspector, Dialogs, Show,
+  Views) side by side, then `lib.rs`' tests, were each ported by a separate session. The skeleton, the
+  control host, integration and the alpha gate were done here.
 
 ## Crates
 
@@ -220,10 +277,10 @@ reasons are in [PLAN.md](PLAN.md) §3.
 | anim | 6,036 | Port; compositing in DCRender | DCAnim | 4 | **done** — 102 tests; easing, motion paths, timelines, the show state machine, transition layers and Morph frames bit-identical to the oracle ([PORT-NOTES](Packages/DCAnim/PORT-NOTES.md)) |
 | media | 2,974 | Replace (AVFoundation, media-bridge) | DCMedia | 4 | **done** — 62 tests; header probes identical to the oracle (they're stored in documents); decode on AVFoundation, VideoToolbox and media-bridge ([PORT-NOTES](Packages/DCMedia/PORT-NOTES.md)) |
 | h264, hevc, vp9, av1, opus, ogg, bitstream, isobmff, matroska | 51,691 | Replace (VideoToolbox, media-bridge, matroska-swift) | DCMedia | 4 | **replaced** — container parsing ported where the probes need it; decoding is native. VP8 and VP9 go through a decoder the app registers (Wave 5 decides on vpx-swift) |
-| engine | 40,266 | Port | DCEngine | 4 | **done** but the pointer (`tools.rs`, Wave 5) — 495 tests; all 330 commands registered as deckcraft declares them; 44 engine scripts give deckcraft's answers and decks ([PORT-NOTES](Packages/DCEngine/PORT-NOTES.md)) |
-| mcp | 1,689 | Port (swift-sdk) | DCAutomation | 4 | **done** but the pointer (`Session::pointer` is Wave 5's) — every `#[test]` ported; MCP replies byte-identical to the oracle; control.rs ported for the methods that need no window ([PORT-NOTES](Packages/DCAutomation/PORT-NOTES.md)) |
+| engine | 40,266 | Port | DCEngine | 4, 5 | **done** — 549 tests; all 330 commands registered as deckcraft declares them; 44 engine scripts give deckcraft's answers and decks; the pointer (`tools.rs`, Wave 5): 7 MCP sessions give deckcraft's replies and decks ([PORT-NOTES](Packages/DCEngine/PORT-NOTES.md)) |
+| mcp | 1,689 | Port (swift-sdk) | DCAutomation | 4 | **done** (the pointer since `Session.pointer` landed, Wave 5) — every `#[test]` ported; MCP replies byte-identical to the oracle; control.rs ported for the methods that need no window; the app's `control_server.rs` too (`ControlServer`) ([PORT-NOTES](Packages/DCAutomation/PORT-NOTES.md)) |
 | apps/deckcraft-cli | 1,432 | Port | dccli | 4 | **done** — every subcommand; commands, describe, help, errors, scripts, info and convert identical to the oracle ([PORT-NOTES](Packages/DCAutomation/PORT-NOTES.md#dccli)) |
-| ui-egui, apps/deckcraft | 44,551 | Rewrite (AppKit, SwiftUI) | app | 5 | not started |
+| ui-egui, apps/deckcraft | 44,551 | Rewrite (AppKit, SwiftUI) | DCApp | 5 | **done** — 331 tests; all six alpha-gate workflows pass in the app; String Catalogs not started ([PORT-NOTES](Packages/DCApp/PORT-NOTES.md)) |
 | apps/deckcraft-web | 227 | Drop | — | — | — |
 | xtask | 1,489 | Drop; scripts where needed | Tools | — | — |
 
@@ -243,6 +300,12 @@ reasons are in [PLAN.md](PLAN.md) §3.
   Shapes uses CoreGraphics' path boolean operations, not a port of `i_overlay` (about 43k lines with its
   helper crates). Its outlines aren't byte-identical to deckcraft's, so they are checked by area and render.
   Values stored in documents, such as media probe results, stay exact ports.
+- 2026-10-27: the app is AppKit and SwiftUI over the one engine session: an NSDocument per engine document
+  (by `DocState.uid`), every action through `AppModel.run`, DesignScaffold's tokens for the design
+  vocabulary (AB-D-0042). The app's code is the `DCApp` library, so it builds and tests with `swift test`.
+  The Xcode target is a thin wrapper.
+- 2026-10-27: PowerPoint for Mac is a black-box oracle, for checking that a `.pptx` opens without repair.
+  Nothing it saves, renders or shows enters the repository or the fixtures.
 - 2026-10-26: PPTX parity is byte-identical parts on export and a byte-identical model on import, over the
   oracle corpus. Written packages also validate against the ECMA-376 Transitional schemas, after markup
   compatibility. The zip container may differ: DCZip stores a part that wouldn't shrink.

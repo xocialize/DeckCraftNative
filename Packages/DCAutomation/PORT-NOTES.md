@@ -1,14 +1,16 @@
 # DCAutomation — port notes
 
-Port of deckcraft `crates/mcp` (the MCP server), the JSON control channel of `crates/ui-egui/src/control.rs`, and
-`apps/deckcraft-cli` (as `Apps/dccli`, see [dccli](#dccli)), at the pin in `Tools/oracle/pin.env`. **Status: done**
-(Wave 4, last step), apart from the pointer (see [Divergences](#divergences)).
+Port of deckcraft `crates/mcp` (the MCP server), the JSON control channel of `crates/ui-egui/src/control.rs`, the
+app's loopback control server (`apps/deckcraft/src/control_server.rs`), and `apps/deckcraft-cli` (as `Apps/dccli`,
+see [dccli](#dccli)), at the pin in `Tools/oracle/pin.env`. **Status: done** (Wave 4, last step; the control server
+at the start of Wave 5, and the pointer with DCEngine's `Session.pointer`; see [The pointer](#the-pointer)).
 
-- **Code:** about 2,000 lines in `Sources/DCAutomation` and 1,200 in `Apps/dccli`; 2,150 lines of tests.
-- **Tests:** DCAutomationTests 34, dccliTests 31, with 201 parameterised cases; all pass, with 3 known issues (two pointer
-  steps, one PDF page; see [Divergences](#divergences)). `swift test --filter 'DCAutomationTests|dccliTests'` takes
+- **Code:** about 2,600 lines in `Sources/DCAutomation` and 1,200 in `Apps/dccli`; 2,600 lines of tests.
+- **Tests:** DCAutomationTests 52, dccliTests 31, with 201 parameterised cases; all pass, with 1 known issue (one PDF page; see
+  [Divergences](#divergences)); dccliTests' `PointerParityTests` adds 7 pointer sessions. `swift test --filter 'DCAutomationTests|dccliTests'` takes
   about 8 minutes in debug. Every
-  `#[test]` of `crates/mcp` (25), `control.rs` (1 of 2), `deckcraft-cli` (11) and `automation_args.rs` (3) is ported.
+  `#[test]` of `crates/mcp` (25), `control.rs` (1 of 2), `control_server.rs` (14), `deckcraft-cli` (11) and
+  `automation_args.rs` (3) is ported.
 
 ## File map
 
@@ -20,11 +22,13 @@ Port of deckcraft `crates/mcp` (the MCP server), the JSON control channel of `cr
 | `mcp/src/tools.rs` | `MCPTools.swift` | `ToolResult`, `MCPTools.definitions` (deckcraft's JSON values), `MCPTools.call` |
 | `mcp/src/server.rs` | `MCPServer.swift`, `MCPTransport.swift` | `MCPCore` (`request`, `notification`), `MCPServer` (framing on the SDK), `LineReader`, `serve` |
 | `ui-egui/src/control.rs` | `Control.swift` | `ControlRequest` (`take`/`abandon`), `ControlReply`, `ControlOutcome`, `ControlHost`, `Control.handle`, `ControlChannel`, `HeadlessControlHost` |
+| `apps/deckcraft/src/control_server.rs` | `ControlServer.swift` | `ControlServer` (`Limits`, `tryReceive`/`receive`, `stop`), `ControlChannel.serve`, `ControlQueue` (`sync_channel`), `ControlStream` (`read_line`, `close_politely`) |
 | — | `EngineThread.swift` | the 32 MiB engine thread |
 | — | `JSONText.swift` | `JSON.pretty`: serde_json's `to_string_pretty` |
 | `mcp/src/tests.rs` | `Tests/DCAutomationTests/MCPServerTests.swift` | all 9 |
 | `backend.rs` tests | `Tests/DCAutomationTests/RemoteTests.swift` | all 9, plus address errors |
 | `control.rs` tests | `Tests/DCAutomationTests/ControlTests.swift` | `take_and_abandon_are_exclusive`; `screenshot_reply_is_path_only_or_explicitly_inline` is the window's (Wave 5) |
+| `control_server.rs` tests | `Tests/DCAutomationTests/ControlServerTests.swift` | all 14, plus every reply byte for byte, `stop`, and `Remote` against a headless app |
 | — | `Tests/DCAutomationTests/FramingTests.swift`, `LargeStackTests.swift` | framing replies byte for byte, lifecycle, resources, line reading; deep groups |
 
 ## The MCP server on swift-sdk
@@ -74,17 +78,48 @@ there in Wave 5. Replies are `{"ok": true, "result"}` / `{"ok": false, "error"}`
 and skips abandoned ones; `HeadlessControlHost` is a host without a window (tests, and the fake app in dccliTests
 that `mcp --connect` and `app` drive).
 
-Not ported: `apps/deckcraft/src/control_server.rs` (the loopback TCP server and its limits) is the app's, Wave 5;
-`save_screenshot` belongs with the window's capture budget (`capture.rs`).
+Not ported: `save_screenshot` belongs with the window's capture budget (`capture.rs`).
+
+## The control server
+
+`ControlServer` is `control_server.rs`: 127.0.0.1 only, one request per line, one reply per line, under deckcraft's
+`Limits` (16 clients, 256 MiB lines, 64 queued, idle 600 s, write 30 s, reply 60 s). Behaviour and reply texts are
+deckcraft's, byte for byte (`repliesAreDeckcraftsBytes` holds every literal): a line that isn't a JSON object with a
+string `method` (HTTP, binary, bad JSON) gets one error and the connection closes politely (FIN, then a drain of at
+most 64 KiB until the write timeout); a connection past the limit reads `busy` and is drained on a thread of its own
+(at most 16 at once, 250 ms each); an oversized line and an idle socket close the connection; a full queue answers
+`busy`; a timed-out request still queued is abandoned (it never runs late, #719), one already taken reports an
+unknown outcome.
+
+- **BSD sockets**, as `Remote`: `SO_RCVTIMEO`/`SO_SNDTIMEO` are Rust's `set_read_timeout`/`set_write_timeout`
+  exactly (per read and per write, a sub-microsecond timeout rounded up to 1 µs as Rust does), `shutdown(SHUT_WR)`
+  is the polite close, and each connection is a blocking thread as in deckcraft. Network.framework has no
+  per-read timeout or half-close-then-drain without rebuilding them on timers.
+- **The app's side.** The server answers nothing: requests wait in a bounded queue (`sync_channel`) and `wake`
+  (egui's `request_repaint`) runs after each is queued, on the connection's thread. The app's main thread drains
+  `tryReceive()` and answers each with `take()`, `Control.handle(host, method, params)` and `reply.send` (a
+  `.screenshot` outcome once the window has captured). Bind failure throws; deckcraft logs
+  `control server failed to bind 127.0.0.1:{port}: {e}` and runs without the channel.
+- **Headless.** `ControlChannel.serve(port:limits:)` is the server with one consumer that answers each request on
+  the channel's engine thread before taking the next, as the app's main thread does. dccliTests' `FakeApp` is now
+  exactly that (it was a hand-written socket loop): `dccli app` gave the same stdout, stderr and exit code against
+  both for a 12-call session, and the oracle's `deckcraft-cli app` drives it too.
+- **Stopping.** deckcraft's server lives as long as the app; `stop()` (and `deinit`) closes the listener through a
+  self-pipe, shuts the connections being served and drops the queue.
+
+## The pointer
+
+`ui.pointer` and the MCP `pointer` tool validate their events as deckcraft does and feed each to DCEngine's
+`Session.pointer` (tools.rs, ported at the start of Wave 5; DCEngine's PORT-NOTES, "Pointer") through `drivePointer`
+in `Headless.swift`; an engine error is the request's error, as `e.to_string()` is in deckcraft. The divergence
+this section used to record (`pointerNotPorted`) is gone: `agent_builds_a_deck` drags its shape with the pointer
+and passes plainly, `connectedToAnApp` (dccliTests) presses the fake app's canvas, and seven pointer sessions
+(`Tools/oracle/pointer-sessions/`, 992 lines: every pointer kind, tool and drag, snapping on and off, modifiers,
+pressures) give deckcraft-cli's replies, every one, and its deck's `presentation` byte for byte
+(`PointerParityTests`; DCEngine's PORT-NOTES has the table).
 
 ## Divergences
 
-- **The pointer.** deckcraft's `Session::pointer` (tools.rs: hit testing, drags, snapping, drawing; about 1,900
-  lines) isn't ported — DCEngine left it for the app's canvas (its PORT-NOTES, "Not ported"). `ui.pointer` and the
-  MCP `pointer` tool validate their events as deckcraft does and then answer an error (`pointerNotPorted`).
-  `drivePointer` in `Headless.swift` is the one place to connect `Session.pointer`. `agent_builds_a_deck` drags a
-  shape with the pointer: those two steps are `withKnownIssue`, so the test passes and will flag them once the
-  pointer works. Everything else in it passes.
 - **Pictures.** `render_slide` and `ui.render` PNGs are ImageIO's (DCEngine's `ImageEncoding`): same pixels' sizes,
   other bytes. Saved files' sizes in `save_presentation` answers are DCZip's deflate.
 - **Bounded lines.** deckcraft reads MCP lines without limit; here a line is at most 256 MiB (an oversized line ends
@@ -96,6 +131,10 @@ Not ported: `apps/deckcraft/src/control_server.rs` (the loopback TCP server and 
   where deckcraft's page is a 200 dpi picture of the slide. DCRender's PORT-NOTES records the choice (its raster
   canvas enlarges such pictures first; PDF output keeps the original). The parity test marks that page
   `withKnownIssue`.
+- **Control server.** A request the app drops without answering is noticed at once in Rust (its reply channel
+  disconnects) and only at the reply timeout here (`ControlReply` has no drop signal); the reply text is the same.
+  Requests queued when the server stops wait out their reply timeout in the same way. A client thread that can't be
+  started isn't detected (Foundation's `Thread`), so there is no "could not start a client thread" log.
 - **Versions.** `serverInfo.version` and `dccli --version` say 0.11.1, deckcraft-cli's version, since the
   answers are its answers.
 
@@ -147,7 +186,7 @@ Not ported: `apps/deckcraft/src/control_server.rs` (the loopback TCP server and 
 | `convert` → `.png`; `render --all --scale 2` (43 slides); `render-transition` (15 transitions × 3 frames) | file names, sizes, printed lines; SSIMULACRA2 at 480 px wide, floor 85 | PNG ≥ 96.0, slides ≥ 94.6, frames ≥ 92.8 |
 | `convert` → `.pdf` | the oracle's page count; each page drawn at 2 px/pt against the oracle's slide picture | same page counts; every page ≥ 95.1 but one (below) |
 | `mcp` | the oracle's 35 replies to a 36-line session | identical but saved files' sizes |
-| `mcp --connect`, `app` | a fake app on a loopback port; the oracle's `app` against another | identical |
+| `mcp --connect`, `app` | the control server over a headless channel (`FakeApp`); the oracle's `app` against another | identical |
 
 One test-harness lesson: Foundation's `Process` passes arguments in their file-system representation, which
 decomposes `Ü` into `U` + U+0308; the harness spawns with `posix_spawn` so a script's `--cmd` reaches dccli byte
