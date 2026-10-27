@@ -725,9 +725,11 @@ extension PPTXWrite {
         /// written under a fresh name (`keptName`) and the relationships between kept parts are
         /// rewritten to those names; a relationship to anything that was not kept is dropped.
         /// `nKept` numbers kept parts across the package.
-        static func writeKept(_ pkg: inout PackageOut, _ chartName: String, _ c: Chart, _ nKept: inout UInt32) {
+        /// Returns the chart's relationships as written.
+        @discardableResult
+        static func writeKept(_ pkg: inout PackageOut, _ chartName: String, _ c: Chart, _ nKept: inout UInt32) -> RelsOut {
             if c.kept.rels.isEmpty {
-                return
+                return RelsOut()
             }
             // Original part name (normalized) → the name written.
             var names: [ByteKey: String] = [:]
@@ -780,6 +782,7 @@ extension PPTXWrite {
                 }
                 pkg.rels(newSource, out)
             }
+            return rels
         }
 
         /// A `cx:tx` holding plain text.

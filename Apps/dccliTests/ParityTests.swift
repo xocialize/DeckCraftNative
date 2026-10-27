@@ -228,7 +228,20 @@ struct ParityTests {
         let pptx = dir.appending(path: "\(name).pptx")
         var r = try dccli(["convert", decks.appending(path: "\(name).deckcraft").path, pptx.path])
         #expect(r.code == 0 && r.stdout == "\(pptx.path)\n", "\(r.stderr)")
-        let (ours, theirs) = (try zipParts(readBytes(pptx)), try zipParts(readBytes(decks.appending(path: "\(name).pptx"))))
+        var (ours, theirs) = (try zipParts(readBytes(pptx)), try zipParts(readBytes(decks.appending(path: "\(name).pptx"))))
+        // The one deliberate divergence (PORT-STATUS.md, decisions): a style and a colour style part per
+        // `chartEx` part, and their content types. DCPPTX's ChartexStyleTests check those bytes.
+        let added = /ppt\/charts\/(style|colors)\d+\.xml|ppt\/charts\/_rels\/chartEx\d+\.xml\.rels/
+        let chartex = Set(theirs.keys.compactMap { $0.wholeMatch(of: /ppt\/charts\/chartEx(\d+)\.xml/).map { String($0.1) } })
+        for k in ours.keys where k.wholeMatch(of: added) != nil {
+            #expect(chartex.contains(k.filter(\.isNumber)), "\(name).pptx: \(k) without its chartEx part")
+            ours[k] = nil
+        }
+        if let ct = ours["[Content_Types].xml"] {
+            let t = String(decoding: ct, as: UTF8.self)
+                .replacing(/<Override PartName="\/ppt\/charts\/(style|colors)\d+\.xml" ContentType="application\/vnd\.ms-office\.chart(color)?style\+xml"\/>/, with: "")
+            ours["[Content_Types].xml"] = Array(t.utf8)
+        }
         #expect(Set(ours.keys) == Set(theirs.keys), "\(name).pptx parts")
         for (k, v) in theirs where ours[k] != v { Issue.record("\(name).pptx: part \(k) differs") }
         // .pptx → .deckcraft: the same presentation and media.

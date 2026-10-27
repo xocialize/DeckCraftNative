@@ -362,3 +362,7 @@ reasons are in [PLAN.md](PLAN.md) §3.
   stricter and refuses parts deckcraft reads.
 - 2026-10-26: the oracle builds from source with Homebrew's `rustup`. The release binary (v0.11.1) is 112
   commits behind the pin.
+- 2026-10-27: PPTX export gives every `chartEx` part a chart style and a colour style part, which deckcraft
+  doesn't write; without them Microsoft PowerPoint repairs the file. Byte identity with deckcraft is broken
+  for those parts only, which `PPTXExportOracleTests` allows by name and checks byte for byte
+  ([PORT-NOTES](Packages/DCPPTX/PORT-NOTES.md), write/ divergence 7).

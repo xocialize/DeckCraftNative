@@ -286,9 +286,11 @@ extension of `PPTX` in `WriteMod.swift`; everything else is internal, under the 
 | `write/shapes.rs` | `WriteShapes.swift` | `PPTXWrite.Shapes`: `IdMap`, `Ctx` (a `final class`), every shape kind, SmartArt parts, ink, 3-D models, tables, media, kept objects and their OLE fallback |
 | `write/chart.rs` | `WriteChart.swift` | `PPTXWrite.Charts` (`chartXML`, `chartexPart`, `chartexXML`, `buildChartex`, `writeKept`…); `PPTXWrite.chartXML` (Rust `write::chart::chart_xml`, which the reader's tests call) and `PPTXWrite.nsCX` sit on `PPTXWrite` itself |
 | `write/theme.rs` | `WriteTheme.swift` | `PPTXWrite.Themes.themeXML` |
+| — | `WriteChartexStyle.swift` | `PPTXWrite.ChartexStyle`: the style and colour style parts every `chartEx` part gets (divergence 7); DeckCraftNative's own |
 | `write/timing.rs` | `WriteTiming.swift` | `PPTXWrite.Timing`: `transition`, `timing` and the effect builders |
 | in-file tests | `Tests/DCPPTXTests/WriteTests.swift` | `WriteDMLTests` (1), `WriteShapesTests` (1), `WriteChartRegionMapTests` (1), `WriteChartTests` (3); 4 of them read back through `PPTXRead` |
 | — | `Tests/DCPPTXTests/PPTXExportOracleTests.swift` | Export parity, schema validation and deckcraft's read-back over the 9 corpus decks |
+| — | `Tests/DCPPTXTests/ChartexStyleTests.swift` | Divergence 7: the added parts byte for byte (`ChartexStyleExpected`, which the oracle test uses too) and their structure, for every Office 2016 kind, kept and rebuilt |
 
 The writer calls these reader functions, with Rust's parameter and return shapes: `PPTXRead.relRefs`,
 `isRelAttr`, `keepXML`, `resolveMC(_:_:)`, `chartexFrom` and `chartFromEl`. Rust's `has_rel_refs` is
@@ -297,7 +299,11 @@ The writer calls these reader functions, with Rust's parameter and return shapes
 ### Parity
 
 - `exportMatchesOracle`: for each of the 9 corpus decks, every part Swift writes equals deckcraft's byte
-  for byte, under the same names. `exportValidates`: every covered part validates against ECMA-376
+  for byte, under the same names, apart from divergence 7: `charts` gains a style and a colour style part
+  and a relationships part per `chartEx` part, and their `[Content_Types].xml` overrides. Those are an
+  explicit allow-list (`expectedDivergences`) checked byte for byte, and the test fails if any other part
+  differs. `oracleReadsSwiftPackage` lets deckcraft keep the added parts as the chart's `kept` sidecar and
+  nothing else. dccli's `convert` parity test (`Apps/dccliTests/ParityTests.swift`) allows the same parts by name. `exportValidates`: every covered part validates against ECMA-376
   Transitional. `oracleReadsSwiftPackage`: deckcraft reads each Swift package to the model it reads from
   its own.
 - Beyond the corpus, Swift's and deckcraft's exports (`deckcraft-cli convert`) were compared part for
@@ -342,6 +348,29 @@ The writer calls these reader functions, with Rust's parameter and return shapes
 6. **The supplied `PPTXExportOracleTests.swift`** nested one `#require` inside another, which Swift 6.2
    rejects ("recursive expansion of macro"). The copy here binds the inner `#require` to a `let` first;
    nothing else changed.
+7. **Style parts for Office 2016 charts (2026-10-27, deliberate).** deckcraft writes a `chartEx` part with
+   no relationships. Microsoft PowerPoint for Mac (16.114) then reports "found a problem with content" and
+   its repair discards the whole slide. That held for every Office 2016 kind deckcraft writes (waterfall,
+   funnel, treemap, sunburst, histogram, Pareto, box and whisker; region maps open) and for the corpus
+   `charts.pptx`, with or without options, and whether the slide carries the `mc:AlternateContent` or the
+   `cx:chart` frame alone. Found by bisecting copies with `Tools/pptx/powerpoint-check.sh`: removing the
+   title, legend, axes, layout properties, series text or `uniqueId`, or adding `cx:f` references or an
+   embedded workbook with `cx:externalData`, changed nothing. Adding a `chartStyle` and a `chartColorStyle`
+   relationship (`http://schemas.microsoft.com/office/2011/relationships/…`) to schema-shaped
+   `cs:chartStyle` and `cs:colorStyle` parts fixed it; either one alone, or either one empty, did not.
+   PowerPoint also takes a chartEx's default fills and lines from those parts, so placeholder parts open
+   but draw unfilled bars. `ChartexStyle.add` writes a full default style (series in the colour cycle,
+   light gridlines, grey text) as `ppt/charts/styleN.xml` and `colorsN.xml` beside `chartExN.xml`,
+   whenever the part has no style relationship of its own: a rebuilt chart, or a kept one from a file
+   without them. A kept chart that had them keeps them. Plain `c:` charts are unchanged; PowerPoint opens
+   them without style parts. This breaks byte identity with deckcraft for those parts only (PLAN.md §6).
+   Spec basis: ECMA-376 has no chartEx; the `cs:chartStyle`/`cs:colorStyle` parts, their content types and
+   relationship types are Office extensions ([MS-ODRAWXML], which `../pptx-swift-main/specifications` doesn't
+   carry). Their contents use ECMA-376 Part 1 DrawingML: style matrix and font references (§20.1.4: `lnRef`,
+   `fillRef`, `effectRef`, `fontRef` with `minor`), `a:schemeClr` with `lumMod`/`lumOff` (§20.1.2.3), and
+   `a:ln`/`a:solidFill`/`a:noFill`. Nothing was copied from a PowerPoint-written file: the one repaired copy
+   (made with the user's leave, kept in a scratch folder and deleted) blanked the whole slide and named no
+   element. Checked with `Tools/pptx/powerpoint-check.sh`, which presses only Cancel and saves nothing.
 
 ## Integration tests
 
