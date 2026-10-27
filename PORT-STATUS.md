@@ -316,6 +316,19 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   catalog infrastructure, the fonts and licences in the bundle, integration, the final notarized build and
   EVALUATION.md were done here.
 
+## After Wave 6
+
+- **VP9 and VP8 video (2026-10-27).** The app and `dccli` register vpx-swift's `VpxVideoDecoder` (libvpx 1.16, BSD-3
+  with the WebM patent grant) into DCMedia's external-decoder seam, so WebM and Matroska video plays in the editor
+  and the show and gets a poster on insert. DCMedia itself stays free of it (PLAN.md §10.4).
+  - **Checked on deckcraft's own clips:** the frame times are deckcraft's, and the decoded pixels match ffmpeg's VP9
+    and VP8 decoders to 0.25 levels. deckcraft reports VP8 unsupported, so here VP8 goes further than the oracle.
+  - **One divergence:** vpx-swift converts streams with no colour tag as BT.709, where VP8's specification, deckcraft
+    and ffmpeg use BT.601 for SD video. That is about 6 levels on these clips. It's asked of vpx-swift's owner
+    (AB-A-0205), and `CodecsTests` carries it as a known issue that flags the fix.
+  - libvpx's licence and patent grant ship in `Acknowledgements.txt` (`Tools/acknowledgements.sh` now picks up a
+    package's `THIRD-PARTY-NOTICES`).
+
 ## Pin moves
 
 ### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)

@@ -155,7 +155,7 @@ them.
    - Containers: MP4/MOV through AVFoundation; MKV/WebM through `matroska-swift`.
    - Video: H.264 and HEVC; AV1 on M3 and later.
    - Audio: AAC, ALAC, FLAC, MP3, WAV, AIFF and Opus.
-   - VP9 waits for an opt-in through `vpx-swift`. Vorbis and AV1 on M1/M2 are deferred and show a clear "can't play"
+   - VP9 and VP8 play through `vpx-swift` (decided 2026-10-27). AV1 on M1/M2 is deferred and shows a clear "can't play"
      state, never a crash. This follows media-bridge's own deferred list.
 
 ## 6. Oracles and parity
@@ -218,8 +218,8 @@ Mac-specific.
    (`Tools/pptx/powerpoint-check.sh`; its first finding fixed DCPPTX's chartEx parts). Keynote is still open.
 3. ~~**Rust toolchain.**~~ **Decided 2026-10-26:** the oracle builds from source with Homebrew's `rustup`, because the
    v0.11.1 release binary is 112 commits behind the pin. Wave 0 is done (see `PORT-STATUS.md`).
-4. **VP9 and Ogg/Vorbis.** Opt into `vpx-swift`, or accept "can't play" for those (rare in real decks)? Vorbis plays
-   through AudioToolbox; VP8/VP9 show "can't play" in 0.1.0, and `Media.register(externalDecoder:)` is ready for a decoder.
+4. ~~**VP9 and Ogg/Vorbis.**~~ **Decided 2026-10-27:** VP9 and VP8 play through `vpx-swift` (libvpx), registered by the
+   app and `dccli` (DCMedia stays free of it); Vorbis plays through AudioToolbox. AV1 on M1/M2 stays "can't play".
 5. **Consumers.** Is this a standalone app, or the engine for something else (as PhotoCraftNative is for
    PixelAgencyEditor), such as a Marquee or MVS show tool? This decides whether `DCEngine` must be ready as an
    embeddable product early.

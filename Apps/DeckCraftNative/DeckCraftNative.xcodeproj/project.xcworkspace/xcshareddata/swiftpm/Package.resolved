@@ -99,6 +99,15 @@
         "revision" : "869129b7bf4ecc57b97d0193ad29690ca2134750",
         "version" : "1.8.1"
       }
+    },
+    {
+      "identity" : "vpx-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xocialize/vpx-swift.git",
+      "state" : {
+        "revision" : "4d3f702901fbe2dc18c10644176e1c0d8c015d03",
+        "version" : "0.3.0"
+      }
     }
   ],
   "version" : 3

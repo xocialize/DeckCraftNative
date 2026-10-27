@@ -109,7 +109,9 @@ DCMedia depends on media-bridge's **MediaImport** product (`Package.swift`: `.pr
   lists a Vorbis decoder and decodes it (checked at run time through `kAudioFormatProperty_DecodeFormatIDs`).
 - **`FormatDescriptionFactory`**: the MPEG-1/2 video format descriptions.
 - **`ExternalVideoDecoder`, `ExternalVideoPacket`, `DecodedVideoFrame`**: the seam. vpx-swift's `VpxVideoDecoder`
-  conforms already, so `Media.register(externalDecoder: VpxVideoDecoder())` in the app makes VP9 and VP8 play;
+  conforms already, so `Media.register(externalDecoder: VpxVideoDecoder())` in the app makes VP9 and VP8 play
+  (the app and `dccli` register it since 2026-10-27: `DCApp/Codecs.swift`, `DCAppTests/CodecsTests.swift`; vpx-swift
+  converts untagged streams as BT.709 where deckcraft takes SD as BT.601, asked as AB-A-0205);
   DCMedia doesn't depend on vpx-swift (Wave 5's decision). The registry is DCMedia's own, because media-bridge's
   lookup is internal to its MediaBridge product. The protocol decodes a batch of packets asynchronously; DCMedia's
   decoder is synchronous like deckcraft's, so each keyframe-to-keyframe run goes to the decoder on a detached task

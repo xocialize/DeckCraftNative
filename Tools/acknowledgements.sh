@@ -44,6 +44,9 @@ tmp=$(mktemp)
     [[ -n $lic ]] && cat "$dir/$lic" || print "(no licence file in the package)"
     note=$(ls "$dir" | grep -iE '^NOTICE(\.(txt|md))?$' | head -1 || true)
     [[ -n $note ]] && { print; cat "$dir/$note"; }
+    # Licences of what a package bundles (vpx-swift: libvpx's BSD-3 licence and patent grant).
+    third=$(ls "$dir" | grep -iE '^THIRD[-_]PARTY[-_]NOTICES(\.(txt|md))?$' | head -1 || true)
+    [[ -n $third ]] && { print; cat "$dir/$third"; }
     print
   done
   print "------------------------------------------------------------------------------------------------------------"

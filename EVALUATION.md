@@ -21,7 +21,7 @@ Wave 6. Sources: each package's `PORT-NOTES.md`, `PORT-STATUS.md`, `WAVE5-PLAN.m
 |---|---|
 | `vello_cpu` raster, Krilla PDF (raster slides) | CoreGraphics; CGPDFContext gives **vector** PDF with real text (deckcraft's gap #14) |
 | HarfRust shaping, bidi, UAX #14 breaking, fontdb | CoreText under deckcraft's ported layout policy (autofit, bullets, columns, caret) |
-| 52k lines of H.264/HEVC/VP9/AV1/Opus/Ogg decoders | AVFoundation, VideoToolbox, AudioToolbox; media-bridge's codec gate |
+| 52k lines of H.264/HEVC/VP9/AV1/Opus/Ogg decoders | AVFoundation, VideoToolbox, AudioToolbox; media-bridge's codec gate; libvpx (vpx-swift) for VP9 and VP8, which macOS can't decode |
 | `image` crate (PNG/JPEG/GIF) | ImageIO |
 | `i_overlay` (Merge Shapes) | CoreGraphics path booleans (worst relative area difference 2.2e-16) |
 | Hunspell list, built-in word list | Hunspell dictionaries when installed, else NSSpellChecker |
@@ -49,7 +49,7 @@ container probes whose results are stored in documents (ISOBMFF, Matroska, Ogg).
 | Item | Native path | Notes |
 |---|---|---|
 | **Translations** | String Catalogs are in place; every UI string is extracted (about 1,900 entries) and a pseudo-localisation run checked layout | No languages yet (user's decision for Wave 6). Some keys share one English word with different meanings ("Normal", "Center", "Zoom") and may need splitting for translators |
-| **VP8 and VP9 video** | `Media.register(externalDecoder:)` takes a decoder; `vpx-swift` would plug in | Shows a clear "can't be played on this Mac" state today. AV1 needs an M3 or later (VideoToolbox) |
+| **AV1 on M1/M2** | none: VideoToolbox decodes AV1 on M3 and later only | Shows a clear "can't be played on this Mac" state. VP8 and VP9 play through libvpx (vpx-swift) since 2026-10-27 |
 | **Versions and autosave in place** | NSDocument `autosavesInPlace` | Off: the engine's AutoRecover keeps deckcraft's crash recovery. Moving to NSDocument autosave means reconciling the two |
 | **The sandbox / Mac App Store** | App Sandbox | Not sandboxed: the loopback control server and AutoRecover beside documents need decisions first (the extensions are sandboxed) |
 | **Background intents without a window** | an App Intents extension | Export / outline / slide-count intents run in-process without a document window, but launching the app for them still opens AppKit's untitled window |
@@ -62,6 +62,7 @@ container probes whose results are stored in documents (ISOBMFF, Matroska, Ogg).
 |---|---|---|
 | **Quick Look for Office files** | macOS's own Office preview and thumbnail win over ours for `.pptx`/`.potx`/`.ppsx` (Times instead of Inter, `‹#›` for slide numbers, hidden slides skipped). Ours handles `.deckcraft` and reads Office files correctly when asked | Leave: not something an app can set |
 | **Spotlight** | The Core Spotlight import extension (`CSImportExtension`, macOS 26's documented mechanism) is built, signed, registered and enabled, and its indexing is tested. On this Mac, `mds` never hands a file to a third-party importer extension (Apple's own PDFImporter extension isn't called either; the legacy `PDF.mdimporter` does the indexing), and a Developer ID–signed legacy `.mdimporter` isn't loaded. So `.deckcraft` files get system attributes only | Re-test on a clean Mac with the notarized build; if the platform still doesn't call it, file a Feedback with Apple and leave the extension in |
+| **VP8 and untagged SD VP9 colours** | vpx-swift converts streams with no colour tag as BT.709 (the web default); VP8 is BT.601 by its specification, and deckcraft and ffmpeg take untagged SD video as BT.601. Such videos show about 6 levels off (the decode itself matches ffmpeg to 0.25 levels) | Asked of vpx-swift's owner (AB-A-0205); `CodecsTests` flags the fix |
 | **Fonts in sandboxed extensions** | An app extension can't read its containing app's bundle (EPERM), so the preview and thumbnail extensions carry their own copy of craft-fonts' Latin set (14 families, 17.5 MB each); the app carries all of craft-fonts (77 MB) | Leave; trim the extensions to the metric-compatible families (about 9 MB each) if size matters |
 
 ## 3. Fidelity checked against PowerPoint

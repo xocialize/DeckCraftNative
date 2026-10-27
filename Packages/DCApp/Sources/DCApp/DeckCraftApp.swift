@@ -44,6 +44,7 @@ public enum DeckCraftApp {
     @MainActor public static func main() {
         let env = ProcessInfo.processInfo.environment["DECKCRAFT_CONTROL_PORT"].flatMap { UInt16($0) }
         let launch = Launch(arguments: Array(CommandLine.arguments.dropFirst()), environmentPort: env)
+        Codecs.registerExternalDecoders()
         let app = NSApplication.shared
         // The document controller must exist before anything asks for `NSDocumentController.shared`.
         _ = DocumentController()

@@ -66,6 +66,9 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0"),
         // The fleet's design vocabulary (AB-D-0042): tokens and shared components for the app's UI.
         .package(url: "https://github.com/xocialize/DesignScaffold.git", from: "0.25.0"),
+        // VP9 and VP8 decoding (libvpx, BSD-3), plugged into DCMedia's external-decoder seam by the app and dccli.
+        // DCMedia itself stays free of it (PLAN.md §10.4, decided 2026-10-27).
+        .package(url: "https://github.com/xocialize/vpx-swift.git", from: "0.3.0"),
     ],
     targets: [
         // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
@@ -169,8 +172,9 @@ let package = Package(
         .executableTarget(
             name: "dccli",
             dependencies: [
-                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCModel", "DCCore",
+                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCCore",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "VpxSwift", package: "vpx-swift"),
             ],
             path: "Apps/dccli"
         ),
@@ -204,6 +208,7 @@ let package = Package(
             dependencies: [
                 "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
+                .product(name: "VpxSwift", package: "vpx-swift"),
                 .product(name: "DesignScaffoldPicker", package: "DesignScaffold"),
             ],
             path: sources("DCApp", "DCApp"),
