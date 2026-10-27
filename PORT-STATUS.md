@@ -328,6 +328,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     (AB-A-0205), and `CodecsTests` carries it as a known issue that flags the fix.
   - libvpx's licence and patent grant ship in `Acknowledgements.txt` (`Tools/acknowledgements.sh` now picks up a
     package's `THIRD-PARTY-NOTICES`).
+- **Released as [v0.1.1](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.1) (2026-10-27).**
+  - Built clean from `3335d96`, notarized, and accepted by Gatekeeper; an anonymous download matches its `.sha256`.
+  - The published 0.1.0, run from its own DMG, finds 0.1.1 through Check for Updates.
 
 ## Pin moves
 
