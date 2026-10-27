@@ -10,7 +10,8 @@ ROOT=${0:A:h:h:h}
 OUT=${1:-$(mktemp -d -t dc-gate)}
 mkdir -p "$OUT"
 FIX=${DECKCRAFT_FIXTURES:-$ROOT/../DeckCraftNative-Fixtures}
-CORPUS=$FIX/oracle/27009cd9/decks
+source "$ROOT/Tools/oracle/pin.env"
+CORPUS=$FIX/oracle/${DECKCRAFT_COMMIT[1,8]}/decks
 PORT=${GATE_PORT:-7990}
 BIN=$ROOT/.build-gate/out/Products/Debug
 fails=0

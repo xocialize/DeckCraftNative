@@ -1,8 +1,8 @@
 # Port status
 
 Crate by crate: what deckcraft has, what the native port does with it, and where it stands. Rust line
-counts include in-file tests, measured at the pin `27009cd9` (2026-10-26). Dispositions and their
-reasons are in [PLAN.md](PLAN.md) §3.
+counts include in-file tests, measured at `27009cd9` (2026-10-26). The pin is now `88c2ceff` (see Pin
+moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
 
 ## Wave 0: scaffold and oracle (done 2026-10-26)
 
@@ -315,6 +315,51 @@ reasons are in [PLAN.md](PLAN.md) §3.
 - **Parallel work.** Release and Updates, Extensions, Intents and Strings were each built by a separate session. The
   catalog infrastructure, the fonts and licences in the bundle, integration, the final notarized build and
   EVALUATION.md were done here.
+
+## Pin moves
+
+### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)
+
+- **What changed upstream, in 66 commits.**
+  - **Moves and splits (the bulk):** files were moved and split, with no change in behaviour. Compared crate by crate
+    as a multiset of code lines (imports, module lines and visibility ignored), every ported crate differs only by
+    re-paths (`super::` → `crate::cmd::`), re-exports and rustfmt reflows.
+  - **`apps/deckcraft-cli`:** `bench` times PDF export over every run, not 3. Ported (`dccli bench`).
+  - **`crates/pdf`:** PDF export reuses equal slide backdrops, which makes it faster. This is deckcraft's raster PDF
+    writer; DCRender's vector PDF has no backdrop raster, so it doesn't apply.
+  - **`crates/ui-egui`:** dropdowns use craft-ui's ComboBox. It's egui only; the Mac app has its own controls.
+  - **Tests and CI:** an engine test helper (`file_access.rs`'s source scan reads past `#[cfg(test)]` imports, which
+    isn't ported), plus CI and docs.
+- **The oracle at the new pin gives the same answers.**
+  - **The corpus is byte-identical:** every deck, rendered slide, `.pptx` and Markdown file, and every transition
+    frame. The only differences are `info.json`'s absolute path (which contains the pin), the review deck's comment
+    dates (they come from the clock, and tests blank them) and the PDFs (deckcraft's writer changed, see above).
+  - **The other vectors:** regenerated. The json, display, geom, metafile, media and anim vectors are unchanged. The
+    engine, PPTX and pointer vectors differ only by that path and those dates. The text vectors now cover every
+    corpus deck (272 bodies from 19 decks, up from Wave 2's corpus).
+  - **Our tests at the new pin:** every one passes (2,144, plus release parity, Metal parity and the 18 alpha-gate
+    checks). The old corpus is retired from the fixtures.
+- **Source paths.** Each ported file's header and each package's PORT-NOTES name the Rust source as it was at
+  `27009cd9`. Where upstream has since moved it:
+
+| At 27009cd9 | At 88c2ceff |
+|---|---|
+| `engine/src/cmd/mod.rs` | `engine/src/cmd.rs` |
+| `engine/src/cmd/design.rs` | `engine/src/cmd/design.rs` + `cmd/design/{colors,slide_background,slide_setup,master_view,tests,browse_theme_tests}.rs` |
+| `engine/src/cmd/format.rs` | `engine/src/cmd/format.rs` + `cmd/format/{font,text_effects,paragraph,painter,ruler}.rs` |
+| `engine/src/cmd/insert.rs` | `engine/src/cmd/insert.rs` + `cmd/insert/{picture,album,chart,text_fields,links,icon_and_picture_tests}.rs` |
+| `engine/src/cmd/smartart.rs` | `engine/src/cmd/smartart.rs` + `cmd/smartart/{nodes,paint,layout,diagrams,edit}.rs` |
+| `engine/src/cmd/text.rs` | `engine/src/cmd/text.rs` + `cmd/text/{ime,layout,editing,autocorrect,caret,formatting}.rs` |
+| `engine/src/cmd/shape.rs` | `engine/src/cmd/shape.rs` + `cmd/shape/{size,appearance,picture,freeform}.rs` |
+| `engine/src/tools.rs` | `engine/src/tools.rs` + `tools/{hit,pointer,drag,click,geometry}.rs` |
+| `pptx/src/read/mod.rs`, `pptx/src/write/mod.rs` | `pptx/src/read.rs`, `pptx/src/write.rs` |
+| `render/src/lib.rs` | `render/src/lib.rs` + `{raster,opts,slide,renderer,geometry,stroke,text_draw}.rs` |
+| `text/src/lib.rs` | `text/src/lib.rs` + `{run,style,autonum,shape,symbol,breaking,layout}.rs` |
+| `geom/src/preset.rs` | `geom/src/preset.rs` + `preset/{catalog,builder,build,shapes,tests}.rs` |
+| `fonts/src/lib.rs`, `format/src/lib.rs` (tests) | `fonts/src/tests.rs`, `format/src/tests.rs` |
+| `media/src/player.rs` (tests) | `media/src/player/tests.rs` |
+| `apps/deckcraft/src/control_server.rs` (tests) | `apps/deckcraft/src/control_server/tests.rs` |
+| `ui-egui/src/{lib,canvas,dialogs,ribbon,panes,show,icons,backstage}.rs` | split into `app/`, `canvas/`, `dialogs/`, `ribbon/`, `panels/`, `show/`, `icons/`, `backstage/` (panes → panels; thumbs, selpane, notes, fillui, animtimeline → `panels/`; preview, squiggles → `canvas/`; credits, updates_ui → `dialogs/`; qat → `ribbon/`) |
 
 ## Crates
 

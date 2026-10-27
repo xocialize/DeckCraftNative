@@ -322,7 +322,7 @@ enum CLI {
             ("save .deckcraft", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.saveBytes(doc, "deckcraft") } }),
             ("save .pptx", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.saveBytes(doc, "pptx") } }),
             ("open .pptx", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.openPresentation("bench.pptx", pptx) } }),
-            ("export .pdf", try timeMs(min(runs, 3)) { () throws(CLIFailure) in _ = try engine { try FileCommands.saveBytes(doc, "pdf") } }),
+            ("export .pdf", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.saveBytes(doc, "pdf") } }),
         ]
         let renderTotal = perSlide.reduce(0) { $0 + $1.0 }
         let renderMax = perSlide.reduce(0.0) { Swift.max($0, $1.1) }
