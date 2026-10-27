@@ -250,8 +250,9 @@ reasons are in [PLAN.md](PLAN.md) §3.
   (gap #13), NSDocument, ScreenCaptureKit for the control channel's screenshots, Metal for the show.
 - **PowerPoint.** Installed 2026-10-27 as a black-box oracle (PLAN.md §10). Its first finding: decks with
   charts written by deckcraft, and so by DCPPTX, open with PowerPoint's repair prompt. Decks without
-  charts open cleanly. It is a deckcraft writer bug, carried over byte for byte, to be fixed in DCPPTX on
-  its own branch.
+  charts open cleanly. It is a deckcraft writer bug, carried over byte for byte. Fixed after Wave 6 (merge of
+  `pptx-chart-repair`): every `chartEx` part gets its style parts, and all 9 corpus decks open without repair,
+  as does the `.pptx` the app saves in the alpha gate. Tests: 2,144 with it.
 - **Not done.** String Catalogs: the Xcode target emits localisable strings, but there is no catalog yet.
   The window and update-channel items are Wave 6's.
 - **Upstream.** deckcraft `origin/main` is 62 commits past the pin. The 34 in `ui-egui` and `apps/deckcraft`

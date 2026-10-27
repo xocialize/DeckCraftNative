@@ -10,7 +10,7 @@ Wave 6. Sources: each package's `PORT-NOTES.md`, `PORT-STATUS.md`, `WAVE5-PLAN.m
 |---|---|
 | deckcraft engine commands | **330 of 330** registered with deckcraft's ids, labels, menus, shortcuts and parameters; every engine script gives deckcraft's answers and decks (38 byte for byte, 6 through native frameworks compared by measure) |
 | deckcraft's crates | every library crate ported or replaced by a framework (table below); the egui UI rewritten in AppKit and SwiftUI |
-| Tests | **2,139** across the packages, every one green and warning-free; deckcraft's 2,081 `#[test]`s ported where they test behaviour the Mac app has (the rest are egui internals, listed per area) |
+| Tests | **2,144** across the packages, every one green and warning-free; deckcraft's 2,081 `#[test]`s ported where they test behaviour the Mac app has (the rest are egui internals, listed per area) |
 | Parity with deckcraft | `.deckcraft` and `.pptx` byte-identical both ways over the oracle corpus (apart from the chart fix below); slides render at SSIMULACRA2 ≥ 89 to deckcraft's PNGs; transitions ≥ 89; the Metal show ≥ 91 to the CPU compositor; MCP, `dccli` and the pointer byte-identical |
 | The alpha gate | deckcraft's six core workflows run end to end in the app through the control channel: **18 of 18** checks |
 | Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`); Quick Look, Spotlight, App Intents; String Catalogs |
@@ -69,5 +69,7 @@ container probes whose results are stored in documents (ISOBMFF, Matroska, Ogg).
 PowerPoint for Mac is installed as a black-box oracle (PORT-STATUS decisions, 2026-10-27; nothing it saves enters the
 repository). Its first check found that every deck with an Office 2016 chart (`chartEx`) written by deckcraft — and
 so by DCPPTX — opened with PowerPoint's repair prompt: each chartEx part lacked its chart style and colour style
-parts. The fix is on branch `pptx-chart-repair` (`Tools/pptx/powerpoint-check.sh` checks any file). Decks without
-such charts open cleanly.
+parts. DCPPTX now writes them (MS-ODRAWXML's cs:chartStyle and cs:colorStyle; the one deliberate divergence from
+deckcraft's bytes, allowed by name in the parity tests). All 9 corpus decks exported by DCPPTX now open in PowerPoint
+without repair (`Tools/pptx/powerpoint-check.sh`, which opens any `.pptx` in PowerPoint and reports OPEN-OK or
+NEEDS-REPAIR).
