@@ -27,7 +27,7 @@ final class PresenterModel {
     var blank: ShowBlank?
     var zoomUV: CGRect?
     var zoomArm = false
-    var zoomLabel = "Zoom"
+    var zoomLabel = String(localized: "Zoom", bundle: .module, comment: "Zoom into part of the slide")
     var grid = false
     var slideCount = 0
     var currentSlide = 0
@@ -52,7 +52,7 @@ final class PresenterModel {
         set(\.elapsed, PresenterTimer.format(s.timer.elapsed(now)))
         set(\.paused, s.timer.paused)
         set(\.clock, PresenterTimer.wallClock())
-        set(\.counter, "Slide \(s.state.slide + 1) of \(doc.slides.count)")
+        set(\.counter, String(localized: "Slide \(s.state.slide + 1) of \(doc.slides.count)", bundle: .module))
         set(\.blank, s.blank)
         set(\.zoomUV, s.zoom?.uv)
         set(\.zoomArm, s.zoomArm)
@@ -161,13 +161,13 @@ struct PresenterView: View {
         HStack(spacing: Tokens.Space.l) {
             Text(model.elapsed).font(Tokens.Font.metricValue)
                 .foregroundStyle(model.paused ? Tokens.Color.secondaryLabel : Tokens.Color.label)
-                .accessibilityLabel("Elapsed time")
+                .accessibilityLabel(String(localized: "Elapsed time", bundle: .module))
             Text(model.clock).font(Tokens.Font.body.monospacedDigit()).foregroundStyle(Tokens.Color.secondaryLabel)
             Text(model.counter).font(Tokens.Font.body).foregroundStyle(Tokens.Color.secondaryLabel)
             Spacer()
-            Button("◀ Previous") { model.previous() }
-            Button("Next ▶") { model.nextSlide() }
-            Button("End Show") { model.end() }
+            Button(String(localized: "◀ Previous", bundle: .module, comment: "Go to the previous slide")) { model.previous() }
+            Button(String(localized: "Next ▶", bundle: .module, comment: "Go to the next slide")) { model.nextSlide() }
+            Button(String(localized: "End Show", bundle: .module)) { model.end() }
         }
         .buttonStyle(.bordered)
         .focusable(false)
@@ -175,11 +175,11 @@ struct PresenterView: View {
 
     private var controls: some View {
         HStack(spacing: Tokens.Space.s) {
-            Button(model.paused ? "Resume" : "Pause") { model.toggleTimer() }
-            Button("Reset") { model.resetTimer() }
-            Toggle("Black", isOn: Binding(get: { model.blank == .black }, set: { _ in model.blank(.black) }))
-            Toggle("White", isOn: Binding(get: { model.blank == .white }, set: { _ in model.blank(.white) }))
-            Toggle("All slides", isOn: Binding(get: { model.grid }, set: { _ in model.toggleGrid() }))
+            Button(model.paused ? String(localized: "Resume", bundle: .module, comment: "Resume the timer") : String(localized: "Pause", bundle: .module, comment: "Pause the timer")) { model.toggleTimer() }
+            Button(String(localized: "Reset", bundle: .module, comment: "Reset the timer")) { model.resetTimer() }
+            Toggle(String(localized: "Black", bundle: .module, comment: "Blank the screen to black"), isOn: Binding(get: { model.blank == .black }, set: { _ in model.blank(.black) }))
+            Toggle(String(localized: "White", bundle: .module, comment: "Blank the screen to white"), isOn: Binding(get: { model.blank == .white }, set: { _ in model.blank(.white) }))
+            Toggle(String(localized: "All slides", bundle: .module), isOn: Binding(get: { model.grid }, set: { _ in model.toggleGrid() }))
             Button(model.zoomLabel) { model.zoom() }
         }
         .toggleStyle(.button)
@@ -194,7 +194,7 @@ struct PresenterView: View {
         return ZStack(alignment: .topLeading) {
             current(fitted)
             VStack(alignment: .leading, spacing: Tokens.Space.xs) {
-                Text("Next").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+                Text("Next", bundle: .module, comment: "Heading over the next slide's preview").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
                 nextPreview(right)
                 notesHeader.padding(.top, Tokens.Space.m)
                 ScrollView { notes.frame(maxWidth: .infinity, alignment: .leading) }
@@ -229,7 +229,7 @@ struct PresenterView: View {
         .onTapGesture(coordinateSpace: .local) { p in
             if model.zoomArm { model.zoomAt(p.x / size.width, p.y / size.height) }
         }
-        .accessibilityLabel("Current slide")
+        .accessibilityLabel(String(localized: "Current slide", bundle: .module))
     }
 
     private func nextPreview(_ right: CGRect) -> some View {
@@ -241,20 +241,20 @@ struct PresenterView: View {
             } else {
                 ZStack {
                     Rectangle().fill(Tokens.Color.fillElevated)
-                    Text("End of slide show").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+                    Text("End of slide show", bundle: .module).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
                 }
             }
         }
         .frame(width: box.width, height: box.height)
-        .accessibilityLabel("Next slide")
+        .accessibilityLabel(String(localized: "Next slide", bundle: .module))
     }
 
     private var notesHeader: some View {
         HStack(spacing: Tokens.Space.s) {
-            Text("Notes").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
-            Button("A-") { model.notesSize(-ShowController.notesStep) }.accessibilityLabel("Smaller notes")
-            Text("\(Int(model.notesPx))").font(Tokens.Font.metricInline).foregroundStyle(Tokens.Color.secondaryLabel)
-            Button("A+") { model.notesSize(ShowController.notesStep) }.accessibilityLabel("Larger notes")
+            Text("Notes", bundle: .module).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+            Button(String(localized: "A-", bundle: .module, comment: "Make the notes text smaller")) { model.notesSize(-ShowController.notesStep) }.accessibilityLabel(String(localized: "Smaller notes", bundle: .module))
+            Text(verbatim: "\(Int(model.notesPx))").font(Tokens.Font.metricInline).foregroundStyle(Tokens.Color.secondaryLabel)
+            Button(String(localized: "A+", bundle: .module, comment: "Make the notes text larger")) { model.notesSize(ShowController.notesStep) }.accessibilityLabel(String(localized: "Larger notes", bundle: .module))
         }
         .buttonStyle(.borderless)
         .focusable(false)
@@ -275,7 +275,7 @@ struct PresenterView: View {
                 }
                 .textSelection(.enabled)
             } else {
-                Text("No notes.").font(.system(size: model.notesPx)).foregroundStyle(Tokens.Color.secondaryLabel)
+                Text("No notes.", bundle: .module).font(.system(size: model.notesPx)).foregroundStyle(Tokens.Color.secondaryLabel)
             }
         }
         .foregroundStyle(Tokens.Color.label)
@@ -302,7 +302,7 @@ struct PresenterView: View {
         let cells = ShowGeometry.seeAllCells(full, slides.count, model.aspect)
         _ = model.thumbsRevision
         return ZStack(alignment: .topLeading) {
-            Text("All slides").font(Tokens.Font.panelTitle).frame(width: size.width).offset(y: 16)
+            Text("All slides", bundle: .module).font(Tokens.Font.panelTitle).frame(width: size.width).offset(y: 16)
             ForEach(Array(zip(slides, cells)), id: \.0) { i, r in
                 VStack(spacing: Tokens.Space.xs) {
                     Group {
@@ -310,12 +310,12 @@ struct PresenterView: View {
                     }
                     .frame(width: r.width, height: r.height)
                     .overlay(Rectangle().stroke(i == model.currentSlide ? Color.white : Tokens.Color.separator, lineWidth: i == model.currentSlide ? 3 : 1))
-                    Text(model.hiddenSlides.contains(i) ? "\(i + 1)  Hidden" : "\(i + 1)").font(Tokens.Font.caption)
+                    Text(model.hiddenSlides.contains(i) ? String(localized: "\(i + 1)  Hidden", bundle: .module, comment: "A slide number in See All Slides, for a hidden slide") : "\(i + 1)").font(Tokens.Font.caption)
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { model.pick(i) }
                 .accessibilityAddTraits(.isButton)
-                .accessibilityLabel("Slide \(i + 1)")
+                .accessibilityLabel(String(localized: "Slide \(i + 1)", bundle: .module))
                 .offset(x: r.minX, y: r.minY)
             }
         }

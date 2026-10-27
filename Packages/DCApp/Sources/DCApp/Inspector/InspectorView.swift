@@ -17,7 +17,7 @@ struct InspectorView: View {
         if let ctl = InspectorFeature.controller {
             InspectorRoot(ctl: ctl)
         } else {
-            InspectorNote(text: "The inspector isn't available.").padding(Tokens.Space.l)
+            InspectorNote(text: String(localized: "The inspector isn't available.", bundle: .module)).padding(Tokens.Space.l)
         }
     }
 }
@@ -29,7 +29,7 @@ struct InspectorRoot: View {
         // Every command bumps the revision: reading it here redraws the inspector from the session.
         let _ = ctl.model.revision
         VStack(spacing: 0) {
-            Picker("Inspector", selection: Binding(get: { ctl.tab }, set: { ctl.show($0) })) {
+            Picker(String(localized: "Inspector", bundle: .module), selection: Binding(get: { ctl.tab }, set: { ctl.show($0) })) {
                 ForEach(InspectorTab.allCases, id: \.self) { tab in
                     Image(systemName: Self.symbol(tab)).help(tab.label).accessibilityLabel(tab.label).tag(tab)
                 }
@@ -38,7 +38,7 @@ struct InspectorRoot: View {
             .labelsHidden()
             .padding(.horizontal, Tokens.Space.m)
             .padding(.vertical, Tokens.Space.s)
-            .accessibilityLabel("Inspector")
+            .accessibilityLabel(String(localized: "Inspector", bundle: .module))
             Text(ctl.tab.label).font(Tokens.Font.sectionTitle).padding(.bottom, Tokens.Space.xs)
             Separator(.horizontal)
             Form {
@@ -77,11 +77,11 @@ struct FormatView: View {
         let sh = ctl.selectedShape ?? st?.selection.text.flatMap { st?.shape($0.shape) }
         if sh == nil {
             Section {
-                InspectorNote(text: "Select a shape to format it.")
+                InspectorNote(text: String(localized: "Select a shape to format it.", bundle: .module))
             }
         } else {
             Section {
-                Picker("Format", selection: Binding(get: { ctl.formatTab }, set: { ctl.showFormatTab($0) })) {
+                Picker(String(localized: "Format", bundle: .module, comment: "The inspector's Format tab (noun)"), selection: Binding(get: { ctl.formatTab }, set: { ctl.showFormatTab($0) })) {
                     ForEach(ctl.formatTabs(), id: \.id) { t in
                         Image(systemName: Self.symbol(t.id)).help(t.label).accessibilityLabel(t.label).tag(t.id)
                     }
@@ -131,10 +131,10 @@ struct FormatPainterRow: View {
         let on = ctl.session.painter != nil
         HStack {
             Menu {
-                Button("Keep Format Painter On") { ctl.run("format.painter", ["sticky": true]) }
-                Button("Paste Formatting") { ctl.run("format.painterApply") }.disabled(!on)
+                Button(String(localized: "Keep Format Painter On", bundle: .module)) { ctl.run("format.painter", ["sticky": true]) }
+                Button(String(localized: "Paste Formatting", bundle: .module)) { ctl.run("format.painterApply") }.disabled(!on)
             } label: {
-                Label(on ? "Format Painter (on)" : "Format Painter", systemImage: on ? "paintbrush.fill" : "paintbrush")
+                Label(on ? String(localized: "Format Painter (on)", bundle: .module) : String(localized: "Format Painter", bundle: .module), systemImage: on ? "paintbrush.fill" : "paintbrush")
             } primaryAction: {
                 if on {
                     ctl.session.painter = nil
@@ -145,7 +145,7 @@ struct FormatPainterRow: View {
             }
             .fixedSize()
             .disabled(!on && !ctl.enabled("format.painter"))
-            .help("Format Painter (⇧⌘C): copy this formatting to the next object you click")
+            .help(String(localized: "Format Painter (⇧⌘C): copy this formatting to the next object you click", bundle: .module))
         }
     }
 }

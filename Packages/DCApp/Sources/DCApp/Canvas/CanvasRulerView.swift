@@ -31,7 +31,10 @@ final class CanvasRulerView: NSView {
     }
 
     /// The tab kinds the corner selector cycles through (`KINDS`).
-    static let kinds: [(String, String)] = [("l", "Left Tab"), ("ctr", "Center Tab"), ("r", "Right Tab"), ("dec", "Decimal Tab")]
+    static let kinds: [(String, String)] = [
+        ("l", String(localized: "Left Tab", bundle: .module)), ("ctr", String(localized: "Center Tab", bundle: .module)),
+        ("r", String(localized: "Right Tab", bundle: .module)), ("dec", String(localized: "Decimal Tab", bundle: .module)),
+    ]
     private(set) var kind = 0
     private var drag: Drag?
     private var press: CGPoint?
@@ -233,7 +236,7 @@ final class CanvasRulerView: NSView {
         if at.x < r && at.y < r {
             // The tab selector: a click cycles the kind a click on the ruler sets.
             kind = (kind + 1) % Self.kinds.count
-            toolTip = "\(Self.kinds[kind % Self.kinds.count].1) (click to change)"
+            toolTip = String(localized: "\(Self.kinds[kind % Self.kinds.count].1) (click to change)", bundle: .module, comment: "The ruler's tab selector: the tab kind a click sets")
             needsDisplay = true
             press = nil
             return

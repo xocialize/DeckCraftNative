@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Merged with the generated Info.plist. A data-based preview (QLPreviewReply) of DeckCraft's and Open XML presentations: the types are the app's (Support/Info.plist). -->
+<plist version="1.0">
+<dict>
+  <key>NSExtension</key>
+  <dict>
+    <key>NSExtensionAttributes</key>
+    <dict>
+      <key>QLIsDataBasedPreview</key>
+      <true/>
+      <key>QLSupportsSearchableItems</key>
+      <false/>
+      <key>QLSupportedContentTypes</key>
+      <array>
+        <string>ai.storyteller.deckcraft.presentation</string>
+        <string>org.openxmlformats.presentationml.presentation</string>
+        <string>org.openxmlformats.presentationml.template</string>
+        <string>org.openxmlformats.presentationml.slideshow</string>
+      </array>
+    </dict>
+    <key>NSExtensionPointIdentifier</key>
+    <string>com.apple.quicklook.preview</string>
+    <key>NSExtensionPrincipalClass</key>
+    <string>$(PRODUCT_MODULE_NAME).PreviewProvider</string>
+  </dict>
+</dict>
+</plist>

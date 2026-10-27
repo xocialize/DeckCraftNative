@@ -89,14 +89,15 @@ public enum Palette {
     /// `palette_items`: the palette's entries for query `q` (any case). Engine commands that are disabled,
     /// that need arguments the palette can't give, or whose label a UI command also has (Open…, Save As…,
     /// Export…, Audio/Video from File…: the UI command opens the dialog) are left out. Entries whose label
-    /// starts with the query come first; at most 60.
+    /// starts with the query come first; at most 60. Labels are shown, and matched, as the Commands catalog has them.
     public static func items(_ session: Session, _ query: String) -> [PaletteItem] {
         let q = query.lowercased()
         let uiLabels = Set(UICommands.all.map(\.label))
         var items: [PaletteItem] = session.commands()
             .filter { $0.enabled && !uiLabels.contains($0.label) && !Cmd.needsArguments($0.params) }
-            .map { PaletteItem(id: $0.id, label: $0.label, shortcut: $0.shortcut) }
-        items += UICommands.all.filter { !Cmd.needsArguments($0.params) }.map { PaletteItem(id: $0.id, label: $0.label, shortcut: $0.shortcut) }
+            .map { PaletteItem(id: $0.id, label: L10n.commandLabel($0.id, $0.label), shortcut: $0.shortcut) }
+        items += UICommands.all.filter { !Cmd.needsArguments($0.params) }
+            .map { PaletteItem(id: $0.id, label: L10n.commandLabel($0.id, $0.label), shortcut: $0.shortcut) }
         items = items.filter { q.isEmpty || $0.label.lowercased().contains(q) || $0.id.lowercased().contains(q) }
         // A stable sort on "doesn't start with the query", as `sort_by_key` is.
         let starts = items.filter { $0.label.lowercased().hasPrefix(q) }

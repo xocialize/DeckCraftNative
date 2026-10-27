@@ -26,9 +26,9 @@ public enum PasteboardLogic {
     /// Why a pasted picture of `width` × `height` pixels is refused, or nil (`color_image_png`'s checks).
     public static func imageProblem(width: Int, height: Int) -> String? {
         let (pixels, o) = width.multipliedReportingOverflow(by: height)
-        if o || width < 0 || height < 0 { return "the pasted image is too large" }
-        if pixels == 0 { return "the pasted image is empty" }
-        if pixels > maxPasteImagePixels { return "the pasted image is \(width)×\(height) pixels; the limit is 16 megapixels" }
+        if o || width < 0 || height < 0 { return L10n.text("the pasted image is too large") }
+        if pixels == 0 { return L10n.text("the pasted image is empty") }
+        if pixels > maxPasteImagePixels { return L10n.text("the pasted image is \(String(width))×\(String(height)) pixels; the limit is 16 megapixels") }
         return nil
     }
 
@@ -83,10 +83,10 @@ public enum PrintLayout: Equatable, Sendable, Hashable {
 
     public var label: String {
         switch self {
-        case .slides: "Full Page Slides"
-        case .notes: "Notes Pages"
-        case .handouts(let n): n == 1 ? "Handouts (1 Slide per Page)" : "Handouts (\(n) Slides per Page)"
-        case .outline: "Outline"
+        case .slides: L10n.text("Full Page Slides")
+        case .notes: L10n.text("Notes Pages")
+        case .handouts(let n): L10n.text("Handouts (\(n) Slides per Page)")
+        case .outline: String(localized: "Outline", bundle: .module, comment: "print layout")
         }
     }
 

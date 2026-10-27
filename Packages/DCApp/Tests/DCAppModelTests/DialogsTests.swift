@@ -424,7 +424,7 @@ import Testing
         h.press("findNext", ["text": "there"])
         #expect(h.dialog?.value("status").hasPrefix("Match 1 of 1") == true, "\(h.dialog?.value("status") ?? "")")
         h.press("findNext", ["text": "nowhere"])
-        #expect(h.dialog?.value("status") == "DeckCraft can't find “nowhere”.")
+        #expect(h.dialog?.value("status") == "DeckCraftNative can't find “nowhere”.", "the app's own name (Wave 6)")
         h.dialogs.press("showReplace")
         #expect(h.dialog?.flag("replace") == true)
         h.press("replaceAll", ["text": "there", "with": "world"])
@@ -650,7 +650,7 @@ import Testing
             #expect(h.dialog?.id == id)
             #expect(!h.dialogs.form.isEmpty, "\(id)")
             #expect(!h.dialogs.buttons.isEmpty, "\(id)")
-            #expect(h.dialogs.title != "DeckCraft", "\(id)")
+            #expect(h.dialogs.title != "DeckCraftNative", "\(id)")  // the fallback title is the app's name (Wave 6)
             #expect(h.dialogs.describe()["id"]?.asStr == id)
             h.dialogs.cancel()
         }

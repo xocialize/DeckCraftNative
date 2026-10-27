@@ -610,7 +610,10 @@ public final class ShowController {
     public var zoomUV: CGRect { zoom?.uv ?? ShowGeometry.unitUV }
 
     /// The toolbar's Zoom button label.
-    public var zoomLabel: String { zoom != nil ? "Zoom on" : zoomArm ? "Zoom…" : "Zoom" }
+    public var zoomLabel: String {
+        zoom != nil ? L10n.text("Zoom on") : zoomArm ? L10n.text("Zoom…")
+            : String(localized: "Zoom", bundle: .module, comment: "Zoom into part of the slide")
+    }
 
     /// ⌘/Ctrl+wheel: `lines` notches in (positive) or out around the slide point under `p` (`wheel_zoom`).
     public func wheelZoom(_ srect: CGRect, _ p: CGPoint, _ lines: Double) {

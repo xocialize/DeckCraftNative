@@ -49,7 +49,7 @@ final class OutlineViewController: NSViewController, NSTableViewDataSource, NSTa
         table.columnAutoresizingStyle = .uniformColumnAutoresizingStyle
         table.dataSource = self
         table.delegate = self
-        table.setAccessibilityLabel("Outline")
+        table.setAccessibilityLabel(String(localized: "Outline", bundle: .module, comment: "Accessibility label of the Outline view"))
         scroll.documentView = table
         scroll.hasVerticalScroller = true
         scroll.drawsBackground = false
@@ -192,11 +192,11 @@ final class OutlineRowView: NSTableCellView, NSTextFieldDelegate, NSTextViewDele
         title.isBordered = false
         title.drawsBackground = false
         title.focusRingType = .none
-        title.placeholderString = "Slide title"
+        title.placeholderString = String(localized: "Slide title", bundle: .module)
         title.lineBreakMode = .byWordWrapping
         title.cell?.wraps = true
         title.delegate = self
-        title.setAccessibilityLabel("Slide title")
+        title.setAccessibilityLabel(String(localized: "Slide title", bundle: .module))
         for v in [number, mark, title] { addSubview(v) }
     }
 
@@ -223,7 +223,7 @@ final class OutlineRowView: NSTableCellView, NSTextFieldDelegate, NSTextViewDele
             tv.textContainerInset = .zero
             tv.textContainer?.lineFragmentPadding = 0
             tv.delegate = self
-            tv.setAccessibilityLabel("Slide text")
+            tv.setAccessibilityLabel(String(localized: "Slide text", bundle: .module))
             bodies.append(tv)
             addSubview(tv)
         }

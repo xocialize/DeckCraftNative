@@ -141,30 +141,30 @@ final class DialogsMenuTarget: NSObject {
     }
 
     static let entries: [Entry] = [
-        Entry(menu: "File", after: "file.new", title: "New from Template…", command: "app.backstage", params: ["page": "new"], key: "n", mods: [.command, .option]),
-        Entry(menu: "File", after: "file.properties", title: "Properties…", command: "app.backstage", params: ["page": "info"]),
-        Entry(menu: "Edit", after: "app.replace", title: "Spelling…", command: "app.dialog", params: ["id": "spelling"]),
-        Entry(menu: "Edit", after: "app.replace", title: "Accessibility Checker…", command: "app.dialog", params: ["id": "accessibility"]),
-        Entry(menu: "Edit", after: "app.replace", title: "Language…", command: "app.dialog", params: ["id": "language"]),
-        Entry(menu: "Insert", after: "insert.slideNumber", title: "Hyperlink…", command: "app.dialog", params: ["id": "hyperlink"], key: "k"),
-        Entry(menu: "Insert", after: "insert.slideNumber", title: "Header and Footer…", command: "app.dialog", params: ["id": "headerFooter"]),
-        Entry(menu: "Insert", after: "insert.slideNumber", title: "Symbol…", command: "app.dialog", params: ["id": "symbol"]),
-        Entry(menu: "Insert", after: "insert.slideNumber", title: "Equation…", command: "app.dialog", params: ["id": "equation"]),
-        Entry(menu: "Insert", after: "insert.chart", title: "SmartArt…", command: "app.dialog", params: ["id": "smartart"]),
-        Entry(menu: "Insert", after: "slide.duplicate", title: "Slides from Outline…", command: "app.dialog", params: ["id": "outline"]),
-        Entry(menu: "Insert", after: "slide.duplicate", title: "Reuse Slides…", command: "app.reuseSlidesDialog", params: [:]),
-        Entry(menu: "Format", after: "format.paragraphDialog", title: "Bullets and Numbering…", command: "app.dialog", params: ["id": "bullets"]),
-        Entry(menu: "Format", after: "format.paragraphDialog", title: "Columns…", command: "format.columns", params: [:]),
-        Entry(menu: "Format", after: "format.paragraphDialog", title: "Replace Fonts…", command: "app.dialog", params: ["id": "replaceFonts"]),
-        Entry(menu: "Slide Show", after: "show.setup", title: "Custom Shows…", command: "app.dialog", params: ["id": "customShow"]),
-        Entry(menu: "Help", after: "app.palette", title: "Command Palette…", command: "app.palette", params: [:]),
+        Entry(menu: "File", after: "file.new", title: String(localized: "New from Template…", bundle: .module), command: "app.backstage", params: ["page": "new"], key: "n", mods: [.command, .option]),
+        Entry(menu: "File", after: "file.properties", title: String(localized: "Properties…", bundle: .module), command: "app.backstage", params: ["page": "info"]),
+        Entry(menu: "Edit", after: "app.replace", title: String(localized: "Spelling…", bundle: .module), command: "app.dialog", params: ["id": "spelling"]),
+        Entry(menu: "Edit", after: "app.replace", title: String(localized: "Accessibility Checker…", bundle: .module), command: "app.dialog", params: ["id": "accessibility"]),
+        Entry(menu: "Edit", after: "app.replace", title: String(localized: "Language…", bundle: .module), command: "app.dialog", params: ["id": "language"]),
+        Entry(menu: "Insert", after: "insert.slideNumber", title: String(localized: "Hyperlink…", bundle: .module), command: "app.dialog", params: ["id": "hyperlink"], key: "k"),
+        Entry(menu: "Insert", after: "insert.slideNumber", title: String(localized: "Header and Footer…", bundle: .module), command: "app.dialog", params: ["id": "headerFooter"]),
+        Entry(menu: "Insert", after: "insert.slideNumber", title: String(localized: "Symbol…", bundle: .module), command: "app.dialog", params: ["id": "symbol"]),
+        Entry(menu: "Insert", after: "insert.slideNumber", title: String(localized: "Equation…", bundle: .module), command: "app.dialog", params: ["id": "equation"]),
+        Entry(menu: "Insert", after: "insert.chart", title: String(localized: "SmartArt…", bundle: .module), command: "app.dialog", params: ["id": "smartart"]),
+        Entry(menu: "Insert", after: "slide.duplicate", title: String(localized: "Slides from Outline…", bundle: .module), command: "app.dialog", params: ["id": "outline"]),
+        Entry(menu: "Insert", after: "slide.duplicate", title: String(localized: "Reuse Slides…", bundle: .module), command: "app.reuseSlidesDialog", params: [:]),
+        Entry(menu: "Format", after: "format.paragraphDialog", title: String(localized: "Bullets and Numbering…", bundle: .module), command: "app.dialog", params: ["id": "bullets"]),
+        Entry(menu: "Format", after: "format.paragraphDialog", title: String(localized: "Columns…", bundle: .module), command: "format.columns", params: [:]),
+        Entry(menu: "Format", after: "format.paragraphDialog", title: String(localized: "Replace Fonts…", bundle: .module), command: "app.dialog", params: ["id": "replaceFonts"]),
+        Entry(menu: "Slide Show", after: "show.setup", title: String(localized: "Custom Shows…", bundle: .module), command: "app.dialog", params: ["id": "customShow"]),
+        Entry(menu: "Help", after: "app.palette", title: String(localized: "Command Palette…", bundle: .module), command: "app.palette", params: [:]),
     ]
 
     func install() {
         guard let main = NSApp.mainMenu else { return }
         for e in Self.entries.reversed() {
-            guard let menu = main.items.first(where: { $0.title == e.menu })?.submenu else { continue }
-            if e.title == "Properties…", let old = menu.items.first(where: { ($0.representedObject as? String) == "file.properties" }) {
+            guard let menu = main.items.first(where: { $0.title == L10n.menuTitle(e.menu) })?.submenu else { continue }
+            if e.title == String(localized: "Properties…", bundle: .module), let old = menu.items.first(where: { ($0.representedObject as? String) == "file.properties" }) {
                 // The tree's Properties runs the engine's query, which has nothing to show: open the sheet instead.
                 retarget(old, e)
                 continue

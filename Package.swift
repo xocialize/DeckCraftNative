@@ -22,6 +22,9 @@ func tests(_ package: String, _ target: String) -> String { "Packages/\(package)
 
 let package = Package(
     name: "DeckCraftNative",
+    // The app's user-visible strings are in String Catalogs (`Resources/*.xcstrings` in DCAppModel and DCApp);
+    // English is the source language.
+    defaultLocalization: "en",
     platforms: [.macOS(.v26)],
     products: [
         // L0
@@ -48,6 +51,9 @@ let package = Package(
         .library(name: "DCAppModel", targets: ["DCAppModel"]),
         .library(name: "DCApp", targets: ["DCApp"]),
         .executable(name: "DeckCraftDev", targets: ["DeckCraftDev"]),
+        // L7: the app's Quick Look and Spotlight extensions (the appex targets in Apps/DeckCraftNative link these).
+        .library(name: "DCQuickLook", targets: ["DCQuickLook"]),
+        .library(name: "DCSpotlight", targets: ["DCSpotlight"]),
         // Tests' access to the fixtures and the upstream pin
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
@@ -182,7 +188,8 @@ let package = Package(
         .target(
             name: "DCAppModel",
             dependencies: ["DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCFormat", "DCModel", "DCText", "DCGeometry", "DCColor", "DCCore"],
-            path: sources("DCApp", "DCAppModel")
+            path: sources("DCApp", "DCAppModel"),
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "DCAppModelTests",
@@ -199,7 +206,8 @@ let package = Package(
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "DesignScaffoldPicker", package: "DesignScaffold"),
             ],
-            path: sources("DCApp", "DCApp")
+            path: sources("DCApp", "DCApp"),
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "DCAppTests",
@@ -209,6 +217,27 @@ let package = Package(
         // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev
         // --control 4242 --sample`). The Xcode wrapper has the same one-line entry point.
         .executableTarget(name: "DeckCraftDev", dependencies: ["DCApp"], path: "Apps/DeckCraftDev"),
+
+        // MARK: DCExtensions — the Quick Look preview and thumbnail and the Spotlight importer: reading a file within
+        // an extension's budget (DCExtensionKit), the PDF preview and the first-slide thumbnail (DCQuickLook), the
+        // attributes and text Spotlight indexes (DCSpotlight). No AppKit. Wave 6.
+        .target(
+            name: "DCExtensionKit",
+            dependencies: ["DCEngine", "DCFormat", "DCPPTX", "DCText", "DCModel", "DCZip", "DCCore"],
+            path: sources("DCExtensions", "DCExtensionKit")
+        ),
+        .target(
+            name: "DCQuickLook",
+            dependencies: ["DCExtensionKit", "DCEngine", "DCRender", "DCModel", "DCCore"],
+            path: sources("DCExtensions", "DCQuickLook"),
+            resources: [.process("Resources")]
+        ),
+        .target(name: "DCSpotlight", dependencies: ["DCExtensionKit", "DCModel", "DCCore"], path: sources("DCExtensions", "DCSpotlight")),
+        .testTarget(
+            name: "DCExtensionsTests",
+            dependencies: ["DCQuickLook", "DCSpotlight", "DCExtensionKit", "DCEngine", "DCRender", "DCModel", "DCZip", "DCCore", "DCTestSupport"],
+            path: tests("DCExtensions", "DCExtensionsTests")
+        ),
 
         // MARK: DCTestSupport — the fixtures root and the upstream pin, for every test target.
         .target(

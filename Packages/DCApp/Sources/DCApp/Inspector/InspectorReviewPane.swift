@@ -18,10 +18,10 @@ struct ReviewView: View {
         let pane = ctl.model.ui.pane
         let part = pane == "thesaurus" || pane == "revisions" ? pane ?? "comments" : "comments"
         Section {
-            Picker("Show", selection: Binding(get: { part }, set: { ctl.run("view.pane", ["pane": .string($0)]) })) {
-                Text("Comments").tag("comments")
-                Text("Thesaurus").tag("thesaurus")
-                Text("Revisions").tag("revisions")
+            Picker(String(localized: "Show", bundle: .module, comment: "Which part of the Review inspector to show"), selection: Binding(get: { part }, set: { ctl.run("view.pane", ["pane": .string($0)]) })) {
+                Text("Comments", bundle: .module).tag("comments")
+                Text("Thesaurus", bundle: .module).tag("thesaurus")
+                Text("Revisions", bundle: .module).tag("revisions")
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -31,10 +31,10 @@ struct ReviewView: View {
         case "revisions": RevisionsView(ctl: ctl)
         default: CommentsView(ctl: ctl)
         }
-        Section("Proofing") {
-            Button("Spelling…") { ctl.run("app.dialog", ["id": "spelling"]) }
-            Button("Check Accessibility…") { ctl.run("app.dialog", ["id": "accessibility"]) }
-            Button("Language…") { ctl.run("app.dialog", ["id": "language"]) }
+        Section(String(localized: "Proofing", bundle: .module)) {
+            Button(String(localized: "Spelling…", bundle: .module)) { ctl.run("app.dialog", ["id": "spelling"]) }
+            Button(String(localized: "Check Accessibility…", bundle: .module)) { ctl.run("app.dialog", ["id": "accessibility"]) }
+            Button(String(localized: "Language…", bundle: .module)) { ctl.run("app.dialog", ["id": "language"]) }
         }
     }
 }
@@ -43,20 +43,20 @@ struct CommentsView: View {
     let ctl: InspectorController
 
     var body: some View {
-        Section("Comments") {
+        Section(String(localized: "Comments", bundle: .module)) {
             HStack {
-                Button { ctl.run("app.dialog", ["id": "comment"]) } label: { Label("New Comment", systemImage: "plus.bubble") }
+                Button { ctl.run("app.dialog", ["id": "comment"]) } label: { Label(String(localized: "New Comment", bundle: .module), systemImage: "plus.bubble") }
                 Spacer()
                 Button { ctl.commentNav(forward: false) } label: { Image(systemName: "chevron.up") }
-                    .help("Previous Comment").accessibilityLabel("Previous").disabled(!ctl.enabled("comment.prev"))
+                    .help(String(localized: "Previous Comment", bundle: .module)).accessibilityLabel(String(localized: "Previous", bundle: .module)).disabled(!ctl.enabled("comment.prev"))
                 Button { ctl.commentNav(forward: true) } label: { Image(systemName: "chevron.down") }
-                    .help("Next Comment").accessibilityLabel("Next").disabled(!ctl.enabled("comment.next"))
+                    .help(String(localized: "Next Comment", bundle: .module)).accessibilityLabel(String(localized: "Next", bundle: .module)).disabled(!ctl.enabled("comment.next"))
             }
             let threads = ctl.commentThreads()
-            if threads.isEmpty { InspectorNote(text: "No comments.") }
+            if threads.isEmpty { InspectorNote(text: String(localized: "No comments.", bundle: .module)) }
             ScrollViewReader { proxy in
                 ForEach(threads, id: \.slide) { t in
-                    SectionHeader("Slide \(t.slide + 1)")
+                    SectionHeader(String(localized: "Slide \(t.slide + 1)", bundle: .module))
                     ForEach(Array(t.comments.enumerated()), id: \.offset) { i, c in
                         CommentCard(ctl: ctl, slide: t.slide, index: i, comment: c, focused: ctl.commentFocus.map { $0.slide == t.slide && $0.index == i } ?? false)
                             .id("\(t.slide):\(i)")
@@ -94,20 +94,20 @@ struct CommentCard: View {
             }
             Text(comment.text).fixedSize(horizontal: false, vertical: true)
             ForEach(Array(comment.replies.enumerated()), id: \.offset) { _, r in
-                Text("↳ \(r.author): \(r.text)").foregroundStyle(Tokens.Color.secondaryLabel).fixedSize(horizontal: false, vertical: true)
+                Text(verbatim: "↳ \(r.author): \(r.text)").foregroundStyle(Tokens.Color.secondaryLabel).fixedSize(horizontal: false, vertical: true)
             }
             HStack {
-                TextField("Reply…", text: $reply)
+                TextField(String(localized: "Reply…", bundle: .module), text: $reply)
                     .labelsHidden()
                     .textFieldStyle(.roundedBorder)
                     .onSubmit {
                         ctl.reply(slide, index, reply)
                         reply = ""
                     }
-                Button(comment.resolved ? "Reopen" : "Resolve") { ctl.resolve(slide, index, !comment.resolved) }
+                Button(comment.resolved ? String(localized: "Reopen", bundle: .module) : String(localized: "Resolve", bundle: .module)) { ctl.resolve(slide, index, !comment.resolved) }
                 Button { ctl.deleteComment(slide, index) } label: { Image(systemName: "trash") }
                     .buttonStyle(.borderless)
-                    .accessibilityLabel("Delete")
+                    .accessibilityLabel(String(localized: "Delete", bundle: .module))
             }
         }
         .padding(Tokens.Space.s)
@@ -120,7 +120,7 @@ struct CommentCard: View {
     private var when: String {
         var w = comment.date.replacingOccurrences(of: "T", with: " ")
         while w.hasSuffix("Z") { w.removeLast() }
-        return comment.resolved ? "\(w) · Resolved" : w
+        return comment.resolved ? String(localized: "\(w) · Resolved", bundle: .module, comment: "A comment's date, then that it is resolved") : w
     }
 }
 
@@ -128,22 +128,22 @@ struct ThesaurusView: View {
     let ctl: InspectorController
 
     var body: some View {
-        Section("Thesaurus") {
-            TextField("Search for a word", text: Binding(get: { ctl.model.thesaurusQuery }, set: { ctl.model.thesaurusQuery = $0 }))
+        Section(String(localized: "Thesaurus", bundle: .module)) {
+            TextField(String(localized: "Search for a word", bundle: .module), text: Binding(get: { ctl.model.thesaurusQuery }, set: { ctl.model.thesaurusQuery = $0 }))
                 .labelsHidden()
                 .textFieldStyle(.roundedBorder)
             let q = ctl.model.thesaurusQuery
             if rustTrim(q).isEmpty {
-                InspectorNote(text: "Select a word on the slide, or type one above.")
+                InspectorNote(text: String(localized: "Select a word on the slide, or type one above.", bundle: .module))
             } else if ctl.thesaurusSenses.isEmpty {
-                InspectorNote(text: "No synonyms for \"\(rustTrim(q))\".")
+                InspectorNote(text: String(localized: "No synonyms for \"\(rustTrim(q))\".", bundle: .module))
             } else {
                 ForEach(Array(ctl.thesaurusSenses.enumerated()), id: \.offset) { _, sense in
                     Text(sense.word).font(Tokens.Font.sectionTitle)
                     ForEach(sense.synonyms, id: \.self) { syn in
                         Button(syn) { ctl.pickSynonym(syn) }
                             .buttonStyle(.link)
-                            .help(ctl.editingText ? "Insert" : "Look up")
+                            .help(ctl.editingText ? String(localized: "Insert", bundle: .module, comment: "Thesaurus: insert the synonym") : String(localized: "Look up", bundle: .module))
                     }
                 }
             }
@@ -155,28 +155,28 @@ struct RevisionsView: View {
     let ctl: InspectorController
 
     var body: some View {
-        Section("Revisions") {
+        Section(String(localized: "Revisions", bundle: .module)) {
             if case .success(let v) = Result(catching: { try ctl.session.execute("review.revisions", .emptyObject) }) {
                 let changes = v["changes"]?.asArray ?? []
-                InspectorNote(text: "Compared with \(v["name"]?.asStr ?? "?")")
-                if v["byPosition"]?.asBool == true { InspectorNote(text: "Not a copy of this presentation: slides are matched by position.") }
+                InspectorNote(text: String(localized: "Compared with \(v["name"]?.asStr ?? "?")", bundle: .module))
+                if v["byPosition"]?.asBool == true { InspectorNote(text: String(localized: "Not a copy of this presentation: slides are matched by position.", bundle: .module)) }
                 if changes.isEmpty {
-                    InspectorNote(text: "No differences left.")
-                    Button("End Review") {
+                    InspectorNote(text: String(localized: "No differences left.", bundle: .module))
+                    Button(String(localized: "End Review", bundle: .module)) {
                         ctl.run("review.endCompare")
                         ctl.model.ui.pane = nil
                     }
                 } else {
                     HStack {
-                        Button("Accept All (\(changes.count))") { ctl.run("review.accept", ["all": true]) }
-                        Button("Reject All (\(changes.count))") { ctl.run("review.reject", ["all": true]) }
-                        Button("End Review") { ctl.run("review.endCompare") }
+                        Button(String(localized: "Accept All (\(changes.count))", bundle: .module)) { ctl.run("review.accept", ["all": true]) }
+                        Button(String(localized: "Reject All (\(changes.count))", bundle: .module)) { ctl.run("review.reject", ["all": true]) }
+                        Button(String(localized: "End Review", bundle: .module)) { ctl.run("review.endCompare") }
                     }
                     ForEach(Array(changes.enumerated()), id: \.offset) { i, c in change(i, c) }
                 }
             } else {
-                InspectorNote(text: "Compare this presentation with a revised copy from Review ▸ Compare.")
-                Button("Compare…") { ctl.run("app.compareDialog") }
+                InspectorNote(text: String(localized: "Compare this presentation with a revised copy from Review ▸ Compare.", bundle: .module))
+                Button(String(localized: "Compare…", bundle: .module)) { ctl.run("app.compareDialog") }
             }
         }
     }
@@ -184,9 +184,9 @@ struct RevisionsView: View {
     private func change(_ i: Int, _ c: JSON) -> some View {
         let slide = c["slide"]?.asU64 ?? 0
         let (head, color): (String, Color) = switch c["kind"]?.asStr ?? "" {
-        case "inserted": ("Slide inserted after \(slide)", Tokens.Color.ready)
-        case "deleted": ("Slide \(slide &+ 1) deleted", Tokens.Color.failure)
-        default: ("Slide \(slide &+ 1) changed", Tokens.Color.accent)
+        case "inserted": (String(localized: "Slide inserted after \(slide)", bundle: .module), Tokens.Color.ready)
+        case "deleted": (String(localized: "Slide \(slide &+ 1) deleted", bundle: .module), Tokens.Color.failure)
+        default: (String(localized: "Slide \(slide &+ 1) changed", bundle: .module), Tokens.Color.accent)
         }
         return VStack(alignment: .leading, spacing: Tokens.Space.xs) {
             HStack {
@@ -197,11 +197,11 @@ struct RevisionsView: View {
                 }
                 .buttonStyle(.link)
                 Spacer()
-                Button("Accept") { ctl.run("review.accept", ["index": .integer(i)]) }
-                Button("Reject") { ctl.run("review.reject", ["index": .integer(i)]) }
+                Button(String(localized: "Accept", bundle: .module)) { ctl.run("review.accept", ["index": .integer(i)]) }
+                Button(String(localized: "Reject", bundle: .module)) { ctl.run("review.reject", ["index": .integer(i)]) }
             }
             ForEach(Array((c["details"]?.asArray ?? []).compactMap(\.asStr).prefix(8).enumerated()), id: \.offset) { _, d in
-                Text("• \(d)").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+                Text(verbatim: "• \(d)").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
             }
         }
     }

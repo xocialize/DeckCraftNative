@@ -243,7 +243,7 @@ public final class MediaHost {
             m.state = s.state.name
             m.positionMs = UInt64(rustCast: (Swift.max(s.position, 0) * 1000).rounded())
             m.durationMs = UInt64(rustCast: (Swift.max(s.duration, 0) * 1000).rounded())
-            m.error = s.error ?? (videoUnplayable(id) ? "this video's codec can't be played on this Mac; only its sound plays" : nil)
+            m.error = s.error ?? (videoUnplayable(id) ? L10n.text("this video's codec can't be played on this Mac; only its sound plays") : nil)
             statuses[id] = m
         }
         session.mediaStatus = statuses

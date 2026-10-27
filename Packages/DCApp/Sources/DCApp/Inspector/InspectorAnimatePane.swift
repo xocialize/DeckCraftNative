@@ -21,9 +21,9 @@ struct AnimateView: View {
         let hasSel = !(ctl.doc?.selection.shapes.isEmpty ?? true)
         let shown = part ?? (hasSel ? "animations" : "transition")
         Section {
-            Picker("Show", selection: Binding(get: { shown }, set: { part = $0 })) {
-                Text("Animations").tag("animations")
-                Text("Transition").tag("transition")
+            Picker(String(localized: "Show", bundle: .module, comment: "Which part of the Animate inspector to show"), selection: Binding(get: { shown }, set: { part = $0 })) {
+                Text("Animations", bundle: .module).tag("animations")
+                Text("Transition", bundle: .module).tag("transition")
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -32,7 +32,7 @@ struct AnimateView: View {
             TransitionView(ctl: ctl)
         } else {
             AnimationsView(ctl: ctl)
-            Section("Animation Pane") { AnimationPaneView(ctl: ctl) }
+            Section(String(localized: "Animation Pane", bundle: .module)) { AnimationPaneView(ctl: ctl) }
         }
     }
 }
@@ -43,11 +43,11 @@ struct AnimationsView: View {
     var body: some View {
         let hasSel = !(ctl.doc?.selection.shapes.isEmpty ?? true)
         let cur = ctl.currentAnimation
-        Section("Animation") {
-            Button { ctl.run("animation.preview") } label: { Label("Preview", systemImage: "play") }
-                .help("Play this slide's animations on the canvas")
-            Picker("Effect", selection: Binding(get: { cur.map { "\($0.class.rawValue):\($0.effect)" } ?? "" }, set: { set($0, "animation.set") })) {
-                if cur == nil { Text("None").tag("") }
+        Section(String(localized: "Animation", bundle: .module)) {
+            Button { ctl.run("animation.preview") } label: { Label(String(localized: "Preview", bundle: .module), systemImage: "play") }
+                .help(String(localized: "Play this slide's animations on the canvas", bundle: .module))
+            Picker(String(localized: "Effect", bundle: .module), selection: Binding(get: { cur.map { "\($0.class.rawValue):\($0.effect)" } ?? "" }, set: { set($0, "animation.set") })) {
+                if cur == nil { Text("None", bundle: .module).tag("") }
                 ForEach([AnimClass.entrance, .emphasis, .exit, .path], id: \.self) { cls in
                     Section(InspectorMotion.className(cls)) {
                         ForEach(animations.filter { $0.animClass == cls }, id: \.id) { a in Text(a.label).tag("\(cls.rawValue):\(a.id)") }
@@ -56,7 +56,7 @@ struct AnimationsView: View {
                 if let c = cur, animationInfo(c.effect, c.class) == nil { Text(c.effect).tag("\(c.class.rawValue):\(c.effect)") }
             }
             .disabled(!hasSel)
-            Menu("Add Animation") {
+            Menu(String(localized: "Add Animation", bundle: .module)) {
                 ForEach([AnimClass.entrance, .emphasis, .exit, .path], id: \.self) { cls in
                     Section(InspectorMotion.className(cls)) {
                         ForEach(animations.filter { $0.animClass == cls }, id: \.id) { a in
@@ -69,45 +69,45 @@ struct AnimationsView: View {
             if let c = cur {
                 let rows = InspectorMotion.animationEffectRows(c.effect, c.class, c.option)
                 if !rows.isEmpty {
-                    Picker("Effect Options", selection: Binding(get: { c.option }, set: { ctl.run("animation.options", ["option": .string($0)]) })) {
-                        if !rows.contains(where: \.1) { Text("—").tag(c.option) }
+                    Picker(String(localized: "Effect Options", bundle: .module), selection: Binding(get: { c.option }, set: { ctl.run("animation.options", ["option": .string($0)]) })) {
+                        if !rows.contains(where: \.1) { Text(verbatim: "—").tag(c.option) }
                         ForEach(rows, id: \.0) { Text(InspectorMotion.optionLabel($0.0)).tag($0.0) }
                     }
                 }
-                Picker("Sequence", selection: Binding(get: { InspectorMotion.textBuildId(c.textBuild) }, set: { ctl.run("animation.options", ["textBuild": .string($0)]) })) {
-                    Text("As One Object").tag("asOne")
-                    Text("By Paragraph").tag("byParagraph")
+                Picker(String(localized: "Sequence", bundle: .module), selection: Binding(get: { InspectorMotion.textBuildId(c.textBuild) }, set: { ctl.run("animation.options", ["textBuild": .string($0)]) })) {
+                    Text("As One Object", bundle: .module).tag("asOne")
+                    Text("By Paragraph", bundle: .module).tag("byParagraph")
                     if ![.asOne, .byParagraph].contains(c.textBuild) { Text(InspectorMotion.optionLabel(c.textBuild.rawValue)).tag(c.textBuild.rawValue) }
                 }
             }
         }
-        Section("Timing") {
-            Picker("Start", selection: Binding(get: { cur?.start.rawValue ?? "" }, set: { ctl.run("animation.timing", ["start": .string($0)]) })) {
-                if cur == nil { Text("—").tag("") }
+        Section(String(localized: "Timing", bundle: .module)) {
+            Picker(String(localized: "Start", bundle: .module), selection: Binding(get: { cur?.start.rawValue ?? "" }, set: { ctl.run("animation.timing", ["start": .string($0)]) })) {
+                if cur == nil { Text(verbatim: "—").tag("") }
                 ForEach(InspectorMotion.starts, id: \.1) { Text($0.0).tag($0.1) }
             }
             .disabled(cur == nil)
-            NumberField(label: "Duration", value: Double(cur?.durationMs ?? 500) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
+            NumberField(label: String(localized: "Duration", bundle: .module), value: Double(cur?.durationMs ?? 500) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
                 ctl.run("animation.timing", ["duration": InspectorMotion.ms($0)])
             }
             .disabled(cur == nil)
-            NumberField(label: "Delay", value: Double(cur?.delayMs ?? 0) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
+            NumberField(label: String(localized: "Delay", bundle: .module), value: Double(cur?.delayMs ?? 0) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
                 ctl.run("animation.timing", ["delay": InspectorMotion.ms($0)])
             }
             .disabled(cur == nil)
-            Picker("Trigger", selection: Binding(get: { cur?.trigger.map { Int($0.rawValue) } ?? -1 }, set: { v in
+            Picker(String(localized: "Trigger", bundle: .module), selection: Binding(get: { cur?.trigger.map { Int($0.rawValue) } ?? -1 }, set: { v in
                 ctl.run("animation.timing", ["trigger": v < 0 ? .null : .integer(v)])
             })) {
-                Text("On Click Sequence").tag(-1)
-                ForEach(ctl.doc?.shapes ?? [], id: \.id) { s in Text("On Click of \(s.name)").tag(Int(s.id.rawValue)) }
+                Text("On Click Sequence", bundle: .module).tag(-1)
+                ForEach(ctl.doc?.shapes ?? [], id: \.id) { s in Text("On Click of \(s.name)", bundle: .module).tag(Int(s.id.rawValue)) }
             }
             .disabled(cur == nil)
             Toggle(isOn: Binding(get: { ctl.session.animPainter != nil }, set: { on in
                 if on { ctl.run("animation.painter") } else { ctl.session.animPainter = nil; ctl.model.changed() }
-            })) { Label("Animation Painter", systemImage: "paintbrush") }
+            })) { Label(String(localized: "Animation Painter", bundle: .module), systemImage: "paintbrush") }
                 .toggleStyle(.button)
                 .disabled(!ctl.enabled("animation.painter") && ctl.session.animPainter == nil)
-                .help("Animation Painter: copy this animation to the next object you click")
+                .help(String(localized: "Animation Painter: copy this animation to the next object you click", bundle: .module))
         }
     }
 
@@ -133,10 +133,10 @@ struct AnimationPaneView: View {
             HStack {
                 let play = AnimPane.playButton(playing: false, from: from)
                 Button { ctl.run("animation.preview", play.params) } label: { Label(play.label, systemImage: "play.fill") }
-                Button { ctl.run("animation.preview", ["on": false]) } label: { Label("Stop", systemImage: "stop.fill") }
+                Button { ctl.run("animation.preview", ["on": false]) } label: { Label(String(localized: "Stop", bundle: .module), systemImage: "stop.fill") }
             }
             if pane.rows.isEmpty {
-                InspectorNote(text: "Select an object on the slide and add an animation to it.")
+                InspectorNote(text: String(localized: "Select an object on the slide and add an animation to it.", bundle: .module))
             } else {
                 GeometryReader { geo in
                     let track = Swift.max(geo.size.width * 0.45, Tokens.Space.xxl * 2)
@@ -171,15 +171,15 @@ struct AnimationPaneView: View {
         .onTapGesture { ctl.clickAnimation(row) }
         .contextMenu {
             ForEach(InspectorMotion.starts, id: \.1) { l, v in
-                Button("Start \(l)") { ctl.run("animation.timing", ["index": .integer(row.index), "start": .string(v)]) }
+                Button(String(localized: "Start \(l)", bundle: .module, comment: "Context menu: set an animation's start (On Click, With Previous, After Previous)")) { ctl.run("animation.timing", ["index": .integer(row.index), "start": .string(v)]) }
             }
             Divider()
-            Button("Move Up") { ctl.animationEdit("animation.move", ["index": .integer(row.index), "to": .integer(Swift.max(row.index - 1, 0))]) }
-            Button("Move Down") { ctl.animationEdit("animation.move", ["index": .integer(row.index), "to": .integer(row.index + 1)]) }
-            Button("Remove") { ctl.animationEdit("animation.remove", ["index": .integer(row.index)]) }
+            Button(String(localized: "Move Up", bundle: .module)) { ctl.animationEdit("animation.move", ["index": .integer(row.index), "to": .integer(Swift.max(row.index - 1, 0))]) }
+            Button(String(localized: "Move Down", bundle: .module)) { ctl.animationEdit("animation.move", ["index": .integer(row.index), "to": .integer(row.index + 1)]) }
+            Button(String(localized: "Remove", bundle: .module)) { ctl.animationEdit("animation.remove", ["index": .integer(row.index)]) }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(row.click) \(row.name)")
+        .accessibilityLabel(Text(verbatim: "\(row.click) \(row.name)"))
     }
 
     @ViewBuilder
@@ -208,7 +208,7 @@ struct AnimationPaneView: View {
                     if ms != row.delayMs { ctl.run("animation.timing", ["index": .integer(row.index), "delay": .integer(ms)]) }
                 })
                 .help(AnimTimeline.label(b))
-                .accessibilityLabel("Timing bar \(row.index + 1)")
+                .accessibilityLabel(String(localized: "Timing bar \(row.index + 1)", bundle: .module))
             Rectangle().fill(Color.clear).frame(width: Tokens.Space.s).contentShape(Rectangle())
                 .onHover { inside in if inside { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
                 .gesture(DragGesture(minimumDistance: 1).onChanged { v in drag = (row.index, true, v.translation.width) }.onEnded { v in
@@ -216,7 +216,7 @@ struct AnimationPaneView: View {
                     drag = nil
                     if ms != row.durationMs { ctl.run("animation.timing", ["index": .integer(row.index), "duration": .integer(ms)]) }
                 })
-                .accessibilityLabel("Duration handle \(row.index + 1)")
+                .accessibilityLabel(String(localized: "Duration handle \(row.index + 1)", bundle: .module))
         }
         .frame(width: Swift.max(end - start, Tokens.Space.xs), height: Tokens.Space.s)
         .offset(x: start)
@@ -232,7 +232,7 @@ struct AnimationPaneView: View {
             ForEach(Array(stride(from: 0, through: seconds, by: Int(every))), id: \.self) { s in
                 let x = x0 + Double(s) * pps
                 if x <= x0 + track + 0.5 {
-                    Text("\(s)s").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel).offset(x: x - Tokens.Space.xs, y: Tokens.Space.xs)
+                    Text("\(Int(s))s", bundle: .module, comment: "Seconds on the animation timeline's ruler").font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel).offset(x: x - Tokens.Space.xs, y: Tokens.Space.xs)
                 }
             }
         }
@@ -265,10 +265,14 @@ struct TransitionView: View {
     var body: some View {
         let cur = ctl.doc?.currentSlide?.transition
         let kind = cur?.kind ?? "none"
-        Section("Transition to This Slide") {
-            Picker("Transition", selection: Binding(get: { kind }, set: { ctl.run("transition.set", ["kind": .string($0)]) })) {
-                ForEach(["Subtle", "Exciting", "Dynamic Content"], id: \.self) { cat in
-                    Section(cat) {
+        Section(String(localized: "Transition to This Slide", bundle: .module)) {
+            Picker(String(localized: "Transition", bundle: .module), selection: Binding(get: { kind }, set: { ctl.run("transition.set", ["kind": .string($0)]) })) {
+                ForEach([
+                    ("Subtle", String(localized: "Subtle", bundle: .module, comment: "A category of slide transitions")),
+                    ("Exciting", String(localized: "Exciting", bundle: .module, comment: "A category of slide transitions")),
+                    ("Dynamic Content", String(localized: "Dynamic Content", bundle: .module, comment: "A category of slide transitions")),
+                ], id: \.0) { cat, title in
+                    Section(title) {
                         ForEach(transitions.filter { $0.category == cat }, id: \.id) { Text($0.label).tag($0.id) }
                     }
                 }
@@ -276,38 +280,38 @@ struct TransitionView: View {
             }
             let rows = InspectorMotion.transitionEffectRows(kind, cur?.option)
             if !rows.isEmpty {
-                Picker("Effect Options", selection: Binding(get: { cur?.option ?? "" }, set: { ctl.run("transition.options", ["option": .string($0)]) })) {
-                    if !rows.contains(where: \.1) { Text("—").tag(cur?.option ?? "") }
+                Picker(String(localized: "Effect Options", bundle: .module), selection: Binding(get: { cur?.option ?? "" }, set: { ctl.run("transition.options", ["option": .string($0)]) })) {
+                    if !rows.contains(where: \.1) { Text(verbatim: "—").tag(cur?.option ?? "") }
                     ForEach(rows, id: \.0) { Text(transitionOptionLabel(kind, $0.0)).tag($0.0) }
                 }
             }
-            Button { ctl.run("show.start", ["from": .integer(ctl.doc?.selection.slide ?? 0), "preview": true]) } label: { Label("Preview", systemImage: "play") }
+            Button { ctl.run("show.start", ["from": .integer(ctl.doc?.selection.slide ?? 0), "preview": true]) } label: { Label(String(localized: "Preview", bundle: .module), systemImage: "play") }
         }
-        Section("Sound") {
-            Picker("Sound", selection: Binding(get: { soundTag(cur) }, set: setSound)) {
-                Text("[No Sound]").tag("none")
-                Text("[Stop Previous Sound]").tag("stop")
+        Section(String(localized: "Sound", bundle: .module)) {
+            Picker(String(localized: "Sound", bundle: .module), selection: Binding(get: { soundTag(cur) }, set: setSound)) {
+                Text("[No Sound]", bundle: .module).tag("none")
+                Text("[Stop Previous Sound]", bundle: .module).tag("stop")
                 Divider()
                 ForEach(Sounds.builtin, id: \.0) { Text($0.1).tag("builtin:\($0.0)") }
                 if let name = mediaName(cur) { Text(name).tag("media") }
                 Divider()
-                Text("Other Sound…").tag("other")
+                Text("Other Sound…", bundle: .module).tag("other")
             }
-            Toggle("Loop Until Next Sound", isOn: Binding(get: { cur?.soundLoop ?? false }, set: { ctl.run("transition.sound", ["loop": .bool($0)]) }))
+            Toggle(String(localized: "Loop Until Next Sound", bundle: .module), isOn: Binding(get: { cur?.soundLoop ?? false }, set: { ctl.run("transition.sound", ["loop": .bool($0)]) }))
                 .disabled(cur?.sound == nil)
         }
-        Section("Timing") {
-            NumberField(label: "Duration", value: Double(cur?.durationMs ?? 1000) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
+        Section(String(localized: "Timing", bundle: .module)) {
+            NumberField(label: String(localized: "Duration", bundle: .module), value: Double(cur?.durationMs ?? 1000) / 1000, step: 0.25, suffix: " s", range: 0 ... 600) {
                 ctl.run("transition.timing", ["duration": InspectorMotion.ms($0)])
             }
-            Toggle("On Mouse Click", isOn: Binding(get: { cur?.advanceOnClick ?? true }, set: { ctl.run("transition.timing", ["onClick": .bool($0)]) }))
-            Toggle("After", isOn: Binding(get: { cur?.advanceAfterMs != nil }, set: { on in
+            Toggle(String(localized: "On Mouse Click", bundle: .module), isOn: Binding(get: { cur?.advanceOnClick ?? true }, set: { ctl.run("transition.timing", ["onClick": .bool($0)]) }))
+            Toggle(String(localized: "After", bundle: .module, comment: "Advance the slide after a time"), isOn: Binding(get: { cur?.advanceAfterMs != nil }, set: { on in
                 ctl.run("transition.timing", ["after": on ? .integer(cur?.advanceAfterMs ?? 0) : .null])
             }))
-            NumberField(label: "After (seconds)", value: Double(cur?.advanceAfterMs ?? 0) / 1000, step: 1, suffix: " s", range: 0 ... 86_400) {
+            NumberField(label: String(localized: "After (seconds)", bundle: .module), value: Double(cur?.advanceAfterMs ?? 0) / 1000, step: 1, suffix: " s", range: 0 ... 86_400) {
                 ctl.run("transition.timing", ["after": InspectorMotion.ms($0)])
             }
-            Button("Apply To All") { ctl.run("transition.applyAll") }.disabled(!ctl.enabled("transition.applyAll"))
+            Button(String(localized: "Apply To All", bundle: .module)) { ctl.run("transition.applyAll") }.disabled(!ctl.enabled("transition.applyAll"))
         }
     }
 

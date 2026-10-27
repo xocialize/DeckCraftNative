@@ -1,0 +1,73 @@
+# What isn't native yet — evaluation
+
+The plan (PLAN.md §2) was to replace deckcraft's libraries with macOS frameworks wherever one does the job, port
+what PowerPoint's semantics require, and say what's left. This is that evaluation, as of 2026-10-27, at the end of
+Wave 6. Sources: each package's `PORT-NOTES.md`, `PORT-STATUS.md`, `WAVE5-PLAN.md`, `WAVE6-PLAN.md`.
+
+## Where the port stands
+
+| Measure | Result |
+|---|---|
+| deckcraft engine commands | **330 of 330** registered with deckcraft's ids, labels, menus, shortcuts and parameters; every engine script gives deckcraft's answers and decks (38 byte for byte, 6 through native frameworks compared by measure) |
+| deckcraft's crates | every library crate ported or replaced by a framework (table below); the egui UI rewritten in AppKit and SwiftUI |
+| Tests | **2,139** across the packages, every one green and warning-free; deckcraft's 2,081 `#[test]`s ported where they test behaviour the Mac app has (the rest are egui internals, listed per area) |
+| Parity with deckcraft | `.deckcraft` and `.pptx` byte-identical both ways over the oracle corpus (apart from the chart fix below); slides render at SSIMULACRA2 ≥ 89 to deckcraft's PNGs; transitions ≥ 89; the Metal show ≥ 91 to the CPU compositor; MCP, `dccli` and the pointer byte-identical |
+| The alpha gate | deckcraft's six core workflows run end to end in the app through the control channel: **18 of 18** checks |
+| Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`); Quick Look, Spotlight, App Intents; String Catalogs |
+
+## What became native
+
+| deckcraft | Native here |
+|---|---|
+| `vello_cpu` raster, Krilla PDF (raster slides) | CoreGraphics; CGPDFContext gives **vector** PDF with real text (deckcraft's gap #14) |
+| HarfRust shaping, bidi, UAX #14 breaking, fontdb | CoreText under deckcraft's ported layout policy (autofit, bullets, columns, caret) |
+| 52k lines of H.264/HEVC/VP9/AV1/Opus/Ogg decoders | AVFoundation, VideoToolbox, AudioToolbox; media-bridge's codec gate |
+| `image` crate (PNG/JPEG/GIF) | ImageIO |
+| `i_overlay` (Merge Shapes) | CoreGraphics path booleans (worst relative area difference 2.2e-16) |
+| Hunspell list, built-in word list | Hunspell dictionaries when installed, else NSSpellChecker |
+| egui UI (42k lines), ribbon | AppKit + SwiftUI: NSDocument, menu bar (gap #13), toolbar, inspector, sheets; DesignScaffold tokens |
+| egui text input and IME | `NSTextInputClient`: input methods, dictation, Services |
+| — (no printing: gap #6) | `NSPrintOperation` with deckcraft's layouts and handouts |
+| egui clipboard | `NSPasteboard`, PDF and PNG of copied shapes for other apps (gap #8) |
+| presenter window placed by hand (gap #9) | `NSScreen`: the presenter view goes on the other display |
+| GPU-less show compositing | Metal, exact to the CPU compositor |
+| screenshots through egui | ScreenCaptureKit |
+| `craft_update` self-update | a native GitHub releases checker (URLSession) |
+| — | Quick Look preview and thumbnail, Spotlight import, App Intents and Shortcuts, String Catalogs |
+
+## Ported, by design
+
+These have no native equivalent, or PowerPoint's semantics have to match exactly (PLAN.md §2): the presentation
+model and placeholder inheritance; preset geometry and warps; DrawingML colour transforms; PPTX read/write with
+`Opaque` round-trip; EMF/EMF+/WMF; the animation timeline, transitions and Morph; autofit; the command registry and
+every command; the `.deckcraft` format; charts (PLAN.md §12: Swift Charts can't match PowerPoint's chart semantics
+or draw into the shared PDF/print path); the pointer and its snapping; the MCP server (on Apple's swift-sdk); the
+container probes whose results are stored in documents (ISOBMFF, Matroska, Ogg).
+
+## 1. Possible natively, not built yet
+
+| Item | Native path | Notes |
+|---|---|---|
+| **Translations** | String Catalogs are in place; every UI string is extracted (about 1,900 entries) and a pseudo-localisation run checked layout | No languages yet (user's decision for Wave 6). Some keys share one English word with different meanings ("Normal", "Center", "Zoom") and may need splitting for translators |
+| **VP8 and VP9 video** | `Media.register(externalDecoder:)` takes a decoder; `vpx-swift` would plug in | Shows a clear "can't be played on this Mac" state today. AV1 needs an M3 or later (VideoToolbox) |
+| **Versions and autosave in place** | NSDocument `autosavesInPlace` | Off: the engine's AutoRecover keeps deckcraft's crash recovery. Moving to NSDocument autosave means reconciling the two |
+| **The sandbox / Mac App Store** | App Sandbox | Not sandboxed: the loopback control server and AutoRecover beside documents need decisions first (the extensions are sandboxed) |
+| **Background intents without a window** | an App Intents extension | Export / outline / slide-count intents run in-process without a document window, but launching the app for them still opens AppKit's untitled window |
+| **Legacy `.ppt` and encrypted `.pptx`** | a `DCPPT` reader from [MS-PPT]/[MS-ODRAW], decryption from [MS-OFFCRYPTO] | PLAN.md §11: a later wave (deckcraft has neither) |
+| **Small items** | — | Theme Colors' wells touch the sheet edge; the Review inspector's segments clip in long languages; the status bar clips its zoom controls at the narrowest width; "1 slides" plurals are kept as deckcraft says them |
+
+## 2. Native, but the platform decides
+
+| Area | What happens | Recommendation |
+|---|---|---|
+| **Quick Look for Office files** | macOS's own Office preview and thumbnail win over ours for `.pptx`/`.potx`/`.ppsx` (Times instead of Inter, `‹#›` for slide numbers, hidden slides skipped). Ours handles `.deckcraft` and reads Office files correctly when asked | Leave: not something an app can set |
+| **Spotlight** | The Core Spotlight import extension (`CSImportExtension`, macOS 26's documented mechanism) is built, signed, registered and enabled, and its indexing is tested. On this Mac, `mds` never hands a file to a third-party importer extension (Apple's own PDFImporter extension isn't called either; the legacy `PDF.mdimporter` does the indexing), and a Developer ID–signed legacy `.mdimporter` isn't loaded. So `.deckcraft` files get system attributes only | Re-test on a clean Mac with the notarized build; if the platform still doesn't call it, file a Feedback with Apple and leave the extension in |
+| **Fonts in sandboxed extensions** | An app extension can't read its containing app's bundle (EPERM), so the preview and thumbnail extensions carry their own copy of craft-fonts' Latin set (14 families, 17.5 MB each); the app carries all of craft-fonts (77 MB) | Leave; trim the extensions to the metric-compatible families (about 9 MB each) if size matters |
+
+## 3. Fidelity checked against PowerPoint
+
+PowerPoint for Mac is installed as a black-box oracle (PORT-STATUS decisions, 2026-10-27; nothing it saves enters the
+repository). Its first check found that every deck with an Office 2016 chart (`chartEx`) written by deckcraft — and
+so by DCPPTX — opened with PowerPoint's repair prompt: each chartEx part lacked its chart style and colour style
+parts. The fix is on branch `pptx-chart-repair` (`Tools/pptx/powerpoint-check.sh` checks any file). Decks without
+such charts open cleanly.

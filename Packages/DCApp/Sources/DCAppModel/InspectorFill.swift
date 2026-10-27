@@ -25,14 +25,14 @@ public enum InspectorFill {
 
     /// The fill choices of Format Shape ▸ Fill: label and kind.
     public static let shapeKinds: [(label: String, kind: String)] = [
-        ("No fill", "none"), ("Solid fill", "solid"), ("Gradient fill", "gradient"),
-        ("Picture or texture fill", "picture"), ("Pattern fill", "pattern"), ("Automatic", "auto"),
+        (L10n.text("No fill"), "none"), (L10n.text("Solid fill"), "solid"), (L10n.text("Gradient fill"), "gradient"),
+        (L10n.text("Picture or texture fill"), "picture"), (L10n.text("Pattern fill"), "pattern"), (L10n.text("Automatic"), "auto"),
     ]
 
     /// The fill choices of Format Background.
     public static let backgroundKinds: [(label: String, kind: String)] = [
-        ("Solid fill", "solid"), ("Gradient fill", "gradient"), ("Picture or texture fill", "picture"),
-        ("Pattern fill", "pattern"), ("Follow the layout", "auto"),
+        (L10n.text("Solid fill"), "solid"), (L10n.text("Gradient fill"), "gradient"), (L10n.text("Picture or texture fill"), "picture"),
+        (L10n.text("Pattern fill"), "pattern"), (L10n.text("Follow the layout"), "auto"),
     ]
 
     /// `shape.fill` parameters that switch the selection to fill kind `kind` (`picture` asks for a file).
@@ -231,8 +231,8 @@ public enum InspectorFill {
         ("→", 0), ("↘", 45), ("↓", 90), ("↙", 135), ("←", 180), ("↖", 225), ("↑", 270), ("↗", 315),
     ]
     public static let pathDirections: [(label: String, focus: [Double])] = [
-        ("From center", [0.5, 0.5, 0.5, 0.5]), ("From top left", [0, 0, 1, 1]), ("From top right", [1, 0, 0, 1]),
-        ("From bottom left", [0, 1, 1, 0]), ("From bottom right", [1, 1, 0, 0]),
+        (L10n.text("From center"), [0.5, 0.5, 0.5, 0.5]), (L10n.text("From top left"), [0, 0, 1, 1]), (L10n.text("From top right"), [1, 0, 0, 1]),
+        (L10n.text("From bottom left"), [0, 1, 1, 0]), (L10n.text("From bottom right"), [1, 1, 0, 0]),
     ]
 
     /// A linear gradient at `angle` (degrees, wrapped into 0..<360).
@@ -321,17 +321,17 @@ public enum InspectorFill {
     static let patternLabels: [(String, String)] = [
         ("pct5", "5%"), ("pct10", "10%"), ("pct20", "20%"), ("pct25", "25%"), ("pct30", "30%"), ("pct40", "40%"),
         ("pct50", "50%"), ("pct60", "60%"), ("pct70", "70%"), ("pct75", "75%"), ("pct80", "80%"), ("pct90", "90%"),
-        ("horz", "Horizontal"), ("vert", "Vertical"), ("ltHorz", "Light horizontal"), ("ltVert", "Light vertical"),
-        ("dkHorz", "Dark horizontal"), ("dkVert", "Dark vertical"), ("narHorz", "Narrow horizontal"), ("narVert", "Narrow vertical"),
-        ("dashHorz", "Dashed horizontal"), ("dashVert", "Dashed vertical"), ("cross", "Cross"), ("dnDiag", "Downward diagonal"),
-        ("upDiag", "Upward diagonal"), ("ltDnDiag", "Light downward diagonal"), ("ltUpDiag", "Light upward diagonal"),
-        ("dkDnDiag", "Dark downward diagonal"), ("dkUpDiag", "Dark upward diagonal"), ("wdDnDiag", "Wide downward diagonal"),
-        ("wdUpDiag", "Wide upward diagonal"), ("dashDnDiag", "Dashed downward diagonal"), ("dashUpDiag", "Dashed upward diagonal"),
-        ("diagCross", "Diagonal cross"), ("smCheck", "Small checkerboard"), ("lgCheck", "Large checkerboard"), ("smGrid", "Small grid"),
-        ("lgGrid", "Large grid"), ("dotGrid", "Dotted grid"), ("smConfetti", "Small confetti"), ("lgConfetti", "Large confetti"),
-        ("horzBrick", "Horizontal brick"), ("diagBrick", "Diagonal brick"), ("solidDmnd", "Solid diamond"), ("openDmnd", "Outlined diamond"),
-        ("dotDmnd", "Dotted diamond"), ("plaid", "Plaid"), ("sphere", "Sphere"), ("weave", "Weave"), ("divot", "Divot"),
-        ("shingle", "Shingle"), ("wave", "Wave"), ("trellis", "Trellis"), ("zigZag", "Zig zag"),
+        ("horz", L10n.text("Horizontal")), ("vert", L10n.text("Vertical")), ("ltHorz", L10n.text("Light horizontal")), ("ltVert", L10n.text("Light vertical")),
+        ("dkHorz", L10n.text("Dark horizontal")), ("dkVert", L10n.text("Dark vertical")), ("narHorz", L10n.text("Narrow horizontal")), ("narVert", L10n.text("Narrow vertical")),
+        ("dashHorz", L10n.text("Dashed horizontal")), ("dashVert", L10n.text("Dashed vertical")), ("cross", L10n.text("Cross")), ("dnDiag", L10n.text("Downward diagonal")),
+        ("upDiag", L10n.text("Upward diagonal")), ("ltDnDiag", L10n.text("Light downward diagonal")), ("ltUpDiag", L10n.text("Light upward diagonal")),
+        ("dkDnDiag", L10n.text("Dark downward diagonal")), ("dkUpDiag", L10n.text("Dark upward diagonal")), ("wdDnDiag", L10n.text("Wide downward diagonal")),
+        ("wdUpDiag", L10n.text("Wide upward diagonal")), ("dashDnDiag", L10n.text("Dashed downward diagonal")), ("dashUpDiag", L10n.text("Dashed upward diagonal")),
+        ("diagCross", L10n.text("Diagonal cross")), ("smCheck", L10n.text("Small checkerboard")), ("lgCheck", L10n.text("Large checkerboard")), ("smGrid", L10n.text("Small grid")),
+        ("lgGrid", L10n.text("Large grid")), ("dotGrid", L10n.text("Dotted grid")), ("smConfetti", L10n.text("Small confetti")), ("lgConfetti", L10n.text("Large confetti")),
+        ("horzBrick", L10n.text("Horizontal brick")), ("diagBrick", L10n.text("Diagonal brick")), ("solidDmnd", L10n.text("Solid diamond")), ("openDmnd", L10n.text("Outlined diamond")),
+        ("dotDmnd", L10n.text("Dotted diamond")), ("plaid", L10n.text("Plaid")), ("sphere", L10n.text("Sphere")), ("weave", L10n.text("Weave")), ("divot", L10n.text("Divot")),
+        ("shingle", L10n.text("Shingle")), ("wave", L10n.text("Wave")), ("trellis", L10n.text("Trellis")), ("zigZag", L10n.text("Zig zag")),
     ]
 
     /// `pattern_gallery`: the 48 presets the gallery offers, in its 6 rows of 8. `horz`, `vert`, `cross`,
@@ -366,28 +366,28 @@ public enum InspectorFill {
     // MARK: Picture fills
 
     public static let tileAlignments: [(key: String, label: String)] = [
-        ("tl", "Top Left"), ("t", "Top"), ("tr", "Top Right"), ("l", "Left"), ("ctr", "Center"),
-        ("r", "Right"), ("bl", "Bottom Left"), ("b", "Bottom"), ("br", "Bottom Right"),
+        ("tl", L10n.text("Top Left")), ("t", String(localized: "Top", bundle: .module, comment: "tile alignment")), ("tr", L10n.text("Top Right")), ("l", String(localized: "Left", bundle: .module, comment: "tile alignment")), ("ctr", String(localized: "Center", bundle: .module, comment: "tile alignment")),
+        ("r", String(localized: "Right", bundle: .module, comment: "tile alignment")), ("bl", L10n.text("Bottom Left")), ("b", String(localized: "Bottom", bundle: .module, comment: "tile alignment")), ("br", L10n.text("Bottom Right")),
     ]
-    public static let mirrors: [(key: String, label: String)] = [("none", "None"), ("x", "Horizontal"), ("y", "Vertical"), ("xy", "Both")]
+    public static let mirrors: [(key: String, label: String)] = [("none", String(localized: "None", bundle: .module, comment: "no mirroring / no arrow")), ("x", String(localized: "Horizontal", bundle: .module, comment: "picture fill mirror")), ("y", String(localized: "Vertical", bundle: .module, comment: "picture fill mirror")), ("xy", String(localized: "Both", bundle: .module, comment: "mirror both ways"))]
 
     // MARK: Lines (panes.rs `line_details`)
 
-    public static let compounds: [(String, String)] = [("Single", "single"), ("Double", "double"), ("Thick Thin", "thickThin"), ("Thin Thick", "thinThick"), ("Triple", "triple")]
-    public static let caps: [(String, String)] = [("Flat", "flat"), ("Round", "round"), ("Square", "square")]
-    public static let joins: [(String, String)] = [("Round", "round"), ("Bevel", "bevel"), ("Miter", "miter")]
-    public static let arrows: [(String, String)] = [("None", "none"), ("Arrow", "triangle"), ("Open Arrow", "arrow"), ("Stealth", "stealth"), ("Diamond", "diamond"), ("Oval", "oval")]
-    public static let arrowSizes: [(String, String)] = [("Small", "sm"), ("Medium", "med"), ("Large", "lg")]
+    public static let compounds: [(String, String)] = [(String(localized: "Single", bundle: .module, comment: "line compound type"), "single"), (String(localized: "Double", bundle: .module, comment: "line compound type"), "double"), (L10n.text("Thick Thin"), "thickThin"), (L10n.text("Thin Thick"), "thinThick"), (L10n.text("Triple"), "triple")]
+    public static let caps: [(String, String)] = [(String(localized: "Flat", bundle: .module, comment: "line cap"), "flat"), (String(localized: "Round", bundle: .module, comment: "line cap or join"), "round"), (String(localized: "Square", bundle: .module, comment: "line cap"), "square")]
+    public static let joins: [(String, String)] = [(String(localized: "Round", bundle: .module, comment: "line cap or join"), "round"), (String(localized: "Bevel", bundle: .module, comment: "line join"), "bevel"), (String(localized: "Miter", bundle: .module, comment: "line join"), "miter")]
+    public static let arrows: [(String, String)] = [(String(localized: "None", bundle: .module, comment: "no mirroring / no arrow"), "none"), (String(localized: "Arrow", bundle: .module, comment: "arrowhead kind"), "triangle"), (L10n.text("Open Arrow"), "arrow"), (String(localized: "Stealth", bundle: .module, comment: "arrowhead kind"), "stealth"), (String(localized: "Diamond", bundle: .module, comment: "arrowhead kind"), "diamond"), (String(localized: "Oval", bundle: .module, comment: "arrowhead kind"), "oval")]
+    public static let arrowSizes: [(String, String)] = [(String(localized: "Small", bundle: .module, comment: "arrow size"), "sm"), (String(localized: "Medium", bundle: .module, comment: "arrow size"), "med"), (String(localized: "Large", bundle: .module, comment: "arrow size"), "lg")]
     /// The outline menu's dashes (ribbon `outline_menu`).
     public static let dashes: [(String, String)] = [
-        ("Solid", "solid"), ("Round Dot", "sysDot"), ("Square Dot", "sysDash"), ("Dash", "dash"),
-        ("Dash Dot", "dashDot"), ("Long Dash", "lgDash"), ("Long Dash Dot", "lgDashDot"),
+        (String(localized: "Solid", bundle: .module, comment: "line dash"), "solid"), (L10n.text("Round Dot"), "sysDot"), (L10n.text("Square Dot"), "sysDash"), (String(localized: "Dash", bundle: .module, comment: "line dash style"), "dash"),
+        (L10n.text("Dash Dot"), "dashDot"), (L10n.text("Long Dash"), "lgDash"), (L10n.text("Long Dash Dot"), "lgDashDot"),
     ]
     public static let weights: [Double] = [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0, 4.5, 6.0]
     /// The outline menu's arrow combinations: label, head, tail.
     public static let arrowCombos: [(String, String, String)] = [
-        ("None", "none", "none"), ("Arrow at end", "none", "triangle"), ("Arrow at start", "triangle", "none"),
-        ("Arrows at both ends", "triangle", "triangle"), ("Stealth end", "none", "stealth"), ("Oval ends", "oval", "oval"),
+        (String(localized: "None", bundle: .module, comment: "no arrowheads"), "none", "none"), (L10n.text("Arrow at end"), "none", "triangle"), (L10n.text("Arrow at start"), "triangle", "none"),
+        (L10n.text("Arrows at both ends"), "triangle", "triangle"), (L10n.text("Stealth end"), "none", "stealth"), (L10n.text("Oval ends"), "oval", "oval"),
     ]
 
     /// The line's stored choices as `shape.line` names.

@@ -278,8 +278,8 @@ final class PrintPagesView: NSView {
 final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
     let pages: PrintPagesView
     let layout = NSPopUpButton()
-    let frame = NSButton(checkboxWithTitle: "Frame slides", target: nil, action: nil)
-    let hidden = NSButton(checkboxWithTitle: "Print hidden slides", target: nil, action: nil)
+    let frame = NSButton(checkboxWithTitle: String(localized: "Frame slides", bundle: .module, comment: "Print panel option"), target: nil, action: nil)
+    let hidden = NSButton(checkboxWithTitle: String(localized: "Print hidden slides", bundle: .module, comment: "Print panel option"), target: nil, action: nil)
     let color = NSPopUpButton()
     /// Bumped on every change, so the panel redraws its preview.
     @objc dynamic var version = 0
@@ -287,7 +287,7 @@ final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
     init(_ pages: PrintPagesView) {
         self.pages = pages
         super.init(nibName: nil, bundle: nil)
-        title = "DeckCraft"
+        title = "DeckCraftNative"  // the print panel's tab for these options: the app's name, not translated
     }
 
     @available(*, unavailable)
@@ -296,7 +296,7 @@ final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
     override func loadView() {
         for l in PrintLayout.all { layout.addItem(withTitle: l.label) }
         layout.selectItem(at: PrintLayout.all.firstIndex(of: pages.settings.layout) ?? 0)
-        color.addItems(withTitles: ["Color", "Grayscale"])
+        color.addItems(withTitles: [String(localized: "Color", bundle: .module, comment: "Print panel: print in colour"), String(localized: "Grayscale", bundle: .module, comment: "Print panel: print in grayscale")])
         color.selectItem(at: pages.settings.grayscale ? 1 : 0)
         frame.state = pages.settings.frame ? .on : .off
         hidden.state = pages.settings.includeHidden ? .on : .off
@@ -305,10 +305,10 @@ final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
             c.action = #selector(changed)
         }
         let grid = NSGridView(views: [
-            [NSTextField(labelWithString: "Layout:"), layout],
+            [NSTextField(labelWithString: String(localized: "Layout:", bundle: .module, comment: "Print panel: the pages' layout (slides, notes, handouts, outline)")), layout],
             [NSGridCell.emptyContentView, frame],
             [NSGridCell.emptyContentView, hidden],
-            [NSTextField(labelWithString: "Color:"), color],
+            [NSTextField(labelWithString: String(localized: "Color:", bundle: .module, comment: "Print panel: colour or grayscale")), color],
         ])
         grid.column(at: 0).xPlacement = .trailing
         grid.rowSpacing = Tokens.Space.s
@@ -337,10 +337,10 @@ final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
 
     func localizedSummaryItems() -> [[NSPrintPanel.AccessorySummaryKey: String]] {
         [
-            [.itemName: "Layout", .itemDescription: pages.settings.layout.label],
-            [.itemName: "Frame slides", .itemDescription: pages.settings.frame ? "On" : "Off"],
-            [.itemName: "Hidden slides", .itemDescription: pages.settings.includeHidden ? "Printed" : "Not printed"],
-            [.itemName: "Color", .itemDescription: pages.settings.grayscale ? "Grayscale" : "Color"],
+            [.itemName: String(localized: "Layout", bundle: .module, comment: "Print panel summary: the pages' layout"), .itemDescription: pages.settings.layout.label],
+            [.itemName: String(localized: "Frame slides", bundle: .module, comment: "Print panel option"), .itemDescription: pages.settings.frame ? String(localized: "On", bundle: .module, comment: "Print panel summary: an option is on") : String(localized: "Off", bundle: .module, comment: "Print panel summary: an option is off")],
+            [.itemName: String(localized: "Hidden slides", bundle: .module, comment: "Print panel summary"), .itemDescription: pages.settings.includeHidden ? String(localized: "Printed", bundle: .module, comment: "Print panel summary: hidden slides are printed") : String(localized: "Not printed", bundle: .module, comment: "Print panel summary: hidden slides are not printed")],
+            [.itemName: String(localized: "Color", bundle: .module, comment: "Print panel summary: colour or grayscale"), .itemDescription: pages.settings.grayscale ? String(localized: "Grayscale", bundle: .module, comment: "Print panel: print in grayscale") : String(localized: "Color", bundle: .module, comment: "Print panel: print in colour")],
         ]
     }
 

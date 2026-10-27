@@ -138,7 +138,7 @@ public final class ShowCoordinator {
                     let ms = UInt64(rustCast: (secs * 1000).rounded())
                     _ = try? session.execute("transition.timing", ["index": .integer(i), "after": .integer(Int(clamping: ms))])
                 }
-                model.status = "Slide timings recorded."
+                model.status = L10n.text("Slide timings recorded.")
             }
             if session.activeDoc?.uid == uid {
                 _ = try? session.execute("slide.go", ["index": .integer(s.state.slide)])
@@ -534,7 +534,7 @@ public final class ShowCoordinator {
         let timeline = ShowState.timeline(d.doc, slide)
         if timeline.isEmpty {
             stopAnimPreview()
-            model.status = "This slide has no animations"
+            model.status = L10n.text("This slide has no animations")
             return .success(["playing": false])
         }
         var fromSecs = 0.0
@@ -544,7 +544,7 @@ public final class ShowCoordinator {
         }
         if model.ui.view == .sorter || model.ui.view == .notesPage { model.ui.view = .normal }
         animPreview = AnimPreview(uid: d.uid, slide: slide, slideValue: s, started: nil, from: fromSecs, elapsed: fromSecs, timeline: timeline)
-        model.status = "Previewing animations"
+        model.status = L10n.text("Previewing animations")
         onPreviewChanged?()
         return .success(["playing": true, "slide": .integer(slide), "duration": .double(timeline.totalDuration), "from": .double(fromSecs)])
     }

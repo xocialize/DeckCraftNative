@@ -20,7 +20,7 @@ final class ShowChromeModel {
     var laser = false
     var blank: ShowBlank?
     var grid = false
-    var zoomLabel = "Zoom"
+    var zoomLabel = String(localized: "Zoom", bundle: .module, comment: "Zoom into part of the slide")
     var slideText = ""
 }
 
@@ -229,7 +229,7 @@ final class ShowView: NSView, MTKViewDelegate {
         if chrome.blank != s.blank { chrome.blank = s.blank }
         if chrome.grid != s.grid { chrome.grid = s.grid }
         if chrome.zoomLabel != s.zoomLabel { chrome.zoomLabel = s.zoomLabel }
-        let text = "Slide \(s.state.slide + 1) of \(doc.slides.count)"
+        let text = String(localized: "Slide \(s.state.slide + 1) of \(doc.slides.count)", bundle: .module)
         if chrome.slideText != text { chrome.slideText = text }
         readingHost?.isHidden = !s.reading
     }
@@ -426,7 +426,7 @@ final class ShowOverlayView: NSView {
             for m in v.stage.mediaPlaces where m.unplayable && v.coord.media.status(m.id) != nil {
                 ctx.setFillColor(NSColor.black.withAlphaComponent(0.72).cgColor)
                 ctx.fill(m.rect)
-                drawCentered(text("This video can't be played on this Mac", size: 13, color: .white), CGPoint(x: m.rect.midX, y: m.rect.midY))
+                drawCentered(text(String(localized: "This video can't be played on this Mac", bundle: .module), size: 13, color: .white), CGPoint(x: m.rect.midX, y: m.rect.midY))
             }
             // Play/pause on the GIF under the pointer, and the media bar (Slide Show ▸ Show Media Controls).
             if doc.show.showMediaControls && !s.zoomArm && s.zoom == nil {
@@ -443,14 +443,14 @@ final class ShowOverlayView: NSView {
             }
         }
         if s.ended {
-            drawCentered(text("End of slide show, click to exit.", size: 18, color: NSColor(white: 0.78, alpha: 1)), CGPoint(x: full.midX, y: full.minY + 40))
+            drawCentered(text(String(localized: "End of slide show, click to exit.", bundle: .module), size: 18, color: NSColor(white: 0.78, alpha: 1)), CGPoint(x: full.midX, y: full.minY + 40))
         }
         if let b = s.blank {
             ctx.setFillColor(b == .black ? NSColor.black.cgColor : NSColor.white.cgColor)
             ctx.fill(full)
         }
         if !s.goto.isEmpty {
-            let label = "Go to slide \(s.goto)"
+            let label = String(localized: "Go to slide \(s.goto)", bundle: .module, comment: "The slide number typed so far while the show waits for Enter")
             let w = Swift.min(Swift.max(28 + Double(label.count) * 10, 160), Swift.max(full.width - 32, 160))
             let r = CGRect(x: full.minX + 16, y: full.maxY - 96, width: w, height: 36)
             ctx.addPath(CGPath(roundedRect: r, cornerWidth: Tokens.Radius.control, cornerHeight: Tokens.Radius.control, transform: nil))
@@ -478,7 +478,7 @@ final class ShowOverlayView: NSView {
             ctx.fillEllipse(in: CGRect(x: p.x - 5.5, y: p.y - 5.5, width: 11, height: 11))
         }
         if s.zoomArm && !s.grid {
-            drawCentered(text("Click the slide to zoom in. Esc cancels.", size: 16, color: .white), CGPoint(x: full.midX, y: full.minY + 36))
+            drawCentered(text(String(localized: "Click the slide to zoom in. Esc cancels.", bundle: .module), size: 16, color: .white), CGPoint(x: full.midX, y: full.minY + 36))
         }
         if s.grid && !s.ended { drawGrid(ctx, v, full, current: s.state.slide, doc) }
         if s.rehearse {
@@ -488,7 +488,7 @@ final class ShowOverlayView: NSView {
             ctx.setFillColor(NSColor.black.withAlphaComponent(0.63).cgColor)
             ctx.fillPath()
             let label = String(
-                format: "Slide %02d:%04.1f   Total %02d:%02d", Int(Swift.max(t, 0) / 60), Swift.max(t, 0).truncatingRemainder(dividingBy: 60),
+                format: String(localized: "Slide %02d:%04.1f   Total %02d:%02d", bundle: .module, comment: "Rehearse Timings: this slide's time (minutes:seconds.tenths) and the total time (minutes:seconds); a format string"), Int(Swift.max(t, 0) / 60), Swift.max(t, 0).truncatingRemainder(dividingBy: 60),
                 Int(Swift.max(total, 0) / 60), Int(Swift.max(total, 0).truncatingRemainder(dividingBy: 60))
             )
             drawCentered(text(label, size: 13, color: .white), CGPoint(x: r.midX, y: r.midY))
@@ -501,9 +501,9 @@ final class ShowOverlayView: NSView {
         let cells = ShowGeometry.seeAllCells(full, slides.count, ShowGeometry.slideAspect(doc))
         ctx.setFillColor(NSColor(white: 16 / 255, alpha: 1).cgColor)
         ctx.fill(full)
-        drawCentered(text("All slides", size: 20, color: .white), CGPoint(x: full.midX, y: full.minY + 28))
+        drawCentered(text(String(localized: "All slides", bundle: .module), size: 20, color: .white), CGPoint(x: full.midX, y: full.minY + 28))
         if doc.slides.count > ShowGeometry.gridCap {
-            drawCentered(text("First \(ShowGeometry.gridCap) slides", size: 13, color: NSColor(white: 0.7, alpha: 1)), CGPoint(x: full.midX, y: full.minY + 50))
+            drawCentered(text(String(localized: "First \(ShowGeometry.gridCap) slides", bundle: .module, comment: "See All Slides shows at most this many slides"), size: 13, color: NSColor(white: 0.7, alpha: 1)), CGPoint(x: full.midX, y: full.minY + 50))
         }
         var budget = slides.count <= 12 ? 12 : 4
         var missing = false
@@ -525,7 +525,7 @@ final class ShowOverlayView: NSView {
             ctx.stroke(rect.insetBy(dx: cur ? 1.5 : 0.5, dy: cur ? 1.5 : 0.5))
             let hidden = doc.slides.at(i)?.hidden ?? false
             drawCentered(
-                text(hidden ? "\(i + 1)  Hidden" : "\(i + 1)", size: 13, color: cur ? .white : NSColor(white: 0.7, alpha: 1)),
+                text(hidden ? String(localized: "\(i + 1)  Hidden", bundle: .module, comment: "A slide number in See All Slides, for a hidden slide") : "\(i + 1)", size: 13, color: cur ? .white : NSColor(white: 0.7, alpha: 1)),
                 CGPoint(x: rect.midX, y: rect.maxY + 12)
             )
         }
@@ -583,7 +583,7 @@ final class ShowOverlayView: NSView {
             ctx.fillEllipse(in: CGRect(x: done.maxX - 5, y: track.midY - 5, width: 10, height: 10))
         }
         if let err = status?.error {
-            text("No sound: \(err)", size: 10, color: .systemRed).draw(at: CGPoint(x: rect.minX, y: rect.maxY + 3))
+            text(String(localized: "No sound: \(err)", bundle: .module, comment: "Under a media bar: why the media plays without sound"), size: 10, color: .systemRed).draw(at: CGPoint(x: rect.minX, y: rect.maxY + 3))
         }
     }
 }
@@ -601,15 +601,15 @@ struct ShowToolbar: View {
 
     var body: some View {
         HStack(spacing: Tokens.Space.s) {
-            button("chevron.left", "Previous", .previous)
-            button("chevron.right", "Next", .next)
-            button("pencil.tip", chrome.pen ? "Pen on" : "Pen", .pen, on: chrome.pen)
-            button("smallcircle.filled.circle", chrome.laser ? "Laser on" : "Laser", .laser, on: chrome.laser)
-            button("rectangle.fill", "Black", .black, on: chrome.blank == .black)
-            button("rectangle", "White", .white, on: chrome.blank == .white)
-            button("square.grid.3x3", "All", .all, on: chrome.grid)
-            button("plus.magnifyingglass", chrome.zoomLabel, .zoom, on: chrome.zoomLabel != "Zoom")
-            button("xmark.circle", "End", .end)
+            button("chevron.left", String(localized: "Previous", bundle: .module, comment: "Go to the previous slide"), .previous)
+            button("chevron.right", String(localized: "Next", bundle: .module, comment: "Go to the next slide"), .next)
+            button("pencil.tip", chrome.pen ? String(localized: "Pen on", bundle: .module) : String(localized: "Pen", bundle: .module), .pen, on: chrome.pen)
+            button("smallcircle.filled.circle", chrome.laser ? String(localized: "Laser on", bundle: .module) : String(localized: "Laser", bundle: .module, comment: "The laser pointer"), .laser, on: chrome.laser)
+            button("rectangle.fill", String(localized: "Black", bundle: .module, comment: "Blank the screen to black"), .black, on: chrome.blank == .black)
+            button("rectangle", String(localized: "White", bundle: .module, comment: "Blank the screen to white"), .white, on: chrome.blank == .white)
+            button("square.grid.3x3", String(localized: "All", bundle: .module, comment: "See all slides"), .all, on: chrome.grid)
+            button("plus.magnifyingglass", chrome.zoomLabel, .zoom, on: chrome.zoomLabel != String(localized: "Zoom", bundle: .module, comment: "Zoom into part of the slide"))
+            button("xmark.circle", String(localized: "End", bundle: .module, comment: "End the slide show"), .end)
         }
         .padding(.horizontal, Tokens.Space.m)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -639,9 +639,9 @@ struct ShowReadingBar: View {
         HStack(spacing: Tokens.Space.s) {
             Text(chrome.slideText).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
             Spacer()
-            Button { act(.previous) } label: { Image(systemName: "chevron.left") }.help("Previous").focusable(false)
-            Button { act(.next) } label: { Image(systemName: "chevron.right") }.help("Next").focusable(false)
-            Button("Close") { act(.end) }.focusable(false)
+            Button { act(.previous) } label: { Image(systemName: "chevron.left") }.help(String(localized: "Previous", bundle: .module, comment: "Go to the previous slide")).focusable(false)
+            Button { act(.next) } label: { Image(systemName: "chevron.right") }.help(String(localized: "Next", bundle: .module, comment: "Go to the next slide")).focusable(false)
+            Button(String(localized: "Close", bundle: .module, comment: "Close Reading View")) { act(.end) }.focusable(false)
         }
         .controlSize(.small)
         .padding(.horizontal, Tokens.Space.m)

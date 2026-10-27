@@ -867,3 +867,156 @@ ported** by an area (cited), **ported** here (`DCAppModelTests/LibTests.swift`, 
   and a model drops only the thumbnails of presentations it closed. One app, one model: no change in the app.
 - `DCApp/Views/Pasteboard.swift`: `PasteboardBridge.menuCommand` takes the responder with the keyboard as a defaulted
   parameter (the key window's first responder, as before), since a test process has no key window.
+
+## Intents (Wave 6: App Intents and App Shortcuts)
+
+New in the port (deckcraft has no counterpart). Code in `DCApp/Intents/`; the app target adds two files.
+
+| File | What |
+|---|---|
+| `DCApp/Intents/IntentsEngine.swift` | the window-free work: `PresentationInput` (an `IntentFile`'s bytes), `ExportRequest` (→ `file.export` params), `IntentsEngine.export`/`outline`/`slideCount` (a session of their own on an `EngineThread` named `dc.intents`, 32 MiB stack), `DeckIntentError` |
+| `DCApp/Intents/FileIntents.swift` | Export Presentation (PDF slides/notes/handouts with per-page, PPTX, PNG/JPEG of one slide or all; returns `[IntentFile]`), Get Presentation Outline, Get Slide Count: no window, no app session |
+| `DCApp/Intents/WindowIntents.swift` | Open Presentation, New Presentation (theme or starter), Start Slide Show (from a slide), Add Slide (layout, title, text), Run DeckCraft Command (id + JSON → JSON): main actor, through `AppModel.run` |
+| `DCApp/Intents/PresentationEntity.swift` | `PresentationEntity` (an open presentation, by `DocState.uid`) and its query; `IntentsHost` (activate, run, errors) |
+| `DCApp/Intents/IntentsOptions.swift` | the `AppEnum`s (format, PDF layout, per page, slide layout) and the options providers (themes, starters, command ids) |
+| `DCApp/Intents/IntentsPackage.swift` | `DCAppIntentsPackage: AppIntentsPackage` |
+| `DCApp/Intents/IntentsFeature.swift` | control methods `intents.run` / `intents.result`: run the real intents in the app's process (end-to-end checks without the Shortcuts app) |
+| `Apps/DeckCraftNative/App/DeckCraftIntentsPackage.swift` | the app's `AppIntentsPackage`, including `DCAppIntentsPackage`: what makes Xcode merge the package's intents into the app's `Metadata.appintents` |
+| `Apps/DeckCraftNative/App/DeckCraftIntentShortcuts.swift` | the `AppShortcutsProvider` (7 shortcuts, 2–3 phrases each). It must be in the app target: the merge takes actions, entities and enums from a package, not App Shortcuts (measured: the package's own metadata had 7 `autoShortcuts`, the app's 0, until it moved) |
+
+- **Metadata strings are in the main bundle.** `appintentsmetadataprocessor` rejects
+  `LocalizedStringResource(…, bundle: .atURL(Bundle.module.bundleURL))` in titles, descriptions, parameter titles,
+  enum and type display representations and short titles ("AppIntents requires 'LocalizedStringResource' to use the
+  main bundle"), so those are plain literals. Summaries (`ParameterSummaryString`) and phrases take no bundle at all.
+  Strings resolved at run time — errors, dialogs, an entity's display representation — use the package bundle,
+  per the String Catalog convention. Their catalog for translation belongs in the app target (open item).
+- **Window-free.** Export and the read intents never touch `AppModel.session`: a fresh `Session` per call, opened from
+  the bytes with `FileCommands.openChecked`/`addOpened`, `file.export` run on it, dropped.
+- **Tests:** `DCAppTests/IntentsTests.swift` (15): PDF slides/notes/handouts page counts, PPTX reopens with the same
+  slides, PNG of one slide and JPEG of all, a slide past the end fails before writing, outline equals deckcraft's
+  outline export (`content.md`), slide counts against the corpus (`.deckcraft` and `.pptx`), damaged files (garbage,
+  empty, a cut zip, a cut pptx) fail cleanly, Run DeckCraft Command (answers, bad JSON, non-object, unknown id, the
+  command's own failure, a UI command with no app), New Presentation's and Add Slide's parameters against the engine.
+- **Open:** a launch for a background intent also opens AppKit's untitled window (`applicationShouldOpenUntitledFile`);
+  an App Intents extension for the file intents (a project change) would avoid launching the app at all.
+
+## Release and Updates (Wave 6, session A)
+
+- **File map.** craft-update (storytold/craft-libs @495e5971, MIT OR Apache-2.0), which deckcraft's
+  `crates/ui-egui/src/updates_ui.rs` drives: `version.rs` `parse`/`is_newer` → `DCAppModel/UpdatesFeed.swift`
+  (`UpdateVersion`); `release.rs` `parse_github_release_list`, `release_from_value`, `valid_file_name`,
+  `download_url_under`, `safe_release_html_url` → `UpdatesFeed.swift` (`UpdateFeed`, `UpdateRelease`, `UpdateAsset`);
+  `lib.rs` `check_for_update` and `http.rs` `refused_until` → `UpdatesCheck.swift` (`UpdateChecker`); `http.rs`'s
+  download and `verify_sha256` → `UpdatesDownload.swift` (`UpdateDownloader`); `updater.rs` `Updater` →
+  `UpdatesCenter.swift` (`UpdateCenter`, `UpdatePreferences`); `dialog.rs` `StartupPrompt` →
+  `DCApp/Updates/UpdatesWindow.swift`; `updates_ui.rs` → `DCApp/Updates/UpdatesFeature.swift`.
+  `DCAppModel/UpdatesVersion.swift` is the version (`DCAppVersion.current`, equal to `MARKETING_VERSION`).
+- **Native instead of ported.** URLSession (data and download tasks), CryptoKit's SHA-256, `JSONSerialization`
+  (per-item tolerance, as serde_json `Value`), UserDefaults for the three preferences, `NSWorkspace.open` mounts the
+  DMG, LaunchServices' quarantine properties on the download.
+- **Divergences.** deckcraft checks at every start and installs in place (self-update helper, restart). Here the
+  automatic check is a preference, **off by default**, at most daily (first look 10 s after launch, then hourly;
+  never with `DECKCRAFT_NO_PREFS`), and the update is the notarized DMG, downloaded to Downloads, checked
+  (size, GitHub's `digest`), quarantined and opened; the user drags it to Applications. A "Skip This Version" quiets
+  automatic checks for that version. Releases are read from `xocialize/deckcraftnative-releases`
+  (`UpdateSource.releasesRepo`, the one constant). A 404 (no releases, or no repo yet) is "up to date", as
+  craft-update's `NotFound`. A window of its own (Software Update), not a sheet: there may be no document window,
+  and it never blocks one. Release notes are Markdown's inline syntax; links open only when `https`.
+  Debian `~` versions and the `SHA256SUMS.txt` route aren't ported (GitHub tags and `digest` cover a Mac app).
+- **Control channel.** `app.checkUpdates` answers at once; `ui.inspect`'s `updates` reports the state
+  (`phase`, `version`, `installer`, `error`, `file`, `automatic`, `windowVisible`); `ui.updates {action}` presses
+  the window's buttons (`check`, `download`, `cancel`, `retry`, `skip`, `later`). Debug builds take
+  `DECKCRAFT_UPDATES_FEED=http://127.0.0.1:PORT/releases.json` (downloads from that origin's `/download/`).
+- **Tests.** `DCAppModelTests/UpdatesTests.swift` (27, window-free, stubbed `URLProtocol` per host): versions and
+  precedence, the one version number against the project, the feed (newest stable, drafts, links outside the repo,
+  caps), the check (up to date, newer, pre-release, malformed JSON, no DMG, network error, rate limit, 404, the
+  request's headers), the download (stub server and a file URL: checksum, size, unique names, quarantine), and the
+  center (updater.rs: a requested check reports either way, the automatic one stays quiet, a request during it is
+  not lost, runs when due, skipped versions, download and open, retry). `DCAppTests/UpdatesWindowTests.swift` (3):
+  the command answers at once and opens the window, every state lays out, notes keep inline Markdown.
+- **Release.** `Tools/release.sh` (archive → Developer ID export → strict verification of every piece of code →
+  notarize and staple the app → DMG with an Applications link, made with `hdiutil create` (deckcraft's
+  `makehybrid -hfs` leaves `com.apple.FinderInfo` on every file and an app copied off it fails
+  `codesign --verify --strict`) → sign, notarize and staple the DMG → Gatekeeper). `Tools/publish-release.sh`
+  (`--dry-run`; never creates the releases repo). The DMG is plain: deckcraft's background is licensed for reuse but
+  is titled "DeckCraft" and laid out for `DeckCraft.app` (ATTRIBUTION.md).
+
+## Strings (Wave 6, session D: String Catalogs)
+
+**The convention** (WAVE6-PLAN.md, "String Catalogs"): text in DCApp is `String(localized: "…", bundle: .module)` or
+SwiftUI's `Text("…", bundle: .module)`; every SwiftUI title API (Button, Toggle, Picker, TextField, Label, Section,
+Menu, `.help`, `.accessibilityLabel`…) gets a `String(localized:…, bundle: .module)`, and a literal that isn't text
+(a symbol, "Aa", a percentage) is `Text(verbatim:)`. DCAppModel uses `L10n.text("…")` (or `String(localized:…,
+bundle: .module, comment:)` when a comment is needed). Command labels and menu titles shown in the app go through
+`L10n.commandLabel(id, english)` / `L10n.menuTitle(english)`: MenuBuilder (menus and items), the palette
+(`Palette.items`). Interpolations are String or Int only (Int → `%lld`, locale-grouped: counts and slide numbers;
+sizes, years and ids are passed as `String(n)`); Doubles are passed already formatted.
+
+**The exception: App Intents metadata uses the main bundle.** The App Intents metadata processor refuses any
+other bundle, so intent titles, descriptions, parameter titles, enum and entity names and short titles in
+`DCApp/Intents/*.swift` and `Apps/DeckCraftNative/App/*Intent*.swift` are `LocalizedStringResource("…")` with no
+`bundle:`; their keys are in `Apps/DeckCraftNative/App/Localizable.xcstrings`, the App Shortcuts phrases in
+`App/AppShortcuts.xcstrings`. Intent error and dialog text that's built at run time uses
+`bundle: .atURL(Bundle.module.bundleURL)` and lives in DCApp's catalog.
+
+| Catalog | Holds | Filled by |
+|---|---|---|
+| `DCAppModel/Resources/Localizable.xcstrings` | DCAppModel's text | `Tools/l10n/sync.sh` |
+| `DCAppModel/Resources/Commands.xcstrings` | every registry command's label (by id), the UI commands, `menu.<Title>` for the menu tree | `Tools/l10n/commands.sh` (a test-backed generator: `StringsCatalogTests` with `DC_L10N_WRITE=1`) |
+| `DCApp/Resources/Localizable.xcstrings` | DCApp's text, plurals | `Tools/l10n/sync.sh` |
+| `Apps/DeckCraftNative/App/Localizable.xcstrings` | App Intents metadata (main bundle), parameter summaries | `Tools/l10n/sync.sh` (Xcode build) |
+| `Apps/DeckCraftNative/App/AppShortcuts.xcstrings` | App Shortcuts phrases | `Tools/l10n/sync.sh` (Xcode build) |
+| `Apps/DeckCraftNative/App/InfoPlist.xcstrings` | name, copyright, document and file type names | `Tools/l10n/sync.sh` (from the built Info.plist) |
+
+**Extraction is the compiler's.** A target with a String Catalog is compiled with string extraction on, and each
+file writes a `.stringsdata` (type-checked keys: `%lld` vs `%@`, and the `comment:`s). `sync.sh` builds DCApp
+(`.build-strings`) and the app (Xcode, derived data in `~/Library/Caches/DeckCraftNative/xcode-strings`), splits the
+`.stringsdata` by catalog (a DCApp literal whose call names no `bundle:` belongs to the main bundle; outside
+`Intents/` that's an error and the script stops), runs `xcstringstool sync`, then `l10n.py`: plural variations from
+`Tools/l10n/plurals.json`, every English value written out (so the compiled `en.lproj` holds every key and
+`Bundle.localizedString` can be checked), and stale entries with no translation dropped. Re-run it after changing
+UI text; the tests fail until you do.
+
+**Plurals** (`plurals.json`): one key per count phrase with the catalog's plural variation (a substitution when
+the key has other arguments). Where the converted code didn't branch on 1, `one` keeps the old English
+("Inserted 1 slides") so English output is unchanged; correcting it is a catalog edit, no code.
+
+**Product name.** The engine's labels stay deckcraft's (parity); the app shows its own name: `app.about` and
+`menu.About DeckCraft` are "About DeckCraftNative" in the Commands catalog (`appNameLabels` in the generator), and
+"DeckCraftNative can't find/export/open…", the presenter window title, the print panel's tab and the dialog
+fallback title say DeckCraftNative. Text crediting deckcraft is unchanged.
+
+**Tests.** `DCAppModelTests/StringsCatalogTests` (Commands catalog = registry + UI commands + menu tree; every
+command has an entry; labels come from the compiled Commands table; every localized literal in DCAppModel and
+DCApp has its key in the right catalog, by a source scan that matches interpolations to format specifiers; every
+entry is used; no SwiftUI title literal without `bundle:`; every `String(localized:)` names its bundle; App
+Shortcuts phrases and InfoPlist document types present; DCAppModel's compiled bundle has every key; plural
+variations), `DCAppTests/StringsTests` (DCApp's compiled bundle has every key; plurals; the menu bar's titles come
+from the catalogs).
+
+**Pseudo-localization.** `Tools/l10n/pseudo.sh [--control PORT] [--sample]` compiles a build-only `en-XA` table from
+each catalog into the built bundles of `.build-strings` (never into the catalogs: `[Śļîðé Šöŕţéŕ]`, format
+specifiers kept) and launches DeckCraftDev with `-AppleLanguages '(en-XA)'`; English left on screen bypasses the
+catalogs. (DeckCraftDev's main bundle is its folder, and CFBundle doesn't mix localizations, so the script gives
+that folder an `en-XA.lproj` too; delete `.build-strings/out/Products/Debug/en-XA.lproj` to run in English again.)
+
+**Layout fixes the pseudo-localization found** (layout only): Settings' labels were clipped at the window's
+left edge and AutoCorrect's Replace … With … Add row spilled past both edges (also slightly in English): both
+dialogs now take the wide dialog width. SmartArt's category segments overflowed the sheet (in English too): a
+form's `.tabs` row shows segments when they fit and a pop-up menu when they don't (`ViewThatFits`). Tried and
+rejected: letting every dialog grow to its content (`.frame(minWidth:)`: notes are measured unwrapped, so sheets
+came out too short) and the hosting controller's `.minSize` (a constraint-update loop that AppKit aborts).
+
+**Left as is, on purpose:** control-channel answers and command errors (deckcraft's English, scripts compare
+them); engine text shown as is (accessibility checker issues, `SchemeSlot` names in Theme Colors, preset, chart,
+SmartArt, icon, table-style and layout names from the engine, transition ids on sorter badges); document content
+the app writes (the photo album's "Text Box", "Custom Show 1"); QAT labels (persisted, and part of `app.qat`'s
+answer); values that are also tags or compared (`InspectorFill.types`, `InspectorController.contextual()`, the
+paragraph line-spacing presets); language endonyms; DesignScaffold's own strings ("180 items" in its searchable
+picker) — that package isn't localized yet.
+
+**Open items.** Keys shared by different meanings ("Normal", "Center", "Zoom"…) carry several comments; a
+translator may need them split into distinct keys. ShowView compares the zoom label to DCApp's "Zoom" while
+ShowController produces DCAppModel's: the two must be translated alike. The canvas control channel's `choose`
+finds a context-menu item by its (now localized) title. Theme Colors' right-hand colour wells touch the sheet's
+edge (English too); the Review inspector's segments clip in a long language.

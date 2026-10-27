@@ -163,10 +163,10 @@ public enum StatusLogic {
     public static func slideText(_ st: DocState) -> String {
         let n = st.doc.slides.count
         switch st.selection.target {
-        case .slides: return "Slide \(Swift.min(st.selection.slide + 1, Swift.max(n, 1))) of \(n)"
-        case .master, .layout: return "Slide Master"
-        case .handout: return "Handout Master"
-        case .notesMaster: return "Notes Master"
+        case .slides: return L10n.text("Slide \(Swift.min(st.selection.slide + 1, Swift.max(n, 1))) of \(n)")
+        case .master, .layout: return L10n.text("Slide Master")
+        case .handout: return L10n.text("Handout Master")
+        case .notesMaster: return L10n.text("Notes Master")
         }
     }
 

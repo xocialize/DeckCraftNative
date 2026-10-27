@@ -192,7 +192,7 @@ extension DialogController {
             } else if let scale = DialogMath.parseZoomPercent(d.value("percent")) {
                 model.ui.zoom = scale
             } else {
-                status("Enter a zoom percent")
+                status(L10n.text("Enter a zoom percent"))
                 return false
             }
             model.changed()
@@ -235,7 +235,7 @@ extension DialogController {
             case "ok":
                 let picked = list.map(\.0).filter { d.flag("slide\($0)") && !d.flag("off\($0)") }
                 if picked.isEmpty {
-                    status("Tick at least one slide to insert")
+                    status(L10n.text("Tick at least one slide to insert"))
                     return false
                 }
                 // A failed insert keeps the dialog (and the ticked slides) open; the error is in the status bar.
@@ -310,7 +310,7 @@ extension DialogController {
             let from = d.value("from"), to = String(rustTrim(d.value("to")))
             guard !from.isEmpty, !to.isEmpty else { return false }
             let n = (try? model.run("font.replace", ["from": .string(from), "to": .string(to)]).get())?["replaced"]?.asU64 ?? 0
-            d.fields["result"] = n == 0 ? "“\(from)” isn't used explicitly." : "Replaced “\(from)” with “\(to)”."
+            d.fields["result"] = n == 0 ? L10n.text("“\(from)” isn't used explicitly.") : L10n.text("Replaced “\(from)” with “\(to)”.")
             d.fields["from"] = usedFonts().first ?? ""
             // Stays open, like PowerPoint, so several fonts can be replaced in a row.
             return false
@@ -430,12 +430,12 @@ extension DialogController {
             return true
         case "ok":
             let pt = DialogMath.finitePt
-            guard let beforeIn = pt(d.value("before")) else { status("Indent before text must be a number of inches"); return false }
-            guard let afterIn = pt(d.value("after")) else { status("Indent after text must be a number of inches"); return false }
-            guard let byIn = pt(d.value("by")) else { status("Special indent must be a number of inches"); return false }
-            guard let spaceBefore = pt(d.value("spaceBefore")) else { status("Spacing before must be a number"); return false }
-            guard let spaceAfter = pt(d.value("spaceAfter")) else { status("Spacing after must be a number"); return false }
-            guard let lineValue = pt(d.value("lineValue")) else { status("Line spacing must be a number"); return false }
+            guard let beforeIn = pt(d.value("before")) else { status(L10n.text("Indent before text must be a number of inches")); return false }
+            guard let afterIn = pt(d.value("after")) else { status(L10n.text("Indent after text must be a number of inches")); return false }
+            guard let byIn = pt(d.value("by")) else { status(L10n.text("Special indent must be a number of inches")); return false }
+            guard let spaceBefore = pt(d.value("spaceBefore")) else { status(L10n.text("Spacing before must be a number")); return false }
+            guard let spaceAfter = pt(d.value("spaceAfter")) else { status(L10n.text("Spacing after must be a number")); return false }
+            guard let lineValue = pt(d.value("lineValue")) else { status(L10n.text("Line spacing must be a number")); return false }
             let beforeSame = d.value("spaceBefore") == d.value("spaceBeforeSeed")
             let afterSame = d.value("spaceAfter") == d.value("spaceAfterSeed")
             var p: JSON = [
@@ -490,9 +490,9 @@ extension DialogController {
     func fontAct(_ d: inout Dialog, _ id: String) -> Bool? {
         guard id == "ok" else { return nil }
         let family = String(rustTrim(d.value("family")))
-        guard !family.isEmpty else { status("Choose a font"); return false }
-        guard let size = DialogMath.finitePt(d.value("size")) else { status("Font size must be a number"); return false }
-        guard let spacing = DialogMath.finitePt(d.value("spacing")) else { status("Character spacing must be a number"); return false }
+        guard !family.isEmpty else { status(L10n.text("Choose a font")); return false }
+        guard let size = DialogMath.finitePt(d.value("size")) else { status(L10n.text("Font size must be a number")); return false }
+        guard let spacing = DialogMath.finitePt(d.value("spacing")) else { status(L10n.text("Character spacing must be a number")); return false }
         var p: JSON = [
             "family": .string(family), "size": .num(size), "bold": .bool(d.flag("bold")), "italic": .bool(d.flag("italic")),
             "underline": .string(d.value("underline")), "strike": .string(d.value("strike")), "baseline": .string(d.value("baseline")),
@@ -546,15 +546,15 @@ extension DialogController {
             "rtf": ("rtf", "rtf", false), "deckcraft": ("deckcraft", "deckcraft", false), "gif": ("gif", "gif", false),
         ]
         guard let (ext, format, all) = table[fmt] else {
-            status("DeckCraft can't export “\(fmt)”")
+            status(L10n.text("DeckCraftNative can't export “\(fmt)”"))
             return false
         }
         guard let services else {
-            status("Exporting needs the app's save panel")
+            status(L10n.text("Exporting needs the app's save panel"))
             return false
         }
         let base = (st.title as NSString).deletingPathExtension
-        services.pickSave("\(base.isEmpty ? "Presentation" : base).\(ext)") { [weak self] path in
+        services.pickSave("\(base.isEmpty ? String(localized: "Presentation", bundle: .module, comment: "The file name suggested when exporting an untitled presentation") : base).\(ext)") { [weak self] path in
             guard let self, let path else {
                 completion?(false)
                 return
@@ -562,7 +562,7 @@ extension DialogController {
             var p: JSON = ["path": .string(path), "format": .string(format), "all": .bool(all)]
             for e in extra.asObject?.entries ?? [] { p.set(e.key, e.value) }
             let done = self.ok("file.export", p)
-            if done { self.status("Exported \(path)") }
+            if done { self.status(L10n.text("Exported \(path)")) }
             completion?(done)
         }
         return true
@@ -578,12 +578,12 @@ extension DialogController {
         case "newTextBox":
             let text = String(rustTrim(d.value("boxText")))
             if text.isEmpty {
-                status("Type the text for the new text box")
+                status(L10n.text("Type the text for the new text box"))
             } else if text.charCount > 400 {
-                status("Text is longer than 400 characters")
+                status(L10n.text("Text is longer than 400 characters"))
             } else if var list = DialogAlbum.items(d) {
                 if list.count >= 48 {
-                    status("A photo album holds at most 48 pictures or text boxes")
+                    status(L10n.text("A photo album holds at most 48 pictures or text boxes"))
                 } else {
                     list.append(["text": .string(text)])
                     DialogAlbum.store(&d, list)
@@ -610,9 +610,9 @@ extension DialogController {
         case "moreContrast": DialogAlbum.nudge(&d, "contrast", 0.1); return false
         case "lessContrast": DialogAlbum.nudge(&d, "contrast", -0.1); return false
         case "ok":
-            guard let list = DialogAlbum.items(d) else { status("The picture list is invalid"); return false }
+            guard let list = DialogAlbum.items(d) else { status(L10n.text("The picture list is invalid")); return false }
             if list.isEmpty {
-                status("Add a picture or a text box first")
+                status(L10n.text("Add a picture or a text box first"))
                 return false
             }
             var p: JSON = [
@@ -632,7 +632,7 @@ extension DialogController {
     /// `pick_album_picture`: a picture from the open panel, added to the open album's list.
     func pickAlbumPicture() {
         guard let services else {
-            status("Pass pictures to insert.photoAlbum")
+            status(L10n.text("Pass pictures to insert.photoAlbum"))
             return
         }
         let gen = generation
@@ -645,8 +645,8 @@ extension DialogController {
                 DialogAlbum.store(&d, list)
                 d.fields["sel"] = String(list.count - 1)
                 self.current = d
-            case .some: self.status("A photo album holds at most 48 pictures or text boxes")
-            case .none: self.status("The picture list is invalid")
+            case .some: self.status(L10n.text("A photo album holds at most 48 pictures or text boxes"))
+            case .none: self.status(L10n.text("The picture list is invalid"))
             }
         }
     }
@@ -657,8 +657,8 @@ extension DialogController {
             status("\(path): \(error.localizedDescription)")
             return nil
         }
-        if bytes.isEmpty { status("That file is empty"); return nil }
-        if bytes.count > 32 * 1024 * 1024 { status("That picture is larger than 32 MB"); return nil }
+        if bytes.isEmpty { status(L10n.text("That file is empty")); return nil }
+        if bytes.count > 32 * 1024 * 1024 { status(L10n.text("That picture is larger than 32 MB")); return nil }
         let name = (path as NSString).lastPathComponent
         return ["name": .string(name.isEmpty ? "picture" : name), "data": .string(Cmd.base64Encode(bytes))]
     }
@@ -766,10 +766,10 @@ extension DialogController {
             var p = q
             p.set("with", .string(d.value("with")))
             if let v = try? model.session.execute("text.replace", p) {
-                d.fields["status"] = "Replaced \(v["replaced"]?.asU64 ?? 0) occurrence(s)."
+                d.fields["status"] = L10n.text("Replaced \(v["replaced"]?.asU64 ?? 0) occurrence(s).")
                 model.changed()
             } else {
-                d.fields["status"] = "DeckCraft can't find “\(text)”."
+                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.")
             }
             d.fields["cur"] = nil
             return false
@@ -778,7 +778,7 @@ extension DialogController {
         if findNext {
             let list = query("text.find", q)?.asArray ?? []
             if list.isEmpty {
-                d.fields["status"] = "DeckCraft can't find “\(text)”."
+                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.")
                 d.fields["cur"] = nil
             } else {
                 let n = Int((UInt(d.value("next")) ?? 0) % UInt(list.count))
@@ -787,8 +787,8 @@ extension DialogController {
                 if let shape = m["shape"], !shape.isNull { run("edit.select", ["ids": [shape]]) }
                 d.fields["cur"] = JSONWriter().string(m)
                 d.fields["next"] = String(n + 1)
-                let notes = m["shape"]?.isNull ?? false ? " (notes)" : ""
-                d.fields["status"] = "Match \(n + 1) of \(list.count) on slide \((m["slide"]?.asU64 ?? 0) + 1)\(notes)."
+                let notes = m["shape"]?.isNull ?? false ? String(localized: " (notes)", bundle: .module, comment: "After a find match: it is in the speaker notes") : ""
+                d.fields["status"] = L10n.text("Match \(n + 1) of \(list.count) on slide \((m["slide"]?.asU64 ?? 0) + 1)\(notes).")
             }
         }
         return false
@@ -852,7 +852,7 @@ extension DialogController {
         case "copyPath":
             if let path {
                 services?.copyText(path)
-                status("Copied the path")
+                status(L10n.text("Copied the path"))
             }
             return false
         case "reveal":
@@ -953,11 +953,11 @@ extension DialogController {
 enum DialogPayloads {
     static func themeColors(_ d: Dialog) -> Result<JSON, CommandError> {
         let name = String(rustTrim(d.value("schemeName")))
-        if name.isEmpty { return .failure("Enter a scheme name.") }
+        if name.isEmpty { return .failure(CommandError(L10n.text("Enter a scheme name."))) }
         var colors = JSONObject()
         for slot in SchemeSlot.theme {
             guard let rgb = Rgba.fromHex(String(rustTrim(d.value(slot.xmlName)))) else {
-                return .failure(CommandError("\(slot.label) needs a colour like #RRGGBB."))
+                return .failure(CommandError(L10n.text("\(slot.label) needs a colour like #RRGGBB.")))
             }
             colors.set(slot.xmlName, .string("#\(rgb.hex)"))
         }
@@ -966,11 +966,11 @@ enum DialogPayloads {
 
     static func themeFonts(_ d: Dialog) -> Result<JSON, CommandError> {
         let name = String(rustTrim(d.value("schemeName")))
-        if name.isEmpty { return .failure("Enter a scheme name.") }
+        if name.isEmpty { return .failure(CommandError(L10n.text("Enter a scheme name."))) }
         let major = String(rustTrim(d.value("major")))
-        if major.isEmpty { return .failure("Choose a heading font.") }
+        if major.isEmpty { return .failure(CommandError(L10n.text("Choose a heading font."))) }
         let minor = String(rustTrim(d.value("minor")))
-        if minor.isEmpty { return .failure("Choose a body font.") }
+        if minor.isEmpty { return .failure(CommandError(L10n.text("Choose a body font."))) }
         return .success(["name": .string(name), "major": .string(major), "minor": .string(minor)])
     }
 }

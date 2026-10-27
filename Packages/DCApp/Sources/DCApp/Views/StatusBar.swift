@@ -56,13 +56,13 @@ struct StatusBarView: View {
                     }
             }
             Spacer(minLength: 0)
-            toggle("Notes", "note.text", on: model.ui.notes) { link.run("view.notes") }
-            toggle("Comments", "text.bubble", on: model.ui.pane == "comments") { link.run("view.pane", ["pane": "comments", "toggle": true]) }
+            toggle(String(localized: "Notes", bundle: .module, comment: "Status bar button: shows or hides the notes pane"), "note.text", on: model.ui.notes) { link.run("view.notes") }
+            toggle(String(localized: "Comments", bundle: .module, comment: "Status bar button: shows or hides the comments pane"), "text.bubble", on: model.ui.pane == "comments") { link.run("view.pane", ["pane": "comments", "toggle": true]) }
             Divider().frame(height: Tokens.Space.l)
-            toggle("Normal", "rectangle.split.2x1", on: view == .normal || view == .outline) { link.run("view.normal") }
-            toggle("Slide Sorter", "square.grid.2x2", on: view == .sorter) { link.run("view.sorter") }
-            toggle("Reading View", "book", on: view == .reading) { link.run("view.reading") }
-            toggle("Slide Show", "play.rectangle", on: false) { link.run("show.start", ["from": .integer(st?.selection.slide ?? 0)]) }
+            toggle(String(localized: "Normal", bundle: .module, comment: "The Normal view (status bar button)"), "rectangle.split.2x1", on: view == .normal || view == .outline) { link.run("view.normal") }
+            toggle(String(localized: "Slide Sorter", bundle: .module), "square.grid.2x2", on: view == .sorter) { link.run("view.sorter") }
+            toggle(String(localized: "Reading View", bundle: .module), "book", on: view == .reading) { link.run("view.reading") }
+            toggle(String(localized: "Slide Show", bundle: .module), "play.rectangle", on: false) { link.run("show.start", ["from": .integer(st?.selection.slide ?? 0)]) }
             Divider().frame(height: Tokens.Space.l)
             if view == .sorter { sorterZoom(model) } else { zoom(model) }
         }
@@ -78,21 +78,22 @@ struct StatusBarView: View {
     @ViewBuilder
     private func language(_ st: DocState) -> some View {
         let (lang, noProof) = StatusLogic.selectedLanguage(st)
-        let name = StatusLogic.languageName(lang) + (noProof ? " (not checked)" : "")
+        let langName = StatusLogic.languageName(lang)
+        let name = noProof ? String(localized: "\(langName) (not checked)", bundle: .module, comment: "Status bar: the selection's proofing language, marked do-not-check") : langName
         Button { link.run("app.dialog", ["id": "language"]) } label: {
             Text(name).lineLimit(1).truncationMode(.tail)
         }
             .buttonStyle(.plain)
             .frame(minWidth: Tokens.Space.xxl, alignment: .leading)
-            .help("Language")
-            .accessibilityLabel("Language")
+            .help(String(localized: "Language", bundle: .module, comment: "Proofing language (status bar)"))
+            .accessibilityLabel(String(localized: "Language", bundle: .module, comment: "Proofing language (status bar)"))
             .accessibilityValue(name)
     }
 
     @ViewBuilder
     private func proofing(_ st: DocState) -> some View {
         let n = st.selection.target == .slides ? spelling.issues(st.currentSlide) : 0
-        let tip = n == 0 ? "No spelling problems on this slide" : "\(n) spelling problem\(n == 1 ? "" : "s") on this slide"
+        let tip = n == 0 ? String(localized: "No spelling problems on this slide", bundle: .module) : String(localized: "\(n) spelling problems on this slide", bundle: .module)
         Button {
             link.run("app.dialog", ["id": "spelling"])
         } label: {
@@ -101,7 +102,7 @@ struct StatusBarView: View {
         }
         .buttonStyle(.plain)
         .help(tip)
-        .accessibilityLabel("Spelling")
+        .accessibilityLabel(String(localized: "Spelling", bundle: .module))
         .accessibilityValue(tip)
     }
 
@@ -123,26 +124,26 @@ struct StatusBarView: View {
         let z = model.ui.zoom ?? model.canvasScale
         let pct = Int((z * 100).rounded())
         Button { link.run("view.zoomOut") } label: { Image(systemName: "minus.magnifyingglass") }
-            .buttonStyle(.plain).help("Zoom Out").accessibilityLabel("Zoom Out")
+            .buttonStyle(.plain).help(String(localized: "Zoom Out", bundle: .module)).accessibilityLabel(String(localized: "Zoom Out", bundle: .module))
         Slider(value: Binding(
             get: { StatusLogic.sliderValue(z) },
             set: { link.run("view.zoom", ["percent": .double(StatusLogic.percent($0))]) }
         ), in: StatusLogic.sliderRange)
             .controlSize(.mini)
             .frame(width: Tokens.Space.xxl * 3)
-            .accessibilityLabel("Zoom")
-            .accessibilityValue("\(pct)%")
+            .accessibilityLabel(String(localized: "Zoom", bundle: .module, comment: "The zoom slider"))
+            .accessibilityValue(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage"))
         Button { link.run("view.zoomIn") } label: { Image(systemName: "plus.magnifyingglass") }
-            .buttonStyle(.plain).help("Zoom In").accessibilityLabel("Zoom In")
-        Button("\(pct)%") { link.run("view.zoomDialog") }
+            .buttonStyle(.plain).help(String(localized: "Zoom In", bundle: .module)).accessibilityLabel(String(localized: "Zoom In", bundle: .module))
+        Button(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage")) { link.run("view.zoomDialog") }
             .buttonStyle(.plain)
             .font(Tokens.Font.metricInline)
             .frame(minWidth: Tokens.Space.xxl + Tokens.Space.s, alignment: .trailing)
-            .help("Zoom…")
-            .accessibilityLabel("Zoom level")
-            .accessibilityValue("\(pct)%")
+            .help(String(localized: "Zoom…", bundle: .module))
+            .accessibilityLabel(String(localized: "Zoom level", bundle: .module))
+            .accessibilityValue(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage"))
         Button { link.run("view.fit") } label: { Image(systemName: "arrow.up.left.and.down.right.magnifyingglass") }
-            .buttonStyle(.plain).help("Fit slide to current window").accessibilityLabel("Fit slide to current window")
+            .buttonStyle(.plain).help(String(localized: "Fit slide to current window", bundle: .module)).accessibilityLabel(String(localized: "Fit slide to current window", bundle: .module))
     }
 
     @ViewBuilder
@@ -158,7 +159,7 @@ struct StatusBarView: View {
         ), in: r)
             .controlSize(.mini)
             .frame(width: Tokens.Space.xxl * 3)
-            .accessibilityLabel("Thumbnail size")
+            .accessibilityLabel(String(localized: "Thumbnail size", bundle: .module))
         Image(systemName: "square.grid.2x2").accessibilityHidden(true)
     }
 }

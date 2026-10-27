@@ -1,0 +1,683 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "1 slide per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 slide per page"
+          }
+        }
+      }
+    },
+    "2 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 slides per page"
+          }
+        }
+      }
+    },
+    "3 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 slides per page"
+          }
+        }
+      }
+    },
+    "4 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 slides per page"
+          }
+        }
+      }
+    },
+    "6 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 slides per page"
+          }
+        }
+      }
+    },
+    "9 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9 slides per page"
+          }
+        }
+      }
+    },
+    "Add Slide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Slide"
+          }
+        }
+      }
+    },
+    "Add a slide to ${presentation}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a slide to ${presentation}"
+          }
+        }
+      }
+    },
+    "Adds a slide after the current one in an open presentation, with a layout, a title and body text. Returns the new slide's number." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adds a slide after the current one in an open presentation, with a layout, a title and body text. Returns the new slide's number."
+          }
+        }
+      }
+    },
+    "All Slides" : {
+      "comment" : "Export every slide as an image, one file each.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Slides"
+          }
+        }
+      }
+    },
+    "Blank" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blank"
+          }
+        }
+      }
+    },
+    "Command" : {
+      "comment" : "A command id, such as slide.new.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command"
+          }
+        }
+      }
+    },
+    "Comparison" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparison"
+          }
+        }
+      }
+    },
+    "Content with Caption" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content with Caption"
+          }
+        }
+      }
+    },
+    "Creates a new presentation in DeckCraftNative, in a built-in theme or from a starter presentation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creates a new presentation in DeckCraftNative, in a built-in theme or from a starter presentation."
+          }
+        }
+      }
+    },
+    "Export ${file} as ${format}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export ${file} as ${format}"
+          }
+        }
+      }
+    },
+    "Export Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Format"
+          }
+        }
+      }
+    },
+    "Export Presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Presentation"
+          }
+        }
+      }
+    },
+    "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "File Path" : {
+      "comment" : "Where an open presentation is saved, in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Path"
+          }
+        }
+      }
+    },
+    "Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
+    "From Slide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Slide"
+          }
+        }
+      }
+    },
+    "Get Outline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Outline"
+          }
+        }
+      }
+    },
+    "Get Presentation Outline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Presentation Outline"
+          }
+        }
+      }
+    },
+    "Get Slide Count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Slide Count"
+          }
+        }
+      }
+    },
+    "Get the outline of ${file}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get the outline of ${file}"
+          }
+        }
+      }
+    },
+    "Get the slide count of ${file}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get the slide count of ${file}"
+          }
+        }
+      }
+    },
+    "Gets how many slides a presentation has. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets how many slides a presentation has. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "Handouts" : {
+      "comment" : "PDF layout: several slides per page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handouts"
+          }
+        }
+      }
+    },
+    "JPEG Image" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG Image"
+          }
+        }
+      }
+    },
+    "Layout" : {
+      "comment" : "A new slide's layout.\nWhat a PDF export lays out.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "New Presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Presentation"
+          }
+        }
+      }
+    },
+    "New presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New presentation"
+          }
+        }
+      }
+    },
+    "Notes Pages" : {
+      "comment" : "PDF layout: each slide with its speaker notes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Pages"
+          }
+        }
+      }
+    },
+    "Open ${file}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open ${file}"
+          }
+        }
+      }
+    },
+    "Open Presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Presentation"
+          }
+        }
+      }
+    },
+    "Opens a DeckCraft or PowerPoint presentation in DeckCraftNative." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens a DeckCraft or PowerPoint presentation in DeckCraftNative."
+          }
+        }
+      }
+    },
+    "PDF" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        }
+      }
+    },
+    "PDF Layout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF Layout"
+          }
+        }
+      }
+    },
+    "PNG Image" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PNG Image"
+          }
+        }
+      }
+    },
+    "Parameters" : {
+      "comment" : "The command's parameters, a JSON object.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parameters"
+          }
+        }
+      }
+    },
+    "Picture with Caption" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture with Caption"
+          }
+        }
+      }
+    },
+    "Plays an open presentation's slide show, from the first slide or another one." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plays an open presentation's slide show, from the first slide or another one."
+          }
+        }
+      }
+    },
+    "PowerPoint (PPTX)" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint (PPTX)"
+          }
+        }
+      }
+    },
+    "Presentation" : {
+      "comment" : "An open presentation; empty means the frontmost one.\nThe presentation file an intent works on.\nThe type of an open presentation, in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentation"
+          }
+        }
+      }
+    },
+    "Run ${command} with ${parameters}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run ${command} with ${parameters}"
+          }
+        }
+      }
+    },
+    "Run DeckCraft Command" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run DeckCraft Command"
+          }
+        }
+      }
+    },
+    "Runs a DeckCraft command by its id (such as slide.new or file.info) with JSON parameters, on the open presentation, and returns the command's JSON answer. For automation: the commands and their parameters are listed by `dccli describe`." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runs a DeckCraft command by its id (such as slide.new or file.info) with JSON parameters, on the open presentation, and returns the command's JSON answer. For automation: the commands and their parameters are listed by `dccli describe`."
+          }
+        }
+      }
+    },
+    "Section Header" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Section Header"
+          }
+        }
+      }
+    },
+    "Slide" : {
+      "comment" : "The slide to export as an image, from 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide"
+          }
+        }
+      }
+    },
+    "Slide Count" : {
+      "comment" : "How many slides an open presentation has, in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Count"
+          }
+        }
+      }
+    },
+    "Slide Layout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Layout"
+          }
+        }
+      }
+    },
+    "Slides" : {
+      "comment" : "PDF layout: one slide per page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides"
+          }
+        }
+      }
+    },
+    "Slides per Page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides per Page"
+          }
+        }
+      }
+    },
+    "Start Slide Show" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Slide Show"
+          }
+        }
+      }
+    },
+    "Start the slide show of ${presentation} from slide ${slide}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start the slide show of ${presentation} from slide ${slide}"
+          }
+        }
+      }
+    },
+    "Starter" : {
+      "comment" : "A starter presentation (a template with slides) to begin from.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starter"
+          }
+        }
+      }
+    },
+    "Text" : {
+      "comment" : "A new slide's body text; each line is a bullet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "Theme" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme"
+          }
+        }
+      }
+    },
+    "Title" : {
+      "comment" : "A new slide's title text.\nAn open presentation's title, in Shortcuts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        }
+      }
+    },
+    "Title Only" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title Only"
+          }
+        }
+      }
+    },
+    "Title Slide" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title Slide"
+          }
+        }
+      }
+    },
+    "Title and Content" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title and Content"
+          }
+        }
+      }
+    },
+    "Two Content" : {
+      "comment" : "A slide layout.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two Content"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

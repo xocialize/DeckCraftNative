@@ -1,0 +1,100 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add a slide in ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Add a slide in ${applicationName}",
+              "Add a slide to my ${applicationName} presentation"
+            ]
+          }
+        }
+      }
+    },
+    "Count the slides in a presentation with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Count the slides in a presentation with ${applicationName}",
+              "How many slides are in a ${applicationName} presentation"
+            ]
+          }
+        }
+      }
+    },
+    "Export a presentation with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Export a presentation with ${applicationName}",
+              "Export a ${applicationName} presentation",
+              "Make a PDF of a presentation with ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Get a presentation's outline with ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Get a presentation's outline with ${applicationName}",
+              "Get the outline of a ${applicationName} presentation"
+            ]
+          }
+        }
+      }
+    },
+    "New ${applicationName} presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "New ${applicationName} presentation",
+              "Create a presentation in ${applicationName}",
+              "Start a new presentation in ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Open a presentation in ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Open a presentation in ${applicationName}",
+              "Open a ${applicationName} presentation"
+            ]
+          }
+        }
+      }
+    },
+    "Start the slide show in ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Start the slide show in ${applicationName}",
+              "Play the ${applicationName} slide show",
+              "Present with ${applicationName}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -110,7 +110,7 @@ public final class AppController: NSObject, AppHost {
         for h in requestHandlers where h(request) { return }
         switch request {
         case .pickFile(let purpose):
-            model.status = "Choosing a \(purpose) file isn't available yet"
+            model.status = String(localized: "Choosing a \(purpose) file isn't available yet", bundle: .module, comment: "Status message; the placeholder is the engine's file purpose id (picture, audio, video…)")
         default:
             break
         }

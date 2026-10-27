@@ -1,0 +1,21 @@
+{
+  "// about" : "English plural variations, applied by `l10n.py plurals` after every sync. Where the code this was converted from didn't branch on 1, `one` keeps its old English text (\"1 slides\") so the English output is unchanged; a translation still gets the plural form to fill in.",
+  "DCAppModel" : {
+    "%@ (%lld slides)" : {"value" : "%1$@ (%#@slides@)", "arg" : 2, "spec" : "lld", "one" : "%arg slides", "other" : "%arg slides"},
+    "%llu bytes" : {"one" : "%llu bytes", "other" : "%llu bytes"},
+    "Handouts (%lld Slides per Page)" : {"one" : "Handouts (%lld Slide per Page)", "other" : "Handouts (%lld Slides per Page)"},
+    "Inserted %lld slides" : {"one" : "Inserted %lld slides", "other" : "Inserted %lld slides"},
+    "Replaced %llu occurrence(s)." : {"one" : "Replaced %llu occurrence(s).", "other" : "Replaced %llu occurrence(s)."}
+  },
+  "DCApp" : {
+    "%lld Columns" : {"one" : "%lld Column", "other" : "%lld Columns"},
+    "%lld Slides" : {"one" : "%lld Slide", "other" : "%lld Slides"},
+    "%lld slides" : {"one" : "%lld slide", "other" : "%lld slides"},
+    "%lld spelling problems on this slide" : {"one" : "%lld spelling problem on this slide", "other" : "%lld spelling problems on this slide"},
+    "Compressed %lld picture(s): %@ KB → %@ KB" : {"value" : "Compressed %#@pictures@: %2$@ KB → %3$@ KB", "arg" : 1, "spec" : "lld", "one" : "%arg picture(s)", "other" : "%arg picture(s)"},
+    "Exported %lld files." : {"one" : "Exported %lld file.", "other" : "Exported %lld files."},
+    "First %lld slides" : {"one" : "First %lld slides", "other" : "First %lld slides"},
+    "The presentation has %lld slides." : {"one" : "The presentation has %lld slide.", "other" : "The presentation has %lld slides."},
+    "There's no slide %lld: the presentation has %lld slides." : {"value" : "There's no slide %1$lld: the presentation has %#@slides@.", "arg" : 2, "spec" : "lld", "one" : "%arg slide", "other" : "%arg slides"}
+  }
+}

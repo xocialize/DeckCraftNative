@@ -260,6 +260,55 @@ reasons are in [PLAN.md](PLAN.md) §3.
   Views) side by side, then `lib.rs`' tests, were each ported by a separate session. The skeleton, the
   control host, integration and the alpha gate were done here.
 
+## Wave 6: ship (done 2026-10-27)
+
+- **Decided by the user** (WAVE6-PLAN.md):
+  - the name is DeckCraftNative, with deckcraft's MIT placeholder icon and no ArtCraft marks;
+  - updates come from a native GitHub releases checker, through a public releases repo created only when publishing
+    is approved;
+  - English only, in String Catalogs;
+  - Developer ID (CFZS6RXUCP), notarized with the `mlx-notary` profile.
+- **A notarized build.** `Tools/release.sh --notarize mlx-notary` archives, exports with Developer ID, verifies every
+  nested binary, builds the DMG, and notarizes and staples both the app and the DMG.
+  - Gatekeeper accepts the DMG and the app (`source=Notarized Developer ID`).
+  - It refuses to build when `Acknowledgements.txt` is stale or craft-fonts is missing.
+  - `Tools/publish-release.sh` exists and has only been run as a dry run: nothing is published.
+- **What ships in the app:**
+  - All of craft-fonts (77 MB). The preview and thumbnail extensions carry the Latin set, since a sandboxed extension
+    can't read its app's bundle.
+  - `Acknowledgements.txt`: deckcraft's licence and NOTICE, craft-fonts' attribution, and every Swift package's
+    licence (`Tools/acknowledgements.sh`).
+  - About credits DeckCraft in plain text.
+- **Updates.** Check for Updates… with a Software Update window: notes, download checked against GitHub's size and
+  digest, quarantine, open. The daily check is optional. Tested against a stubbed `URLProtocol` and a local server.
+- **Quick Look and Spotlight.** A preview (vector PDF of every slide, with a text layer) and a thumbnail (the first
+  slide at the requested size) for `.deckcraft`, `.pptx`, `.potx` and `.ppsx`. Verified with `qlmanage`; the
+  thumbnail draws in Inter. A Core Spotlight import extension is tested, but on this Mac macOS never calls
+  third-party importers (EVALUATION.md). macOS's own Office previews take precedence over ours for Office files.
+- **App Intents.** Eight intents and seven App Shortcuts, listed in the built app's `Metadata.appintents` and run end
+  to end in the built app: export, outline, slide count, new presentation, add slide. Not yet seen in the Shortcuts
+  app.
+- **String Catalogs.** Every UI string in DCApp and DCAppModel comes from a catalog: 6 catalogs, 1,921 entries, about
+  1,630 call sites converted.
+  - Command labels and menu titles are translated at display time (`L10n`). The engine keeps deckcraft's English
+    for parity.
+  - `Tools/l10n/` fills the catalogs from the compiler's `.stringsdata` and regenerates the Commands catalog.
+  - A pseudo-localisation pass found three clipped layouts and fixed them.
+  - Tests keep the catalogs complete.
+- **Tests.** 2,139 in all, every one green and warning-free; Wave 6 added 89 (DCApp 50, the extensions 29, and more).
+  - The alpha gate passes 18 of 18 after the strings conversion.
+  - Release, render, transition and Metal parity pass in release.
+- **Fixed on the way.**
+  - **Fonts.** The app found its fonts through a path into the source tree, so on any other Mac decks would have drawn
+    in substitute fonts. It now bundles them.
+  - **Dialog sheets.** Their sizing could loop inside AppKit; they're hardened.
+  - **Tests.** An Updates window test was order-dependent; it no longer is.
+- **Not done.** Translations. Spotlight end to end (above). Publishing (needs the user's yes). The licence of this
+  repository's own code (the user's call).
+- **Parallel work.** Release and Updates, Extensions, Intents and Strings were each built by a separate session. The
+  catalog infrastructure, the fonts and licences in the bundle, integration, the final notarized build and
+  EVALUATION.md were done here.
+
 ## Crates
 
 | deckcraft crate | Rust lines | Disposition | Target | Wave | Status |

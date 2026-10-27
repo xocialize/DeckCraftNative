@@ -40,7 +40,7 @@ struct NumberField: View {
                     .focused($focused)
                     .onSubmit(apply)
                     .onChange(of: focused) { _, now in if !now { apply() } }
-                    .accessibilityLabel("\(label) value")
+                    .accessibilityLabel(String(localized: "\(label) value", bundle: .module, comment: "Accessibility label of a number field's text: the field's label, then 'value'"))
                 Stepper(label, onIncrement: { send(value + step) }, onDecrement: { send(value - step) })
                     .labelsHidden()
                     .accessibilityLabel(label)
@@ -135,7 +135,7 @@ struct ColorGrid: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Tokens.Space.s) {
-            SectionHeader("Theme Colors")
+            SectionHeader(String(localized: "Theme Colors", bundle: .module))
             Grid(horizontalSpacing: Tokens.Space.xs, verticalSpacing: Tokens.Space.xs / 2) {
                 ForEach(Array(InspectorColors.themeGrid(scheme).enumerated()), id: \.offset) { row in
                     GridRow {
@@ -144,25 +144,25 @@ struct ColorGrid: View {
                     if row.offset == 0 { Color.clear.frame(height: Tokens.Space.xs).gridCellUnsizedAxes(.horizontal) }
                 }
             }
-            SectionHeader("Standard Colors")
+            SectionHeader(String(localized: "Standard Colors", bundle: .module))
             HStack(spacing: Tokens.Space.xs) {
                 ForEach(Array(InspectorColors.standard.enumerated()), id: \.offset) { swatch($0.element) }
             }
             Divider()
             if let noneLabel { Button(noneLabel) { pick(nil) } }
             HStack(spacing: Tokens.Space.xs) {
-                Text("More Colors… #")
-                TextField("RRGGBB", text: $hex)
-                    .accessibilityLabel("Hex color")
+                Text("More Colors… #", bundle: .module, comment: "Before the hex colour field")
+                TextField(String(localized: "RRGGBB", bundle: .module, comment: "Placeholder of the hex colour field: red, green, blue as hex digits"), text: $hex)
+                    .accessibilityLabel(String(localized: "Hex color", bundle: .module))
                     .onSubmit { if let c = InspectorColors.hex(hex) { pick(c) } }
             }
             HStack {
-                Button("Eyedropper") {
+                Button(String(localized: "Eyedropper", bundle: .module)) {
                     NSColorSampler().show { color in
                         if let c = color.flatMap(Self.rgba) { MainActor.assumeIsolated { pick(.rgb(c)) } }
                     }
                 }
-                .help("Click anywhere on the screen to take the colour under the pointer")
+                .help(String(localized: "Click anywhere on the screen to take the colour under the pointer", bundle: .module))
             }
         }
         .padding(Tokens.Space.m)
@@ -241,8 +241,8 @@ struct ColorSplitButton: View {
                 .help(title)
                 .accessibilityLabel(title)
                 Button { open.toggle() } label: { Image(systemName: "chevron.down") }
-                    .accessibilityLabel("\(title) options")
-                    .help("\(title) options")
+                    .accessibilityLabel(String(localized: "\(title) options", bundle: .module, comment: "A split button's menu half: the control's title, then 'options'"))
+                    .help(String(localized: "\(title) options", bundle: .module, comment: "A split button's menu half: the control's title, then 'options'"))
                     .popover(isPresented: $open, arrowEdge: .bottom) {
                         ColorGrid(scheme: scheme, noneLabel: noneLabel) { c in
                             open = false
@@ -329,7 +329,7 @@ struct ThemeTile: View {
             .fill(colors.get(.lt1).swiftUI)
             .aspectRatio(3 / 2, contentMode: .fit)
             .overlay(alignment: .topLeading) {
-                Text("Aa").font(Tokens.Font.headline).foregroundStyle(colors.get(.dk1).swiftUI).padding(Tokens.Space.xs)
+                Text(verbatim: "Aa").font(Tokens.Font.headline).foregroundStyle(colors.get(.dk1).swiftUI).padding(Tokens.Space.xs)
             }
             .overlay(alignment: .bottom) {
                 HStack(spacing: Tokens.Layout.hairline) {

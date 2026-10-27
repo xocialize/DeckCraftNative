@@ -11,11 +11,11 @@ enum MenuBuilder {
         let main = NSMenu()
         main.addItem(submenu(appMenu(target: target)))
         for m in MenuTree.menus {
-            let menu = NSMenu(title: m.title)
+            let menu = NSMenu(title: L10n.menuTitle(m.title))
             for e in m.entries {
                 switch e {
                 case .separator: menu.addItem(.separator())
-                case .command(let label, let id): menu.addItem(item(label, id, target: target))
+                case .command(let label, let id): menu.addItem(item(L10n.menuTitle(label), id, target: target))
                 }
             }
             if m.title == "Help" { NSApp.helpMenu = menu }
@@ -84,31 +84,31 @@ enum MenuBuilder {
     private static func appMenu(target: AppController) -> NSMenu {
         let name = ProcessInfo.processInfo.processName
         let m = NSMenu(title: name)
-        m.addItem(item("About \(name)", "app.about", target: target))
+        m.addItem(item(String(localized: "About \(name)", bundle: .module, comment: "App menu; %@ is the app name"), "app.about", target: target))
         m.addItem(.separator())
-        m.addItem(item("Settings…", "app.preferences", target: target))
+        m.addItem(item(String(localized: "Settings…", bundle: .module, comment: "App menu"), "app.preferences", target: target))
         m.addItem(.separator())
-        let services = NSMenuItem(title: "Services", action: nil, keyEquivalent: "")
-        services.submenu = NSMenu(title: "Services")
+        let services = NSMenuItem(title: String(localized: "Services", bundle: .module, comment: "App menu"), action: nil, keyEquivalent: "")
+        services.submenu = NSMenu(title: String(localized: "Services", bundle: .module, comment: "App menu"))
         NSApp.servicesMenu = services.submenu
         m.addItem(services)
         m.addItem(.separator())
-        m.addItem(NSMenuItem(title: "Hide \(name)", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
-        let others = NSMenuItem(title: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
+        m.addItem(NSMenuItem(title: String(localized: "Hide \(name)", bundle: .module, comment: "App menu; %@ is the app name"), action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
+        let others = NSMenuItem(title: String(localized: "Hide Others", bundle: .module, comment: "App menu"), action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
         others.keyEquivalentModifierMask = [.command, .option]
         m.addItem(others)
-        m.addItem(NSMenuItem(title: "Show All", action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: ""))
+        m.addItem(NSMenuItem(title: String(localized: "Show All", bundle: .module, comment: "App menu"), action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: ""))
         m.addItem(.separator())
-        m.addItem(NSMenuItem(title: "Quit \(name)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        m.addItem(NSMenuItem(title: String(localized: "Quit \(name)", bundle: .module, comment: "App menu; %@ is the app name"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         return m
     }
 
     private static func windowMenu() -> NSMenu {
-        let m = NSMenu(title: "Window")
-        m.addItem(NSMenuItem(title: "Minimize", action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m"))
-        m.addItem(NSMenuItem(title: "Zoom", action: #selector(NSWindow.performZoom(_:)), keyEquivalent: ""))
+        let m = NSMenu(title: String(localized: "Window", bundle: .module, comment: "The Window menu"))
+        m.addItem(NSMenuItem(title: String(localized: "Minimize", bundle: .module, comment: "Window menu"), action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m"))
+        m.addItem(NSMenuItem(title: String(localized: "Zoom", bundle: .module, comment: "Window menu: zoom the window"), action: #selector(NSWindow.performZoom(_:)), keyEquivalent: ""))
         m.addItem(.separator())
-        m.addItem(NSMenuItem(title: "Bring All to Front", action: #selector(NSApplication.arrangeInFront(_:)), keyEquivalent: ""))
+        m.addItem(NSMenuItem(title: String(localized: "Bring All to Front", bundle: .module, comment: "Window menu"), action: #selector(NSApplication.arrangeInFront(_:)), keyEquivalent: ""))
         NSApp.windowsMenu = m
         return m
     }

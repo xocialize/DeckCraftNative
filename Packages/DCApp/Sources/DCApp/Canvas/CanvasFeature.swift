@@ -63,7 +63,7 @@ enum CanvasFeature {
             } else if p["transparent"]?.asBool == true {
                 c.canvas.beginEyedropper(.transparentColor)
             } else {
-                c.canvas.beginEyedropper(.color { hex in AppController.shared?.model.status = "Eyedropper: #\(hex)" })
+                c.canvas.beginEyedropper(.color { hex in AppController.shared?.model.status = String(localized: "Eyedropper: #\(hex)", bundle: .module, comment: "Status: the colour the eyedropper picked, as hex") })
             }
             return .done(["ok": true, "result": .bool(c.canvas.eyedropper != nil)])
         }

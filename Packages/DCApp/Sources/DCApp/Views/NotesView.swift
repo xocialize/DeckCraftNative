@@ -72,7 +72,7 @@ enum NotesText {
 /// empty. TextKit 1, so the bullets can be placed from the layout manager.
 @MainActor
 final class NotesTextView: NSTextView {
-    var placeholder = "Click to add notes"
+    var placeholder = String(localized: "Click to add notes", bundle: .module, comment: "Placeholder of the empty notes pane")
     var placeholderColor = NSColor.placeholderTextColor
     var bullets: [String?] = []
     var bulletFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
@@ -153,7 +153,7 @@ final class NotesEditor: NSObject, NSTextViewDelegate {
         textView.autoresizingMask = [.width]
         textView.textContainer?.widthTracksTextView = true
         textView.textContainerInset = NSSize(width: Tokens.Space.xs, height: Tokens.Space.xs)
-        textView.setAccessibilityLabel("Notes")
+        textView.setAccessibilityLabel(String(localized: "Notes", bundle: .module, comment: "Accessibility label of the speaker notes editor"))
     }
 
     var focused: Bool { textView.window?.firstResponder === textView }
@@ -278,7 +278,7 @@ final class NotesPageViewController: NSViewController {
         page.controller = self
         // The notes fill the notes master's body box.
         editor.textView.isVerticallyResizable = false
-        editor.textView.placeholder = "Click to add text"
+        editor.textView.placeholder = String(localized: "Click to add text", bundle: .module, comment: "Placeholder of the empty notes on the Notes Page")
         editor.textView.placeholderColor = PaperColors.rule
         editor.textView.autoresizingMask = []
         page.addSubview(editor.textView)

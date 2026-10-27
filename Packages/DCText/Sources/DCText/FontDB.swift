@@ -33,20 +33,35 @@ public final class FontDB: Sendable {
     public let bundledScripts: [(family: String, scripts: [String])]
     private let systemFallback: Bool
 
-    /// The process-wide database: craft-fonts from `CRAFT_FONTS_DIR` (else `../craft-fonts` beside the
-    /// repository), then the installed system fonts.
+    /// The process-wide database: craft-fonts from `CRAFT_FONTS_DIR`, else the copy the app bundles, else
+    /// `../craft-fonts` beside the repository; then the installed system fonts.
     public static let shared = FontDB(craftFontsDir: FontDB.defaultCraftFontsDir(), systemFonts: true)
 
-    /// Where craft-fonts is: `CRAFT_FONTS_DIR`, else a `craft-fonts` checkout beside this repository.
+    /// Where craft-fonts is: `CRAFT_FONTS_DIR`, else the app bundle's copy (as deckcraft's official builds
+    /// embed it), else a `craft-fonts` checkout beside this repository.
     public static func defaultCraftFontsDir() -> URL? {
         if let env = ProcessInfo.processInfo.environment["CRAFT_FONTS_DIR"], !env.isEmpty {
             return URL(filePath: env, directoryHint: .isDirectory)
         }
+        if let bundled = bundledCraftFontsDir() { return bundled }
         // …/Packages/DCText/Sources/DCText/FontDB.swift → the research folder.
         var url = URL(filePath: #filePath)
         for _ in 0 ..< 6 { url = url.deletingLastPathComponent() }
         let dir = url.appending(path: "craft-fonts", directoryHint: .isDirectory)
         return FileManager.default.fileExists(atPath: dir.appending(path: "fonts/manifest.txt").path) ? dir : nil
+    }
+
+    /// The app's bundled craft-fonts: `Contents/Resources/fonts/` holds the `fonts/` folder of craft-fonts,
+    /// so the app's Resources folder is the craft-fonts root. A sandboxed app extension can't read its
+    /// containing app's bundle (`stat` succeeds, `open` fails with EPERM), so the Quick Look extensions carry
+    /// their own copy of the Latin set (`fonts/latin-manifest.txt` and its files) in their own Resources.
+    static func bundledCraftFontsDir() -> URL? {
+        let bundle = Bundle.main.bundleURL
+        guard bundle.pathExtension == "app" || bundle.pathExtension == "appex" else { return nil }
+        let resources = bundle.appending(path: "Contents/Resources", directoryHint: .isDirectory)
+        let fonts = resources.appending(path: "fonts", directoryHint: .isDirectory)
+        let readable = ["manifest.txt", "latin-manifest.txt"].contains { FileManager.default.isReadableFile(atPath: fonts.appending(path: $0).path) }
+        return readable ? resources : nil
     }
 
     /// A database of the craft-fonts faces in `craftFontsDir` (none when nil), with the installed

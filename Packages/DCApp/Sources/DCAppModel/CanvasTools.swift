@@ -32,7 +32,7 @@ public struct CanvasEyedropper {
     /// slide (`begin`).
     public static func begin(_ s: Session, _ pick: Pick) -> Result<CanvasEyedropper, CommandError> {
         guard let d = s.activeDoc else { return .failure("no presentation is open") }
-        guard d.selection.target == .slides else { return .failure("The Eyedropper takes colours from a slide") }
+        guard d.selection.target == .slides else { return .failure(CommandError(L10n.text("The Eyedropper takes colours from a slide"))) }
         let slide = d.selection.slide
         let image = renderSlide(d.doc, slide, RenderOpts(scale: scale))
         return .success(CanvasEyedropper(pick: pick, slide: slide, image: image))
@@ -41,8 +41,8 @@ public struct CanvasEyedropper {
     /// The status line while it waits.
     public var prompt: String {
         switch pick {
-        case .color: "Eyedropper: click the slide (Esc cancels)"
-        case .transparentColor: "Set Transparent Color: click the colour in the picture (Esc cancels)"
+        case .color: L10n.text("Eyedropper: click the slide (Esc cancels)")
+        case .transparentColor: L10n.text("Set Transparent Color: click the colour in the picture (Esc cancels)")
         }
     }
 

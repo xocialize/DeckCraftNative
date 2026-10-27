@@ -440,33 +440,33 @@ enum SizePosition {
 
     static func shownPoints(_ d: Dialog, _ key: String, _ label: String) -> Result<Double, CommandError> {
         if edited(d, key) {
-            guard let n = DialogMath.parseShown(d.field(key)) else { return .failure(CommandError("\(label) must be a number")) }
+            guard let n = DialogMath.parseShown(d.field(key)) else { return .failure(CommandError(L10n.text("\(label) must be a number"))) }
             return .success(n * 72)
         }
-        return exact(d, key).map { .success($0) } ?? .failure(CommandError("\(label) must be a number"))
+        return exact(d, key).map { .success($0) } ?? .failure(CommandError(L10n.text("\(label) must be a number")))
     }
 
     static func shownNumber(_ d: Dialog, _ key: String, _ label: String) -> Result<Double, CommandError> {
         if edited(d, key) {
-            return DialogMath.parseShown(d.field(key)).map { .success($0) } ?? .failure(CommandError("\(label) must be a number"))
+            return DialogMath.parseShown(d.field(key)).map { .success($0) } ?? .failure(CommandError(L10n.text("\(label) must be a number")))
         }
-        return exact(d, key).map { .success($0) } ?? .failure(CommandError("\(label) must be a number"))
+        return exact(d, key).map { .success($0) } ?? .failure(CommandError(L10n.text("\(label) must be a number")))
     }
 
     /// `size_position_value`: `shape.sizePosition`'s params.
     static func value(_ d: Dialog) -> Result<JSON, CommandError> {
         do {
-            let x = try shownPoints(d, "x", "Horizontal").get()
-            let y = try shownPoints(d, "y", "Vertical").get()
-            let rot = try shownNumber(d, "rot", "Rotation").get()
+            let x = try shownPoints(d, "x", L10n.text("Horizontal")).get()
+            let y = try shownPoints(d, "y", L10n.text("Vertical")).get()
+            let rot = try shownNumber(d, "rot", L10n.text("Rotation")).get()
             let baseW = DialogMath.parseShown(d.field("baseW")) ?? 1
             let baseH = DialogMath.parseShown(d.field("baseH")) ?? 1
-            var w = edited(d, "w") ? try shownPoints(d, "w", "Width").get()
-                : edited(d, "scaleW") ? baseW * (try shownNumber(d, "scaleW", "Scale width").get()) / 100
-                : try shownPoints(d, "w", "Width").get()
-            var h = edited(d, "h") ? try shownPoints(d, "h", "Height").get()
-                : edited(d, "scaleH") ? baseH * (try shownNumber(d, "scaleH", "Scale height").get()) / 100
-                : try shownPoints(d, "h", "Height").get()
+            var w = edited(d, "w") ? try shownPoints(d, "w", L10n.text("Width")).get()
+                : edited(d, "scaleW") ? baseW * (try shownNumber(d, "scaleW", L10n.text("Scale width")).get()) / 100
+                : try shownPoints(d, "w", L10n.text("Width")).get()
+            var h = edited(d, "h") ? try shownPoints(d, "h", L10n.text("Height")).get()
+                : edited(d, "scaleH") ? baseH * (try shownNumber(d, "scaleH", L10n.text("Scale height")).get()) / 100
+                : try shownPoints(d, "h", L10n.text("Height")).get()
             let lock = d.field("lock") == "1"
             if lock {
                 let ar = baseH > 0 ? baseW / baseH : 1
@@ -489,7 +489,7 @@ enum DialogParams {
         let count = d.field("count")
         if count != shownCount {
             guard let n = UInt32(String(rustTrim(count))), (1 ... 16).contains(n) else {
-                return .failure("Number must be a whole number from 1 to 16")
+                return .failure(CommandError(L10n.text("Number must be a whole number from 1 to 16")))
             }
             p.set("count", .integer(n))
         }
@@ -499,7 +499,7 @@ enum DialogParams {
             while t.hasSuffix("in") { t.removeLast(2) }
             while t.hasSuffix("\"") { t.removeLast() }
             guard let inches = DialogMath.finite(rustTrim(t)), (0 ... 22).contains(inches) else {
-                return .failure("Spacing must be from 0 to 22 inches")
+                return .failure(CommandError(L10n.text("Spacing must be from 0 to 22 inches")))
             }
             p.set("spacing", .num(inches * 72))
         }
@@ -535,7 +535,7 @@ enum DialogParams {
         if size == "custom" {
             let w = (DialogMath.number(d.get("gifWidth", "960")) ?? 960).rounded()
             guard Double(GifExport.minWidth) ... Double(GifExport.maxWidth) ~= w else {
-                return .failure(CommandError("Width: enter \(GifExport.minWidth) to \(GifExport.maxWidth) pixels"))
+                return .failure(CommandError(L10n.text("Width: enter \(String(GifExport.minWidth)) to \(String(GifExport.maxWidth)) pixels")))
             }
             width = .integer(UInt32(rustCast: w))
         } else {
@@ -543,7 +543,7 @@ enum DialogParams {
         }
         let seconds = DialogMath.number(d.get("gifSeconds", "5")) ?? .nan
         if (try? GifExport.checkSeconds(seconds)) == nil {
-            return .failure(CommandError("Seconds per slide: enter \(DialogMath.fmtNum(GifExport.minSeconds)) to \(DialogMath.fmtNum(GifExport.maxSeconds))"))
+            return .failure(CommandError(L10n.text("Seconds per slide: enter \(DialogMath.fmtNum(GifExport.minSeconds)) to \(DialogMath.fmtNum(GifExport.maxSeconds))")))
         }
         var p: JSON = [
             "width": width, "secondsPerSlide": .num(seconds), "loop": .bool(d.get("gifLoop", "1") == "1"),
@@ -551,7 +551,7 @@ enum DialogParams {
         ]
         let from = (DialogMath.number(d.get("gifFrom", "1")) ?? 1).rounded()
         let to = (DialogMath.number(d.get("gifTo", String(Swift.max(n, 1)))) ?? Double(n)).rounded()
-        guard from >= 1 && from <= to && to <= Double(n) else { return .failure(CommandError("Slides: choose a range from 1 to \(n)")) }
+        guard from >= 1 && from <= to && to <= Double(n) else { return .failure(CommandError(L10n.text("Slides: choose a range from 1 to \(n)"))) }
         if from > 1 || to < Double(n) {
             p.set("slides", .array((DialogMath.usize(from) - 1 ..< DialogMath.usize(to)).map { .integer($0) }))
         }
@@ -575,8 +575,8 @@ public enum DialogLists {
 
     /// `DATE_LANGS`.
     public static let dateLanguages: [(String, String)] = [
-        ("en-US", "English (United States)"), ("en-GB", "English (United Kingdom)"), ("fr-FR", "French (France)"),
-        ("ja-JP", "Japanese"), ("sv-SE", "Swedish"),
+        ("en-US", L10n.text("English (United States)")), ("en-GB", L10n.text("English (United Kingdom)")),
+        ("fr-FR", L10n.text("French (France)")), ("ja-JP", L10n.text("Japanese")), ("sv-SE", L10n.text("Swedish")),
     ]
 
     /// `ALBUM_THEMES`.
@@ -599,12 +599,12 @@ public enum DialogLists {
 
     /// The Symbol dialog's groups.
     public static let symbols: [(String, String)] = [
-        ("Punctuation", "–—‘’“”…•·§¶†‡‰′″‹›«»¡¿"),
-        ("Currency", "$€£¥¢₹₩₽₺₿"),
-        ("Math", "±×÷≠≈≤≥∞√∑∏∫∂∆∇∈∉∩∪⊂⊃∀∃¬∧∨⇒⇔°′"),
-        ("Greek", "αβγδεζηθικλμνξοπρστυφχψωΓΔΘΛΞΠΣΦΨΩ"),
-        ("Arrows", "←↑→↓↔↕⇐⇑⇒⇓↖↗↘↙⟵⟶"),
-        ("Shapes", "■□▪▫▲△▶▷▼▽◀◁◆◇○●◎★☆✓✔✗✘♠♣♥♦"),
+        (L10n.text("Punctuation"), "–—‘’“”…•·§¶†‡‰′″‹›«»¡¿"),
+        (L10n.text("Currency"), "$€£¥¢₹₩₽₺₿"),
+        (L10n.text("Math"), "±×÷≠≈≤≥∞√∑∏∫∂∆∇∈∉∩∪⊂⊃∀∃¬∧∨⇒⇔°′"),
+        (L10n.text("Greek"), "αβγδεζηθικλμνξοπρστυφχψωΓΔΘΛΞΠΣΦΨΩ"),
+        (L10n.text("Arrows"), "←↑→↓↔↕⇐⇑⇒⇓↖↗↘↙⟵⟶"),
+        (L10n.text("Shapes"), "■□▪▫▲△▶▷▼▽◀◁◆◇○●◎★☆✓✔✗✘♠♣♥♦"),
     ]
 
     /// `selected_language`: the selection's proofing language and Do Not Check Spelling.

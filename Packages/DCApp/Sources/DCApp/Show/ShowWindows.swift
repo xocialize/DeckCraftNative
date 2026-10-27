@@ -74,7 +74,7 @@ final class ShowWindows {
             w = ShowWindow(contentRect: base, styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
             w.setContentSize(size)
             w.setFrameOrigin(base.origin)
-            w.title = s.reading ? "Reading View" : "Slide Show"
+            w.title = s.reading ? String(localized: "Reading View", bundle: .module) : String(localized: "Slide Show", bundle: .module)
         } else {
             let frame = screen?.frame ?? CGRect(x: 0, y: 0, width: 1440, height: 900)
             w = ShowWindow(contentRect: frame, styleMask: [.borderless], backing: .buffered, defer: false, screen: screen)
@@ -118,7 +118,7 @@ final class ShowWindows {
             w = ShowWindow(contentRect: frame, styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
         }
         w.setFrame(frame, display: false)
-        w.title = "Presenter View — DeckCraft"
+        w.title = String(localized: "Presenter View — DeckCraftNative", bundle: .module, comment: "The presenter view window's title")
         w.appearance = NSAppearance(named: .darkAqua)
         w.isReleasedWhenClosed = false
         w.contentView = host

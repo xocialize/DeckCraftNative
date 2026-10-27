@@ -43,13 +43,13 @@ public enum InspectorShape {
 
     /// The Draw tab's pens (`draw`): label, ink mode, colour, width in points.
     public static let pens: [(label: String, mode: String, color: Rgba, width: Double)] = [
-        ("Black Pen", "pen", .rgb(20, 20, 20), 1.5), ("Red Pen", "pen", .rgb(0xD8, 0x3F, 0x3F), 1.5),
-        ("Blue Pen", "pen", .rgb(0x2E, 0x6F, 0xD8), 1.5), ("Pencil", "pen", .rgb(90, 90, 90), 1.0),
-        ("Highlighter", "highlighter", .rgb(255, 230, 0), 10.0), ("Eraser", "eraser", .black, 2.0),
+        (L10n.text("Black Pen"), "pen", .rgb(20, 20, 20), 1.5), (L10n.text("Red Pen"), "pen", .rgb(0xD8, 0x3F, 0x3F), 1.5),
+        (L10n.text("Blue Pen"), "pen", .rgb(0x2E, 0x6F, 0xD8), 1.5), (String(localized: "Pencil", bundle: .module, comment: "ink tool"), "pen", .rgb(90, 90, 90), 1.0),
+        (String(localized: "Highlighter", bundle: .module, comment: "ink tool"), "highlighter", .rgb(255, 230, 0), 10.0), (String(localized: "Eraser", bundle: .module, comment: "ink tool"), "eraser", .black, 2.0),
     ]
 
     /// Insert ▸ Zoom (`zoom_menu`): the kinds, and `insert.zoom`'s parameters for the checked items (sorted).
-    public static let zoomKinds: [(String, String)] = [("Slide Zoom", "slide"), ("Section Zoom", "section"), ("Summary Zoom", "summary")]
+    public static let zoomKinds: [(String, String)] = [(L10n.text("Slide Zoom"), "slide"), (L10n.text("Section Zoom"), "section"), (L10n.text("Summary Zoom"), "summary")]
 
     public static func zoomParams(_ kind: String, _ picked: Set<Int>) -> JSON? {
         guard !picked.isEmpty else { return nil }

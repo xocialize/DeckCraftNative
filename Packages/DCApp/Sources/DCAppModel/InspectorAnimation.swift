@@ -108,7 +108,7 @@ public enum AnimTimeline {
 
     /// `label`: the bar's tooltip.
     public static func label(_ bar: Bar) -> String {
-        "Start: \(rustFixed(bar.start, places: 2))s, End: \(rustFixed(bar.start + bar.span, places: 2))s"
+        L10n.text("Start: \(rustFixed(bar.start, places: 2))s, End: \(rustFixed(bar.start + bar.span, places: 2))s")
     }
 }
 
@@ -151,7 +151,7 @@ public struct AnimPane: Sendable {
         for (i, a) in anims.enumerated() {
             if a.start == .onClick { click += 1 }
             rows.append(AnimPaneRow(
-                index: i, shape: a.shape, name: names[a.shape] ?? "Shape \(a.shape)", animClass: a.class, effect: a.effect,
+                index: i, shape: a.shape, name: names[a.shape] ?? L10n.text("Shape \(String(describing: a.shape))"), animClass: a.class, effect: a.effect,
                 click: a.start == .onClick ? "\(click)" : "", bar: bars.at(i) ?? nil, durationMs: a.durationMs,
                 delayMs: a.delayMs, repeatForever: a.repeat == UInt32.max, start: a.start, trigger: a.trigger
             ))
@@ -172,9 +172,9 @@ public struct AnimPane: Sendable {
     /// The Play button's label and `animation.preview` parameters.
     public static func playButton(playing: Bool, from: Int?) -> (label: String, params: JSON) {
         switch (playing, from) {
-        case (true, _): ("Stop", ["on": false])
-        case (false, let i?): ("Play From", ["on": true, "from": .integer(i)])
-        case (false, nil): ("Play All", ["on": true])
+        case (true, _): (L10n.text("Stop"), ["on": false])
+        case (false, let i?): (L10n.text("Play From"), ["on": true, "from": .integer(i)])
+        case (false, nil): (L10n.text("Play All"), ["on": true])
         }
     }
 }
@@ -205,14 +205,14 @@ public enum InspectorMotion {
     /// `option_label`: an animation option's name ("l" → "From Left", "fromBottom" → "From Bottom").
     public static func optionLabel(_ o: String) -> String {
         switch o {
-        case "l": return "From Left"
-        case "r": return "From Right"
-        case "u": return "From Top"
-        case "d": return "From Bottom"
-        case "horz": return "Horizontal"
-        case "vert": return "Vertical"
-        case "in": return "In"
-        case "out": return "Out"
+        case "l": return L10n.text("From Left")
+        case "r": return L10n.text("From Right")
+        case "u": return L10n.text("From Top")
+        case "d": return L10n.text("From Bottom")
+        case "horz": return L10n.text("Horizontal")
+        case "vert": return L10n.text("Vertical")
+        case "in": return L10n.text("In")
+        case "out": return L10n.text("Out")
         default:
             var s = ""
             for (i, c) in o.enumerated() {
@@ -224,21 +224,21 @@ public enum InspectorMotion {
 
     public static func className(_ c: AnimClass) -> String {
         switch c {
-        case .entrance: "Entrance"
-        case .emphasis: "Emphasis"
-        case .exit: "Exit"
-        case .path: "Motion Paths"
-        case .media: "Media"
+        case .entrance: L10n.text("Entrance")
+        case .emphasis: L10n.text("Emphasis")
+        case .exit: L10n.text("Exit")
+        case .path: L10n.text("Motion Paths")
+        case .media: L10n.text("Media")
         }
     }
 
-    public static let starts: [(String, String)] = [("On Click", "onClick"), ("With Previous", "withPrevious"), ("After Previous", "afterPrevious")]
+    public static let starts: [(String, String)] = [(L10n.text("On Click"), "onClick"), (L10n.text("With Previous"), "withPrevious"), (L10n.text("After Previous"), "afterPrevious")]
 
     public static func startLabel(_ s: AnimStart) -> String {
         switch s {
-        case .onClick: "On Click"
-        case .withPrevious: "With Previous"
-        case .afterPrevious: "After Previous"
+        case .onClick: L10n.text("On Click")
+        case .withPrevious: L10n.text("With Previous")
+        case .afterPrevious: L10n.text("After Previous")
         }
     }
 

@@ -125,7 +125,7 @@ extension DialogController {
     /// `extra`, on the presentation and slide that were current when the panel opened.
     public func pickAndRun(_ purpose: String, _ cmd: String, _ extra: JSON = .emptyObject) {
         guard let services else {
-            status("Choosing a \(purpose) file needs the app")
+            status(String(localized: "Choosing a \(purpose) file needs the app", bundle: .module, comment: "Status; the placeholder is a file kind id: picture, audio, video, theme or open"))
             return
         }
         let target = captureTarget()
@@ -157,7 +157,7 @@ extension DialogController {
         let s = model.session
         guard let target else { return body() }
         guard let idx = s.documents.firstIndex(where: { $0.uid == target.doc }) else {
-            return .failure(CommandError("\(name) was not applied: the presentation it was chosen for is closed"))
+            return .failure(CommandError(String(localized: "\(name) was not applied: the presentation it was chosen for is closed", bundle: .module, comment: "Status; the placeholder is a file name or Reuse Slides")))
         }
         let view = s.activeIndex
         guard let st = s.documents.at(idx) else { return body() }
@@ -167,7 +167,7 @@ extension DialogController {
         if let slide = target.slide {
             guard let i = st.doc.slides.firstIndex(where: { $0.id == slide }) else {
                 if let view { s.setActive(view) }
-                return .failure(CommandError("\(name) was not applied: its slide was deleted"))
+                return .failure(CommandError(String(localized: "\(name) was not applied: its slide was deleted", bundle: .module, comment: "Status; the placeholder is a file name or Reuse Slides")))
             }
             st.selection.target = .slides
             st.selection.slide = i
@@ -189,7 +189,7 @@ extension DialogController {
     /// `pick_and_reuse`: pick a presentation, list its slides, and offer them in Reuse Slides.
     func pickAndReuse(keep: Bool) {
         guard let services else {
-            status("Reuse Slides needs the app")
+            status(L10n.text("Reuse Slides needs the app"))
             return
         }
         let target = captureTarget()
@@ -226,10 +226,10 @@ extension DialogController {
         var args = source.isObject ? source : .emptyObject
         args.set("keepFormatting", .bool(keep))
         args.set("slides", .array(picked.map { .integer($0) }))
-        switch onTarget(reuseTarget, "Reuse Slides", { self.model.run("slide.reuse", args) }) {
+        switch onTarget(reuseTarget, L10n.text("Reuse Slides"), { self.model.run("slide.reuse", args) }) {
         case .success:
             reuseTarget = nil
-            status("Inserted \(picked.count) slides")
+            status(L10n.text("Inserted \(picked.count) slides"))
             return true
         case .failure(let e):
             status(e.message)
@@ -276,39 +276,42 @@ public enum DialogBackstage {
 
     /// The Info page's properties (`PROPERTIES`): `file.properties` key, label, hint.
     public static let properties: [(String, String, String)] = [
-        ("title", "Title", "Add a title"), ("subject", "Subject", "Specify the subject"), ("keywords", "Tags", "Add a tag"),
-        ("category", "Categories", "Add a category"), ("company", "Company", "Specify the company"), ("comments", "Comments", "Add comments"),
-        ("author", "Author", "Add an author"),
+        ("title", L10n.text("Title"), L10n.text("Add a title")), ("subject", L10n.text("Subject"), L10n.text("Specify the subject")),
+        ("keywords", L10n.text("Tags"), L10n.text("Add a tag")),
+        ("category", L10n.text("Categories"), L10n.text("Add a category")), ("company", L10n.text("Company"), L10n.text("Specify the company")),
+        ("comments", L10n.text("Comments"), L10n.text("Add comments")), ("author", L10n.text("Author"), L10n.text("Add an author")),
     ]
 
     /// The Export dialog's formats.
     public static let exportFormats: [(String, String)] = [
-        ("pdf", "PDF document (.pdf)"), ("png", "PNG images (current slide)"), ("pngAll", "PNG images (all slides)"),
-        ("jpeg", "JPEG image (current slide)"), ("pptx", "PowerPoint Presentation (.pptx)"), ("outline", "Outline (.txt)"),
-        ("gif", "Animated GIF (.gif)"), ("rtf", "Outline/RTF (.rtf)"),
+        ("pdf", L10n.text("PDF document (.pdf)")), ("png", L10n.text("PNG images (current slide)")),
+        ("pngAll", L10n.text("PNG images (all slides)")), ("jpeg", L10n.text("JPEG image (current slide)")),
+        ("pptx", L10n.text("PowerPoint Presentation (.pptx)")), ("outline", L10n.text("Outline (.txt)")),
+        ("gif", L10n.text("Animated GIF (.gif)")), ("rtf", L10n.text("Outline/RTF (.rtf)")),
     ]
 
     /// The PDF's layouts (`LAYOUTS`).
     public static let pdfLayouts: [(String, String)] = [
-        ("slides", "Full Page Slides"), ("notes", "Notes Pages"), ("h1", "Handouts (1 slide per page)"), ("h2", "Handouts (2 slides per page)"),
-        ("h3", "Handouts (3 slides per page)"), ("h4", "Handouts (4 slides per page)"), ("h6", "Handouts (6 slides per page)"),
-        ("h9", "Handouts (9 slides per page)"),
+        ("slides", L10n.text("Full Page Slides")), ("notes", L10n.text("Notes Pages")),
+        ("h1", L10n.text("Handouts (1 slide per page)")), ("h2", L10n.text("Handouts (2 slides per page)")),
+        ("h3", L10n.text("Handouts (3 slides per page)")), ("h4", L10n.text("Handouts (4 slides per page)")),
+        ("h6", L10n.text("Handouts (6 slides per page)")), ("h9", L10n.text("Handouts (9 slides per page)")),
     ]
 
     /// `format_bytes`: `1234567` → `1.2 MB`.
     public static func formatBytes(_ b: UInt64) -> String {
         switch b {
-        case 0 ..< 1024: "\(b) bytes"
-        case 1024 ..< 1_048_576: "\(rustFixed(Double(b) / 1024, places: 1)) KB"
-        default: "\(rustFixed(Double(b) / 1_048_576, places: 1)) MB"
+        case 0 ..< 1024: L10n.text("\(b) bytes")
+        case 1024 ..< 1_048_576: String(localized: "\(rustFixed(Double(b) / 1024, places: 1)) KB", bundle: .module, comment: "A file size in kilobytes")
+        default: String(localized: "\(rustFixed(Double(b) / 1_048_576, places: 1)) MB", bundle: .module, comment: "A file size in megabytes")
         }
     }
 
     /// `version_line`: the bundle's version, and the build when there is one.
     public static func versionLine(_ info: [String: Any]? = Bundle.main.infoDictionary) -> String {
-        let v = info?["CFBundleShortVersionString"] as? String ?? "0.1"
+        let v = info?["CFBundleShortVersionString"] as? String ?? DCAppVersion.current
         let b = info?["CFBundleVersion"] as? String
-        return b.map { "Version \(v) (\($0))" } ?? "Version \(v)"
+        return b.map { String(localized: "Version \(v) (\($0))", bundle: .module, comment: "About: the version, then the build") } ?? L10n.text("Version \(v)")
     }
 }
 

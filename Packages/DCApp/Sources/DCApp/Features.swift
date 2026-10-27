@@ -10,5 +10,7 @@ enum Features {
         ShowFeature.install(app)
         ViewsFeature.install(app)
         AutomationFeature.install(app)
+        UpdatesFeature.install(app)
+        IntentsFeature.install(app)
     }
 }

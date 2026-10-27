@@ -44,9 +44,13 @@ final class DialogPresenter: NSObject, NSWindowDelegate, DialogServices {
         dismiss()
         let host = NSHostingController(rootView: DialogView(controller: controller))
         host.sizingOptions = [.preferredContentSize]
+        // The window follows SwiftUI's size; safe-area insets that change with the window's frame would feed back
+        // into that size and AppKit aborts the update-constraints loop (seen while dialog widths were in flux).
+        host.safeAreaRegions = []
         let parent = DialogCatalog.isWindow(d.id) ? nil : Self.documentWindow()
         if let parent {
             let sheet = NSWindow(contentViewController: host)
+            sheet.styleMask.remove(.resizable)
             sheet.title = controller.title
             parent.beginSheet(sheet)
             shown = (controller.generation, sheet, parent)
@@ -216,7 +220,7 @@ struct PaletteView: View {
     var body: some View {
         let selection = controller.palette?.selection ?? 0
         VStack(alignment: .leading, spacing: Tokens.Space.s) {
-            TextField("Search commands…", text: Binding(
+            TextField(String(localized: "Search commands…", bundle: .module, comment: "Command palette search field"), text: Binding(
                 get: { controller.palette?.query ?? "" },
                 set: { q in
                     controller.palette?.query = q
@@ -280,8 +284,8 @@ struct ToastView: View {
             Button(action: close) { Image(systemName: "xmark") }
                 .buttonStyle(.plain)
                 .foregroundStyle(Tokens.Color.secondaryLabel)
-                .help("Close")
-                .accessibilityLabel("Close")
+                .help(String(localized: "Close", bundle: .module, comment: "Closes the notice (toast)"))
+                .accessibilityLabel(String(localized: "Close", bundle: .module, comment: "Closes the notice (toast)"))
         }
         .padding(Tokens.Space.m)
         .frame(maxWidth: Tokens.Layout.inspectorWidth * 1.5)

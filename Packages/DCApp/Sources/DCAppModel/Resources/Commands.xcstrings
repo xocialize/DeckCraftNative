@@ -1,0 +1,5634 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "animation.add" : {
+      "comment" : "The label of command animation.add (Animations › Advanced Animation)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Animation"
+          }
+        }
+      }
+    },
+    "animation.clear" : {
+      "comment" : "The label of command animation.clear",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Animations"
+          }
+        }
+      }
+    },
+    "animation.get" : {
+      "comment" : "The label of command animation.get",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animations on Slide"
+          }
+        }
+      }
+    },
+    "animation.list" : {
+      "comment" : "The label of command animation.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation Gallery"
+          }
+        }
+      }
+    },
+    "animation.move" : {
+      "comment" : "The label of command animation.move (Animations › Timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reorder Animation"
+          }
+        }
+      }
+    },
+    "animation.options" : {
+      "comment" : "The label of command animation.options (Animations › Animation)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effect Options"
+          }
+        }
+      }
+    },
+    "animation.painter" : {
+      "comment" : "The label of command animation.painter (Animations › Advanced Animation)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation Painter"
+          }
+        }
+      }
+    },
+    "animation.painterApply" : {
+      "comment" : "The label of command animation.painterApply",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply Animation"
+          }
+        }
+      }
+    },
+    "animation.preview" : {
+      "comment" : "The label of the app's command animation.preview",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview Animations"
+          }
+        }
+      }
+    },
+    "animation.remove" : {
+      "comment" : "The label of command animation.remove (Animation Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Animation"
+          }
+        }
+      }
+    },
+    "animation.set" : {
+      "comment" : "The label of command animation.set (Animations › Animation)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation Styles"
+          }
+        }
+      }
+    },
+    "animation.timing" : {
+      "comment" : "The label of command animation.timing (Animations › Timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timing"
+          }
+        }
+      }
+    },
+    "app.about" : {
+      "comment" : "The label of the app's command app.about; the app's own name, not deckcraft's",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About DeckCraftNative"
+          }
+        }
+      }
+    },
+    "app.backstage" : {
+      "comment" : "The label of the app's command app.backstage",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "app.browseThemeDialog" : {
+      "comment" : "The label of the app's command app.browseThemeDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse for Themes…"
+          }
+        }
+      }
+    },
+    "app.changePictureDialog" : {
+      "comment" : "The label of the app's command app.changePictureDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Picture…"
+          }
+        }
+      }
+    },
+    "app.checkUpdates" : {
+      "comment" : "The label of the app's command app.checkUpdates",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates…"
+          }
+        }
+      }
+    },
+    "app.closePresentation" : {
+      "comment" : "The label of the app's command app.closePresentation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "app.compareDialog" : {
+      "comment" : "The label of the app's command app.compareDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare…"
+          }
+        }
+      }
+    },
+    "app.dialog" : {
+      "comment" : "The label of the app's command app.dialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Dialog"
+          }
+        }
+      }
+    },
+    "app.exportDialog" : {
+      "comment" : "The label of the app's command app.exportDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export…"
+          }
+        }
+      }
+    },
+    "app.find" : {
+      "comment" : "The label of the app's command app.find",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find…"
+          }
+        }
+      }
+    },
+    "app.home" : {
+      "comment" : "The label of the app's command app.home",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "app.insertAudioDialog" : {
+      "comment" : "The label of the app's command app.insertAudioDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio from File…"
+          }
+        }
+      }
+    },
+    "app.insertPictureDialog" : {
+      "comment" : "The label of the app's command app.insertPictureDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture from File…"
+          }
+        }
+      }
+    },
+    "app.insertVideoDialog" : {
+      "comment" : "The label of the app's command app.insertVideoDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video from File…"
+          }
+        }
+      }
+    },
+    "app.links" : {
+      "comment" : "The label of the app's command app.links",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community Links"
+          }
+        }
+      }
+    },
+    "app.openDialog" : {
+      "comment" : "The label of the app's command app.openDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open…"
+          }
+        }
+      }
+    },
+    "app.palette" : {
+      "comment" : "The label of the app's command app.palette",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Palette"
+          }
+        }
+      }
+    },
+    "app.pasteSpecial" : {
+      "comment" : "The label of the app's command app.pasteSpecial",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Special…"
+          }
+        }
+      }
+    },
+    "app.preferences" : {
+      "comment" : "The label of the app's command app.preferences",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferences…"
+          }
+        }
+      }
+    },
+    "app.print" : {
+      "comment" : "The label of the app's command app.print",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print"
+          }
+        }
+      }
+    },
+    "app.qat" : {
+      "comment" : "The label of the app's command app.qat",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Access Toolbar"
+          }
+        }
+      }
+    },
+    "app.replace" : {
+      "comment" : "The label of the app's command app.replace",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace…"
+          }
+        }
+      }
+    },
+    "app.reuseSlidesDialog" : {
+      "comment" : "The label of the app's command app.reuseSlidesDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reuse Slides…"
+          }
+        }
+      }
+    },
+    "app.saveAsDialog" : {
+      "comment" : "The label of the app's command app.saveAsDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save As…"
+          }
+        }
+      }
+    },
+    "app.smartArtPictureDialog" : {
+      "comment" : "The label of the app's command app.smartArtPictureDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Picture in SmartArt…"
+          }
+        }
+      }
+    },
+    "arrange.align" : {
+      "comment" : "The label of command arrange.align (Arrange › Align or Distribute)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "arrange.bringForward" : {
+      "comment" : "The label of command arrange.bringForward (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring Forward"
+          }
+        }
+      }
+    },
+    "arrange.bringToFront" : {
+      "comment" : "The label of command arrange.bringToFront (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring to Front"
+          }
+        }
+      }
+    },
+    "arrange.distribute" : {
+      "comment" : "The label of command arrange.distribute (Arrange › Align or Distribute)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribute"
+          }
+        }
+      }
+    },
+    "arrange.flipHorizontal" : {
+      "comment" : "The label of command arrange.flipHorizontal (Arrange › Rotate or Flip)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip Horizontal"
+          }
+        }
+      }
+    },
+    "arrange.flipVertical" : {
+      "comment" : "The label of command arrange.flipVertical (Arrange › Rotate or Flip)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip Vertical"
+          }
+        }
+      }
+    },
+    "arrange.group" : {
+      "comment" : "The label of command arrange.group (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group"
+          }
+        }
+      }
+    },
+    "arrange.nudge" : {
+      "comment" : "The label of command arrange.nudge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nudge"
+          }
+        }
+      }
+    },
+    "arrange.regroup" : {
+      "comment" : "The label of command arrange.regroup (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regroup"
+          }
+        }
+      }
+    },
+    "arrange.reorder" : {
+      "comment" : "The label of command arrange.reorder (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reorder Objects"
+          }
+        }
+      }
+    },
+    "arrange.rotateLeft" : {
+      "comment" : "The label of command arrange.rotateLeft (Arrange › Rotate or Flip)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate Left 90°"
+          }
+        }
+      }
+    },
+    "arrange.rotateRight" : {
+      "comment" : "The label of command arrange.rotateRight (Arrange › Rotate or Flip)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate Right 90°"
+          }
+        }
+      }
+    },
+    "arrange.sendBackward" : {
+      "comment" : "The label of command arrange.sendBackward (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Backward"
+          }
+        }
+      }
+    },
+    "arrange.sendToBack" : {
+      "comment" : "The label of command arrange.sendToBack (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send to Back"
+          }
+        }
+      }
+    },
+    "arrange.ungroup" : {
+      "comment" : "The label of command arrange.ungroup (Arrange)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungroup"
+          }
+        }
+      }
+    },
+    "chart.data" : {
+      "comment" : "The label of command chart.data (Chart Design › Data)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Data"
+          }
+        }
+      }
+    },
+    "chart.options" : {
+      "comment" : "The label of command chart.options (Chart Design › Chart Layouts)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Elements"
+          }
+        }
+      }
+    },
+    "chart.type" : {
+      "comment" : "The label of command chart.type (Chart Design › Type)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Chart Type"
+          }
+        }
+      }
+    },
+    "commands.list" : {
+      "comment" : "The label of command commands.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List Commands"
+          }
+        }
+      }
+    },
+    "comment.add" : {
+      "comment" : "The label of command comment.add (Review › Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Comment"
+          }
+        }
+      }
+    },
+    "comment.delete" : {
+      "comment" : "The label of command comment.delete (Review › Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Comment"
+          }
+        }
+      }
+    },
+    "comment.list" : {
+      "comment" : "The label of command comment.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
+    "comment.next" : {
+      "comment" : "The label of command comment.next (Review › Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Comment"
+          }
+        }
+      }
+    },
+    "comment.prev" : {
+      "comment" : "The label of command comment.prev (Review › Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Comment"
+          }
+        }
+      }
+    },
+    "comment.reply" : {
+      "comment" : "The label of command comment.reply (Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reply"
+          }
+        }
+      }
+    },
+    "comment.resolve" : {
+      "comment" : "The label of command comment.resolve (Comments)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve Thread"
+          }
+        }
+      }
+    },
+    "design.applyIdea" : {
+      "comment" : "The label of command design.applyIdea (Home › Designer)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply Design Idea"
+          }
+        }
+      }
+    },
+    "design.background" : {
+      "comment" : "The label of command design.background (Design › Customize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Background"
+          }
+        }
+      }
+    },
+    "design.browseTheme" : {
+      "comment" : "The label of command design.browseTheme (Design › Themes)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse for Themes…"
+          }
+        }
+      }
+    },
+    "design.colors" : {
+      "comment" : "The label of command design.colors (Design › Variants)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colors"
+          }
+        }
+      }
+    },
+    "design.effects" : {
+      "comment" : "The label of command design.effects (Design › Variants)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effects"
+          }
+        }
+      }
+    },
+    "design.fonts" : {
+      "comment" : "The label of command design.fonts (Design › Variants)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonts"
+          }
+        }
+      }
+    },
+    "design.headerFooter" : {
+      "comment" : "The label of command design.headerFooter (Insert › Text)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Header and Footer…"
+          }
+        }
+      }
+    },
+    "design.hideBackgroundGraphics" : {
+      "comment" : "The label of command design.hideBackgroundGraphics (Format Background)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Background Graphics"
+          }
+        }
+      }
+    },
+    "design.ideas" : {
+      "comment" : "The label of command design.ideas",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design Ideas"
+          }
+        }
+      }
+    },
+    "design.slideSize" : {
+      "comment" : "The label of command design.slideSize (Design › Customize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Size"
+          }
+        }
+      }
+    },
+    "design.theme" : {
+      "comment" : "The label of command design.theme (Design › Themes)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Themes"
+          }
+        }
+      }
+    },
+    "design.themes" : {
+      "comment" : "The label of command design.themes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme Gallery"
+          }
+        }
+      }
+    },
+    "design.variant" : {
+      "comment" : "The label of command design.variant (Design › Variants)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        }
+      }
+    },
+    "design.variants" : {
+      "comment" : "The label of command design.variants",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variant Gallery"
+          }
+        }
+      }
+    },
+    "document.inspect" : {
+      "comment" : "The label of command document.inspect",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspect Presentation"
+          }
+        }
+      }
+    },
+    "draw.inkToShape" : {
+      "comment" : "The label of command draw.inkToShape (Draw › Convert)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ink to Shape"
+          }
+        }
+      }
+    },
+    "edit.copy" : {
+      "comment" : "The label of command edit.copy (Home › Clipboard)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "edit.cut" : {
+      "comment" : "The label of command edit.cut (Home › Clipboard)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "edit.delete" : {
+      "comment" : "The label of command edit.delete (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "edit.deselect" : {
+      "comment" : "The label of command edit.deselect",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect"
+          }
+        }
+      }
+    },
+    "edit.duplicate" : {
+      "comment" : "The label of command edit.duplicate (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
+    "edit.paste" : {
+      "comment" : "The label of command edit.paste (Home › Clipboard)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "edit.pasteSpecial" : {
+      "comment" : "The label of command edit.pasteSpecial (Home › Clipboard)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Special"
+          }
+        }
+      }
+    },
+    "edit.pasteText" : {
+      "comment" : "The label of command edit.pasteText (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste and Match Formatting"
+          }
+        }
+      }
+    },
+    "edit.redo" : {
+      "comment" : "The label of command edit.redo (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redo"
+          }
+        }
+      }
+    },
+    "edit.select" : {
+      "comment" : "The label of command edit.select",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Objects"
+          }
+        }
+      }
+    },
+    "edit.selectAll" : {
+      "comment" : "The label of command edit.selectAll (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "edit.undo" : {
+      "comment" : "The label of command edit.undo (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "file.adopt" : {
+      "comment" : "The label of command file.adopt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "file.close" : {
+      "comment" : "The label of command file.close (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "file.export" : {
+      "comment" : "The label of command file.export (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export…"
+          }
+        }
+      }
+    },
+    "file.info" : {
+      "comment" : "The label of command file.info (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "file.new" : {
+      "comment" : "The label of command file.new (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Presentation"
+          }
+        }
+      }
+    },
+    "file.open" : {
+      "comment" : "The label of command file.open (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open…"
+          }
+        }
+      }
+    },
+    "file.openBytes" : {
+      "comment" : "The label of command file.openBytes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Data"
+          }
+        }
+      }
+    },
+    "file.properties" : {
+      "comment" : "The label of command file.properties (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Properties"
+          }
+        }
+      }
+    },
+    "file.recovery.discard" : {
+      "comment" : "The label of command file.recovery.discard",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard Recovered Presentations"
+          }
+        }
+      }
+    },
+    "file.recovery.list" : {
+      "comment" : "The label of command file.recovery.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recovered Presentations"
+          }
+        }
+      }
+    },
+    "file.recovery.open" : {
+      "comment" : "The label of command file.recovery.open",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Recovered Presentations"
+          }
+        }
+      }
+    },
+    "file.recovery.save" : {
+      "comment" : "The label of command file.recovery.save",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save AutoRecover Information"
+          }
+        }
+      }
+    },
+    "file.render" : {
+      "comment" : "The label of command file.render",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Render Slide"
+          }
+        }
+      }
+    },
+    "file.revert" : {
+      "comment" : "The label of command file.revert",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revert"
+          }
+        }
+      }
+    },
+    "file.save" : {
+      "comment" : "The label of command file.save (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "file.saveAs" : {
+      "comment" : "The label of command file.saveAs (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save As…"
+          }
+        }
+      }
+    },
+    "file.saveBytes" : {
+      "comment" : "The label of command file.saveBytes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Data"
+          }
+        }
+      }
+    },
+    "file.saveTemplate" : {
+      "comment" : "The label of command file.saveTemplate (File)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save as Template…"
+          }
+        }
+      }
+    },
+    "file.templates" : {
+      "comment" : "The label of command file.templates",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starter Templates"
+          }
+        }
+      }
+    },
+    "font.add" : {
+      "comment" : "The label of command font.add",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Font"
+          }
+        }
+      }
+    },
+    "font.replace" : {
+      "comment" : "The label of command font.replace (Home › Editing › Replace)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Fonts"
+          }
+        }
+      }
+    },
+    "font.rescan" : {
+      "comment" : "The label of command font.rescan (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rescan Installed Fonts"
+          }
+        }
+      }
+    },
+    "font.used" : {
+      "comment" : "The label of command font.used",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonts in Presentation"
+          }
+        }
+      }
+    },
+    "format.align" : {
+      "comment" : "The label of command format.align (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "format.alignCenter" : {
+      "comment" : "The label of command format.alignCenter (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        }
+      }
+    },
+    "format.alignLeft" : {
+      "comment" : "The label of command format.alignLeft (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Left"
+          }
+        }
+      }
+    },
+    "format.alignRight" : {
+      "comment" : "The label of command format.alignRight (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Right"
+          }
+        }
+      }
+    },
+    "format.anchor" : {
+      "comment" : "The label of command format.anchor (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Text"
+          }
+        }
+      }
+    },
+    "format.autofit" : {
+      "comment" : "The label of command format.autofit (Format Shape › Text Box)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autofit"
+          }
+        }
+      }
+    },
+    "format.bold" : {
+      "comment" : "The label of command format.bold (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bold"
+          }
+        }
+      }
+    },
+    "format.bullets" : {
+      "comment" : "The label of command format.bullets (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bullets"
+          }
+        }
+      }
+    },
+    "format.caps" : {
+      "comment" : "The label of command format.caps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caps"
+          }
+        }
+      }
+    },
+    "format.case" : {
+      "comment" : "The label of command format.case (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Case"
+          }
+        }
+      }
+    },
+    "format.clear" : {
+      "comment" : "The label of command format.clear (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear All Formatting"
+          }
+        }
+      }
+    },
+    "format.color" : {
+      "comment" : "The label of command format.color (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font Color"
+          }
+        }
+      }
+    },
+    "format.columns" : {
+      "comment" : "The label of command format.columns (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Columns"
+          }
+        }
+      }
+    },
+    "format.direction" : {
+      "comment" : "The label of command format.direction (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Direction"
+          }
+        }
+      }
+    },
+    "format.font" : {
+      "comment" : "The label of command format.font (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font"
+          }
+        }
+      }
+    },
+    "format.fontDialog" : {
+      "comment" : "The label of command format.fontDialog (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font…"
+          }
+        }
+      }
+    },
+    "format.grow" : {
+      "comment" : "The label of command format.grow (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Increase Font Size"
+          }
+        }
+      }
+    },
+    "format.highlight" : {
+      "comment" : "The label of command format.highlight (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Highlight Color"
+          }
+        }
+      }
+    },
+    "format.indent" : {
+      "comment" : "The label of command format.indent (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Increase List Level"
+          }
+        }
+      }
+    },
+    "format.italic" : {
+      "comment" : "The label of command format.italic (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italic"
+          }
+        }
+      }
+    },
+    "format.justify" : {
+      "comment" : "The label of command format.justify (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Justify"
+          }
+        }
+      }
+    },
+    "format.language" : {
+      "comment" : "The label of command format.language (Review › Language)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
+    "format.languageAll" : {
+      "comment" : "The label of command format.languageAll (Review › Language)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language for All Text"
+          }
+        }
+      }
+    },
+    "format.lineSpacing" : {
+      "comment" : "The label of command format.lineSpacing (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line Spacing"
+          }
+        }
+      }
+    },
+    "format.margins" : {
+      "comment" : "The label of command format.margins (Format Shape › Text Box)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Box Margins"
+          }
+        }
+      }
+    },
+    "format.numbering" : {
+      "comment" : "The label of command format.numbering (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numbering"
+          }
+        }
+      }
+    },
+    "format.outdent" : {
+      "comment" : "The label of command format.outdent (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrease List Level"
+          }
+        }
+      }
+    },
+    "format.painter" : {
+      "comment" : "The label of command format.painter (Home › Clipboard)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Painter"
+          }
+        }
+      }
+    },
+    "format.painterApply" : {
+      "comment" : "The label of command format.painterApply",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Formatting"
+          }
+        }
+      }
+    },
+    "format.paragraph" : {
+      "comment" : "The label of command format.paragraph (Format)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragraph…"
+          }
+        }
+      }
+    },
+    "format.paragraphDialog" : {
+      "comment" : "The label of command format.paragraphDialog (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragraph…"
+          }
+        }
+      }
+    },
+    "format.rtl" : {
+      "comment" : "The label of command format.rtl (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right-to-Left Text Direction"
+          }
+        }
+      }
+    },
+    "format.ruler" : {
+      "comment" : "The label of command format.ruler",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruler"
+          }
+        }
+      }
+    },
+    "format.shrink" : {
+      "comment" : "The label of command format.shrink (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrease Font Size"
+          }
+        }
+      }
+    },
+    "format.size" : {
+      "comment" : "The label of command format.size (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font Size"
+          }
+        }
+      }
+    },
+    "format.spacing" : {
+      "comment" : "The label of command format.spacing (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Character Spacing"
+          }
+        }
+      }
+    },
+    "format.state" : {
+      "comment" : "The label of command format.state",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formatting State"
+          }
+        }
+      }
+    },
+    "format.strikethrough" : {
+      "comment" : "The label of command format.strikethrough (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strikethrough"
+          }
+        }
+      }
+    },
+    "format.subscript" : {
+      "comment" : "The label of command format.subscript (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscript"
+          }
+        }
+      }
+    },
+    "format.superscript" : {
+      "comment" : "The label of command format.superscript (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superscript"
+          }
+        }
+      }
+    },
+    "format.tabs" : {
+      "comment" : "The label of command format.tabs (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs…"
+          }
+        }
+      }
+    },
+    "format.textOutline" : {
+      "comment" : "The label of command format.textOutline (Shape Format › WordArt Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Outline"
+          }
+        }
+      }
+    },
+    "format.textShadow" : {
+      "comment" : "The label of command format.textShadow (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Shadow"
+          }
+        }
+      }
+    },
+    "format.textTransparency" : {
+      "comment" : "The label of command format.textTransparency (Shape Format › WordArt Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Transparency"
+          }
+        }
+      }
+    },
+    "format.textWarp" : {
+      "comment" : "The label of command format.textWarp (Shape Format › WordArt Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Transform"
+          }
+        }
+      }
+    },
+    "format.underline" : {
+      "comment" : "The label of command format.underline (Home › Font)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Underline"
+          }
+        }
+      }
+    },
+    "format.wrap" : {
+      "comment" : "The label of command format.wrap (Format Shape › Text Box)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrap Text in Shape"
+          }
+        }
+      }
+    },
+    "guide.add" : {
+      "comment" : "The label of command guide.add (View › Show › Guides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Guide"
+          }
+        }
+      }
+    },
+    "guide.delete" : {
+      "comment" : "The label of command guide.delete",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Guide"
+          }
+        }
+      }
+    },
+    "guide.list" : {
+      "comment" : "The label of command guide.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guides"
+          }
+        }
+      }
+    },
+    "guide.move" : {
+      "comment" : "The label of command guide.move",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Guide"
+          }
+        }
+      }
+    },
+    "handout.placeholders" : {
+      "comment" : "The label of command handout.placeholders (Handout Master › Placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handout Placeholders"
+          }
+        }
+      }
+    },
+    "insert.actionButton" : {
+      "comment" : "The label of command insert.actionButton (Insert › Illustrations)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Buttons"
+          }
+        }
+      }
+    },
+    "insert.audio" : {
+      "comment" : "The label of command insert.audio (Insert › Media › Audio)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio from File…"
+          }
+        }
+      }
+    },
+    "insert.chart" : {
+      "comment" : "The label of command insert.chart (Insert › Illustrations)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart…"
+          }
+        }
+      }
+    },
+    "insert.dateTime" : {
+      "comment" : "The label of command insert.dateTime (Insert › Text)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date & Time"
+          }
+        }
+      }
+    },
+    "insert.hyperlink" : {
+      "comment" : "The label of command insert.hyperlink (Insert › Links)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        }
+      }
+    },
+    "insert.icon" : {
+      "comment" : "The label of command insert.icon (Insert › Illustrations)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons"
+          }
+        }
+      }
+    },
+    "insert.icons" : {
+      "comment" : "The label of command insert.icons",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon Gallery"
+          }
+        }
+      }
+    },
+    "insert.photoAlbum" : {
+      "comment" : "The label of command insert.photoAlbum (Insert › Images)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo Album…"
+          }
+        }
+      }
+    },
+    "insert.photoAlbumEdit" : {
+      "comment" : "The label of command insert.photoAlbumEdit (Insert › Images)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Photo Album…"
+          }
+        }
+      }
+    },
+    "insert.picture" : {
+      "comment" : "The label of command insert.picture (Insert › Images › Pictures)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture from File…"
+          }
+        }
+      }
+    },
+    "insert.slideNumber" : {
+      "comment" : "The label of command insert.slideNumber (Insert › Text)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Number"
+          }
+        }
+      }
+    },
+    "insert.smartArt" : {
+      "comment" : "The label of command insert.smartArt (Insert › Illustrations)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt"
+          }
+        }
+      }
+    },
+    "insert.symbol" : {
+      "comment" : "The label of command insert.symbol (Insert › Symbols)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol"
+          }
+        }
+      }
+    },
+    "insert.table" : {
+      "comment" : "The label of command insert.table (Insert › Tables)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table…"
+          }
+        }
+      }
+    },
+    "insert.textBox" : {
+      "comment" : "The label of command insert.textBox (Insert › Text)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Box"
+          }
+        }
+      }
+    },
+    "insert.video" : {
+      "comment" : "The label of command insert.video (Insert › Media › Video)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video from File…"
+          }
+        }
+      }
+    },
+    "insert.wordArt" : {
+      "comment" : "The label of command insert.wordArt (Insert › Text)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WordArt"
+          }
+        }
+      }
+    },
+    "insert.zoom" : {
+      "comment" : "The label of command insert.zoom (Insert › Links)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "master.deleteLayout" : {
+      "comment" : "The label of command master.deleteLayout (Slide Master › Edit Master)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Layout"
+          }
+        }
+      }
+    },
+    "master.insertLayout" : {
+      "comment" : "The label of command master.insertLayout (Slide Master › Edit Master)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Layout"
+          }
+        }
+      }
+    },
+    "master.insertPlaceholder" : {
+      "comment" : "The label of command master.insertPlaceholder (Slide Master › Master Layout)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Placeholder"
+          }
+        }
+      }
+    },
+    "master.placeholders" : {
+      "comment" : "The label of command master.placeholders (Slide Master › Edit Master)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout Placeholders"
+          }
+        }
+      }
+    },
+    "master.preserve" : {
+      "comment" : "The label of command master.preserve (Slide Master › Edit Master)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preserve"
+          }
+        }
+      }
+    },
+    "master.renameLayout" : {
+      "comment" : "The label of command master.renameLayout (Slide Master › Edit Master)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Layout"
+          }
+        }
+      }
+    },
+    "media.gifPlay" : {
+      "comment" : "The label of command media.gifPlay",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play/Pause GIF"
+          }
+        }
+      }
+    },
+    "media.info" : {
+      "comment" : "The label of command media.info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Info"
+          }
+        }
+      }
+    },
+    "media.options" : {
+      "comment" : "The label of command media.options (Playback)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playback"
+          }
+        }
+      }
+    },
+    "media.pause" : {
+      "comment" : "The label of command media.pause (Playback › Preview)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "media.play" : {
+      "comment" : "The label of command media.play (Playback › Preview)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
+    },
+    "media.posterFrame" : {
+      "comment" : "The label of command media.posterFrame (Video Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poster Frame"
+          }
+        }
+      }
+    },
+    "media.seek" : {
+      "comment" : "The label of command media.seek",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seek"
+          }
+        }
+      }
+    },
+    "media.stop" : {
+      "comment" : "The label of command media.stop (Playback › Preview)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "media.toggle" : {
+      "comment" : "The label of command media.toggle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play/Pause"
+          }
+        }
+      }
+    },
+    "menu.About DeckCraft" : {
+      "comment" : "An item of the Help menu (runs app.about); the app's own name, not deckcraft's",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About DeckCraftNative"
+          }
+        }
+      }
+    },
+    "menu.Align Left" : {
+      "comment" : "An item of the Format menu (runs format.alignLeft)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Left"
+          }
+        }
+      }
+    },
+    "menu.Align Right" : {
+      "comment" : "An item of the Format menu (runs format.alignRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Right"
+          }
+        }
+      }
+    },
+    "menu.Arrange" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "menu.Audio from File…" : {
+      "comment" : "An item of the Insert menu (runs app.insertAudioDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio from File…"
+          }
+        }
+      }
+    },
+    "menu.Bold" : {
+      "comment" : "An item of the Format menu (runs format.bold)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bold"
+          }
+        }
+      }
+    },
+    "menu.Bring Forward" : {
+      "comment" : "An item of the Arrange menu (runs arrange.bringForward)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring Forward"
+          }
+        }
+      }
+    },
+    "menu.Bring to Front" : {
+      "comment" : "An item of the Arrange menu (runs arrange.bringToFront)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bring to Front"
+          }
+        }
+      }
+    },
+    "menu.Center" : {
+      "comment" : "An item of the Format menu (runs format.alignCenter)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        }
+      }
+    },
+    "menu.Chart" : {
+      "comment" : "An item of the Insert menu (runs insert.chart)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        }
+      }
+    },
+    "menu.Check for Updates…" : {
+      "comment" : "An item of the Help menu (runs app.checkUpdates)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates…"
+          }
+        }
+      }
+    },
+    "menu.Close" : {
+      "comment" : "An item of the File menu (runs app.closePresentation)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "menu.Command Palette" : {
+      "comment" : "An item of the Help menu (runs app.palette)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Palette"
+          }
+        }
+      }
+    },
+    "menu.Copy" : {
+      "comment" : "An item of the Edit menu (runs edit.copy)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "menu.Cut" : {
+      "comment" : "An item of the Edit menu (runs edit.cut)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "menu.Date and Time" : {
+      "comment" : "An item of the Insert menu (runs insert.dateTime)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date and Time"
+          }
+        }
+      }
+    },
+    "menu.Delete Slide" : {
+      "comment" : "An item of the Edit menu (runs slide.delete)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Slide"
+          }
+        }
+      }
+    },
+    "menu.Duplicate" : {
+      "comment" : "An item of the Edit menu (runs edit.duplicate)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        }
+      }
+    },
+    "menu.Duplicate Slide" : {
+      "comment" : "An item of the Insert menu (runs slide.duplicate)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Slide"
+          }
+        }
+      }
+    },
+    "menu.Edit" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "menu.Edit Photo Album…" : {
+      "comment" : "An item of the Insert menu (runs insert.photoAlbumEdit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Photo Album…"
+          }
+        }
+      }
+    },
+    "menu.Export…" : {
+      "comment" : "An item of the File menu (runs app.exportDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export…"
+          }
+        }
+      }
+    },
+    "menu.File" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "menu.Find…" : {
+      "comment" : "An item of the Edit menu (runs app.find)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find…"
+          }
+        }
+      }
+    },
+    "menu.Fit to Window" : {
+      "comment" : "An item of the View menu (runs view.fit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit to Window"
+          }
+        }
+      }
+    },
+    "menu.Flip Horizontal" : {
+      "comment" : "An item of the Arrange menu (runs arrange.flipHorizontal)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip Horizontal"
+          }
+        }
+      }
+    },
+    "menu.Flip Vertical" : {
+      "comment" : "An item of the Arrange menu (runs arrange.flipVertical)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip Vertical"
+          }
+        }
+      }
+    },
+    "menu.Font…" : {
+      "comment" : "An item of the Format menu (runs format.fontDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font…"
+          }
+        }
+      }
+    },
+    "menu.Format" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
+    "menu.Grid Options…" : {
+      "comment" : "An item of the View menu (runs view.gridOptions)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid Options…"
+          }
+        }
+      }
+    },
+    "menu.Gridlines" : {
+      "comment" : "An item of the View menu (runs view.gridlines)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gridlines"
+          }
+        }
+      }
+    },
+    "menu.Group" : {
+      "comment" : "An item of the Arrange menu (runs arrange.group)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group"
+          }
+        }
+      }
+    },
+    "menu.Guides" : {
+      "comment" : "An item of the View menu (runs view.guides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guides"
+          }
+        }
+      }
+    },
+    "menu.Handout Master" : {
+      "comment" : "An item of the View menu (runs view.handoutMaster)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handout Master"
+          }
+        }
+      }
+    },
+    "menu.Help" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help"
+          }
+        }
+      }
+    },
+    "menu.Hide Slide" : {
+      "comment" : "An item of the Slide Show menu (runs slide.hide)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Slide"
+          }
+        }
+      }
+    },
+    "menu.Insert" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert"
+          }
+        }
+      }
+    },
+    "menu.Italic" : {
+      "comment" : "An item of the Format menu (runs format.italic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italic"
+          }
+        }
+      }
+    },
+    "menu.Justify" : {
+      "comment" : "An item of the Format menu (runs format.justify)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Justify"
+          }
+        }
+      }
+    },
+    "menu.New Presentation" : {
+      "comment" : "An item of the File menu (runs file.new)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Presentation"
+          }
+        }
+      }
+    },
+    "menu.New Slide" : {
+      "comment" : "An item of the Insert menu (runs slide.new)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Slide"
+          }
+        }
+      }
+    },
+    "menu.New Window" : {
+      "comment" : "An item of the View menu (runs view.newWindow)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Window"
+          }
+        }
+      }
+    },
+    "menu.Normal" : {
+      "comment" : "An item of the View menu (runs view.normal)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
+    "menu.Notes Master" : {
+      "comment" : "An item of the View menu (runs view.notesMaster)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Master"
+          }
+        }
+      }
+    },
+    "menu.Notes Page" : {
+      "comment" : "An item of the View menu (runs view.notesPage)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Page"
+          }
+        }
+      }
+    },
+    "menu.Open…" : {
+      "comment" : "An item of the File menu (runs app.openDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open…"
+          }
+        }
+      }
+    },
+    "menu.Outline View" : {
+      "comment" : "An item of the View menu (runs view.outline)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outline View"
+          }
+        }
+      }
+    },
+    "menu.Paragraph…" : {
+      "comment" : "An item of the Format menu (runs format.paragraphDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragraph…"
+          }
+        }
+      }
+    },
+    "menu.Paste" : {
+      "comment" : "An item of the Edit menu (runs edit.paste)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "menu.Paste and Match Formatting" : {
+      "comment" : "An item of the Edit menu (runs edit.pasteText)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste and Match Formatting"
+          }
+        }
+      }
+    },
+    "menu.Paste Special…" : {
+      "comment" : "An item of the Edit menu (runs app.pasteSpecial)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Special…"
+          }
+        }
+      }
+    },
+    "menu.Photo Album…" : {
+      "comment" : "An item of the Insert menu (runs insert.photoAlbum)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo Album…"
+          }
+        }
+      }
+    },
+    "menu.Picture from File…" : {
+      "comment" : "An item of the Insert menu (runs app.insertPictureDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture from File…"
+          }
+        }
+      }
+    },
+    "menu.Play from Current Slide" : {
+      "comment" : "An item of the Slide Show menu (runs show.fromCurrent)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Current Slide"
+          }
+        }
+      }
+    },
+    "menu.Play from Start" : {
+      "comment" : "An item of the Slide Show menu (runs show.fromStart)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Start"
+          }
+        }
+      }
+    },
+    "menu.Print…" : {
+      "comment" : "An item of the File menu (runs app.print)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print…"
+          }
+        }
+      }
+    },
+    "menu.Properties" : {
+      "comment" : "An item of the File menu (runs file.properties)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Properties"
+          }
+        }
+      }
+    },
+    "menu.Reading View" : {
+      "comment" : "An item of the View menu (runs view.reading)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading View"
+          }
+        }
+      }
+    },
+    "menu.Redo" : {
+      "comment" : "An item of the Edit menu (runs edit.redo)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redo"
+          }
+        }
+      }
+    },
+    "menu.Regroup" : {
+      "comment" : "An item of the Arrange menu (runs arrange.regroup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regroup"
+          }
+        }
+      }
+    },
+    "menu.Replace…" : {
+      "comment" : "An item of the Edit menu (runs app.replace)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace…"
+          }
+        }
+      }
+    },
+    "menu.Right-to-Left Text Direction" : {
+      "comment" : "An item of the Format menu (runs format.rtl)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right-to-Left Text Direction"
+          }
+        }
+      }
+    },
+    "menu.Rotate Left 90°" : {
+      "comment" : "An item of the Arrange menu (runs arrange.rotateLeft)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate Left 90°"
+          }
+        }
+      }
+    },
+    "menu.Rotate Right 90°" : {
+      "comment" : "An item of the Arrange menu (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate Right 90°"
+          }
+        }
+      }
+    },
+    "menu.Ruler" : {
+      "comment" : "An item of the View menu (runs view.ruler)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruler"
+          }
+        }
+      }
+    },
+    "menu.Save" : {
+      "comment" : "An item of the File menu (runs file.save)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "menu.Save As…" : {
+      "comment" : "An item of the File menu (runs app.saveAsDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save As…"
+          }
+        }
+      }
+    },
+    "menu.Section" : {
+      "comment" : "An item of the Insert menu (runs section.add)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Section"
+          }
+        }
+      }
+    },
+    "menu.Select All" : {
+      "comment" : "An item of the Edit menu (runs edit.selectAll)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "menu.Send Backward" : {
+      "comment" : "An item of the Arrange menu (runs arrange.sendBackward)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Backward"
+          }
+        }
+      }
+    },
+    "menu.Send to Back" : {
+      "comment" : "An item of the Arrange menu (runs arrange.sendToBack)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send to Back"
+          }
+        }
+      }
+    },
+    "menu.Set Up Show…" : {
+      "comment" : "An item of the Slide Show menu (runs show.setup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Show…"
+          }
+        }
+      }
+    },
+    "menu.Size and Position…" : {
+      "comment" : "An item of the Format menu (runs shape.sizePosition)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size and Position…"
+          }
+        }
+      }
+    },
+    "menu.Slide Master" : {
+      "comment" : "An item of the View menu (runs view.slideMaster)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Master"
+          }
+        }
+      }
+    },
+    "menu.Slide Number" : {
+      "comment" : "An item of the Insert menu (runs insert.slideNumber)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Number"
+          }
+        }
+      }
+    },
+    "menu.Slide Show" : {
+      "comment" : "An item of the View menu (runs show.start)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Show"
+          }
+        }
+      }
+    },
+    "menu.Slide Sorter" : {
+      "comment" : "An item of the View menu (runs view.sorter)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Sorter"
+          }
+        }
+      }
+    },
+    "menu.Table…" : {
+      "comment" : "An item of the Insert menu (runs insert.table)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table…"
+          }
+        }
+      }
+    },
+    "menu.Text Box" : {
+      "comment" : "An item of the Insert menu (runs insert.textBox)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Box"
+          }
+        }
+      }
+    },
+    "menu.Underline" : {
+      "comment" : "An item of the Format menu (runs format.underline)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Underline"
+          }
+        }
+      }
+    },
+    "menu.Undo" : {
+      "comment" : "An item of the Edit menu (runs edit.undo)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "menu.Ungroup" : {
+      "comment" : "An item of the Arrange menu (runs arrange.ungroup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungroup"
+          }
+        }
+      }
+    },
+    "menu.Video from File…" : {
+      "comment" : "An item of the Insert menu (runs app.insertVideoDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video from File…"
+          }
+        }
+      }
+    },
+    "menu.View" : {
+      "comment" : "A menu in the menu bar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        }
+      }
+    },
+    "menu.WordArt" : {
+      "comment" : "An item of the Insert menu (runs insert.wordArt)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WordArt"
+          }
+        }
+      }
+    },
+    "menu.Zoom In" : {
+      "comment" : "An item of the View menu (runs view.zoomIn)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom In"
+          }
+        }
+      }
+    },
+    "menu.Zoom Out" : {
+      "comment" : "An item of the View menu (runs view.zoomOut)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom Out"
+          }
+        }
+      }
+    },
+    "menu.Zoom…" : {
+      "comment" : "An item of the View menu (runs view.zoomDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom…"
+          }
+        }
+      }
+    },
+    "notes.placeholders" : {
+      "comment" : "The label of command notes.placeholders (Notes Master › Placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Placeholders"
+          }
+        }
+      }
+    },
+    "picture.adjust" : {
+      "comment" : "The label of command picture.adjust (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corrections"
+          }
+        }
+      }
+    },
+    "picture.artisticEffect" : {
+      "comment" : "The label of command picture.artisticEffect (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artistic Effects"
+          }
+        }
+      }
+    },
+    "picture.change" : {
+      "comment" : "The label of command picture.change (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Picture"
+          }
+        }
+      }
+    },
+    "picture.compress" : {
+      "comment" : "The label of command picture.compress (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compress Pictures"
+          }
+        }
+      }
+    },
+    "picture.crop" : {
+      "comment" : "The label of command picture.crop (Picture Format › Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop"
+          }
+        }
+      }
+    },
+    "picture.recolor" : {
+      "comment" : "The label of command picture.recolor (Picture Format › Adjust › Color)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recolor"
+          }
+        }
+      }
+    },
+    "picture.recolors" : {
+      "comment" : "The label of command picture.recolors",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recolor Gallery"
+          }
+        }
+      }
+    },
+    "picture.removeBackground" : {
+      "comment" : "The label of command picture.removeBackground (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Background"
+          }
+        }
+      }
+    },
+    "picture.reset" : {
+      "comment" : "The label of command picture.reset (Picture Format › Adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Picture"
+          }
+        }
+      }
+    },
+    "picture.style" : {
+      "comment" : "The label of command picture.style (Picture Format › Picture Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Styles"
+          }
+        }
+      }
+    },
+    "picture.styles" : {
+      "comment" : "The label of command picture.styles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Style Gallery"
+          }
+        }
+      }
+    },
+    "picture.transparentColor" : {
+      "comment" : "The label of command picture.transparentColor (Picture Format › Adjust › Color)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Transparent Color"
+          }
+        }
+      }
+    },
+    "review.accept" : {
+      "comment" : "The label of command review.accept (Review › Compare)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accept Revision"
+          }
+        }
+      }
+    },
+    "review.accessibility" : {
+      "comment" : "The label of command review.accessibility (Review › Accessibility)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Accessibility"
+          }
+        }
+      }
+    },
+    "review.addToDictionary" : {
+      "comment" : "The label of command review.addToDictionary (Review › Proofing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Dictionary"
+          }
+        }
+      }
+    },
+    "review.compare" : {
+      "comment" : "The label of command review.compare (Review › Compare)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare"
+          }
+        }
+      }
+    },
+    "review.dictionary" : {
+      "comment" : "The label of command review.dictionary (Review › Proofing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spelling Dictionary"
+          }
+        }
+      }
+    },
+    "review.endCompare" : {
+      "comment" : "The label of command review.endCompare (Review › Compare)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End Review"
+          }
+        }
+      }
+    },
+    "review.reject" : {
+      "comment" : "The label of command review.reject (Review › Compare)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reject Revision"
+          }
+        }
+      }
+    },
+    "review.replaceWord" : {
+      "comment" : "The label of command review.replaceWord",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Synonym"
+          }
+        }
+      }
+    },
+    "review.revisions" : {
+      "comment" : "The label of command review.revisions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisions"
+          }
+        }
+      }
+    },
+    "review.spelling" : {
+      "comment" : "The label of command review.spelling (Review › Proofing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spelling"
+          }
+        }
+      }
+    },
+    "review.spellingChange" : {
+      "comment" : "The label of command review.spellingChange (Review › Proofing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Spelling"
+          }
+        }
+      }
+    },
+    "review.thesaurus" : {
+      "comment" : "The label of command review.thesaurus (Review › Proofing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thesaurus"
+          }
+        }
+      }
+    },
+    "review.thesaurusPane" : {
+      "comment" : "The label of the app's command review.thesaurusPane",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thesaurus"
+          }
+        }
+      }
+    },
+    "section.add" : {
+      "comment" : "The label of command section.add (Home › Slides › Section)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Section"
+          }
+        }
+      }
+    },
+    "section.move" : {
+      "comment" : "The label of command section.move",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Section"
+          }
+        }
+      }
+    },
+    "section.remove" : {
+      "comment" : "The label of command section.remove (Home › Slides › Section)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Section"
+          }
+        }
+      }
+    },
+    "section.removeAll" : {
+      "comment" : "The label of command section.removeAll (Home › Slides › Section)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Sections"
+          }
+        }
+      }
+    },
+    "section.rename" : {
+      "comment" : "The label of command section.rename (Home › Slides › Section)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Section"
+          }
+        }
+      }
+    },
+    "selection.hideAll" : {
+      "comment" : "The label of command selection.hideAll (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide All"
+          }
+        }
+      }
+    },
+    "selection.select" : {
+      "comment" : "The label of command selection.select (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
+    "selection.showAll" : {
+      "comment" : "The label of command selection.showAll (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show All"
+          }
+        }
+      }
+    },
+    "shape.action" : {
+      "comment" : "The label of command shape.action (Insert › Links)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Settings"
+          }
+        }
+      }
+    },
+    "shape.addPoint" : {
+      "comment" : "The label of command shape.addPoint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Point"
+          }
+        }
+      }
+    },
+    "shape.adjust" : {
+      "comment" : "The label of command shape.adjust",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust Shape"
+          }
+        }
+      }
+    },
+    "shape.altText" : {
+      "comment" : "The label of command shape.altText (Shape Format › Accessibility)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt Text"
+          }
+        }
+      }
+    },
+    "shape.change" : {
+      "comment" : "The label of command shape.change (Shape Format › Insert Shapes › Edit Shape)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Shape"
+          }
+        }
+      }
+    },
+    "shape.closePath" : {
+      "comment" : "The label of command shape.closePath",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Path"
+          }
+        }
+      }
+    },
+    "shape.connect" : {
+      "comment" : "The label of command shape.connect",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect Shapes"
+          }
+        }
+      }
+    },
+    "shape.deletePoint" : {
+      "comment" : "The label of command shape.deletePoint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Point"
+          }
+        }
+      }
+    },
+    "shape.deleteSegment" : {
+      "comment" : "The label of command shape.deleteSegment",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Segment"
+          }
+        }
+      }
+    },
+    "shape.editPoints" : {
+      "comment" : "The label of command shape.editPoints (Shape Format › Insert Shapes › Edit Shape)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Points"
+          }
+        }
+      }
+    },
+    "shape.effects" : {
+      "comment" : "The label of command shape.effects (Shape Format › Shape Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Effects"
+          }
+        }
+      }
+    },
+    "shape.fill" : {
+      "comment" : "The label of command shape.fill (Shape Format › Shape Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Fill"
+          }
+        }
+      }
+    },
+    "shape.flip" : {
+      "comment" : "The label of command shape.flip (Shape Format › Arrange › Rotate)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flip"
+          }
+        }
+      }
+    },
+    "shape.freeform" : {
+      "comment" : "The label of command shape.freeform (Insert › Shapes)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freeform"
+          }
+        }
+      }
+    },
+    "shape.insert" : {
+      "comment" : "The label of command shape.insert (Insert › Illustrations)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shapes"
+          }
+        }
+      }
+    },
+    "shape.inspect" : {
+      "comment" : "The label of command shape.inspect",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspect Shape"
+          }
+        }
+      }
+    },
+    "shape.line" : {
+      "comment" : "The label of command shape.line (Shape Format › Shape Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Outline"
+          }
+        }
+      }
+    },
+    "shape.lock" : {
+      "comment" : "The label of command shape.lock (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock"
+          }
+        }
+      }
+    },
+    "shape.merge" : {
+      "comment" : "The label of command shape.merge (Shape Format › Insert Shapes › Merge Shapes)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge Shapes"
+          }
+        }
+      }
+    },
+    "shape.move" : {
+      "comment" : "The label of command shape.move",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
+          }
+        }
+      }
+    },
+    "shape.moveHandle" : {
+      "comment" : "The label of command shape.moveHandle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Handle"
+          }
+        }
+      }
+    },
+    "shape.movePoint" : {
+      "comment" : "The label of command shape.movePoint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Point"
+          }
+        }
+      }
+    },
+    "shape.openPath" : {
+      "comment" : "The label of command shape.openPath",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Path"
+          }
+        }
+      }
+    },
+    "shape.points" : {
+      "comment" : "The label of command shape.points",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Points"
+          }
+        }
+      }
+    },
+    "shape.pointType" : {
+      "comment" : "The label of command shape.pointType",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point Type"
+          }
+        }
+      }
+    },
+    "shape.presets" : {
+      "comment" : "The label of command shape.presets",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Gallery"
+          }
+        }
+      }
+    },
+    "shape.quickStyle" : {
+      "comment" : "The label of command shape.quickStyle (Home › Drawing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Styles"
+          }
+        }
+      }
+    },
+    "shape.rename" : {
+      "comment" : "The label of command shape.rename (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "shape.resize" : {
+      "comment" : "The label of command shape.resize (Shape Format › Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "shape.rotate" : {
+      "comment" : "The label of command shape.rotate (Shape Format › Arrange › Rotate)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation"
+          }
+        }
+      }
+    },
+    "shape.segmentType" : {
+      "comment" : "The label of command shape.segmentType",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segment Type"
+          }
+        }
+      }
+    },
+    "shape.setBounds" : {
+      "comment" : "The label of command shape.setBounds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position and Size"
+          }
+        }
+      }
+    },
+    "shape.setDefault" : {
+      "comment" : "The label of command shape.setDefault",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as Default Shape"
+          }
+        }
+      }
+    },
+    "shape.sites" : {
+      "comment" : "The label of command shape.sites",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Sites"
+          }
+        }
+      }
+    },
+    "shape.sizePosition" : {
+      "comment" : "The label of command shape.sizePosition (Shape Format › Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size and Position…"
+          }
+        }
+      }
+    },
+    "shape.smoothCorners" : {
+      "comment" : "The label of command shape.smoothCorners (Shape Format › Insert Shapes › Edit Shape)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smooth Corners"
+          }
+        }
+      }
+    },
+    "shape.visible" : {
+      "comment" : "The label of command shape.visible (Selection Pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show/Hide"
+          }
+        }
+      }
+    },
+    "show.customShow" : {
+      "comment" : "The label of command show.customShow (Slide Show › Start Slide Show)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Slide Show"
+          }
+        }
+      }
+    },
+    "show.end" : {
+      "comment" : "The label of the app's command show.end",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End Show"
+          }
+        }
+      }
+    },
+    "show.fromCurrent" : {
+      "comment" : "The label of command show.fromCurrent (Slide Show › Start Slide Show)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Current Slide"
+          }
+        }
+      }
+    },
+    "show.fromStart" : {
+      "comment" : "The label of command show.fromStart (Slide Show › Start Slide Show)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Start"
+          }
+        }
+      }
+    },
+    "show.presenter" : {
+      "comment" : "The label of the app's command show.presenter",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presenter View"
+          }
+        }
+      }
+    },
+    "show.setup" : {
+      "comment" : "The label of command show.setup (Slide Show › Set Up)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Slide Show…"
+          }
+        }
+      }
+    },
+    "show.start" : {
+      "comment" : "The label of the app's command show.start",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Show"
+          }
+        }
+      }
+    },
+    "slide.colorAt" : {
+      "comment" : "The label of command slide.colorAt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color At"
+          }
+        }
+      }
+    },
+    "slide.delete" : {
+      "comment" : "The label of command slide.delete (Edit)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Slide"
+          }
+        }
+      }
+    },
+    "slide.duplicate" : {
+      "comment" : "The label of command slide.duplicate (Insert)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Slide"
+          }
+        }
+      }
+    },
+    "slide.first" : {
+      "comment" : "The label of command slide.first",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Slide"
+          }
+        }
+      }
+    },
+    "slide.fromOutline" : {
+      "comment" : "The label of command slide.fromOutline (Insert › Slides From)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides from Outline…"
+          }
+        }
+      }
+    },
+    "slide.go" : {
+      "comment" : "The label of command slide.go",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to Slide"
+          }
+        }
+      }
+    },
+    "slide.hide" : {
+      "comment" : "The label of command slide.hide (Slide Show › Set Up)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Slide"
+          }
+        }
+      }
+    },
+    "slide.inspect" : {
+      "comment" : "The label of command slide.inspect",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspect Slide"
+          }
+        }
+      }
+    },
+    "slide.last" : {
+      "comment" : "The label of command slide.last",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Slide"
+          }
+        }
+      }
+    },
+    "slide.layout" : {
+      "comment" : "The label of command slide.layout (Home › Slides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "slide.move" : {
+      "comment" : "The label of command slide.move",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Slide"
+          }
+        }
+      }
+    },
+    "slide.new" : {
+      "comment" : "The label of command slide.new (Home › Slides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Slide"
+          }
+        }
+      }
+    },
+    "slide.next" : {
+      "comment" : "The label of command slide.next",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Slide"
+          }
+        }
+      }
+    },
+    "slide.notes" : {
+      "comment" : "The label of command slide.notes (View)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
+    },
+    "slide.previous" : {
+      "comment" : "The label of command slide.previous",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Slide"
+          }
+        }
+      }
+    },
+    "slide.rename" : {
+      "comment" : "The label of command slide.rename",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Slide"
+          }
+        }
+      }
+    },
+    "slide.reset" : {
+      "comment" : "The label of command slide.reset (Home › Slides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "slide.reuse" : {
+      "comment" : "The label of command slide.reuse (Home › Slides › New Slide)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reuse Slides…"
+          }
+        }
+      }
+    },
+    "slide.reuseList" : {
+      "comment" : "The label of command slide.reuseList",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List Slides to Reuse"
+          }
+        }
+      }
+    },
+    "slide.selectRange" : {
+      "comment" : "The label of command slide.selectRange",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Slide Range"
+          }
+        }
+      }
+    },
+    "slide.selectSlides" : {
+      "comment" : "The label of command slide.selectSlides",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Slides"
+          }
+        }
+      }
+    },
+    "smartArt.addNode" : {
+      "comment" : "The label of command smartArt.addNode (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape"
+          }
+        }
+      }
+    },
+    "smartArt.colors" : {
+      "comment" : "The label of command smartArt.colors (SmartArt Design › SmartArt Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Colors"
+          }
+        }
+      }
+    },
+    "smartArt.demote" : {
+      "comment" : "The label of command smartArt.demote (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demote"
+          }
+        }
+      }
+    },
+    "smartArt.fromText" : {
+      "comment" : "The label of command smartArt.fromText (Home › Paragraph)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to SmartArt"
+          }
+        }
+      }
+    },
+    "smartArt.layout" : {
+      "comment" : "The label of command smartArt.layout (SmartArt Design › Layouts)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Layout"
+          }
+        }
+      }
+    },
+    "smartArt.nodes" : {
+      "comment" : "The label of command smartArt.nodes (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Pane"
+          }
+        }
+      }
+    },
+    "smartArt.picture" : {
+      "comment" : "The label of command smartArt.picture (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Picture in SmartArt"
+          }
+        }
+      }
+    },
+    "smartArt.promote" : {
+      "comment" : "The label of command smartArt.promote (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Promote"
+          }
+        }
+      }
+    },
+    "smartArt.removeNode" : {
+      "comment" : "The label of command smartArt.removeNode (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Shape"
+          }
+        }
+      }
+    },
+    "smartArt.setNodes" : {
+      "comment" : "The label of command smartArt.setNodes (SmartArt Design › Create Graphic)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit SmartArt Text"
+          }
+        }
+      }
+    },
+    "smartArt.style" : {
+      "comment" : "The label of command smartArt.style (SmartArt Design › SmartArt Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt Styles"
+          }
+        }
+      }
+    },
+    "smartArt.toShapes" : {
+      "comment" : "The label of command smartArt.toShapes (SmartArt Design › Reset)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to Shapes"
+          }
+        }
+      }
+    },
+    "smartArt.toText" : {
+      "comment" : "The label of command smartArt.toText (SmartArt Design › Reset)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to Text"
+          }
+        }
+      }
+    },
+    "table.borders" : {
+      "comment" : "The label of command table.borders (Table Design › Draw Borders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borders"
+          }
+        }
+      }
+    },
+    "table.cellAlign" : {
+      "comment" : "The label of command table.cellAlign (Table Layout › Alignment)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Cell Text"
+          }
+        }
+      }
+    },
+    "table.cellFill" : {
+      "comment" : "The label of command table.cellFill (Table Design › Table Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shading"
+          }
+        }
+      }
+    },
+    "table.cellMargins" : {
+      "comment" : "The label of command table.cellMargins (Table Layout › Alignment)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cell Margins"
+          }
+        }
+      }
+    },
+    "table.columnWidth" : {
+      "comment" : "The label of command table.columnWidth (Table Layout › Cell Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Width"
+          }
+        }
+      }
+    },
+    "table.deleteColumn" : {
+      "comment" : "The label of command table.deleteColumn (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Columns"
+          }
+        }
+      }
+    },
+    "table.deleteRow" : {
+      "comment" : "The label of command table.deleteRow (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Rows"
+          }
+        }
+      }
+    },
+    "table.distributeColumns" : {
+      "comment" : "The label of command table.distributeColumns (Table Layout › Cell Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribute Columns"
+          }
+        }
+      }
+    },
+    "table.distributeRows" : {
+      "comment" : "The label of command table.distributeRows (Table Layout › Cell Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribute Rows"
+          }
+        }
+      }
+    },
+    "table.drawLine" : {
+      "comment" : "The label of command table.drawLine (Table Design › Draw Borders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw Table"
+          }
+        }
+      }
+    },
+    "table.eraseLine" : {
+      "comment" : "The label of command table.eraseLine (Table Design › Draw Borders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Eraser"
+          }
+        }
+      }
+    },
+    "table.insertColumnLeft" : {
+      "comment" : "The label of command table.insertColumnLeft (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Left"
+          }
+        }
+      }
+    },
+    "table.insertColumnRight" : {
+      "comment" : "The label of command table.insertColumnRight (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Right"
+          }
+        }
+      }
+    },
+    "table.insertRowAbove" : {
+      "comment" : "The label of command table.insertRowAbove (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Above"
+          }
+        }
+      }
+    },
+    "table.insertRowBelow" : {
+      "comment" : "The label of command table.insertRowBelow (Table Layout › Rows & Columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Below"
+          }
+        }
+      }
+    },
+    "table.merge" : {
+      "comment" : "The label of command table.merge (Table Layout › Merge)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge Cells"
+          }
+        }
+      }
+    },
+    "table.options" : {
+      "comment" : "The label of command table.options (Table Design › Table Style Options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Style Options"
+          }
+        }
+      }
+    },
+    "table.rowHeight" : {
+      "comment" : "The label of command table.rowHeight (Table Layout › Cell Size)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height"
+          }
+        }
+      }
+    },
+    "table.selectCells" : {
+      "comment" : "The label of command table.selectCells",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Cells"
+          }
+        }
+      }
+    },
+    "table.split" : {
+      "comment" : "The label of command table.split (Table Layout › Merge)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split Cells"
+          }
+        }
+      }
+    },
+    "table.style" : {
+      "comment" : "The label of command table.style (Table Design › Table Styles)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Styles"
+          }
+        }
+      }
+    },
+    "text.autocorrect" : {
+      "comment" : "The label of command text.autocorrect (Tools)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AutoCorrect Options"
+          }
+        }
+      }
+    },
+    "text.commit" : {
+      "comment" : "The label of command text.commit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commit Composition"
+          }
+        }
+      }
+    },
+    "text.compose" : {
+      "comment" : "The label of command text.compose",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compose Text"
+          }
+        }
+      }
+    },
+    "text.delete" : {
+      "comment" : "The label of command text.delete",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Text"
+          }
+        }
+      }
+    },
+    "text.deleteSurrounding" : {
+      "comment" : "The label of command text.deleteSurrounding",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Surrounding Text"
+          }
+        }
+      }
+    },
+    "text.edit" : {
+      "comment" : "The label of command text.edit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Text"
+          }
+        }
+      }
+    },
+    "text.exit" : {
+      "comment" : "The label of command text.exit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop Editing Text"
+          }
+        }
+      }
+    },
+    "text.find" : {
+      "comment" : "The label of command text.find (Home › Editing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find"
+          }
+        }
+      }
+    },
+    "text.get" : {
+      "comment" : "The label of command text.get",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Text"
+          }
+        }
+      }
+    },
+    "text.insert" : {
+      "comment" : "The label of command text.insert",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type Text"
+          }
+        }
+      }
+    },
+    "text.move" : {
+      "comment" : "The label of command text.move",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Insertion Point"
+          }
+        }
+      }
+    },
+    "text.replace" : {
+      "comment" : "The label of command text.replace (Home › Editing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
+    },
+    "text.select" : {
+      "comment" : "The label of command text.select",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Text"
+          }
+        }
+      }
+    },
+    "text.selectAll" : {
+      "comment" : "The label of command text.selectAll",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All Text"
+          }
+        }
+      }
+    },
+    "text.selectParagraph" : {
+      "comment" : "The label of command text.selectParagraph",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Paragraph"
+          }
+        }
+      }
+    },
+    "text.selectWord" : {
+      "comment" : "The label of command text.selectWord",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Word"
+          }
+        }
+      }
+    },
+    "text.set" : {
+      "comment" : "The label of command text.set",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Text"
+          }
+        }
+      }
+    },
+    "transition.applyAll" : {
+      "comment" : "The label of command transition.applyAll (Transitions › Timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply To All"
+          }
+        }
+      }
+    },
+    "transition.list" : {
+      "comment" : "The label of command transition.list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transition Gallery"
+          }
+        }
+      }
+    },
+    "transition.options" : {
+      "comment" : "The label of command transition.options (Transitions › Transition to This Slide)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effect Options"
+          }
+        }
+      }
+    },
+    "transition.set" : {
+      "comment" : "The label of command transition.set (Transitions › Transition to This Slide)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transition"
+          }
+        }
+      }
+    },
+    "transition.sound" : {
+      "comment" : "The label of command transition.sound (Transitions › Timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound"
+          }
+        }
+      }
+    },
+    "transition.timing" : {
+      "comment" : "The label of command transition.timing (Transitions › Timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timing"
+          }
+        }
+      }
+    },
+    "view.closeMaster" : {
+      "comment" : "The label of command view.closeMaster (Slide Master › Close)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Master View"
+          }
+        }
+      }
+    },
+    "view.collapseRibbon" : {
+      "comment" : "The label of the app's command view.collapseRibbon",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse the Ribbon"
+          }
+        }
+      }
+    },
+    "view.dark" : {
+      "comment" : "The label of the app's command view.dark",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark Mode"
+          }
+        }
+      }
+    },
+    "view.fit" : {
+      "comment" : "The label of the app's command view.fit",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit to Window"
+          }
+        }
+      }
+    },
+    "view.grayscale" : {
+      "comment" : "The label of the app's command view.grayscale",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grayscale"
+          }
+        }
+      }
+    },
+    "view.gridlines" : {
+      "comment" : "The label of the app's command view.gridlines",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gridlines"
+          }
+        }
+      }
+    },
+    "view.gridOptions" : {
+      "comment" : "The label of the app's command view.gridOptions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid Options…"
+          }
+        }
+      }
+    },
+    "view.guides" : {
+      "comment" : "The label of the app's command view.guides",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guides"
+          }
+        }
+      }
+    },
+    "view.handoutMaster" : {
+      "comment" : "The label of command view.handoutMaster (View › Master Views)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handout Master"
+          }
+        }
+      }
+    },
+    "view.newWindow" : {
+      "comment" : "The label of the app's command view.newWindow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Window"
+          }
+        }
+      }
+    },
+    "view.normal" : {
+      "comment" : "The label of the app's command view.normal",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
+    "view.notes" : {
+      "comment" : "The label of the app's command view.notes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        }
+      }
+    },
+    "view.notesMaster" : {
+      "comment" : "The label of command view.notesMaster (View › Master Views)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Master"
+          }
+        }
+      }
+    },
+    "view.notesPage" : {
+      "comment" : "The label of the app's command view.notesPage",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Page"
+          }
+        }
+      }
+    },
+    "view.outline" : {
+      "comment" : "The label of the app's command view.outline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outline View"
+          }
+        }
+      }
+    },
+    "view.pane" : {
+      "comment" : "The label of the app's command view.pane",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task Pane"
+          }
+        }
+      }
+    },
+    "view.reading" : {
+      "comment" : "The label of the app's command view.reading",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading View"
+          }
+        }
+      }
+    },
+    "view.ruler" : {
+      "comment" : "The label of the app's command view.ruler",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruler"
+          }
+        }
+      }
+    },
+    "view.slideMaster" : {
+      "comment" : "The label of command view.slideMaster (View › Master Views)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Master"
+          }
+        }
+      }
+    },
+    "view.sorter" : {
+      "comment" : "The label of the app's command view.sorter",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Sorter"
+          }
+        }
+      }
+    },
+    "view.tab" : {
+      "comment" : "The label of the app's command view.tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon Tab"
+          }
+        }
+      }
+    },
+    "view.zoom" : {
+      "comment" : "The label of the app's command view.zoom",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Zoom"
+          }
+        }
+      }
+    },
+    "view.zoomDialog" : {
+      "comment" : "The label of the app's command view.zoomDialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom…"
+          }
+        }
+      }
+    },
+    "view.zoomIn" : {
+      "comment" : "The label of the app's command view.zoomIn",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom In"
+          }
+        }
+      }
+    },
+    "view.zoomOut" : {
+      "comment" : "The label of the app's command view.zoomOut",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom Out"
+          }
+        }
+      }
+    },
+    "window.next" : {
+      "comment" : "The label of command window.next (Window)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Window"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

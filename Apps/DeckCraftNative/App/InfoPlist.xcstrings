@@ -1,0 +1,126 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "The app's name, as Finder and the menu bar show it",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeckCraftNative"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "The app's short name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeckCraftNative"
+          }
+        }
+      }
+    },
+    "DeckCraft Presentation" : {
+      "comment" : "The description of the file type ai.storyteller.deckcraft.presentation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeckCraft Presentation"
+          }
+        }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "comment" : "The copyright line in About and Finder's Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A native port of DeckCraft (MIT OR Apache-2.0)."
+          }
+        }
+      }
+    },
+    "Open XML Presentation" : {
+      "comment" : "The description of the file type org.openxmlformats.presentationml.presentation",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open XML Presentation"
+          }
+        }
+      }
+    },
+    "Open XML Presentation Template" : {
+      "comment" : "The description of the file type org.openxmlformats.presentationml.template",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open XML Presentation Template"
+          }
+        }
+      }
+    },
+    "Open XML Slide Show" : {
+      "comment" : "The description of the file type org.openxmlformats.presentationml.slideshow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open XML Slide Show"
+          }
+        }
+      }
+    },
+    "PowerPoint Presentation" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint Presentation"
+          }
+        }
+      }
+    },
+    "PowerPoint Slide Show" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint Slide Show"
+          }
+        }
+      }
+    },
+    "PowerPoint Template" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint Template"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

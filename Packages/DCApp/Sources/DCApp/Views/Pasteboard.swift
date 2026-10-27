@@ -178,7 +178,7 @@ final class PasteboardBridge {
         if board.availableType(from: [.png, .tiff, .pdf]) == nil, let url = imageFile() {
             let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
             guard size > 0, size <= 256 << 20, let data = try? Data(contentsOf: url) else {
-                return fail(model, "the copied picture file can't be read")
+                return fail(model, String(localized: "the copied picture file can't be read", bundle: .module, comment: "Status message after a failed paste"))
             }
             return model.run("insert.picture", ["name": .string(url.lastPathComponent), "data": .string(Cmd.base64Encode([UInt8](data)))])
         }
@@ -188,16 +188,16 @@ final class PasteboardBridge {
             png = d
         } else if let d = board.data(forType: .tiff), let rep = NSBitmapImageRep(data: d) {
             if let problem = PasteboardLogic.imageProblem(width: rep.pixelsWide, height: rep.pixelsHigh) { return fail(model, problem) }
-            guard let out = rep.representation(using: .png, properties: [:]) else { return fail(model, "the pasted image can't be read") }
+            guard let out = rep.representation(using: .png, properties: [:]) else { return fail(model, String(localized: "the pasted image can't be read", bundle: .module, comment: "Status message after a failed paste")) }
             png = out
         } else if let d = board.data(forType: .pdf), let rep = NSPDFImageRep(data: d) {
             // A PDF picture (another app's vector copy) is drawn at twice its size.
             let w = Int((rep.bounds.width * 2).rounded()), h = Int((rep.bounds.height * 2).rounded())
             if let problem = PasteboardLogic.imageProblem(width: w, height: h) { return fail(model, problem) }
-            guard let out = Self.rasterize(rep, w, h) else { return fail(model, "the pasted image can't be read") }
+            guard let out = Self.rasterize(rep, w, h) else { return fail(model, String(localized: "the pasted image can't be read", bundle: .module, comment: "Status message after a failed paste")) }
             png = out
         } else {
-            return fail(model, "the pasteboard has no picture")
+            return fail(model, String(localized: "the pasteboard has no picture", bundle: .module, comment: "Status message after a failed paste"))
         }
         return model.run("insert.picture", ["name": "Pasted image.png", "data": .string(Cmd.base64Encode([UInt8](png)))])
     }

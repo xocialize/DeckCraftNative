@@ -34,13 +34,13 @@ struct SlideShowSection: View {
 
     var body: some View {
         let show = ctl.doc?.doc.show
-        Section("Slide Show") {
-            Toggle("Presenter View", isOn: Binding(get: { ctl.model.ui.presenterView }, set: { ctl.run("show.presenter", ["on": .bool($0)]) }))
-            Toggle("Use Timings", isOn: Binding(get: { show?.useTimings ?? true }, set: { ctl.run("show.setup", ["useTimings": .bool($0)]) }))
-            Toggle("Play Narrations", isOn: Binding(get: { !(show?.withoutNarration ?? false) }, set: { ctl.run("show.setup", ["noNarration": .bool(!$0)]) }))
-            Toggle("Show Media Controls", isOn: Binding(get: { show?.showMediaControls ?? true }, set: { ctl.run("show.setup", ["showMediaControls": .bool($0)]) }))
-            Button("Set Up Slide Show…") { ctl.run("app.dialog", ["id": "setupShow"]) }
-            Button("Custom Shows…") { ctl.run("app.dialog", ["id": "customShow"]) }
+        Section(String(localized: "Slide Show", bundle: .module)) {
+            Toggle(String(localized: "Presenter View", bundle: .module), isOn: Binding(get: { ctl.model.ui.presenterView }, set: { ctl.run("show.presenter", ["on": .bool($0)]) }))
+            Toggle(String(localized: "Use Timings", bundle: .module), isOn: Binding(get: { show?.useTimings ?? true }, set: { ctl.run("show.setup", ["useTimings": .bool($0)]) }))
+            Toggle(String(localized: "Play Narrations", bundle: .module), isOn: Binding(get: { !(show?.withoutNarration ?? false) }, set: { ctl.run("show.setup", ["noNarration": .bool(!$0)]) }))
+            Toggle(String(localized: "Show Media Controls", bundle: .module), isOn: Binding(get: { show?.showMediaControls ?? true }, set: { ctl.run("show.setup", ["showMediaControls": .bool($0)]) }))
+            Button(String(localized: "Set Up Slide Show…", bundle: .module)) { ctl.run("app.dialog", ["id": "setupShow"]) }
+            Button(String(localized: "Custom Shows…", bundle: .module)) { ctl.run("app.dialog", ["id": "customShow"]) }
         }
     }
 }
@@ -52,20 +52,21 @@ struct InsertZoomSection: View {
     @State private var picked: Set<Int> = []
 
     var body: some View {
-        Section("Insert Zoom") {
-            Picker("Zoom", selection: Binding(get: { kind }, set: { kind = $0; picked = [] })) {
+        Section(String(localized: "Insert Zoom", bundle: .module)) {
+            Picker(String(localized: "Zoom", bundle: .module), selection: Binding(get: { kind }, set: { kind = $0; picked = [] })) {
                 ForEach(InspectorShape.zoomKinds, id: \.1) { Text($0.0).tag($0.1) }
             }
             if let doc = ctl.doc?.doc {
                 let items = InspectorShape.zoomItems(doc, kind)
                 if items.isEmpty {
-                    InspectorNote(text: kind == "section" ? "The presentation has no sections. Add one with New Slide ▸ Add Section." : "No slides.")
+                    InspectorNote(text: kind == "section" ? String(localized: "The presentation has no sections. Add one with New Slide ▸ Add Section.", bundle: .module)
+                        : String(localized: "No slides.", bundle: .module))
                 }
                 ForEach(Array(items.enumerated()), id: \.offset) { i, label in
                     Toggle(label, isOn: Binding(get: { picked.contains(i) }, set: { if $0 { picked.insert(i) } else { picked.remove(i) } }))
                 }
             }
-            Button("Insert") {
+            Button(String(localized: "Insert", bundle: .module)) {
                 if let p = InspectorShape.zoomParams(kind, picked) {
                     ctl.run("insert.zoom", p)
                     picked = []
@@ -83,20 +84,20 @@ struct SlideLayoutSection: View {
         let st = ctl.doc
         let layouts = st?.doc.masters.first?.layouts ?? []
         let current = st?.currentSlide?.layout
-        Section("Slide") {
-            Picker("Layout", selection: Binding(get: { current?.rawValue ?? 0 }, set: { ctl.run("slide.layout", ["layout": .integer($0)]) })) {
-                if !layouts.contains(where: { $0.id == current }) { Text("—").tag(current?.rawValue ?? 0) }
+        Section(String(localized: "Slide", bundle: .module)) {
+            Picker(String(localized: "Layout", bundle: .module), selection: Binding(get: { current?.rawValue ?? 0 }, set: { ctl.run("slide.layout", ["layout": .integer($0)]) })) {
+                if !layouts.contains(where: { $0.id == current }) { Text(verbatim: "—").tag(current?.rawValue ?? 0) }
                 ForEach(layouts, id: \.id) { Text($0.name).tag($0.id.rawValue) }
             }
             .disabled(!ctl.enabled("slide.layout"))
             HStack {
-                Button("Reset Slide") { ctl.run("slide.reset") }.disabled(!ctl.enabled("slide.reset"))
-                Toggle("Hide Slide", isOn: Binding(get: { st?.currentSlide?.hidden ?? false }, set: { _ in ctl.run("slide.hide") }))
+                Button(String(localized: "Reset Slide", bundle: .module)) { ctl.run("slide.reset") }.disabled(!ctl.enabled("slide.reset"))
+                Toggle(String(localized: "Hide Slide", bundle: .module), isOn: Binding(get: { st?.currentSlide?.hidden ?? false }, set: { _ in ctl.run("slide.hide") }))
             }
-            Menu("Slide Size") {
-                Button("Standard (4:3)") { ctl.run("design.slideSize", ["preset": "standard"]) }
-                Button("Widescreen (16:9)") { ctl.run("design.slideSize", ["preset": "widescreen"]) }
-                Button("Page Setup…") { ctl.run("app.dialog", ["id": "slideSize"]) }
+            Menu(String(localized: "Slide Size", bundle: .module)) {
+                Button(String(localized: "Standard (4:3)", bundle: .module)) { ctl.run("design.slideSize", ["preset": "standard"]) }
+                Button(String(localized: "Widescreen (16:9)", bundle: .module)) { ctl.run("design.slideSize", ["preset": "widescreen"]) }
+                Button(String(localized: "Page Setup…", bundle: .module)) { ctl.run("app.dialog", ["id": "slideSize"]) }
             }
         }
     }
@@ -108,19 +109,19 @@ struct ThemesSection: View {
     var body: some View {
         let themes = builtinThemes()
         let theme = ctl.doc?.doc.masters.first?.theme
-        Section("Themes") {
+        Section(String(localized: "Themes", bundle: .module)) {
             TileGallery(count: themes.count, columns: 3, selected: themes.firstIndex { $0.name == theme?.name }, tip: { themes.at($0)?.name ?? "" },
                         tile: { ThemeTile(colors: themes.at($0)?.colors ?? Theme.default.colors) },
                         pick: { if let t = themes.at($0) { ctl.run("design.theme", ["name": .string(t.name)]) } })
-            Button("Browse for Themes…") { ctl.run("app.browseThemeDialog") }
+            Button(String(localized: "Browse for Themes…", bundle: .module)) { ctl.run("app.browseThemeDialog") }
         }
         if let theme {
             let variants = themeVariants(theme)
-            Section("Variants") {
+            Section(String(localized: "Variants", bundle: .module)) {
                 TileGallery(count: variants.count, columns: 4, selected: variants.firstIndex { $0.colors == theme.colors.colors }, tip: { variants.at($0)?.name ?? "" },
                             tile: { ThemeTile(colors: variants.at($0) ?? theme.colors) },
                             pick: { ctl.run("design.variant", ["index": .integer($0)]) })
-                Picker("Colors", selection: Binding(get: { theme.colors.name }, set: { name in
+                Picker(String(localized: "Colors", bundle: .module), selection: Binding(get: { theme.colors.name }, set: { name in
                     if name == "\u{0}customize" { ctl.run("design.colors") } else { ctl.run("design.colors", ["name": .string(name)]) }
                 })) {
                     if !builtinColorSchemes().contains(where: { $0.name == theme.colors.name }) { Text(theme.colors.name).tag(theme.colors.name) }
@@ -128,24 +129,24 @@ struct ThemesSection: View {
                         Label { Text(cs.name) } icon: { Image(nsImage: Self.schemeImage(cs)) }.tag(cs.name)
                     }
                     Divider()
-                    Text("Customize Colors…").tag("\u{0}customize")
+                    Text("Customize Colors…", bundle: .module).tag("\u{0}customize")
                 }
-                Picker("Fonts", selection: Binding(get: { theme.fonts.name }, set: { name in
+                Picker(String(localized: "Fonts", bundle: .module), selection: Binding(get: { theme.fonts.name }, set: { name in
                     if name == "\u{0}customize" { ctl.run("design.fonts") } else { ctl.run("design.fonts", ["name": .string(name)]) }
                 })) {
                     if !builtinFontSchemes().contains(where: { $0.name == theme.fonts.name }) { Text(theme.fonts.name).tag(theme.fonts.name) }
-                    ForEach(builtinFontSchemes(), id: \.name) { fs in Text("\(fs.name) — \(fs.major.latin) / \(fs.minor.latin)").tag(fs.name) }
+                    ForEach(builtinFontSchemes(), id: \.name) { fs in Text(verbatim: "\(fs.name) — \(fs.major.latin) / \(fs.minor.latin)").tag(fs.name) }
                     Divider()
-                    Text("Customize Fonts…").tag("\u{0}customize")
+                    Text("Customize Fonts…", bundle: .module).tag("\u{0}customize")
                 }
-                Picker("Effects", selection: Binding(get: { theme.format.name }, set: { ctl.run("design.effects", ["name": .string($0)]) })) {
+                Picker(String(localized: "Effects", bundle: .module), selection: Binding(get: { theme.format.name }, set: { ctl.run("design.effects", ["name": .string($0)]) })) {
                     if !builtinFormatSchemes().contains(where: { $0.name == theme.format.name }) { Text(theme.format.name).tag(theme.format.name) }
                     ForEach(builtinFormatSchemes(), id: \.name) { Text($0.name).tag($0.name) }
                 }
-                Menu("Background Styles") {
-                    ForEach(1 ... 12, id: \.self) { i in Button("Style \(i)") { ctl.run("design.background", ["style": .integer(i), "all": true]) } }
+                Menu(String(localized: "Background Styles", bundle: .module)) {
+                    ForEach(1 ... 12, id: \.self) { i in Button(String(localized: "Style \(i)", bundle: .module)) { ctl.run("design.background", ["style": .integer(i), "all": true]) } }
                     Divider()
-                    Button("Reset Slide Background") { ctl.run("design.background", ["reset": true]) }
+                    Button(String(localized: "Reset Slide Background", bundle: .module)) { ctl.run("design.background", ["reset": true]) }
                 }
             }
         }
@@ -174,8 +175,8 @@ struct BackgroundSection: View {
         let scheme = InspectorColors.scheme(ctl.session)
         let bg = ctl.doc?.currentSlide?.background
         let fill = InspectorFill.backgroundFill(bg)
-        Section("Format Background") {
-            Picker("Fill", selection: Binding(get: { InspectorFill.backgroundKind(bg) }, set: { k in
+        Section(String(localized: "Format Background", bundle: .module)) {
+            Picker(String(localized: "Fill", bundle: .module), selection: Binding(get: { InspectorFill.backgroundKind(bg) }, set: { k in
                 guard k != InspectorFill.backgroundKind(bg) else { return }
                 if k == "picture" {
                     if let p = pickPictureBase64() { ctl.run("design.background", ["picture": .string(p.data), "name": .string(p.name)]) }
@@ -188,10 +189,10 @@ struct BackgroundSection: View {
             .pickerStyle(.radioGroup)
             switch fill {
             case .solid(let color)?:
-                ColorButton(label: "Color", color: color.resolve(scheme, nil), scheme: scheme) { c in
+                ColorButton(label: String(localized: "Color", bundle: .module), color: color.resolve(scheme, nil), scheme: scheme) { c in
                     if let c { ctl.run("design.background", ["color": InspectorColors.param(c)]) }
                 }
-                CommitSlider(label: "Transparency", value: (1 - color.alpha) * 100, range: 0 ... 100, suffix: "%") {
+                CommitSlider(label: String(localized: "Transparency", bundle: .module), value: (1 - color.alpha) * 100, range: 0 ... 100, suffix: "%") {
                     ctl.run("design.background", ["transparency": .num(Swift.min(Swift.max($0 / 100, 0), 1))])
                 }
             case .gradient(let g)?:
@@ -199,7 +200,7 @@ struct BackgroundSection: View {
             case .pattern(let pt)?:
                 PatternEditor(pattern: pt, scheme: scheme) { ctl.run("design.background", ["pattern": InspectorFill.patternJSON($0)]) }
             case .picture(let pf)?:
-                CommitSlider(label: "Transparency", value: (1 - (pf.alpha ?? 1)) * 100, range: 0 ... 100, suffix: "%") {
+                CommitSlider(label: String(localized: "Transparency", bundle: .module), value: (1 - (pf.alpha ?? 1)) * 100, range: 0 ... 100, suffix: "%") {
                     ctl.run("design.background", ["transparency": .num(Swift.min(Swift.max($0 / 100, 0), 1))])
                 }
                 PictureFillOptions(fill: pf) { ctl.run("design.background", ["pictureProps": $0]) } replace: {
@@ -208,13 +209,13 @@ struct BackgroundSection: View {
             default:
                 EmptyView()
             }
-            Toggle("Hide background graphics", isOn: Binding(get: { !(ctl.doc?.currentSlide?.showMasterShapes ?? true) }, set: {
+            Toggle(String(localized: "Hide background graphics", bundle: .module), isOn: Binding(get: { !(ctl.doc?.currentSlide?.showMasterShapes ?? true) }, set: {
                 ctl.run("design.hideBackgroundGraphics", ["hide": .bool($0)])
             }))
             HStack {
-                Button("Apply to All") { if let p = InspectorFill.applyToAllParams(bg) { ctl.run("design.background", p) } }
+                Button(String(localized: "Apply to All", bundle: .module)) { if let p = InspectorFill.applyToAllParams(bg) { ctl.run("design.background", p) } }
                     .disabled(InspectorFill.applyToAllParams(bg) == nil)
-                Button("Reset Background") { ctl.run("design.background", ["reset": true]) }
+                Button(String(localized: "Reset Background", bundle: .module)) { ctl.run("design.background", ["reset": true]) }
             }
         }
     }
@@ -228,18 +229,18 @@ struct DesignIdeasSection: View {
     @State private var cache: (key: String, images: [String: NSImage])?
 
     var body: some View {
-        Section("Design Ideas") {
-            DisclosureGroup("Ideas for this slide", isExpanded: Binding(get: { expanded || ctl.model.ui.pane == "designer" }, set: { expanded = $0 })) {
+        Section(String(localized: "Design Ideas", bundle: .module)) {
+            DisclosureGroup(String(localized: "Ideas for this slide", bundle: .module), isExpanded: Binding(get: { expanded || ctl.model.ui.pane == "designer" }, set: { expanded = $0 })) {
                 if let st = ctl.doc {
                     let idx = st.selection.slide
                     let ideas = IdeasCommands.ideasFor(st.doc, idx)
                     let images = thumbnails(st, idx, ideas)
-                    InspectorNote(text: "Pick a design for this slide. Ideas are generated on your device.")
-                    if ideas.isEmpty { InspectorNote(text: "Add a title with a picture or some text to get layout ideas.") }
+                    InspectorNote(text: String(localized: "Pick a design for this slide. Ideas are generated on your device.", bundle: .module))
+                    if ideas.isEmpty { InspectorNote(text: String(localized: "Add a title with a picture or some text to get layout ideas.", bundle: .module)) }
                     ForEach(ideas, id: \.id) { idea in
                         thumb(images["layout:\(idea.id)"], idea.label) { ctl.run("design.applyIdea", ["id": .string(idea.id)]) }
                     }
-                    InspectorNote(text: "Themes (whole presentation)")
+                    InspectorNote(text: String(localized: "Themes (whole presentation)", bundle: .module))
                     ForEach(builtinThemes(), id: \.name) { th in
                         thumb(images["theme:\(th.name)"], th.name) { ctl.run("design.theme", ["name": .string(th.name)]) }
                     }
@@ -292,54 +293,61 @@ struct MasterViewSections: View {
         let ctx = ctl.contextual()
         if ctx.contains("Slide Master") {
             let (preserve, title, footers) = masterChecks
-            Section("Slide Master") {
+            Section(String(localized: "Slide Master", bundle: .module)) {
                 HStack {
-                    Button("Insert Layout") { ctl.run("master.insertLayout") }
-                    Button("Delete") { ctl.run("master.deleteLayout") }.disabled(!ctl.enabled("master.deleteLayout"))
-                    Button("Rename…") { ctl.run("app.dialog", ["id": "renameLayout"]) }
+                    Button(String(localized: "Insert Layout", bundle: .module)) { ctl.run("master.insertLayout") }
+                    Button(String(localized: "Delete", bundle: .module, comment: "Verb: delete the layout")) { ctl.run("master.deleteLayout") }.disabled(!ctl.enabled("master.deleteLayout"))
+                    Button(String(localized: "Rename…", bundle: .module)) { ctl.run("app.dialog", ["id": "renameLayout"]) }
                 }
-                Toggle("Preserve", isOn: Binding(get: { preserve }, set: { ctl.run("master.preserve", ["preserve": .bool($0)]) }))
-                Toggle("Title", isOn: Binding(get: { title }, set: { ctl.run("master.placeholders", ["title": .bool($0)]) }))
-                Toggle("Footers", isOn: Binding(get: { footers }, set: { ctl.run("master.placeholders", ["footers": .bool($0)]) }))
-                Menu("Insert Placeholder") {
-                    ForEach([("Content", "content"), ("Text", "text"), ("Picture", "picture"), ("Chart", "chart"), ("Table", "table"), ("Media", "media")], id: \.1) { l, k in
+                Toggle(String(localized: "Preserve", bundle: .module), isOn: Binding(get: { preserve }, set: { ctl.run("master.preserve", ["preserve": .bool($0)]) }))
+                Toggle(String(localized: "Title", bundle: .module, comment: "Slide Master: show the layout's title placeholder"), isOn: Binding(get: { title }, set: { ctl.run("master.placeholders", ["title": .bool($0)]) }))
+                Toggle(String(localized: "Footers", bundle: .module), isOn: Binding(get: { footers }, set: { ctl.run("master.placeholders", ["footers": .bool($0)]) }))
+                Menu(String(localized: "Insert Placeholder", bundle: .module)) {
+                    ForEach([
+                        (String(localized: "Content", bundle: .module, comment: "A placeholder kind"), "content"), (String(localized: "Text", bundle: .module, comment: "A placeholder kind"), "text"),
+                        (String(localized: "Picture", bundle: .module, comment: "A placeholder kind"), "picture"), (String(localized: "Chart", bundle: .module, comment: "A placeholder kind"), "chart"),
+                        (String(localized: "Table", bundle: .module, comment: "A placeholder kind"), "table"), (String(localized: "Media", bundle: .module, comment: "A placeholder kind"), "media"),
+                    ], id: \.1) { l, k in
                         Button(l) { ctl.run("master.insertPlaceholder", ["kind": .string(k)]) }
                     }
                 }
-                Button("Close Master View") { ctl.run("view.closeMaster") }
+                Button(String(localized: "Close Master View", bundle: .module)) { ctl.run("view.closeMaster") }
             }
         } else if ctx.contains("Notes Master") {
-            Section("Notes Master") {
-                ForEach([("Header", "header", PhType.header), ("Slide Image", "slideImage", .slideImage), ("Footer", "footer", .footer),
-                         ("Date", "date", .date), ("Body", "body", .body), ("Page Number", "pageNumber", .slideNum)], id: \.1) { l, key, k in
+            Section(String(localized: "Notes Master", bundle: .module)) {
+                ForEach([(String(localized: "Header", bundle: .module), "header", PhType.header), (String(localized: "Slide Image", bundle: .module), "slideImage", .slideImage),
+                         (String(localized: "Footer", bundle: .module), "footer", .footer), (String(localized: "Date", bundle: .module), "date", .date),
+                         (String(localized: "Body", bundle: .module, comment: "The notes master's body placeholder"), "body", .body),
+                         (String(localized: "Page Number", bundle: .module), "pageNumber", .slideNum)], id: \.1) { l, key, k in
                     Toggle(l, isOn: Binding(get: { shown(ctl.doc?.doc.notesMaster, k) }, set: { v in
                         var p: JSON = .emptyObject
                         p.set(key, .bool(v))
                         ctl.run("notes.placeholders", p)
                     }))
                 }
-                Button("Close Master View") { ctl.run("view.closeMaster") }
+                Button(String(localized: "Close Master View", bundle: .module)) { ctl.run("view.closeMaster") }
             }
         } else if ctx.contains("Handout Master") {
-            Section("Handout Master") {
-                Picker("Slides Per Page", selection: Binding(get: { ctl.model.ui.handoutPerPage }, set: { ctl.model.ui.handoutPerPage = $0 })) {
-                    ForEach([1, 2, 3, 4, 6, 9], id: \.self) { n in Text("\(n) Slide\(n == 1 ? "" : "s")").tag(n) }
+            Section(String(localized: "Handout Master", bundle: .module)) {
+                Picker(String(localized: "Slides Per Page", bundle: .module), selection: Binding(get: { ctl.model.ui.handoutPerPage }, set: { ctl.model.ui.handoutPerPage = $0 })) {
+                    ForEach([1, 2, 3, 4, 6, 9], id: \.self) { n in Text("\(n) Slides", bundle: .module, comment: "Handout slides per page").tag(n) }
                 }
-                ForEach([("Header", "header", PhType.header), ("Date", "date", .date), ("Footer", "footer", .footer), ("Page Number", "pageNumber", .slideNum)], id: \.1) { l, key, k in
+                ForEach([(String(localized: "Header", bundle: .module), "header", PhType.header), (String(localized: "Date", bundle: .module), "date", .date),
+                         (String(localized: "Footer", bundle: .module), "footer", .footer), (String(localized: "Page Number", bundle: .module), "pageNumber", .slideNum)], id: \.1) { l, key, k in
                     Toggle(l, isOn: Binding(get: { shown(ctl.doc?.doc.handoutMaster, k) }, set: { v in
                         var p: JSON = .emptyObject
                         p.set(key, .bool(v))
                         ctl.run("handout.placeholders", p)
                     }))
                 }
-                Button("Close Master View") { ctl.run("view.closeMaster") }
+                Button(String(localized: "Close Master View", bundle: .module)) { ctl.run("view.closeMaster") }
             }
         } else {
-            Section("Master Views") {
-                Menu("Edit Master") {
-                    Button("Slide Master") { ctl.run("view.slideMaster") }
-                    Button("Handout Master") { ctl.run("view.handoutMaster") }
-                    Button("Notes Master") { ctl.run("view.notesMaster") }
+            Section(String(localized: "Master Views", bundle: .module)) {
+                Menu(String(localized: "Edit Master", bundle: .module)) {
+                    Button(String(localized: "Slide Master", bundle: .module)) { ctl.run("view.slideMaster") }
+                    Button(String(localized: "Handout Master", bundle: .module)) { ctl.run("view.handoutMaster") }
+                    Button(String(localized: "Notes Master", bundle: .module)) { ctl.run("view.notesMaster") }
                 }
             }
         }

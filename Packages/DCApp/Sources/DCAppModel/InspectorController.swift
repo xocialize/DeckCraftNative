@@ -17,11 +17,11 @@ public enum InspectorTab: String, Sendable, CaseIterable {
 
     public var label: String {
         switch self {
-        case .format: "Format"
-        case .arrange: "Arrange"
-        case .animate: "Animate"
-        case .slide: "Slide"
-        case .review: "Review"
+        case .format: L10n.text("Format")
+        case .arrange: L10n.text("Arrange")
+        case .animate: L10n.text("Animate")
+        case .slide: L10n.text("Slide")
+        case .review: L10n.text("Review")
         }
     }
 
@@ -136,12 +136,12 @@ public final class InspectorController {
     /// picture is selected and the contextual Table, Chart, SmartArt and Media tabs.
     public func formatTabs() -> [(id: String, label: String)] {
         let ctx = contextual()
-        var tabs: [(String, String)] = [("fill", "Fill & Line"), ("effects", "Effects"), ("size", "Size"), ("text", "Text")]
-        if ctx.contains("Picture Format") { tabs.append(("picture", "Picture")) }
-        if ctx.contains("Table Design") { tabs.append(("table", "Table")) }
-        if ctx.contains("Chart Design") { tabs.append(("chart", "Chart")) }
-        if ctx.contains("SmartArt Design") { tabs.append(("smartart", "SmartArt")) }
-        if ctx.contains("Playback") { tabs.append(("media", "Playback")) }
+        var tabs: [(String, String)] = [("fill", L10n.text("Fill & Line")), ("effects", L10n.text("Effects")), ("size", L10n.text("Size")), ("text", L10n.text("Text"))]
+        if ctx.contains("Picture Format") { tabs.append(("picture", L10n.text("Picture"))) }
+        if ctx.contains("Table Design") { tabs.append(("table", L10n.text("Table"))) }
+        if ctx.contains("Chart Design") { tabs.append(("chart", L10n.text("Chart"))) }
+        if ctx.contains("SmartArt Design") { tabs.append(("smartart", L10n.text("SmartArt"))) }
+        if ctx.contains("Playback") { tabs.append(("media", L10n.text("Playback"))) }
         return tabs
     }
 

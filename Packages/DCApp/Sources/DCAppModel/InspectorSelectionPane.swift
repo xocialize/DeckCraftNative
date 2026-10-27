@@ -149,7 +149,7 @@ public enum SelectionPane {
 
     /// The order commands of the row's context menu.
     public static let orderCommands: [(String, String)] = [
-        ("Bring to Front", "arrange.bringToFront"), ("Bring Forward", "arrange.bringForward"),
-        ("Send Backward", "arrange.sendBackward"), ("Send to Back", "arrange.sendToBack"),
+        (L10n.text("Bring to Front"), "arrange.bringToFront"), (L10n.text("Bring Forward"), "arrange.bringForward"),
+        (L10n.text("Send Backward"), "arrange.sendBackward"), (L10n.text("Send to Back"), "arrange.sendToBack"),
     ]
 }

@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ (first %lld of %lld slides)" : {
+      "comment" : "Quick Look title of a preview that shows only the first slides: title, shown, total",
+      "extractionState" : "manual"
+    },
+    "%@ (without pictures)" : {
+      "comment" : "Quick Look title of a preview of a file too large to read its pictures",
+      "extractionState" : "manual"
+    },
+    "DeckCraftNative can't open password-protected presentations yet." : {
+      "comment" : "Quick Look preview detail for an encrypted file",
+      "extractionState" : "manual"
+    },
+    "“%@” can't be previewed." : {
+      "comment" : "Quick Look preview headline when drawing the slides failed",
+      "extractionState" : "manual"
+    },
+    "“%@” couldn't be read." : {
+      "comment" : "Quick Look preview headline: the file couldn't be opened",
+      "extractionState" : "manual"
+    },
+    "“%@” has no slides." : {
+      "comment" : "Quick Look preview of an empty presentation",
+      "extractionState" : "manual"
+    },
+    "“%@” is password-protected." : {
+      "comment" : "Quick Look preview headline: an encrypted file",
+      "extractionState" : "manual"
+    },
+    "“%@” is too large to preview (%@)." : {
+      "comment" : "Quick Look preview headline: name, file size",
+      "extractionState" : "manual"
+    },
+    "“%@” isn't a presentation DeckCraftNative can read." : {
+      "comment" : "Quick Look preview headline: not a presentation",
+      "extractionState" : "manual"
+    }
+  },
+  "version" : "1.0"
+}

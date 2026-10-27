@@ -17,7 +17,8 @@ import Testing
             #expect(exports.first?.id == "app.exportDialog")
         }
         for c in UICommands.all where !Cmd.needsArguments(c.params) {
-            let same = Palette.items(session, c.label.lowercased()).filter { $0.label == c.label }
+            // The palette shows the Commands catalog's label (Wave 6: "About DeckCraft" is "About DeckCraftNative").
+            let same = Palette.items(session, c.label.lowercased()).filter { $0.label == L10n.commandLabel(c.id, c.label) }
             #expect(same.count == 1, "\(c.label)")
             #expect(same.first?.id == c.id, "\(c.label)")
         }

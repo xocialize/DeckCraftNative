@@ -29,7 +29,7 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
     let collection = SorterCollectionView()
     let layout = NSCollectionViewFlowLayout()
     let scroll = NSScrollView()
-    let addSection = NSButton(title: "Add Section", target: nil, action: nil)
+    let addSection = NSButton(title: String(localized: "Add Section", bundle: .module), target: nil, action: nil)
     /// The groups shown: a section (or none) and its slides; a folded section shows none.
     private(set) var groups: [(section: Int?, slides: [Int])] = []
     private var signature: [String] = []
@@ -60,7 +60,7 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
         collection.registerForDraggedTypes([.deckCraftSlideRow, .deckCraftSectionRow])
         collection.setDraggingSourceOperationMask(.move, forLocal: true)
         collection.controller = self
-        collection.setAccessibilityLabel("Slide Sorter")
+        collection.setAccessibilityLabel(String(localized: "Slide Sorter", bundle: .module))
         scroll.documentView = collection
         scroll.hasVerticalScroller = true
         scroll.drawsBackground = false
@@ -181,7 +181,7 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
         let transition = s.transition.flatMap { $0.kind == "none" ? nil : $0.kind }
         item.cell.configure(SorterCell.Content(
             number: "\(i + 1)", image: image, imageSize: size, selected: NavigatorLogic.isSelected(st, i), hidden: s.hidden,
-            transition: transition, label: "Slide \(i + 1)"
+            transition: transition, label: String(localized: "Slide \(i + 1)", bundle: .module)
         ))
     }
 
@@ -558,7 +558,7 @@ final class SorterHeader: NSView, NSCollectionViewElement {
         chevron.image = NSImage(systemSymbolName: folded ? "chevron.right" : "chevron.down", accessibilityDescription: nil)
         chevron.contentTintColor = .secondaryLabelColor
         chevron.isEnabled = foldable
-        chevron.setAccessibilityLabel("\(folded ? "Expand" : "Collapse") \(text)")
+        chevron.setAccessibilityLabel(folded ? String(localized: "Expand \(text)", bundle: .module, comment: "Unfolds the section named") : String(localized: "Collapse \(text)", bundle: .module, comment: "Folds the section named"))
         setAccessibilityElement(true)
         setAccessibilityRole(.button)
         setAccessibilityLabel(text)

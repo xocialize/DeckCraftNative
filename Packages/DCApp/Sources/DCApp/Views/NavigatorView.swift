@@ -93,7 +93,7 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
         table.registerForDraggedTypes([.deckCraftSlideRow])
         table.setDraggingSourceOperationMask(.move, forLocal: true)
         table.draggingDestinationFeedbackStyle = .gap
-        table.setAccessibilityLabel("Slides")
+        table.setAccessibilityLabel(String(localized: "Slides", bundle: .module, comment: "Accessibility label of the slide navigator"))
         table.controller = self
         scroll.documentView = table
         scroll.hasVerticalScroller = true
@@ -238,7 +238,7 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
             let image = Thumbnails.shared.image(st.doc, uid: st.uid, index: i, width: Int((size.width * scale).rounded()))
             cell.configure(SlideThumbCell.Content(
                 number: "\(i + 1)", image: image, imageSize: size, inset: NavigatorMetrics.gutter, selected: NavigatorLogic.isSelected(st, i),
-                hidden: slide.hidden, animated: NavigatorLogic.hasAnimation(slide), label: "Slide \(i + 1)"
+                hidden: slide.hidden, animated: NavigatorLogic.hasAnimation(slide), label: String(localized: "Slide \(i + 1)", bundle: .module)
             ))
         case .master(let mi), .layout(let mi, _):
             guard let cell = v as? SlideThumbCell else { return }
@@ -251,7 +251,7 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
             default: false
             }
             let master = st.doc.masters.at(mi)
-            let name = li.flatMap { master?.layouts.at($0)?.name } ?? "\(master?.name ?? "") Slide Master"
+            let name = li.flatMap { master?.layouts.at($0)?.name } ?? String(localized: "\(master?.name ?? "") Slide Master", bundle: .module, comment: "A slide master's thumbnail: the master's name, then Slide Master")
             cell.configure(SlideThumbCell.Content(
                 number: li == nil ? "\(mi + 1)" : "", image: layoutImage(st.doc, mi, li, Int((size.width * scale).rounded())), imageSize: size,
                 inset: NavigatorMetrics.gutter + (li == nil ? 0 : NavigatorMetrics.layoutIndent), selected: selected, hidden: false,
@@ -508,7 +508,7 @@ final class SlideThumbCell: NSTableCellView {
         let num = NSAttributedString(string: c.number, attributes: attrs)
         let ns = num.size()
         num.draw(at: CGPoint(x: max(Tokens.Space.xs, r.minX - Tokens.Space.s - ns.width), y: r.minY))
-        if c.animated, let star = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Has animations or a transition") {
+        if c.animated, let star = NSImage(systemSymbolName: "sparkle", accessibilityDescription: String(localized: "Has animations or a transition", bundle: .module)) {
             let side = font.pointSize
             let config = NSImage.SymbolConfiguration(pointSize: side, weight: .regular).applying(.init(hierarchicalColor: .tertiaryLabelColor))
             let img = star.withSymbolConfiguration(config) ?? star
@@ -597,7 +597,7 @@ final class SectionBarCell: NSTableCellView {
         chevron.image = NSImage(systemSymbolName: folded ? "chevron.right" : "chevron.down", accessibilityDescription: nil)
         chevron.contentTintColor = .secondaryLabelColor
         chevron.isEnabled = foldable
-        chevron.setAccessibilityLabel("\(folded ? "Expand" : "Collapse") \(text)")
+        chevron.setAccessibilityLabel(folded ? String(localized: "Expand \(text)", bundle: .module, comment: "Unfolds the section named") : String(localized: "Collapse \(text)", bundle: .module, comment: "Folds the section named"))
         setAccessibilityLabel(text)
     }
 
@@ -619,40 +619,40 @@ enum SlideMenus {
         // A right-click on a slide that isn't selected selects it first.
         if let st = link.state, !NavigatorLogic.isSelected(st, i) { link.run("slide.go", ["index": .integer(i)]) }
         let m = NSMenu()
-        m.add("Cut") { PasteboardBridge.shared.copy(link, cut: true, slides: true) }
-        m.add("Copy") { PasteboardBridge.shared.copy(link, cut: false, slides: true) }
-        m.add("Paste") { PasteboardBridge.shared.paste(link, slides: true) }
+        m.add(String(localized: "Cut", bundle: .module)) { PasteboardBridge.shared.copy(link, cut: true, slides: true) }
+        m.add(String(localized: "Copy", bundle: .module)) { PasteboardBridge.shared.copy(link, cut: false, slides: true) }
+        m.add(String(localized: "Paste", bundle: .module)) { PasteboardBridge.shared.paste(link, slides: true) }
         m.addItem(.separator())
-        m.add("New Slide") { link.run("slide.new") }
-        m.add("Duplicate Slide") { link.run("slide.duplicate") }
-        m.add("Delete Slide") { link.run("slide.delete") }
+        m.add(String(localized: "New Slide", bundle: .module)) { link.run("slide.new") }
+        m.add(String(localized: "Duplicate Slide", bundle: .module)) { link.run("slide.duplicate") }
+        m.add(String(localized: "Delete Slide", bundle: .module)) { link.run("slide.delete") }
         m.addItem(.separator())
-        m.add("Add Section") { link.run("section.add", ["at": .integer(i)]) }
+        m.add(String(localized: "Add Section", bundle: .module)) { link.run("section.add", ["at": .integer(i)]) }
         let layouts = NSMenu()
         for l in link.state?.doc.masters.first?.layouts ?? [] {
             layouts.add(l.name) { link.run("slide.layout", ["layout": .integer(l.id.rawValue)]) }
         }
-        let layoutItem = NSMenuItem(title: "Layout", action: nil, keyEquivalent: "")
+        let layoutItem = NSMenuItem(title: String(localized: "Layout", bundle: .module, comment: "Submenu of slide layouts"), action: nil, keyEquivalent: "")
         layoutItem.submenu = layouts
         m.addItem(layoutItem)
-        m.add("Reset Slide") { link.run("slide.reset") }
-        m.add("Format Background…") { link.run("view.pane", ["pane": "background"]) }
+        m.add(String(localized: "Reset Slide", bundle: .module)) { link.run("slide.reset") }
+        m.add(String(localized: "Format Background…", bundle: .module)) { link.run("view.pane", ["pane": "background"]) }
         let hidden = link.state?.doc.slides.at(i)?.hidden ?? false
-        m.add(hidden ? "Show Slide" : "Hide Slide") { link.run("slide.hide", ["index": .integer(i)]) }
+        m.add(hidden ? String(localized: "Show Slide", bundle: .module) : String(localized: "Hide Slide", bundle: .module)) { link.run("slide.hide", ["index": .integer(i)]) }
         return m
     }
 
     static func sectionMenu(_ link: DocLink, _ index: Int, _ name: String, rename: @escaping @MainActor () -> Void) -> NSMenu {
         let m = NSMenu()
-        m.add("Rename Section") { rename() }
-        m.add("Add Section") {
+        m.add(String(localized: "Rename Section", bundle: .module)) { rename() }
+        m.add(String(localized: "Add Section", bundle: .module)) {
             if let at = link.state?.selection.slide { link.run("section.add", ["at": .integer(at)]) }
         }
-        m.add("Remove Section") { link.run("section.remove", ["index": .integer(index)]) }
-        m.add("Remove Section & Slides") { link.run("section.remove", ["index": .integer(index), "slides": true]) }
+        m.add(String(localized: "Remove Section", bundle: .module)) { link.run("section.remove", ["index": .integer(index)]) }
+        m.add(String(localized: "Remove Section & Slides", bundle: .module)) { link.run("section.remove", ["index": .integer(index), "slides": true]) }
         m.addItem(.separator())
-        m.add("Move Section Up") { link.run("section.move", ["index": .integer(index), "to": .integer(max(0, index - 1))]) }
-        m.add("Move Section Down") { link.run("section.move", ["index": .integer(index), "to": .integer(index + 1)]) }
+        m.add(String(localized: "Move Section Up", bundle: .module)) { link.run("section.move", ["index": .integer(index), "to": .integer(max(0, index - 1))]) }
+        m.add(String(localized: "Move Section Down", bundle: .module)) { link.run("section.move", ["index": .integer(index), "to": .integer(index + 1)]) }
         return m
     }
 }

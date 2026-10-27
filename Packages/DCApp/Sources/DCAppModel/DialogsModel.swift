@@ -382,12 +382,24 @@ public enum DialogToast {
         switch fonts.count {
         case 0: return nil
         case 1: names = fonts[0]
-        case 2: names = "\(fonts[0]) and \(fonts[1])"
-        case 3: names = "\(fonts[0]), \(fonts[1]) and \(fonts[2])"
-        default: names = "\(fonts[0]), \(fonts[1]), \(fonts[2]) and \(fonts.count - 3) more"
+        case 2: names = String(localized: "\(fonts[0]) and \(fonts[1])", bundle: .module, comment: "A list of two missing font names")
+        case 3: names = String(localized: "\(fonts[0]), \(fonts[1]) and \(fonts[2])", bundle: .module, comment: "A list of three missing font names")
+        default:
+            names = String(
+                localized: "\(fonts[0]), \(fonts[1]), \(fonts[2]) and \(fonts.count - 3) more", bundle: .module,
+                comment: "Three missing font names and how many more there are"
+            )
         }
-        let (it, them) = fonts.count == 1 ? ("isn't", "it") : ("aren't", "them")
-        return "\(names) \(it) installed on this computer. Text that uses \(them) is shown in a similar font."
+        if fonts.count == 1 {
+            return String(
+                localized: "\(names) isn't installed on this computer. Text that uses it is shown in a similar font.", bundle: .module,
+                comment: "Toast: one missing font (its name)"
+            )
+        }
+        return String(
+            localized: "\(names) aren't installed on this computer. Text that uses them is shown in a similar font.", bundle: .module,
+            comment: "Toast: several missing fonts (a list of their names)"
+        )
     }
 }
 

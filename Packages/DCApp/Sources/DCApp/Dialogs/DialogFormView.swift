@@ -48,7 +48,9 @@ struct DialogView: View {
     /// two inspector widths, the rest one and a half.
     static func width(_ id: String?) -> CGFloat {
         switch id {
-        case "themeColors", "new", "themeFonts", "symbol", "photoAlbum", "spelling": Tokens.Layout.inspectorWidth * 2.2
+        // AutoCorrect's Replace … With … Add row and Settings' labels beside their checkboxes don't fit one and a
+        // half in a long language (pseudo-localized, they spilled past the dialog's edges).
+        case "themeColors", "new", "themeFonts", "symbol", "photoAlbum", "spelling", "autocorrect", "preferences": Tokens.Layout.inspectorWidth * 2.2
         default: Tokens.Layout.inspectorWidth * 1.5
         }
     }
@@ -119,17 +121,28 @@ struct FormRowView: View {
                 }
             }
         case .tabs(let key, let options):
-            Picker(key, selection: text(key)) {
-                ForEach(options, id: \.value) { o in Text(o.label).tag(o.value) }
+            // Segments when they fit the dialog, else a pop-up menu (SmartArt's categories overflowed, more so in a
+            // long language).
+            ViewThatFits(in: .horizontal) {
+                Picker(key, selection: text(key)) {
+                    ForEach(options, id: \.value) { o in Text(o.label).tag(o.value) }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                Picker(key, selection: text(key)) {
+                    ForEach(options, id: \.value) { o in Text(o.label).tag(o.value) }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .fixedSize()
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
         case .list(let label, let key, let options, let findable):
             LabeledContent(label) {
                 if findable {
                     SearchablePicker(
                         options.map { PickerItem(id: $0.value, name: $0.label, systemImage: "textformat") },
-                        placeholder: "Find", emptyMessage: "No matches.", allowsTagScoping: false, selected: controller.current?.value(key)
+                        placeholder: String(localized: "Find", bundle: .module, comment: "Placeholder of a searchable list in a dialog"),
+                        emptyMessage: String(localized: "No matches.", bundle: .module), allowsTagScoping: false, selected: controller.current?.value(key)
                     ) { controller.set(key, $0) }
                     .frame(height: Tokens.Layout.rowHeight * 5)
                 } else {
@@ -165,7 +178,7 @@ struct FormRowView: View {
                 ForEach(Array(cells.enumerated()), id: \.offset) { r, row in
                     GridRow {
                         ForEach(Array(row.enumerated()), id: \.offset) { c, _ in
-                            TextField("Chart cell", text: text("cell:\(r):\(c)")).textFieldStyle(.roundedBorder).labelsHidden()
+                            TextField(String(localized: "Chart cell", bundle: .module, comment: "Accessibility label of a cell in the Chart Data grid"), text: text("cell:\(r):\(c)")).textFieldStyle(.roundedBorder).labelsHidden()
                                 .frame(minWidth: Tokens.Layout.metricTileMinWidth / 2)
                         }
                     }
@@ -262,7 +275,7 @@ struct TileView: View {
                         }
                     }
                     .frame(height: Tokens.Space.s)
-                    Text("Aa")
+                    Text(verbatim: "Aa")
                         .font(Tokens.Font.panelTitle)
                         .foregroundStyle(tile.colors.dropFirst().first.flatMap(HexColor.color) ?? Tokens.Color.label)
                         .frame(maxHeight: .infinity)

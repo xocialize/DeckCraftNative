@@ -723,7 +723,7 @@ final class CanvasView: NSView {
                 any = true
             case .outline?:
                 guard let text = Self.outlineText(url) else {
-                    model.status = "\(name): the outline couldn't be read"
+                    model.status = String(localized: "\(name): the outline couldn't be read", bundle: .module, comment: "Status after a drop: the file's name, then the problem")
                     continue
                 }
                 model.run("slide.fromOutline", ["text": .string(text), "markdown": .bool(name.lowercased().hasSuffix(".md"))])
@@ -731,7 +731,7 @@ final class CanvasView: NSView {
             case .open?:
                 any = true
             case nil:
-                model.status = "\(name): DeckCraft can't open this kind of file"
+                model.status = String(localized: "\(name): DeckCraftNative can't open this kind of file", bundle: .module, comment: "Status after a drop: the file's name, then the problem")
             }
         }
         return any

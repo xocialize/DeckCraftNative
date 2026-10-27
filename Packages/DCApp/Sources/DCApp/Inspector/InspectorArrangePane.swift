@@ -18,67 +18,67 @@ struct ArrangeView: View {
 
     var body: some View {
         let sel = ctl.enabled("arrange.bringForward")
-        Section("Order Objects") {
+        Section(String(localized: "Order Objects", bundle: .module)) {
             HStack(spacing: Tokens.Layout.hairline) {
-                button("Bring to Front", "square.3.layers.3d.top.filled", "arrange.bringToFront")
-                button("Bring Forward", "square.2.layers.3d.top.filled", "arrange.bringForward")
-                button("Send Backward", "square.2.layers.3d.bottom.filled", "arrange.sendBackward")
-                button("Send to Back", "square.3.layers.3d.bottom.filled", "arrange.sendToBack")
+                button(String(localized: "Bring to Front", bundle: .module), "square.3.layers.3d.top.filled", "arrange.bringToFront")
+                button(String(localized: "Bring Forward", bundle: .module), "square.2.layers.3d.top.filled", "arrange.bringForward")
+                button(String(localized: "Send Backward", bundle: .module), "square.2.layers.3d.bottom.filled", "arrange.sendBackward")
+                button(String(localized: "Send to Back", bundle: .module), "square.3.layers.3d.bottom.filled", "arrange.sendToBack")
             }
         }
-        Section("Align") {
+        Section(String(localized: "Align", bundle: .module)) {
             HStack(spacing: Tokens.Layout.hairline) {
                 ForEach(Self.edges, id: \.1) { label, edge, symbol in
                     IconToggle(symbol: symbol, help: label, enabled: ctl.enabled("arrange.align")) { ctl.align(edge) }
                 }
             }
             HStack(spacing: Tokens.Layout.hairline) {
-                IconToggle(symbol: "distribute.horizontal.center", help: "Distribute Horizontally", enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("horizontal") }
-                IconToggle(symbol: "distribute.vertical.center", help: "Distribute Vertically", enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("vertical") }
+                IconToggle(symbol: "distribute.horizontal.center", help: String(localized: "Distribute Horizontally", bundle: .module), enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("horizontal") }
+                IconToggle(symbol: "distribute.vertical.center", help: String(localized: "Distribute Vertically", bundle: .module), enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("vertical") }
             }
-            Picker("Align to", selection: Binding(get: { ctl.alignsToSlide }, set: { ctl.setAlignTo(slide: $0) })) {
-                Text("Slide").tag(true)
-                Text("Selected Objects").tag(false)
+            Picker(String(localized: "Align to", bundle: .module), selection: Binding(get: { ctl.alignsToSlide }, set: { ctl.setAlignTo(slide: $0) })) {
+                Text("Slide", bundle: .module, comment: "Align to: the slide").tag(true)
+                Text("Selected Objects", bundle: .module).tag(false)
             }
             .pickerStyle(.segmented)
             .disabled(!ctl.enabled("arrange.align"))
         }
-        Section("Group, Rotate and Flip") {
+        Section(String(localized: "Group, Rotate and Flip", bundle: .module)) {
             HStack {
                 Menu {
-                    Button("Group") { ctl.run("arrange.group") }.disabled(!ctl.enabled("arrange.group"))
-                    Button("Ungroup") { ctl.run("arrange.ungroup") }.disabled(!ctl.enabled("arrange.ungroup"))
-                    Button("Regroup") { ctl.run("arrange.regroup") }.disabled(!ctl.enabled("arrange.regroup"))
-                } label: { Label("Group", systemImage: "square.on.square") } primaryAction: { ctl.run("arrange.group") }
+                    Button(String(localized: "Group", bundle: .module)) { ctl.run("arrange.group") }.disabled(!ctl.enabled("arrange.group"))
+                    Button(String(localized: "Ungroup", bundle: .module)) { ctl.run("arrange.ungroup") }.disabled(!ctl.enabled("arrange.ungroup"))
+                    Button(String(localized: "Regroup", bundle: .module)) { ctl.run("arrange.regroup") }.disabled(!ctl.enabled("arrange.regroup"))
+                } label: { Label(String(localized: "Group", bundle: .module), systemImage: "square.on.square") } primaryAction: { ctl.run("arrange.group") }
                     .disabled(!sel)
-                    .accessibilityLabel("Group")
+                    .accessibilityLabel(String(localized: "Group", bundle: .module))
                 Menu {
-                    Button("Rotate Right 90°") { ctl.run("arrange.rotateRight") }
-                    Button("Rotate Left 90°") { ctl.run("arrange.rotateLeft") }
-                    Button("Flip Vertical") { ctl.run("arrange.flipVertical") }
-                    Button("Flip Horizontal") { ctl.run("arrange.flipHorizontal") }
-                } label: { Label("Rotate", systemImage: "rotate.right") } primaryAction: { ctl.run("arrange.rotateRight") }
+                    Button(String(localized: "Rotate Right 90°", bundle: .module)) { ctl.run("arrange.rotateRight") }
+                    Button(String(localized: "Rotate Left 90°", bundle: .module)) { ctl.run("arrange.rotateLeft") }
+                    Button(String(localized: "Flip Vertical", bundle: .module)) { ctl.run("arrange.flipVertical") }
+                    Button(String(localized: "Flip Horizontal", bundle: .module)) { ctl.run("arrange.flipHorizontal") }
+                } label: { Label(String(localized: "Rotate", bundle: .module), systemImage: "rotate.right") } primaryAction: { ctl.run("arrange.rotateRight") }
                     .disabled(!sel)
-                    .accessibilityLabel("Rotate")
+                    .accessibilityLabel(String(localized: "Rotate", bundle: .module))
             }
             HStack(spacing: Tokens.Layout.hairline) {
-                IconToggle(symbol: "rotate.left", help: "Rotate Left 90°", enabled: sel) { ctl.run("arrange.rotateLeft") }
-                IconToggle(symbol: "rotate.right", help: "Rotate Right 90°", enabled: sel) { ctl.run("arrange.rotateRight") }
-                IconToggle(symbol: "arrow.left.and.right.righttriangle.left.righttriangle.right", help: "Flip Horizontal", enabled: sel) { ctl.run("arrange.flipHorizontal") }
-                IconToggle(symbol: "arrow.up.and.down.righttriangle.up.righttriangle.down", help: "Flip Vertical", enabled: sel) { ctl.run("arrange.flipVertical") }
+                IconToggle(symbol: "rotate.left", help: String(localized: "Rotate Left 90°", bundle: .module), enabled: sel) { ctl.run("arrange.rotateLeft") }
+                IconToggle(symbol: "rotate.right", help: String(localized: "Rotate Right 90°", bundle: .module), enabled: sel) { ctl.run("arrange.rotateRight") }
+                IconToggle(symbol: "arrow.left.and.right.righttriangle.left.righttriangle.right", help: String(localized: "Flip Horizontal", bundle: .module), enabled: sel) { ctl.run("arrange.flipHorizontal") }
+                IconToggle(symbol: "arrow.up.and.down.righttriangle.up.righttriangle.down", help: String(localized: "Flip Vertical", bundle: .module), enabled: sel) { ctl.run("arrange.flipVertical") }
             }
         }
         if let sh = ctl.selectedShape {
             EditShapeSection(ctl: ctl, sh: sh)
             SizeView(ctl: ctl, sh: sh)
         }
-        Section("Selection Pane") { SelectionPaneView(ctl: ctl) }
+        Section(String(localized: "Selection Pane", bundle: .module)) { SelectionPaneView(ctl: ctl) }
     }
 
     static let edges: [(String, String, String)] = [
-        ("Align Left", "left", "align.horizontal.left"), ("Align Center", "center", "align.horizontal.center"),
-        ("Align Right", "right", "align.horizontal.right"), ("Align Top", "top", "align.vertical.top"),
-        ("Align Middle", "middle", "align.vertical.center"), ("Align Bottom", "bottom", "align.vertical.bottom"),
+        (String(localized: "Align Left", bundle: .module), "left", "align.horizontal.left"), (String(localized: "Align Center", bundle: .module), "center", "align.horizontal.center"),
+        (String(localized: "Align Right", bundle: .module), "right", "align.horizontal.right"), (String(localized: "Align Top", bundle: .module), "top", "align.vertical.top"),
+        (String(localized: "Align Middle", bundle: .module), "middle", "align.vertical.center"), (String(localized: "Align Bottom", bundle: .module), "bottom", "align.vertical.bottom"),
     ]
 
     private func button(_ label: String, _ symbol: String, _ id: String) -> some View {
@@ -98,11 +98,11 @@ struct SelectionPaneView: View {
             let selected = st.selection.shapes.map(\.rawValue)
             VStack(alignment: .leading, spacing: Tokens.Space.s) {
                 HStack {
-                    Button("Show All") { ctl.run("selection.showAll") }
-                    Button("Hide All") { ctl.run("selection.hideAll") }
+                    Button(String(localized: "Show All", bundle: .module)) { ctl.run("selection.showAll") }
+                    Button(String(localized: "Hide All", bundle: .module)) { ctl.run("selection.hideAll") }
                     Spacer()
-                    IconToggle(symbol: "chevron.up", help: "Bring Forward", enabled: !selected.isEmpty) { ctl.run("arrange.bringForward") }
-                    IconToggle(symbol: "chevron.down", help: "Send Backward", enabled: !selected.isEmpty) { ctl.run("arrange.sendBackward") }
+                    IconToggle(symbol: "chevron.up", help: String(localized: "Bring Forward", bundle: .module), enabled: !selected.isEmpty) { ctl.run("arrange.bringForward") }
+                    IconToggle(symbol: "chevron.down", help: String(localized: "Send Backward", bundle: .module), enabled: !selected.isEmpty) { ctl.run("arrange.sendBackward") }
                 }
                 VStack(spacing: 0) {
                     ForEach(Array(rows.enumerated()), id: \.element.id) { k, row in
@@ -154,12 +154,12 @@ struct SelectionPaneView: View {
                     if open { ctl.selectionPane.collapsed.insert(row.id) } else { ctl.selectionPane.collapsed.remove(row.id) }
                 } label: { Image(systemName: open ? "chevron.down" : "chevron.right") }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(open ? "Collapse" : "Expand") \(row.name)")
+                    .accessibilityLabel(open ? String(localized: "Collapse \(row.name)", bundle: .module) : String(localized: "Expand \(row.name)", bundle: .module))
             } else {
                 Image(systemName: "chevron.right").hidden()
             }
             if let r = ctl.selectionPane.renaming, r.id == row.id {
-                TextField("Name", text: Binding(get: { ctl.selectionPane.renaming?.text ?? "" }, set: { ctl.selectionPane.renaming?.text = $0 }))
+                TextField(String(localized: "Name", bundle: .module), text: Binding(get: { ctl.selectionPane.renaming?.text ?? "" }, set: { ctl.selectionPane.renaming?.text = $0 }))
                     .focused($renameFocus)
                     .onAppear { renameFocus = true }
                     .onSubmit { finishRename(row) }
@@ -183,13 +183,13 @@ struct SelectionPaneView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(row.dimmed ? Tokens.Color.tertiaryLabel : Tokens.Color.secondaryLabel)
-            .accessibilityLabel("\(row.hidden ? "Show" : "Hide") \(row.name)")
+            .accessibilityLabel(row.hidden ? String(localized: "Show \(row.name)", bundle: .module) : String(localized: "Hide \(row.name)", bundle: .module))
             Button { ctl.run("shape.lock", ["id": .integer(row.id)]) } label: {
                 Image(systemName: row.locked ? "lock" : "lock.open")
             }
             .buttonStyle(.plain)
             .foregroundStyle(row.dimmed ? Tokens.Color.tertiaryLabel : Tokens.Color.secondaryLabel)
-            .accessibilityLabel("\(row.locked ? "Unlock" : "Lock") \(row.name)")
+            .accessibilityLabel(row.locked ? String(localized: "Unlock \(row.name)", bundle: .module) : String(localized: "Lock \(row.name)", bundle: .module))
         }
         .padding(.leading, SelectionPane.indent * Double(row.depth))
         .padding(.horizontal, Tokens.Space.xs)
@@ -210,9 +210,9 @@ struct SelectionPaneView: View {
         .contextMenu {
             ForEach(SelectionPane.orderCommands, id: \.1) { l, id in Button(l) { ctl.run(id, ["ids": [.integer(row.id)]]) } }
             Divider()
-            Button("Rename") { ctl.selectionPane.renaming = (row.id, row.name) }
-            Button(row.hidden ? "Show" : "Hide") { ctl.run("shape.visible", ["id": .integer(row.id), "visible": .bool(row.hidden)]) }
-            Button(row.locked ? "Unlock" : "Lock") { ctl.run("shape.lock", ["id": .integer(row.id)]) }
+            Button(String(localized: "Rename", bundle: .module)) { ctl.selectionPane.renaming = (row.id, row.name) }
+            Button(row.hidden ? String(localized: "Show", bundle: .module, comment: "Show a hidden object") : String(localized: "Hide", bundle: .module, comment: "Hide an object")) { ctl.run("shape.visible", ["id": .integer(row.id), "visible": .bool(row.hidden)]) }
+            Button(row.locked ? String(localized: "Unlock", bundle: .module) : String(localized: "Lock", bundle: .module, comment: "Verb: lock an object")) { ctl.run("shape.lock", ["id": .integer(row.id)]) }
         }
     }
 
@@ -240,21 +240,21 @@ struct EditShapeSection: View {
     @State private var smooth: (id: ShapeId, radius: Double, percent: Double)?
 
     var body: some View {
-        Section("Edit Shape") {
-            ShapesMenu(includeFreeform: false, pick: { ctl.run("shape.change", ["preset": .string($0)]) }) { Text("Change Shape") }
+        Section(String(localized: "Edit Shape", bundle: .module)) {
+            ShapesMenu(includeFreeform: false, pick: { ctl.run("shape.change", ["preset": .string($0)]) }) { Text("Change Shape", bundle: .module) }
                 .disabled(!ctl.enabled("shape.change"))
-            Button("Edit Points") { ctl.run("shape.editPoints", ["on": true]) }.disabled(!ctl.enabled("shape.editPoints"))
+            Button(String(localized: "Edit Points", bundle: .module)) { ctl.run("shape.editPoints", ["on": true]) }.disabled(!ctl.enabled("shape.editPoints"))
             let own = InspectorShape.cornerRadius(sh)
             let state = smooth?.id == sh.id ? smooth : nil
-            CommitSlider(label: "Smooth Corners", value: state?.percent ?? 0, range: 0 ... 100, suffix: "%") { v in
+            CommitSlider(label: String(localized: "Smooth Corners", bundle: .module), value: state?.percent ?? 0, range: 0 ... 100, suffix: "%") { v in
                 // The radius is the rectangle's when the slider is first used, and kept for later moves.
                 let r = own ?? state?.radius ?? 0
                 smooth = (sh.id, r, v)
                 ctl.run("shape.smoothCorners", InspectorShape.smoothParams(v, radius: r))
             }
             .disabled(own == nil && state == nil)
-            .help(own == nil && state == nil ? "For rectangles and rounded rectangles" : "Smooth the corners into a squircle")
-            Menu("Merge Shapes") {
+            .help(own == nil && state == nil ? String(localized: "For rectangles and rounded rectangles", bundle: .module) : String(localized: "Smooth the corners into a squircle", bundle: .module))
+            Menu(String(localized: "Merge Shapes", bundle: .module)) {
                 ForEach(MergeCommands.ops, id: \.0) { op, label in Button(label) { ctl.run("shape.merge", ["op": .string(op)]) } }
             }
             .disabled(!ctl.enabled("shape.merge"))

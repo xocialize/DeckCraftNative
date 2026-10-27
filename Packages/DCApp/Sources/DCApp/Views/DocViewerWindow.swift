@@ -17,8 +17,8 @@ final class DocViewerWindowController: NSWindowController, NSWindowDelegate {
     private(set) var state: DocWindowState
     let titleLabel = NSTextField(labelWithString: "")
     let counter = NSTextField(labelWithString: "")
-    let previous = NSButton(title: "Previous", target: nil, action: nil)
-    let next = NSButton(title: "Next", target: nil, action: nil)
+    let previous = NSButton(title: String(localized: "Previous", bundle: .module, comment: "Button: the previous slide"), target: nil, action: nil)
+    let next = NSButton(title: String(localized: "Next", bundle: .module, comment: "Button: the next slide"), target: nil, action: nil)
     let slideView = SlideImageView()
     var onClose: (() -> Void)?
 
@@ -84,7 +84,7 @@ final class DocViewerWindowController: NSWindowController, NSWindowDelegate {
         let title = DocWindowLogic.title(st.displayTitle)
         window?.title = title
         titleLabel.stringValue = title
-        counter.stringValue = "Slide \(state.slide + 1) of \(n)"
+        counter.stringValue = String(localized: "Slide \(state.slide + 1) of \(n)", bundle: .module)
         previous.isEnabled = state.slide > 0
         next.isEnabled = state.slide + 1 < n
         slideView.show(st.doc, state.slide)

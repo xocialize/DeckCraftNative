@@ -32,9 +32,9 @@ public enum InspectorText {
     /// The Font Size menu: the engine's sizes, then 72–96.
     public static var sizes: [Double] { FormatCommands.sizes + [72, 80, 88, 96] }
 
-    public static let spacings: [(String, Double)] = [("Very Tight", -3), ("Tight", -1.5), ("Normal", 0), ("Loose", 3), ("Very Loose", 6)]
+    public static let spacings: [(String, Double)] = [(String(localized: "Very Tight", bundle: .module, comment: "character spacing"), -3), (String(localized: "Tight", bundle: .module, comment: "character spacing"), -1.5), (String(localized: "Normal", bundle: .module, comment: "character spacing"), 0), (String(localized: "Loose", bundle: .module, comment: "character spacing"), 3), (String(localized: "Very Loose", bundle: .module, comment: "character spacing"), 6)]
     public static let cases: [(String, String)] = [
-        ("Sentence case.", "sentence"), ("lowercase", "lower"), ("UPPERCASE", "upper"), ("Capitalize Each Word", "title"), ("tOGGLE cASE", "toggle"),
+        (String(localized: "Sentence case.", bundle: .module, comment: "Change Case option; keep the example casing"), "sentence"), (String(localized: "lowercase", bundle: .module, comment: "Change Case option; written in lower case"), "lower"), (String(localized: "UPPERCASE", bundle: .module, comment: "Change Case option; written in upper case"), "upper"), (String(localized: "Capitalize Each Word", bundle: .module, comment: "Change Case option; each word capitalized"), "title"), (String(localized: "tOGGLE cASE", bundle: .module, comment: "Change Case option; written in toggled case"), "toggle"),
     ]
     public static let bulletChars = ["•", "○", "■", "□", "◆", "➢", "✓", "–", "★"]
     public static let numberings: [(String, String)] = [
@@ -42,25 +42,25 @@ public enum InspectorText {
         ("A. B. C.", "alphaUcPeriod"), ("a) b) c)", "alphaLcParenR"), ("a. b. c.", "alphaLcPeriod"),
     ]
     public static let lineSpacings: [Double] = [1.0, 1.5, 2.0, 2.5, 3.0]
-    public static let directions: [(String, String)] = [("Horizontal", "horizontal"), ("Rotate all text 90°", "rotate90"), ("Rotate all text 270°", "rotate270"), ("Stacked", "stacked")]
-    public static let anchors: [(String, String)] = [("Top", "top"), ("Middle", "middle"), ("Bottom", "bottom")]
-    public static let autofits: [(String, String)] = [("Do not Autofit", "none"), ("Shrink text on overflow", "shrink"), ("Resize shape to fit text", "resize")]
+    public static let directions: [(String, String)] = [(String(localized: "Horizontal", bundle: .module, comment: "text direction"), "horizontal"), (L10n.text("Rotate all text 90°"), "rotate90"), (L10n.text("Rotate all text 270°"), "rotate270"), (String(localized: "Stacked", bundle: .module, comment: "text direction"), "stacked")]
+    public static let anchors: [(String, String)] = [(String(localized: "Top", bundle: .module, comment: "vertical text alignment"), "top"), (String(localized: "Middle", bundle: .module, comment: "vertical text alignment"), "middle"), (String(localized: "Bottom", bundle: .module, comment: "vertical text alignment"), "bottom")]
+    public static let autofits: [(String, String)] = [(L10n.text("Do not Autofit"), "none"), (L10n.text("Shrink text on overflow"), "shrink"), (L10n.text("Resize shape to fit text"), "resize")]
     /// The paragraph alignments: label, command, `format.state`'s `align`, SF Symbol.
     public static let aligns: [(String, String, String, String)] = [
-        ("Align Left", "format.alignLeft", "l", "text.alignleft"), ("Center", "format.alignCenter", "ctr", "text.aligncenter"),
-        ("Align Right", "format.alignRight", "r", "text.alignright"), ("Justify", "format.justify", "just", "text.justify"),
+        (L10n.text("Align Left"), "format.alignLeft", "l", "text.alignleft"), (String(localized: "Center", bundle: .module, comment: "paragraph alignment"), "format.alignCenter", "ctr", "text.aligncenter"),
+        (L10n.text("Align Right"), "format.alignRight", "r", "text.alignright"), (String(localized: "Justify", bundle: .module, comment: "paragraph alignment"), "format.justify", "just", "text.justify"),
     ]
     /// The character styles: label, command, `format.state` key, SF Symbol.
     public static let styles: [(String, String, String, String)] = [
-        ("Bold", "format.bold", "bold", "bold"), ("Italic", "format.italic", "italic", "italic"),
-        ("Underline", "format.underline", "underline", "underline"), ("Strikethrough", "format.strikethrough", "strike", "strikethrough"),
-        ("Superscript", "format.superscript", "superscript", "textformat.superscript"), ("Subscript", "format.subscript", "subscript", "textformat.subscript"),
+        (L10n.text("Bold"), "format.bold", "bold", "bold"), (L10n.text("Italic"), "format.italic", "italic", "italic"),
+        (L10n.text("Underline"), "format.underline", "underline", "underline"), (L10n.text("Strikethrough"), "format.strikethrough", "strike", "strikethrough"),
+        (L10n.text("Superscript"), "format.superscript", "superscript", "textformat.superscript"), (L10n.text("Subscript"), "format.subscript", "subscript", "textformat.subscript"),
     ]
 
     /// The text box's insets with PowerPoint's defaults (left, right, top, bottom in points).
     public static func margins(_ sh: Shape) -> [(label: String, key: String, value: Double)] {
         let b = sh.text?.body ?? BodyProps.default
-        return [("Left", "left", b.insetL ?? 7.2), ("Right", "right", b.insetR ?? 7.2), ("Top", "top", b.insetT ?? 3.6), ("Bottom", "bottom", b.insetB ?? 3.6)]
+        return [(String(localized: "Left", bundle: .module, comment: "text box inset"), "left", b.insetL ?? 7.2), (String(localized: "Right", bundle: .module, comment: "text box inset"), "right", b.insetR ?? 7.2), (String(localized: "Top", bundle: .module, comment: "text box inset"), "top", b.insetT ?? 3.6), (String(localized: "Bottom", bundle: .module, comment: "text box inset"), "bottom", b.insetB ?? 3.6)]
     }
 
     /// The anchor stored on the text box (`format.anchor`'s names).

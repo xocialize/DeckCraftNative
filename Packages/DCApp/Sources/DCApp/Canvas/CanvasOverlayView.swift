@@ -36,7 +36,7 @@ final class CanvasOverlayView: NSView {
         let xf = l.xf
         let s = model.session
         if st.doc.slides.isEmpty && st.selection.target == .slides {
-            drawCentered("Click to add first slide", in: bounds, CanvasStyle.emptyFont, CanvasStyle.secondaryLabel)
+            drawCentered(String(localized: "Click to add first slide", bundle: .module), in: bounds, CanvasStyle.emptyFont, CanvasStyle.secondaryLabel)
             return
         }
         if model.ui.gridlines, let step = CanvasMetrics.gridLineStep(s.prefs.gridSpacing, l.scale) { grid(ctx, l.slideRect, step) }
@@ -157,14 +157,14 @@ final class CanvasOverlayView: NSView {
             if let (di, _) = drag, di == i {
                 let centre = g.vertical ? size.width / 2 : size.height / 2
                 let off = pos - centre
-                let side: String = switch (g.vertical, off < 0, off > 0) {
-                case (true, true, _): " left of centre"
-                case (true, _, true): " right of centre"
-                case (false, true, _): " above centre"
-                case (false, _, true): " below centre"
-                default: " (centre)"
+                let pt = String(Int(abs(off).rounded()))
+                let label: String = switch (g.vertical, off < 0, off > 0) {
+                case (true, true, _): String(localized: "\(pt) pt left of centre", bundle: .module, comment: "A guide's distance from the slide's centre, in points")
+                case (true, _, true): String(localized: "\(pt) pt right of centre", bundle: .module, comment: "A guide's distance from the slide's centre, in points")
+                case (false, true, _): String(localized: "\(pt) pt above centre", bundle: .module, comment: "A guide's distance from the slide's centre, in points")
+                case (false, _, true): String(localized: "\(pt) pt below centre", bundle: .module, comment: "A guide's distance from the slide's centre, in points")
+                default: String(localized: "\(pt) pt (centre)", bundle: .module, comment: "A guide at the slide's centre; the distance in points")
                 }
-                let label = "\(Int(abs(off).rounded())) pt\(side)"
                 tag(label, at: g.vertical ? CGPoint(x: a.x + 6, y: slide.minY + 6) : CGPoint(x: slide.minX + 6, y: a.y + 4))
             }
         }
