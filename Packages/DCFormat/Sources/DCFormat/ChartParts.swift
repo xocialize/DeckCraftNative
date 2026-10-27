@@ -16,7 +16,9 @@ enum ChartParts {
     /// Moves every chart part's bytes out of the presentation, naming the zip entry each goes to.
     static func separate(_ p: inout Presentation) -> [Payload] {
         var payloads: [Payload] = []
-        visitParts(&p) { (part: inout ChartPart) in
+        // The visitors are concrete over `FormatError`: generic typed throws specialised to `Never` here
+        // crashed the optimizer (Swift 6.4 release builds: "swifterror value can only be loaded…").
+        try? visitParts(&p) { (part: inout ChartPart) in
             // The native namespace is independent of the original OPC names, which may repeat when charts
             // from several decks are combined. No user-supplied path is extracted.
             let entry = "\(prefix)\(payloads.count)"
@@ -73,7 +75,7 @@ enum ChartParts {
 
     /// Every chart part on every slide, master and layout (notes and handout masters included), groups
     /// walked with an explicit stack.
-    private static func visitParts<E: Error>(_ p: inout Presentation, _ visit: (inout ChartPart) throws(E) -> Void) throws(E) {
+    private static func visitParts(_ p: inout Presentation, _ visit: (inout ChartPart) throws(FormatError) -> Void) throws(FormatError) {
         for i in p.slides.indices { try shapes(&p.slides[i].shapes, visit) }
         for i in p.masters.indices { try masterParts(&p.masters[i], visit) }
         if var m = p.notesMaster {
@@ -86,12 +88,12 @@ enum ChartParts {
         }
     }
 
-    private static func masterParts<E: Error>(_ m: inout Master, _ visit: (inout ChartPart) throws(E) -> Void) throws(E) {
+    private static func masterParts(_ m: inout Master, _ visit: (inout ChartPart) throws(FormatError) -> Void) throws(FormatError) {
         try shapes(&m.shapes, visit)
         for l in m.layouts.indices { try shapes(&m.layouts[l].shapes, visit) }
     }
 
-    private static func shapes<E: Error>(_ shapes: inout [Shape], _ visit: (inout ChartPart) throws(E) -> Void) throws(E) {
+    private static func shapes(_ shapes: inout [Shape], _ visit: (inout ChartPart) throws(FormatError) -> Void) throws(FormatError) {
         for i in shapes.indices {
             switch shapes[i].kind {
             case .group(var children, let child):

@@ -7,6 +7,8 @@
 #   oracle.sh corpus             regenerate $DECKCRAFT_FIXTURES/oracle/<pin>/ from the sample deck and scripts/*.cmds
 #   oracle.sh json-vectors       write serde_json's output for generated floats and strings to $DECKCRAFT_FIXTURES/json/
 #   oracle.sh geom-vectors       write deckcraft-geom's preset, warp and Morph output to $DECKCRAFT_FIXTURES/geom/
+#   oracle.sh metafile-vectors   write deckcraft-metafile's parse, placement and pixels to $DECKCRAFT_FIXTURES/metafile/
+#   oracle.sh text-vectors       write deckcraft-text's layouts of the corpus to $DECKCRAFT_FIXTURES/text/
 #   oracle.sh path               print the binary's path
 #
 # Environment (defaults in brackets):
@@ -128,9 +130,24 @@ cmd_geom_vectors() {
   (cd $here/geom-vectors && cargo run -q --release -- $DECKCRAFT_FIXTURES/geom)
 }
 
+# deckcraft-metafile's output for its test shapes and their mutations, for DCMetafile's bit-exact parity test.
+cmd_metafile_vectors() {
+  check_checkout $DECKCRAFT_SRC $DECKCRAFT_COMMIT deckcraft
+  [[ -d $DECKCRAFT_FIXTURES ]] || die "no fixtures repository at $DECKCRAFT_FIXTURES"
+  (cd $here/metafile-vectors && cargo run -q --release -- $DECKCRAFT_FIXTURES/metafile)
+}
+
+# deckcraft-text's layouts (lines, runs, glyphs) of the corpus decks, for DCText's parity tests. They depend
+# on the fonts installed here.
+cmd_text_vectors() {
+  $here/text-vectors/run.sh
+}
+
 case ${1:-} in
   build) cmd_build ;;
   geom-vectors) cmd_geom_vectors ;;
+  metafile-vectors) cmd_metafile_vectors ;;
+  text-vectors) cmd_text_vectors ;;
   json-vectors) cmd_json_vectors ;;
   cli) shift; cli "$@" ;;
   corpus) cmd_corpus ;;

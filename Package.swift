@@ -8,8 +8,9 @@
 // or SwiftUI — the app is its own Xcode target (wave 5). Ports deckcraft (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors); every ported file names its source and licence.
 //
-// Fleet packages (media-bridge for DCMedia, modelcontextprotocol/swift-sdk for DCAutomation) are added
-// by versioned URL in the wave that needs them. Test data stays outside git, at `DECKCRAFT_FIXTURES`
+// Fleet packages come by versioned URL in the wave that needs them: media-bridge's MediaMeasureCore
+// (SSIMULACRA2, test support only) since Wave 2; media-bridge for DCMedia and modelcontextprotocol/swift-sdk
+// for DCAutomation in Wave 4. Test data stays outside git, at `DECKCRAFT_FIXTURES`
 // (default `../DeckCraftNative-Fixtures`); tests that need it skip without it.
 import PackageDescription
 
@@ -45,6 +46,10 @@ let package = Package(
         // Tests' access to the fixtures and the upstream pin
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
+    dependencies: [
+        // SSIMULACRA2 for render parity (DCTestSupport only): media-bridge's dependency-free metric core.
+        .package(url: "https://github.com/xocialize/media-bridge.git", from: "0.40.0"),
+    ],
     targets: [
         // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
         // Rust's numeric semantics (saturating casts, NaN-propagating clamp). Every package builds on it.
@@ -64,7 +69,8 @@ let package = Package(
         .testTarget(name: "DCColorTests", dependencies: ["DCColor", "DCCore"], path: tests("DCFoundation", "DCColorTests")),
 
         // MARK: DCMetafile — EMF, EMF+ and WMF read into a neutral vector model (deckcraft-metafile). Wave 2.
-        .target(name: "DCMetafile", path: sources("DCMetafile", "DCMetafile")),
+        .target(name: "DCMetafile", dependencies: ["DCCore"], path: sources("DCMetafile", "DCMetafile")),
+        .testTarget(name: "DCMetafileTests", dependencies: ["DCMetafile", "DCCore", "DCTestSupport"], path: tests("DCMetafile", "DCMetafileTests")),
 
         // MARK: DCModel — presentation, masters, layouts, slides, shapes, text, tables, charts,
         // animations, placeholder inheritance (deckcraft-model). Wave 1.
@@ -73,7 +79,8 @@ let package = Package(
 
         // MARK: DCText — CoreText layout under deckcraft's autofit, bullets, columns, caret and field
         // rules; the font substitutes (deckcraft-text, -fonts). Wave 2.
-        .target(name: "DCText", dependencies: ["DCModel", "DCGeometry", "DCColor"], path: sources("DCText", "DCText")),
+        .target(name: "DCText", dependencies: ["DCCore", "DCModel", "DCGeometry", "DCColor"], path: sources("DCText", "DCText")),
+        .testTarget(name: "DCTextTests", dependencies: ["DCText", "DCModel", "DCGeometry", "DCColor", "DCCore", "DCTestSupport"], path: tests("DCText", "DCTextTests")),
 
         // MARK: DCAnim — timeline, show state machine, transition frames, Morph (deckcraft-anim). Wave 4.
         .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry"], path: sources("DCAnim", "DCAnim")),
@@ -90,8 +97,13 @@ let package = Package(
         // compositing (deckcraft-render, -pdf). Wave 2.
         .target(
             name: "DCRender",
-            dependencies: ["DCGeometry", "DCColor", "DCMetafile", "DCModel", "DCAnim", "DCText"],
+            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCMetafile", "DCModel", "DCAnim", "DCText"],
             path: sources("DCRender", "DCRender")
+        ),
+        .testTarget(
+            name: "DCRenderTests",
+            dependencies: ["DCRender", "DCText", "DCModel", "DCFormat", "DCGeometry", "DCColor", "DCCore", "DCTestSupport"],
+            path: tests("DCRender", "DCRenderTests")
         ),
 
         // MARK: DCPPTX — PPTX read and write from ECMA-376 (deckcraft-pptx). Wave 3.
@@ -111,7 +123,11 @@ let package = Package(
         .executableTarget(name: "dccli", dependencies: ["DCEngine", "DCAutomation"], path: "Apps/dccli"),
 
         // MARK: DCTestSupport — the fixtures root and the upstream pin, for every test target.
-        .target(name: "DCTestSupport", path: sources("DCTestSupport", "DCTestSupport")),
+        .target(
+            name: "DCTestSupport",
+            dependencies: [.product(name: "MediaMeasureCore", package: "media-bridge")],
+            path: sources("DCTestSupport", "DCTestSupport")
+        ),
         .testTarget(name: "DCTestSupportTests", dependencies: ["DCTestSupport"], path: tests("DCTestSupport", "DCTestSupportTests")),
     ]
 )

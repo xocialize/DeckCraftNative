@@ -1,0 +1,19 @@
+[package]
+name = "metafile-vectors"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Writes WMF/EMF/EMF+ test files and deckcraft-metafile's parsed and placed models of them as bit patterns, so DCMetafile can be checked against them."
+
+[dependencies]
+deckcraft-metafile = { path = "../../../../deckcraft/crates/metafile" }
+kurbo = "=0.13.1"
+
+# deckcraft's release profile, so float code is generated as deckcraft-cli's is.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 16
+debug = 0
+
+[workspace]
