@@ -155,17 +155,20 @@ enum PPTXWrite {
             return o.rels.addNew("tags", OPC.relative(o.name, name), false)
         }
 
-        /// An unchanged Office 2016 chart's `chartEx` part and its relationship id.
+        /// An Office 2016 chart's `chartEx` part, its kept or new style parts, and its relationship id.
         func chartexRel(_ o: Out, _ c: Chart) -> String? {
             guard let (xml, preserved) = Charts.chartexPart(c) else { return nil }
             nChartex &+= 1
             let name = "ppt/charts/chartEx\(nChartex).xml"
             pkg.xmlPart(name, ctChartex, xml)
+            var rels = RelsOut()
             if preserved {
-                Charts.writeKept(&pkg, name, c, &nKept)
+                rels = Charts.writeKept(&pkg, name, c, &nKept)
             } else if !c.kept.parts.isEmpty {
                 PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
             }
+            // Without its style parts PowerPoint refuses the slide (a divergence from deckcraft).
+            ChartexStyle.add(&pkg, name, nChartex, &rels)
             return o.rels.addNew(rtChartex, OPC.relative(o.name, name), false)
         }
 

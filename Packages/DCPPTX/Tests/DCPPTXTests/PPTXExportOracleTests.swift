@@ -73,17 +73,60 @@ private func scratch() throws -> URL {
     return dir
 }
 
+/// The deliberate divergences from deckcraft's package (PORT-STATUS.md, decisions), applied to its parts:
+/// every `chartEx` part gets a style part and a colour style part, or PowerPoint repairs the file. The added
+/// parts are checked byte for byte; `[Content_Types].xml` is deckcraft's with their overrides after each
+/// `chartExN.xml` override. Nothing else may differ.
+private func expectedDivergences(_ theirs: [String: [UInt8]]) -> [String: [UInt8]] {
+    var out = theirs
+    let chartex = theirs.keys.compactMap { k in
+        k.wholeMatch(of: /ppt\/charts\/chartEx(\d+)\.xml/).flatMap { Int($0.1) }
+    }.sorted()
+    guard !chartex.isEmpty, let ct = theirs["[Content_Types].xml"] else { return out }
+    var types = String(decoding: ct, as: UTF8.self)
+    for n in chartex {
+        let own = #"<Override PartName="/ppt/charts/chartEx\#(n).xml" ContentType="application/vnd.ms-office.chartex+xml"/>"#
+        types = types.replacingOccurrences(of: own, with: own + ChartexStyleExpected.overrides(n))
+        out["ppt/charts/style\(n).xml"] = Array(ChartexStyleExpected.style.utf8)
+        out["ppt/charts/colors\(n).xml"] = Array(ChartexStyleExpected.colors.utf8)
+        out["ppt/charts/_rels/chartEx\(n).xml.rels"] = Array(ChartexStyleExpected.rels(n).utf8)
+    }
+    out["[Content_Types].xml"] = Array(types.utf8)
+    return out
+}
+
+/// A model read by deckcraft without the `kept` sidecars that hold only the style parts Swift adds to a
+/// `chartEx` part (`expectedDivergences`).
+private func withoutAddedStyle(_ v: Any) -> Any {
+    let added: Set<String> = [
+        "http://schemas.microsoft.com/office/2011/relationships/chartStyle",
+        "http://schemas.microsoft.com/office/2011/relationships/chartColorStyle",
+    ]
+    if let a = v as? [Any] { return a.map(withoutAddedStyle) }
+    guard var d = v as? [String: Any] else { return v }
+    if let kept = d["kept"] as? [String: Any], let rels = kept["rels"] as? [[String: Any]], !rels.isEmpty,
+       rels.allSatisfy({ ($0["relType"] as? String).map(added.contains) ?? false }) {
+        d["kept"] = nil
+    }
+    return d.mapValues(withoutAddedStyle)
+}
+
 @Suite struct PPTXExportOracleTests {
-    /// Swift's export of the deck is deckcraft's export of it, part for part.
+    /// Swift's export of the deck is deckcraft's export of it, part for part, apart from the allowed
+    /// divergences (`expectedDivergences`).
     @Test(arguments: corpusDecks()) func exportMatchesOracle(_ name: String) throws {
         let deck = try DeckFormat.load(bytes(#require(deckFile(name, "deckcraft"))))
         let mine = try parts(PPTX.export(deck))
-        let theirs = try parts(bytes(#require(deckFile(name, "pptx"))))
+        let oracle = try parts(bytes(#require(deckFile(name, "pptx"))))
+        let theirs = expectedDivergences(oracle)
         #expect(Set(mine.keys) == Set(theirs.keys), "\(name): parts \(Set(mine.keys).symmetricDifference(theirs.keys).sorted())")
         for k in Set(mine.keys).intersection(theirs.keys).sorted() {
             let a = mine[k] ?? [], b = theirs[k] ?? []
             #expect(a == b, "\(name): \(k) differs \(firstDifference(a, b))")
         }
+        // The allow-list stays narrow: only the parts it names differ from deckcraft's.
+        let changed = Set(theirs.keys).filter { theirs[$0] != oracle[$0] }
+        #expect(changed.allSatisfy { $0 == "[Content_Types].xml" || ChartexStyleExpected.isAdded($0) }, "\(name): \(changed.sorted())")
     }
 
     /// What Swift writes validates against ECMA-376 Transitional (markup compatibility applied, Office
@@ -113,6 +156,11 @@ private func scratch() throws -> URL {
         let a = try #require(parts(bytes(back))["presentation.json"])
         let fromPPTX = try #require(deckFile(name, "from-pptx.deckcraft"))
         let b = try #require(parts(bytes(fromPPTX))["presentation.json"])
-        #expect(a == b, "\(name): deckcraft reads the Swift package differently \(firstDifference(a, b))")
+        if a == b { return }
+        // deckcraft keeps the added style parts as the chart's sidecar (`kept`); nothing else may differ.
+        let mineRead = try JSONSerialization.jsonObject(with: Data(a)), theirsRead = try JSONSerialization.jsonObject(with: Data(b))
+        #expect(
+            withoutAddedStyle(mineRead) as? NSObject == theirsRead as? NSObject,
+            "\(name): deckcraft reads the Swift package differently \(firstDifference(a, b))")
     }
 }
