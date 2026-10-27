@@ -328,6 +328,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     (AB-A-0205), and `CodecsTests` carries it as a known issue that flags the fix.
   - libvpx's licence and patent grant ship in `Acknowledgements.txt` (`Tools/acknowledgements.sh` now picks up a
     package's `THIRD-PARTY-NOTICES`).
+- **PowerPoint sweep (2026-10-27).** `Tools/pptx/powerpoint-sweep.sh` exports every test deck with `dccli` (the 9
+  corpus decks, 44 engine scripts and 7 pointer sessions) and opens each in PowerPoint.
+  - All 60 open without repair, and PowerPoint sees the same slides and shapes per slide as were written.
+  - Nothing needed fixing.
+  - deckcraft's own export of the Office 2016 chart deck, checked as a control, still needs repair.
 - **Released as [v0.1.1](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.1) (2026-10-27).**
   - Built clean from `3335d96`, notarized, and accepted by Gatekeeper; an anonymous download matches its `.sha256`.
   - The published 0.1.0, run from its own DMG, finds 0.1.1 through Check for Updates.

@@ -74,3 +74,9 @@ parts. DCPPTX now writes them (MS-ODRAWXML's cs:chartStyle and cs:colorStyle; th
 deckcraft's bytes, allowed by name in the parity tests). All 9 corpus decks exported by DCPPTX now open in PowerPoint
 without repair (`Tools/pptx/powerpoint-check.sh`, which opens any `.pptx` in PowerPoint and reports OPEN-OK or
 NEEDS-REPAIR).
+
+`Tools/pptx/powerpoint-sweep.sh` widens that to every test deck: the 9 corpus decks, the 44 engine-script decks and
+the 7 pointer-session decks, exported by `dccli`. On 2026-10-27 all **60 open without repair**, and PowerPoint reads
+**the same slides and the same number of shapes on every slide** as DeckCraftNative wrote. That covers tables,
+SmartArt, charts, media, ink, freeforms, comments, sections and the Office 2016 charts. A positive control confirms
+the check catches problems: deckcraft's own export of the Office 2016 chart deck still needs repair.

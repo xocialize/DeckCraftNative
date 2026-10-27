@@ -98,7 +98,8 @@ this repository (or `CRAFT_FONTS_DIR`); the app bundles them.
 - `Tools/publish-release.sh` tags the release and publishes the DMG as a GitHub release, which the app's
   Check for Updates reads.
 - `Tools/app/alpha-gate.sh` runs DeckCraft's six core workflows in the real app through the control channel.
-- `Tools/pptx/powerpoint-check.sh` opens files in PowerPoint and reports whether any needs repair.
+- `Tools/pptx/powerpoint-check.sh` opens files in PowerPoint and reports whether any needs repair, and
+  `Tools/pptx/powerpoint-sweep.sh` runs it, with a slide and shape count check, over every test deck.
 
 ## The Rust oracle
 
