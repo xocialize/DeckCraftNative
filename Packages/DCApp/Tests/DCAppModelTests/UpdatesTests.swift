@@ -227,7 +227,7 @@ func ok(_ json: String, _ headers: [String: String] = [:]) -> StubProtocol.Answe
         #expect(req.value(forHTTPHeaderField: "User-Agent") == "DeckCraftNative/0.1.0")
         #expect(req.value(forHTTPHeaderField: "Accept") == "application/vnd.github+json")
         #expect(req.url == stub.source.feed)
-        #expect(UpdateSource.github().feed.absoluteString == "https://api.github.com/repos/xocialize/deckcraftnative-releases/releases?per_page=10")
+        #expect(UpdateSource.github().feed.absoluteString == "https://api.github.com/repos/xocialize/DeckCraftNative/releases?per_page=10")
     }
 
     // craft-update never offers a pre-release to a desktop app

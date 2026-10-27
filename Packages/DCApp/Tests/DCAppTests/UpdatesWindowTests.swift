@@ -29,7 +29,7 @@ final class UpdatesWindowStubProtocol: URLProtocol, @unchecked Sendable {
     func release(installer: Bool, notes: String = "## Changes\n- **Faster** export\n- [Details](https://example.com)") -> UpdateRelease {
         UpdateRelease(
             tag: "v0.2.0", version: UpdateVersion(0, 2, 0), name: "DeckCraftNative 0.2.0", publishedAt: Date(timeIntervalSince1970: 1_793_102_400),
-            page: URL(string: "https://github.com/xocialize/deckcraftnative-releases/releases/tag/v0.2.0") ?? URL(filePath: "/"), notes: notes,
+            page: URL(string: "https://github.com/xocialize/DeckCraftNative/releases/tag/v0.2.0") ?? URL(filePath: "/"), notes: notes,
             prerelease: false,
             assets: installer ? [UpdateAsset(name: "DeckCraftNative-0.2.0.dmg", size: 1, url: URL(filePath: "/x.dmg"))] : [])
     }

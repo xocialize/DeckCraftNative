@@ -918,7 +918,7 @@ New in the port (deckcraft has no counterpart). Code in `DCApp/Intents/`; the ap
   automatic check is a preference, **off by default**, at most daily (first look 10 s after launch, then hourly;
   never with `DECKCRAFT_NO_PREFS`), and the update is the notarized DMG, downloaded to Downloads, checked
   (size, GitHub's `digest`), quarantined and opened; the user drags it to Applications. A "Skip This Version" quiets
-  automatic checks for that version. Releases are read from `xocialize/deckcraftnative-releases`
+  automatic checks for that version. Releases are read from `xocialize/DeckCraftNative` (public since 0.1.0)
   (`UpdateSource.releasesRepo`, the one constant). A 404 (no releases, or no repo yet) is "up to date", as
   craft-update's `NotFound`. A window of its own (Software Update), not a sheet: there may be no document window,
   and it never blocks one. Release notes are Markdown's inline syntax; links open only when `https`.

@@ -10,9 +10,9 @@ import Foundation
 
 /// The releases repo and the URLs derived from it.
 public struct UpdateSource: Sendable, Equatable {
-    /// The public repo DeckCraftNative's releases are published to (`Tools/publish-release.sh`). The one place
-    /// it is named in the app.
-    public static let releasesRepo = "xocialize/deckcraftnative-releases"
+    /// The public repo DeckCraftNative's releases are published to (`Tools/publish-release.sh`): the code repo
+    /// itself, whose GitHub releases carry the notarized DMG. The one place it is named in the app.
+    public static let releasesRepo = "xocialize/DeckCraftNative"
 
     /// GitHub's releases list, newest first (`GET /repos/<repo>/releases`).
     public var feed: URL

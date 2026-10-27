@@ -1,8 +1,8 @@
 #!/bin/zsh
-# Publishes a notarized build from Tools/release.sh as a GitHub release of the PUBLIC releases repo, which is what
-# Help › Check for Updates… reads (UpdateSource.releasesRepo):
-#   tag v<version> at the build's commit in this (private) repo → push the tag to origin → `gh release create` in
-#   xocialize/deckcraftnative-releases with the DMG, its .sha256 and Docs/releases/<version>.md as the notes.
+# Publishes a notarized build from Tools/release.sh as a GitHub release of the public repo that
+# Help › Check for Updates… reads (UpdateSource.releasesRepo, this repository, xocialize/DeckCraftNative):
+#   tag v<version> at the build's commit → push the tag to origin → `gh release create` with the DMG, its .sha256
+#   and Docs/releases/<version>.md as the notes.
 #
 #   Tools/publish-release.sh --dry-run [version]   check everything and print what would be done; change nothing
 #   Tools/publish-release.sh [version]              publish (the user runs this, never an agent on its own)
