@@ -212,15 +212,14 @@ Mac-specific.
 
 ## 10. Open decisions (yours)
 
-1. **Product name and icon.**
-   - The ArtCraft name, wordmark and logos can't be used by a fork (`docs/brand/LICENSE-brand.txt`).
-   - "DeckCraftNative" is a working name.
-   - The shipping name, and whether to keep the DeckCraft app icon (check its `ATTRIBUTION.md` row), are open.
-2. **Fidelity oracles.** Install Keynote (free) as a "does it open" check, and PowerPoint for Mac if you have a Microsoft
-   365 seat? Without PowerPoint, PPTX writer acceptance has no external check.
+1. ~~**Product name and icon.**~~ **Decided 2026-10-27:** DeckCraftNative, with DeckCraft's MIT placeholder icon and no
+   ArtCraft marks (WAVE6-PLAN.md).
+2. **Fidelity oracles.** **PowerPoint for Mac: installed 2026-10-27** as a black-box "opens without repair" check
+   (`Tools/pptx/powerpoint-check.sh`; its first finding fixed DCPPTX's chartEx parts). Keynote is still open.
 3. ~~**Rust toolchain.**~~ **Decided 2026-10-26:** the oracle builds from source with Homebrew's `rustup`, because the
    v0.11.1 release binary is 112 commits behind the pin. Wave 0 is done (see `PORT-STATUS.md`).
-4. **VP9 and Ogg/Vorbis.** Opt into `vpx-swift`, or accept "can't play" for those (rare in real decks)?
+4. **VP9 and Ogg/Vorbis.** Opt into `vpx-swift`, or accept "can't play" for those (rare in real decks)? Vorbis plays
+   through AudioToolbox; VP8/VP9 show "can't play" in 0.1.0, and `Media.register(externalDecoder:)` is ready for a decoder.
 5. **Consumers.** Is this a standalone app, or the engine for something else (as PhotoCraftNative is for
    PixelAgencyEditor), such as a Marquee or MVS show tool? This decides whether `DCEngine` must be ready as an
    embeddable product early.
