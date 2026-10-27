@@ -304,8 +304,13 @@ reasons are in [PLAN.md](PLAN.md) §3.
     in substitute fonts. It now bundles them.
   - **Dialog sheets.** Their sizing could loop inside AppKit; they're hardened.
   - **Tests.** An Updates window test was order-dependent; it no longer is.
-- **Not done.** Translations. Spotlight end to end (above). Publishing (needs the user's yes). The licence of this
-  repository's own code (the user's call).
+- **Published 2026-10-27.** The user made `xocialize/DeckCraftNative` public and approved publishing:
+  [v0.1.0](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.0), built clean from `0929908`.
+  - The release carries the notarized DMG and its `.sha256`. An anonymous download matches the checksum and passes
+    Gatekeeper.
+  - The update checker reads this repo's releases and answers "up to date" from the shipped build.
+- **Not done.** Translations. Spotlight end to end (above). The licence of this repository's own code (the user's
+  call).
 - **Parallel work.** Release and Updates, Extensions, Intents and Strings were each built by a separate session. The
   catalog infrastructure, the fonts and licences in the bundle, integration, the final notarized build and
   EVALUATION.md were done here.
