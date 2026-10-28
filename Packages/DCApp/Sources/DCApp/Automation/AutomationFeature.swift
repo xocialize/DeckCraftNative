@@ -71,12 +71,18 @@ enum AutomationFeature {
     /// Bytes for one captured image (`MAX_IMAGE_BYTES`).
     static let maxImageBytes = 128 << 20
 
+    /// The window the next `ui.screenshot` captures in place of the document window (the start window's
+    /// `{window: "start"}`); taken by that capture.
+    static var nextCapture: NSWindow?
+
     /// Capture the document window after it settles and answer as `save_screenshot` does: a path reply
     /// writes the PNG and carries no base64; an inline reply carries the PNG base64-encoded.
     static func screenshot(_ path: String?, reply: @escaping @MainActor (JSON) -> Void) {
+        let target = nextCapture
+        nextCapture = nil
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             MainActor.assumeIsolated {
-                guard let window = AppControlHost.keyDocumentWindow() else {
+                guard let window = target ?? AppControlHost.keyDocumentWindow() else {
                     reply(["ok": false, "error": "no window to capture"])
                     return
                 }

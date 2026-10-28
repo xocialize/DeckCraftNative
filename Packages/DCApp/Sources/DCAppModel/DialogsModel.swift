@@ -205,6 +205,8 @@ public final class DialogController {
     @ObservationIgnored var reuseTarget: FileTarget?
     /// Interface font families (the Font dialog's list); the app gives the installed ones.
     @ObservationIgnored public var fontFamiliesProvider: @MainActor () -> [String] = { DialogFonts.installedFamilies() }
+    /// The start window (the app's): File › Home, New and Open show it. Without it, New is the "new" dialog.
+    @ObservationIgnored public weak var startScreen: StartScreenModel?
 
     public init(model: AppModel) {
         self.model = model

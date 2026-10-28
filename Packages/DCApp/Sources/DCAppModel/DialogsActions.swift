@@ -883,18 +883,11 @@ extension DialogController {
     }
 
     func newAct(_ id: String) -> Bool? {
-        if id == "new:blank" {
-            run("file.new")
-        } else if id == "new:sample" {
-            do { try Sample.openSample(model.session) } catch { status(error.description) }
-            model.changed()
-        } else if id.hasPrefix("new:theme:") {
-            run("file.new", ["theme": .string(String(id.dropFirst(10)))])
-        } else if id.hasPrefix("new:template:") {
-            run("file.new", ["template": .string(String(id.dropFirst(13)))])
-        } else {
-            return nil
-        }
+        // The start window's tiles: `new:` and the tile's id.
+        guard id.hasPrefix("new:") else { return nil }
+        let tile = String(id.dropFirst(4))
+        guard tile == "sample" || StartCatalog.newParams(tile) != nil else { return nil }
+        StartCatalog.create(tile, in: model)
         return true
     }
 
@@ -902,7 +895,8 @@ extension DialogController {
 
     /// `preferences_snapshot`: what the Preferences dialog can change, as it was when it opened.
     func preferencesSnapshot() -> JSON {
-        ["brightness": .string(model.ui.brightness.rawValue), "uiScale": .num(model.ui.uiScale), "layout": .string(model.ui.layout.rawValue), "prefs": model.session.prefs.toJSON()]
+        ["brightness": .string(model.ui.brightness.rawValue), "uiScale": .num(model.ui.uiScale), "layout": .string(model.ui.layout.rawValue), "prefs": model.session.prefs.toJSON(),
+         "startScreen": .bool(model.ui.showStartScreen)]
     }
 
     /// `restore_preferences`: puts back what the Preferences dialog opened with (Cancel, Esc, the close button).
@@ -911,6 +905,7 @@ extension DialogController {
         if let b = before["brightness"]?.asStr.flatMap(Brightness.init(rawValue:)) { model.ui.brightness = b }
         if let s = before["uiScale"]?.asF64 { model.ui.uiScale = s }
         if let l = before["layout"]?.asStr.flatMap(WindowLayout.init(rawValue:)), l != model.ui.layout { model.run("view.ribbon", ["on": .bool(l == .ribbon)]) }
+        if let s = before["startScreen"]?.asBool { model.ui.showStartScreen = s }
         if let p = before["prefs"], let prefs = try? Prefs(fromJSON: p) { model.session.prefs = prefs }
         model.changed()
     }
@@ -924,6 +919,7 @@ extension DialogController {
         case "layout":
             if let l = WindowLayout(rawValue: value), l != model.ui.layout { model.run("view.ribbon", ["on": .bool(l == .ribbon)]) }
         case "units": model.session.prefs.units = value == "centimeters" ? .centimeters : .inches
+        case "startScreen": model.ui.showStartScreen = on
         case "smartGuides":
             model.session.prefs.smartGuides = on
             model.ui.smartGuides = on

@@ -383,6 +383,21 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     translated as `help.*` in the Commands catalog.
   - **Tests:** `RibbonModelTests` runs every control's commands against a scratch session (over 400), and
     `RibbonWindowTests` switches a real window back and forth.
+- **S1: the start window (2026-10-28).** A milestone of the ribbon plan, built beside R1; details are in DCApp's PORT-NOTES,
+  under "Ribbon" › "S1".
+  - **A launch with nothing to open shows the start window,** not an untitled presentation. It has Home, New and Open,
+    a search field, rendered theme and template tiles, and the recent list. Settings › "Show the start screen when
+    DeckCraftNative opens" (on by default) turns it off, which brings the untitled presentation back.
+  - **Creating from any tile is `file.new` with that tile's parameters.** A test compares `document.inspect` for every
+    theme, template, Blank and the sample.
+  - **File › Open Recent** is new. It lists the same rows as the start window, including missing files, which show
+    "(missing)" and do nothing when chosen.
+  - **`app.backstage {page: home|new|open}` and `app.home`** show the start window. The "new" dialog remains for
+    scripts only.
+  - **Control channel:** `ui.inspect`'s `home` and `backstage` are live, and it gains `startScreen`. There is a new
+    `ui.startScreen` method, and `ui.screenshot {window: "start"}` captures the window.
+  - **Tests:** 33 new (`StartScreenTests`, `StartWindowTests`), including deckcraft's start-screen tests where they
+    apply. The alpha gate gains step 0 and passes 18 of 18.
 
 ## Pin moves
 

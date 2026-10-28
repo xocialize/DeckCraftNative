@@ -4,7 +4,7 @@ The Mac app: a rewrite of deckcraft's `crates/ui-egui` (about 42k lines) and `ap
 SwiftUI, at the pin in `Tools/oracle/pin.env`. deckcraft's UI is the *behaviour* matched (commands, state,
 tests); the layout and idioms are the Mac's (PLAN.md "Decided"; amended 2026-10-27: the ribbon returns as an optional
 layout, [Docs/plans/Ribbon-and-StartScreen.md](../../Docs/plans/Ribbon-and-StartScreen.md)). **Status: Wave 5, done (2026-10-27); ribbon R0 done
-(2026-10-27, see "Ribbon").**
+(2026-10-27, see "Ribbon"); start window S1 done (2026-10-28).**
 The architecture, the areas and the rules are in [WAVE5-PLAN.md](../../WAVE5-PLAN.md).
 
 Two targets:
@@ -134,7 +134,7 @@ and each OK runs deckcraft's command with deckcraft's params.
 | `themeFonts` | Create New Theme Fonts | `design.fonts` | done |
 | `quit`, `close` | Save changes? | — | **native**: NSDocument's close and quit alerts (Save / Don't Save / Cancel) |
 | `info` (Mac) | Properties | `file.properties` (changed fields only); Check for Issues, Revert, Copy Path, Show in Finder | done (backstage Info) |
-| `new` (Mac) | New Presentation | `file.new {theme | template}`, the sample deck | done (backstage New, a window) |
+| `new` (Mac) | New Presentation | `file.new {theme | template}`, the sample deck | done; since S1 the start window is File › Home/New/Open, and this dialog is script-only (`ui.dialog.open {id: "new"}`), its tiles taken from `StartCatalog` |
 
 ### Native instead of ported
 
@@ -151,7 +151,7 @@ and each OK runs deckcraft's command with deckcraft's params.
   live changes can't. Its colour field and Theme Colors' swatches use the system colour panel.
 - **The palette** is a floating panel (⇧⌘P) over the window; arrows, Return and Esc as in deckcraft.
 - **Toasts** are a child panel at the bottom of the document window for eight seconds.
-- **File backstage.** New → the template gallery; Open, Save As, Print → the system's (NSDocument, the
+- **File backstage.** Home, New and Open → the start window (S1, see "Ribbon"); Save As, Print → the system's (NSDocument, the
   Views area's print); Info → Properties sheet; Export → the Export sheet; Account → About.
 - **Menu items** the menu tree has no entry for (Hyperlink… ⌘K, Header and Footer…, Symbol…, Equation…,
   SmartArt…, Slides from Outline…, Reuse Slides…, Bullets and Numbering…, Columns…, Replace Fonts…, Custom
@@ -178,8 +178,8 @@ properties, account), settings.rs (3), toast.rs (1), lib.rs missing-fonts toast.
 
 Not applicable: egui mechanics — `about_credits_tests` (tab row layout), `columns_dialog_tests`
 format_shape_columns_button (the Inspector's button), replacefonts/compare `screenshot` (review images), the
-backstage keyboard side-menu tests (Alt+F, arrows: no side menu on the Mac), the start-screen tests (the Mac
-has no start screen: with nothing open, File › New), backstage Print tests (the Views area's printing),
+backstage keyboard side-menu tests (Alt+F, arrows: no side menu on the Mac), the start-screen tests (ported in
+S1, "Ribbon" › "S1: the start window"), backstage Print tests (the Views area's printing),
 `opening.rs` (NSDocument opens files; deckcraft's progress window is not ported), `uifonts.rs` (AppKit's font
 fallback draws every script), `theme_colors_tests`/`theme_fonts_tests` and `spelling_tests` (the Inspector's
 and the Canvas's lists).
@@ -855,6 +855,65 @@ Settings › General › Window layout. The toolbar and inspector stay the defau
   - `RibbonWindowTests` (DCAppTests), 4 tests: the window swaps its content and toolbar back and forth; every group of every tab draws; every symbol is an SF Symbol; the toolbar's tooltips carry descriptions.
 - **Screenshots** of all ten tabs were taken through the control channel (`view.tab`, then `ui.screenshot`).
   Contextual tabs, inline galleries and folding are R2 and R3.
+
+### S1: the start window (done 2026-10-28)
+
+The start screen of PowerPoint for Mac, in its own window, holding deckcraft's File › Home, New and Open content
+(§7). With nothing to open, a launch shows it in place of an untitled presentation. Settings › "Show the start screen
+when DeckCraftNative opens" (on by default) turns that off.
+
+| File | What |
+|---|---|
+| `DCAppModel/StartCatalog.swift` | `StartTile` (Blank, the 8 themes, the sample, the 6 starters; ids `blank`, `theme:<name>`, `sample`, `template:<name>`), `newParams`/`create` (`file.new` with the tile's params; the sample through `Sample.openSample`), `StartRecent` rows (`split_path`; `recent_exists`, never probing remote paths; deduped, at most 12), `atLaunch` (the launch rule), and `StartTileArt` (each tile's title slide rendered by DCRender in a scratch session, cached as PNG in `~/Library/Caches/DeckCraftNative/StartTiles/<version>/`; a theme's empty title shows its name) |
+| `DCAppModel/StartScreenModel.swift` | The window's state: page (kept as `UiState.startPage`, so it reopens there), search, selection, arrow-key moves, what Return does (Create, Open, or nothing for a missing file), the merged recent list, `inspect()` and `control()` for the control channel |
+| `DCApp/Start/StartFeature.swift` | Install: the model and its NSDocumentController hooks, `DialogController.startScreen`, `ui.inspect`'s `home`/`backstage`/`startScreen`, `ui.startScreen`, `ui.screenshot {window: "start"}`, File › Open Recent (`StartRecentMenu`), the launch rule, closing when a presentation opens |
+| `DCApp/Start/StartWindowController.swift` | The `NSWindow` hosting `StartView` with its toolbar bridged. Esc closes it; ⌘F focuses the search before the menu bar sees it |
+| `DCApp/Start/StartView.swift` | `NavigationSplitView` (Home, New, Open), `.searchable` in the toolbar, the tile strips and grid, the recent rows (Quick Look thumbnail, folder, last opened, "(missing)"; context menu: Show in Finder, Share…, Remove from List), Cancel and Create/Open |
+| `DCApp/Start/StartArt.swift` | The tile pictures (rendered one at a time off the main thread) and the recent files' thumbnails (`QLThumbnailGenerator`) |
+
+Shared files, small additive edits: `UiState` (`showStartScreen`, `startPage`), `DialogsModel` (`startScreen`),
+`DialogsRouting` (`app.backstage {page: home|new|open}` and `app.home` show the start window when there is one),
+`DialogsForms`/`DialogsActions` (the "new" dialog's tiles come from `StartCatalog`; the Settings switch, which Cancel
+restores), `AppController` (`applicationShouldOpenUntitledFile` asks `StartFeature.atLaunch`), `AutomationFeature`
+(`nextCapture`: the window the next screenshot takes), `Features` (Start is installed last, after Show, so its
+`ui.screenshot` hands every other window on), and both string catalogs.
+
+- **Recents.** NSDocumentController is the truth for files that are there, but its list drops a file that has gone.
+  `UiState.recent` (deckcraft's list, in `ui.json`) keeps those where they were. They show "(missing)" and do nothing
+  when chosen until removed, and the merged list is written back to `UiState.recent`. File › Open Recent is built
+  from the same rows each time it opens (a missing file is listed, disabled), so the two always match.
+  NSDocumentController has no way to remove a single entry, so removing one path clears its list and notes the
+  rest again.
+- **Closing.** Esc, Cancel, the close button, or a presentation opening or being created (`file.new` included,
+  from anywhere). It is not a document window, and it never blocks scripts.
+- **Divergences from deckcraft.** Esc closes it (deckcraft's has nowhere to go). Home shows every recent file, not
+  8 plus "More presentations". There is no Discord link. Typing goes nowhere, as in deckcraft, because the window
+  has no slide; with the search field focused, typing searches.
+- **Left out** (the plan's §3 and decision 6): Favourites, Shared, the account badge, cloud places, the Themes
+  strip's disclosure triangle, and the sortable "Last opened" column.
+- **Tests.** DCAppModelTests `StartScreenTests` (25) and DCAppTests `StartWindowTests` (8).
+  - Ported from `backstage/tests.rs`:
+    - `the_start_screen_is_file_home`, adapted because Esc closes the window here;
+    - `open_lists_recent_files_and_opens_one`;
+    - `start_screen_opens_the_palette_and_preferences`;
+    - `start_screen_ignores_text_paste_and_ime_while_file_keys_navigate`, as typing into the window;
+    - the File-tab half of `start_screen_opens_files_and_the_file_tab_from_the_keyboard`;
+    - `split_path`, from `page_ids_round_trip…`.
+  - Ported from `tests.rs`: `recent_exists_tells_missing_from_present`.
+  - Not applicable:
+    - the ⌘O half of the keyboard test: it opens AppKit's open panel, not a service;
+    - `start_screen_ignores_document_shortcuts`: the menu bar validates against the session, so with nothing open
+      Save, Close and Hyperlink have no target, and ⌘F opens the palette, as the Dialogs area chose;
+    - `a_file_that_cant_be_opened_says_why`: NSDocument shows its own error alert.
+- **Control channel.**
+  - `ui.inspect` reports:
+    - `home`: whether the window is open;
+    - `backstage`: its page, else null;
+    - `startScreen`: `open`, `shown`, `page`, `selection`, `query`, `action`, `items`, `recent` and `openRecent`.
+  - `ui.startScreen {page?, query?, select?, move?, activate?, remove?, open?}` drives the window without pixels.
+  - `ui.screenshot {window: "start"}` captures it.
+  - The alpha gate's step 0 launches with nothing to open and checks that the window shows and no document exists.
+    It then creates a deck from Harbor and checks for one document and a closed window, with a screenshot.
 
 ## lib.rs tests
 

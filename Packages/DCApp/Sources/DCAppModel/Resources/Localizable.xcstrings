@@ -6311,6 +6311,16 @@
         }
       }
     },
+    "Show the start screen when DeckCraftNative opens" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the start screen when DeckCraftNative opens"
+          }
+        }
+      }
+    },
     "Show type" : {
       "localizations" : {
         "en" : {

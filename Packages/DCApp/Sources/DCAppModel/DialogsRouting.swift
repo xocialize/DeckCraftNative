@@ -65,6 +65,10 @@ extension DialogController {
         case "app.reuseSlidesDialog": pickAndReuse(keep: p["keepFormatting"]?.asBool ?? false)
         case "app.backstage": return backstage(p)
         case "app.home":
+            if let start = startScreen {
+                if p["on"]?.asBool ?? !start.isOpen { start.show(.home) } else { start.close() }
+                return .success(.null)
+            }
             let on = p["on"]?.asBool ?? (current?.id != "new")
             if on { open("new") } else if current?.id == "new" { cancel() }
         default: return nil
@@ -86,11 +90,12 @@ extension DialogController {
         }
     }
 
-    /// `app.backstage {page?, on?}`: the File tab's pages, as the Mac shows them: New is the template gallery,
-    /// Info the Properties sheet, Export the export sheet, Account the About window; Open, Save As and Print
-    /// are the system's.
+    /// `app.backstage {page?, on?}`: the File tab's pages, as the Mac shows them: Home, New and Open are the
+    /// start window (the "new" dialog and the open panel without one), Info the Properties sheet, Export the
+    /// export sheet, Account the About window; Save As and Print are the system's.
     func backstage(_ p: JSON) -> Result<JSON, CommandError> {
         if p["on"]?.asBool == false {
+            startScreen?.close()
             if let id = current?.id, ["new", "info", "export", "about"].contains(id) { cancel() }
             return .success(["page": .null])
         }
@@ -100,6 +105,10 @@ extension DialogController {
         }
         if DialogBackstage.needsDoc(page) && model.session.activeDoc == nil {
             return .failure(CommandError("File › \(DialogBackstage.label(page)) needs an open presentation"))
+        }
+        if let start = startScreen, let pg = StartScreenModel.Page(rawValue: page) {
+            start.show(pg)
+            return .success(["page": .string(page)])
         }
         switch page {
         case "home", "new": open("new")

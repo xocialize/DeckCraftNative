@@ -77,6 +77,17 @@
         }
       }
     },
+    "%@ (missing)" : {
+      "comment" : "File › Open Recent: a file that can't be found",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (missing)"
+          }
+        }
+      }
+    },
     "%@ (not checked)" : {
       "comment" : "Status bar: the selection's proofing language, marked do-not-check",
       "localizations" : {
@@ -230,6 +241,17 @@
         }
       }
     },
+    "%@ — this file can't be found" : {
+      "comment" : "Start window: tooltip of a missing recent file; the placeholder is its path",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — this file can't be found"
+          }
+        }
+      }
+    },
     "%@: DeckCraftNative can't open this kind of file" : {
       "comment" : "Status after a drop: the file's name, then the problem",
       "localizations" : {
@@ -372,6 +394,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%llds"
+          }
+        }
+      }
+    },
+    "(missing)" : {
+      "comment" : "Start window: a recent file that can't be found",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(missing)"
           }
         }
       }
@@ -1310,6 +1343,17 @@
         }
       }
     },
+    "Clear Menu" : {
+      "comment" : "File › Open Recent: empties the list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Menu"
+          }
+        }
+      }
+    },
     "Click anywhere on the screen to take the colour under the pointer" : {
       "localizations" : {
         "en" : {
@@ -1668,6 +1712,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn't check for updates"
+          }
+        }
+      }
+    },
+    "Create" : {
+      "comment" : "Start window: creates the selected presentation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
           }
         }
       }
@@ -2950,6 +3005,17 @@
         }
       }
     },
+    "Home" : {
+      "comment" : "Start window sidebar: the start page",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
     "Horizontal" : {
       "localizations" : {
         "en" : {
@@ -3556,6 +3622,28 @@
         }
       }
     },
+    "More templates" : {
+      "comment" : "Start window: link to the New page",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More templates"
+          }
+        }
+      }
+    },
+    "More themes" : {
+      "comment" : "Start window: link to the New page",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More themes"
+          }
+        }
+      }
+    },
     "Move Down" : {
       "localizations" : {
         "en" : {
@@ -3624,6 +3712,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Narrow"
+          }
+        }
+      }
+    },
+    "New" : {
+      "comment" : "Start window sidebar: every theme and template\nStart window: the heading over the new-presentation tiles",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
           }
         }
       }
@@ -3810,6 +3909,17 @@
         }
       }
     },
+    "No recent presentations match “%@”." : {
+      "comment" : "Start window: an empty search of the recent list; the placeholder is the search text",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recent presentations match “%@”."
+          }
+        }
+      }
+    },
     "No release notes." : {
       "localizations" : {
         "en" : {
@@ -3857,6 +3967,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No synonyms for \"%@\"."
+          }
+        }
+      }
+    },
+    "No themes or templates match “%@”." : {
+      "comment" : "Start window: an empty search; the placeholder is the search text",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No themes or templates match “%@”."
           }
         }
       }
@@ -4056,12 +4177,45 @@
         }
       }
     },
+    "Open" : {
+      "comment" : "Start window sidebar: open a file\nStart window: opens the selected recent presentation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "Open Recent" : {
+      "comment" : "File menu: the recent presentations",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Recent"
+          }
+        }
+      }
+    },
     "Open Release Page" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Release Page"
+          }
+        }
+      }
+    },
+    "Open…" : {
+      "comment" : "Start window: opens the system Open panel",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open…"
           }
         }
       }
@@ -4423,6 +4577,28 @@
         }
       }
     },
+    "Presentations" : {
+      "comment" : "Start window: the heading over the recent list on the Open page",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentations"
+          }
+        }
+      }
+    },
+    "Presentations you open show up here. Use Open to browse for one." : {
+      "comment" : "Start window: the empty recent list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentations you open show up here. Use Open to browse for one."
+          }
+        }
+      }
+    },
     "Presenter View" : {
       "localizations" : {
         "en" : {
@@ -4671,12 +4847,34 @@
         }
       }
     },
+    "Recent" : {
+      "comment" : "Start window: the heading over the recent presentations",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent"
+          }
+        }
+      }
+    },
     "Recolor" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recolor"
+          }
+        }
+      }
+    },
+    "Recover Unsaved Presentations" : {
+      "comment" : "Start window: opens AutoRecover's presentations",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recover Unsaved Presentations"
           }
         }
       }
@@ -4788,6 +4986,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove Section & Slides"
+          }
+        }
+      }
+    },
+    "Remove from List" : {
+      "comment" : "Start window: a recent file's context menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from List"
           }
         }
       }
@@ -5186,6 +5395,16 @@
         }
       }
     },
+    "Search for themes and templates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for themes and templates"
+          }
+        }
+      }
+    },
     "Select a SmartArt graphic to edit its text." : {
       "localizations" : {
         "en" : {
@@ -5359,6 +5578,17 @@
         }
       }
     },
+    "Share…" : {
+      "comment" : "Start window: a recent file's context menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share…"
+          }
+        }
+      }
+    },
     "Show" : {
       "comment" : "Show a hidden object\nWhich part of the Animate inspector to show\nWhich part of the Review inspector to show",
       "localizations" : {
@@ -5412,6 +5642,7 @@
       }
     },
     "Show in Finder" : {
+      "comment" : "Start window: a recent file's context menu",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5796,6 +6027,7 @@
       }
     },
     "Start" : {
+      "comment" : "The start window's title (new and recent presentations)",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5948,6 +6180,17 @@
         }
       }
     },
+    "Templates" : {
+      "comment" : "Start window: the heading over the starter templates",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Templates"
+          }
+        }
+      }
+    },
     "Text" : {
       "comment" : "A placeholder kind",
       "localizations" : {
@@ -6091,6 +6334,7 @@
       }
     },
     "Themes" : {
+      "comment" : "Start window: the heading over the theme tiles",
       "localizations" : {
         "en" : {
           "stringUnit" : {

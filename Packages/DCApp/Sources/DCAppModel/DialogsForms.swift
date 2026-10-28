@@ -106,6 +106,7 @@ extension DialogController {
             if d.params["before"] == nil { d.params = ["before": preferencesSnapshot()] }
             d.seed("appearance", model.ui.brightness.rawValue)
             d.seed("layout", model.ui.layout.rawValue)
+            d.seed("startScreen", model.ui.showStartScreen ? "1" : "0")
             d.seed("units", prefs.units == .centimeters ? "centimeters" : "inches")
             d.seed("smartGuides", prefs.smartGuides ? "1" : "0")
             d.seed("snapToGrid", prefs.snapToGrid ? "1" : "0")
@@ -561,6 +562,7 @@ extension DialogController {
                 .choice(label: L10n.text("Appearance:"), key: "appearance", options: [FormOption("system", L10n.text("System")), FormOption("light", L10n.text("Light")), FormOption("dark", L10n.text("Dark"))]),
                 .choice(label: L10n.text("Window layout:"), key: "layout", options: [FormOption("mac", L10n.text("Toolbar and inspector")), FormOption("ribbon", L10n.text("Ribbon"))]),
                 .radio(label: L10n.text("Measurement units:"), key: "units", options: [FormOption("inches", L10n.text("Inches")), FormOption("centimeters", L10n.text("Centimeters"))]),
+                .check(label: L10n.text("Show the start screen when DeckCraftNative opens"), key: "startScreen"),
                 .heading(L10n.text("Editing")),
                 .check(label: L10n.text("Show smart guides"), key: "smartGuides"), .check(label: L10n.text("Snap objects to grid"), key: "snapToGrid"),
                 .check(label: L10n.text("Replace straight quotes with smart quotes"), key: "smartQuotes"),
@@ -925,19 +927,17 @@ extension DialogController {
 
     func newRows(_ d: Dialog) -> [FormRow] {
         let q = String(rustTrim(d.value("query"))).lowercased()
-        let themes = builtinThemes().filter { q.isEmpty || $0.name.lowercased().contains(q) }
-        let sample = q.isEmpty || "sample deck northern lights".contains(q)
         var r: [FormRow] = [.text(label: L10n.text("Search"), key: "query", placeholder: L10n.text("Search for themes and templates"))]
         func swatches(_ name: String) -> [String] {
             guard let th = builtinThemes().first(where: { $0.name == name }) else { return [] }
             return [SchemeSlot.lt1, .dk1, .accent1, .accent2, .accent3, .accent4].map { th.colors.get($0).hex }
         }
-        var tiles = themes.map { FormTile("new:theme:\($0.name)", $0.name, colors: swatches($0.name)) }
-        if sample { tiles.append(FormTile("new:sample", L10n.text("Sample deck: Northern Lights"), colors: swatches("DeckCraft"))) }
+        // The start window's tiles (StartCatalog), less Blank, which is the dialog's button.
+        let tiles = StartCatalog.themeTiles(q, blank: false).map { FormTile("new:\($0.id)", $0.title, colors: swatches($0.theme ?? "")) }
         if !tiles.isEmpty { r += [.heading(L10n.text("Themes")), .tiles(tiles)] }
-        let starters = Templates.matching(q)
+        let starters = StartCatalog.templateTiles(q)
         if !starters.isEmpty {
-            r += [.heading(L10n.text("Templates")), .tiles(starters.map { FormTile("new:template:\($0.name)", $0.name, detail: $0.summary, colors: swatches($0.theme)) })]
+            r += [.heading(L10n.text("Templates")), .tiles(starters.map { FormTile("new:\($0.id)", $0.title, detail: $0.detail ?? "", colors: swatches($0.theme ?? "")) })]
         }
         if tiles.isEmpty && starters.isEmpty { r.append(.note(L10n.text("No themes or templates match “\(q)”."))) }
         return r

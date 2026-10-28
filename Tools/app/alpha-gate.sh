@@ -1,6 +1,7 @@
 #!/bin/zsh
 # DeckCraftNative — deckcraft's six alpha-gate workflows (docs/roadmap.md), driven end to end in the real app
-# through the control channel, with a screenshot of each step. Wave 5's acceptance (PLAN.md §7).
+# through the control channel, with a screenshot of each step. Wave 5's acceptance (PLAN.md §7). Step 0, the start
+# window, is milestone S1's (Docs/plans/Ribbon-and-StartScreen.md §10): a launch with nothing to open shows it.
 #
 # Usage: Tools/app/alpha-gate.sh [OUT_DIR]   (builds DeckCraftDev and dccli into .build-gate first)
 # Every check prints PASS or FAIL; the exit status is the number of failures. Screenshots and the files the
@@ -35,6 +36,21 @@ launch() {
   echo "the app didn't answer on port $PORT"; exit 98
 }
 quit() { method app.quit '{}' >/dev/null 2>&1; sleep 1; pkill -f "DeckCraftDev --control $PORT" 2>/dev/null; sleep 0.5; }
+
+echo "== 0. Start screen → create from Harbor → one document"
+launch
+HOME_=$(method ui.inspect '{}' | jq_ "['startScreen']['shown']")
+DOCS=$(method ui.inspect '{}' | jq_ "['documents'].__len__()")
+check "launch shows the start window and no untitled document" $([ "$HOME_" = True ] && [ "$DOCS" = 0 ]; echo $?)
+method ui.startScreen '{"page":"new","select":"theme:Harbor"}' >/dev/null
+method ui.screenshot "{\"path\":\"$OUT/0-start.png\",\"window\":\"start\"}" >/dev/null
+method ui.startScreen '{"activate":true}' >/dev/null
+DOCS=$(method ui.inspect '{}' | jq_ "['documents'].__len__()")
+HOME_=$(method ui.inspect '{}' | jq_ "['home']")
+THEME=$(app document.inspect | jq_ "['theme']")
+check "created from Harbor: one document, the start window closed" $([ "$DOCS" = 1 ] && [ "$HOME_" = False ] && [ "$THEME" = Harbor ]; echo $?)
+shot 0-created
+quit
 
 echo "== 1. Build a deck from scratch, save, close, reopen"
 launch

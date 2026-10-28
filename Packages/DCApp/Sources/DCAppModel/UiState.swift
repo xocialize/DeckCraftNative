@@ -49,12 +49,17 @@ public struct UiState: Codable, Sendable, Equatable {
     /// Format Shape pane: tab (`fill`, `effects`, `size`, `picture`, `text`).
     public var formatTab = "fill"
     public var grayscale = false
+    /// Settings › "Show the start screen when DeckCraftNative opens" (on by default; Ribbon-and-StartScreen §7).
+    public var showStartScreen = true
+    /// The start window's page (`home`, `new` or `open`): it reopens on the one used last.
+    public var startPage = "home"
 
     public init() {}
 
     enum CodingKeys: String, CodingKey {
         case brightness, tab, ribbonCollapsed, layout, view, notes, notesHeight, thumbsWidth, pane, paneWidth, ruler, gridlines,
-             handoutPerPage, guides, smartGuides, zoom, sorterZoom, recent, presenterView, uiScale, formatTab, grayscale
+             handoutPerPage, guides, smartGuides, zoom, sorterZoom, recent, presenterView, uiScale, formatTab, grayscale,
+             showStartScreen, startPage
     }
 
     /// Every field optional on the way in (`#[serde(default)]`): a missing or mistyped key keeps its default.
@@ -84,6 +89,8 @@ public struct UiState: Codable, Sendable, Equatable {
         uiScale = v(.uiScale, d.uiScale)
         formatTab = v(.formatTab, d.formatTab)
         grayscale = v(.grayscale, d.grayscale)
+        showStartScreen = v(.showStartScreen, d.showStartScreen)
+        startPage = v(.startPage, d.startPage)
     }
 
     /// How many recent files File › Open Recent lists (`RECENT_MAX`).
@@ -108,6 +115,7 @@ public struct UiState: Codable, Sendable, Equatable {
         if tab.utf8.count > 64 { s.tab = d.tab }
         if formatTab.utf8.count > 64 { s.formatTab = d.formatTab }
         if let p = pane, p.utf8.count > 64 { s.pane = nil }
+        if !StartCatalog.pages.contains(startPage) { s.startPage = d.startPage }
         if ![1, 2, 3, 4, 6, 9].contains(handoutPerPage) { s.handoutPerPage = d.handoutPerPage }
         var recent: [String] = []
         for p in self.recent where !p.isEmpty && p.utf8.count <= 4096 && !p.contains("\0") && recent.last != p {
