@@ -438,6 +438,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
 - 2026-10-26: a Rust variant named `None` is `none_` in Swift, so it can't be confused with `Optional.none`.
 - 2026-10-26: the port lives in `research/DeckCraftNative`. It targets macOS 26+ on Apple Silicon only,
   with a Mac-native UI that keeps PowerPoint's verbs and drops the ribbon.
+  **Amended 2026-10-27 (operator):** the ribbon returns as an optional window layout beside the inspector,
+  with a start screen at launch; the Mac layout stays the default until the plan's R4 passes, then new installs
+  get the ribbon. Familiarity for PowerPoint users, not a 100% match ([Docs/plans/Ribbon-and-StartScreen.md](Docs/plans/Ribbon-and-StartScreen.md)).
 - 2026-10-26: PDF export writes vector slides (a recorded `Canvas` replayed into CGPDFContext) with an
   invisible CoreText text layer, where deckcraft rasterises. Blurs and backdrop compose modes are rasterised
   at the export's dpi.

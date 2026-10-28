@@ -12,7 +12,7 @@ shape: the two rules, one root `Package.swift`, packages that follow the crate l
 |---|---|
 | Where it lives | `research/DeckCraftNative`, next to PhotoCraftNative; GitHub remote [`xocialize/DeckCraftNative`](https://github.com/xocialize/DeckCraftNative) (private, created 2026-10-27); the fixtures repo stays local, as PhotoCraftNative's does |
 | Platforms | macOS 26+, Apple Silicon only. Engine packages stay free of AppKit so iPadOS can follow later |
-| UI | A Mac-native app that keeps PowerPoint's verbs: menu bar, toolbar, inspector sidebar and slide navigator (a Keynote-like layout), all generated from the command registry. **The ribbon is dropped** |
+| UI | A Mac-native app that keeps PowerPoint's verbs: menu bar, toolbar, inspector sidebar and slide navigator (a Keynote-like layout), all generated from the command registry. ~~**The ribbon is dropped**~~ **Amended 2026-10-27 (operator):** the ribbon returns as an *optional window layout* beside the inspector, generated from the same registry, with a start screen; the Mac layout stays the default until the ribbon's last milestone passes, then new installs get the ribbon. Familiarity for PowerPoint users, not a 100% match ([Docs/plans/Ribbon-and-StartScreen.md](Docs/plans/Ribbon-and-StartScreen.md)) |
 
 ## 1. What we are converting
 

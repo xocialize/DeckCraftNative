@@ -1,6 +1,6 @@
 # Ribbon and start screen
 
-**Status:** plan, draft 1, 2026-10-27. Nothing is built yet. · **Pin:** deckcraft `88c2ceff` · **Reads with:**
+**Status:** plan, draft 2, 2026-10-27: the operator's decisions are recorded (§12). Nothing is built yet; R0 waits for the go-ahead. · **Pin:** deckcraft `88c2ceff` · **Reads with:**
 [PLAN.md](../../PLAN.md), [PORT-STATUS.md](../../PORT-STATUS.md), [EVALUATION.md](../../EVALUATION.md), and
 DCApp's [PORT-NOTES.md](../../Packages/DCApp/PORT-NOTES.md) ("Inspector" and "Ribbon → Mac").
 
@@ -9,11 +9,17 @@ The operator wants two PowerPoint features in DeckCraftNative: a **start screen*
 decision. The ribbon comes back as an **optional window layout** that sits beside the inspector, and it is
 generated from the same command registry. The Mac layout stays, and so do the inspector, the toolbar and the menus.
 
+> **Guiding principle (the operator, 2026-10-27):** *familiarity, not a 100% match.* Someone who knows
+> PowerPoint should be comfortable in our UI: the tabs, groups and buttons are where they expect, and they
+> behave as they expect. Matching PowerPoint or deckcraft exactly is not a goal in itself. Where exact parity
+> adds work and no comfort, it is left out. Commands keep deckcraft's ids and params, because that is about
+> scripts, not looks.
+
 ## 1. Sources and the clean-room line
 
 | Source | Used for | Rule |
 |---|---|---|
-| deckcraft `crates/ui-egui/src/ribbon.rs`, `ribbon/*.rs`, `backstage.rs`, `backstage/{files,info,print}.rs`, `opening.rs` (MIT OR Apache-2.0) | **The parity source**: the tab order, the groups, the controls and the command ids with their params, when contextual tabs show, the QAT defaults, and the start screen's sections | Portable. Ported files name their source and licence in their header, as the rest of DCApp does |
+| deckcraft `crates/ui-egui/src/ribbon.rs`, `ribbon/*.rs`, `backstage.rs`, `backstage/{files,info,print}.rs`, `opening.rs` (MIT OR Apache-2.0) | **The starting point**: the tabs, the groups, the controls and the command ids with their params, when contextual tabs show, the QAT defaults, and the start screen's sections. Arranged for PowerPoint users' comfort where the two differ | Portable. Ported files name their source and licence in their header, as the rest of DCApp does |
 | Microsoft PowerPoint for Mac (installed; black-box) | **Behaviour only**: how groups fold as the window narrows, where the start window's parts sit, and how each part reacts | Described here in our own words. No screenshots, icons, theme thumbnails, templates or strings that PowerPoint shows or saves enter the repo or `../DeckCraftNative-Fixtures`. The first-run notes are kept outside the repo, in the session notes folder |
 | Apple HIG (toolbars, sidebars, windows, accessibility) | Mac conventions | Wins over both when they disagree |
 
@@ -86,29 +92,31 @@ changed. A first-run privacy notice appeared, and the start window was reached w
 | Tooltips | label and description | label and shortcut only (`ribbon.rs:308`) |
 | Minimised ribbon | View › Ribbon hides it | `view.collapseRibbon` (⌘F1), or a click on the active tab or a double-click on any tab; saved in `ui.json` |
 | Start screen | separate window, remembers its last page | File › Home, forced when nothing is open; no "show at launch" setting; Esc does nothing |
-| Favourites and pinning | Favorites tab with a star | none; up to 12 recents, with "(missing)" and × Remove |
+| Favourites and pinning | Favorites tab with a star | none; up to 12 recents, with "(missing)" and × Remove. **We follow deckcraft here** (decision 6) |
 
 ## 3. Adopt, adapt or skip
 
 | Piece | Verdict | Why, and the Mac form it takes |
 |---|---|---|
-| Ribbon tabs, groups and controls | **Adopt** deckcraft's set, in deckcraft's order | It is the parity source, and every control is already a registry command, mapped in `RibbonMap` |
+| Ribbon tabs, groups and controls | **Adopt** deckcraft's set, arranged as PowerPoint users expect | Every control is already a registry command, mapped in `RibbonMap`. Where deckcraft's order or grouping differs from what a PowerPoint user looks for, the familiar arrangement wins |
 | Contextual tabs | **Adopt** deckcraft's seven predicates (`ribbon.rs:85-118`), already ported in `InspectorController` | Keep deckcraft's rule that a contextual tab is never switched to automatically (PowerPoint does the same). Tint contextual tabs with the accent colour |
 | Group folding at narrow widths | **Adapt**, a PowerPoint-like behaviour that deckcraft lacks | Stepped sizes for each group (§5). deckcraft's scroll chevrons become the last resort only |
 | Split buttons, galleries, spinners, colour grids | **Adopt**, with the native controls DCApp already uses | `Menu(primaryAction:)`, the colour-grid popover with `NSColorSampler`, and `ThemeTile`. The ribbon reuses `InspectorControls`, not new copies |
+| Controls that never work (Screenshot, Ink to Text, Ink to Math, Cameo, Translate, Add-ins) | **Skip** | deckcraft and PowerPoint show some of these greyed out for good. A button that can never be pressed adds no comfort, so it is left out. Controls disabled only for the current selection stay visible, greyed out, as in PowerPoint |
 | Quick Access Toolbar | **Adopt** deckcraft's model (`app.qat`, its defaults; kept in UserDefaults `DeckCraftQuickAccessToolbar`, `InspectorQAT.swift`) | In ribbon layout the QAT's buttons sit in the unified toolbar at the leading edge, beside the traffic lights, as PowerPoint and deckcraft both place them. In Mac layout it stays one toolbar menu item, as now |
 | Title-bar Search, Present, Comments | **Adopt** | Search is the command palette (`app.palette`), Present is `show.fromCurrent`, and Comments opens the Review inspector tab. They are all toolbar items |
-| AutoSave switch | **Skip for now** (open decision 4) | `autosavesInPlace` is off on purpose: AutoRecover keeps deckcraft's crash recovery (EVALUATION.md §1). A switch that lies is worse than no switch |
+| AutoSave switch | **Skip** (decision 4) | AutoRecover is sufficient. `autosavesInPlace` stays off and deckcraft's crash recovery stays (EVALUATION.md §1). Nothing is scheduled to change that |
 | Share button | **Adapt**: `NSSharingServicePicker` on the saved file | There are no accounts and no cloud, so this is the native Share menu and nothing more |
 | Designer, Add-ins | Designer: **adopt** as `view.pane {designer}`. Add-ins: **skip** | deckcraft has Design Ideas but no add-ins |
 | Record tab | **Adopt deckcraft's version**: From Beginning and From Current, which rehearse. Cameo is disabled | As deckcraft has it |
 | KeyTips | **Skip** | Not a Mac convention, not in PowerPoint for Mac, not in deckcraft. Full Keyboard Access and the command palette cover it (§6) |
 | Simplified (single-line) ribbon | **Skip** | Neither PowerPoint for Mac nor deckcraft has one. The inspector layout already fills that role |
-| Live preview on hover | **Adopt only where deckcraft has it** (SmartArt layouts, `galleries.rs:104`) | Previewing everything on hover means rendering into a scratch copy of the document. That is a later item, listed in §10 |
-| Group captions | **Adapt**: hidden by default, with "Show group titles" in Settings | PowerPoint for Mac hides them, and deckcraft never draws them. Accessibility always names each group, captions or not |
+| Live preview on hover | **Skip in this plan** | deckcraft previews SmartArt layouts only (`galleries.rs:104`). A preview on one gallery and not the others is parity, not comfort. Previewing every gallery means rendering into a scratch copy of the document: a candidate after R4 (§10) |
+| Group captions | **Hidden**, as PowerPoint for Mac shows them by default | deckcraft never draws them. No setting for them, which is simpler. Accessibility always names each group, and a collapsed group's button carries its name |
 | Start screen | **Adopt** as its own window (§7) | PowerPoint's shape, deckcraft's content (themes, starter templates, the sample, recents), and AppKit's data (`NSDocumentController`) |
 | Start screen account badge, Shared tab, cloud places | **Skip** | There are no accounts. Open hands over to `NSOpenPanel` |
-| Favourites | **Adopt** (new; deckcraft has none) | A star on a recent row, stored as bookmark data in `ui.json`. It is cheap and makes the start screen useful |
+| Favourites | **Skip** (decision 6) | A plain recent list, as deckcraft has, is sufficient and simpler |
+| Tooltips | **Adapt**: label, shortcut and a one-line description (decision 3) | PowerPoint users expect a sentence saying what a button does. deckcraft shows label and shortcut only. The descriptions are written in our own words (§6) |
 
 ## 4. One source of truth: the ribbon is generated
 
@@ -150,10 +158,10 @@ CommandMenu: the split or menu content, shared with ToolbarCatalog (moved down f
   menus. It replaces the symbols scattered through `ToolbarCatalog.commands` and `ToolbarCatalog.symbol(_:)`.
   Where SF Symbols has nothing that fits, use template images drawn from DCGeometry's presets, as the
   shape icons already are. **We draw no icon to look like Microsoft's.**
-- **Parity check:** `RibbonParityTests` holds deckcraft's ribbon as an inventory written by hand from
-  `ribbon/*.rs`, with a file:line citation per group: tab → group → (command id, params shape). It asserts
-  that RibbonLayout has the same tabs, the same groups in the same order, and the same commands. When the pin
-  moves, `git diff <pin>..origin/main -- crates/ui-egui/src/ribbon*` shows what to update.
+- **Coverage check, not an order check:** `RibbonCoverageTests` asserts that every command deckcraft's ribbon
+  runs (the list in `RibbonMap`, cited to `ribbon/*.rs`) is reachable from RibbonLayout, or is listed as left out
+  on purpose with a reason. It doesn't pin tab or group order: that follows the guiding principle. When the pin
+  moves, `git diff <pin>..origin/main -- crates/ui-egui/src/ribbon*` shows new commands to place.
 - **One view, two layouts.** The ribbon renders RibbonLayout. The inspector keeps its SwiftUI sections, but
   every control that both show is one shared component: the font family and size pickers, B/I/U toggles, the
   colour grid, the theme and transition tiles, spinners that commit on Return, and sliders that commit on release.
@@ -216,7 +224,14 @@ GroupSize: .large → .medium (small icons with labels) → .small (icons only) 
   - A gallery is an `AXList` whose items carry the theme, transition or style name.
   - A collapsed group is a pop-up button named after the group.
   - Disabled controls report as disabled and are never removed.
-- **Tooltips** keep deckcraft's "label (shortcut)" form, with macOS glyphs. Descriptions are open decision 3.
+- **Tooltips** show the label, the shortcut with macOS glyphs, and a one-line description (decision 3).
+  - The descriptions are written in our own words, never copied from PowerPoint. They live in a
+    `CommandHelp` table in DCAppModel, keyed by command id, and are localised in `Commands.xcstrings` as
+    `help.<id>`. The engine's `CommandSpec` is untouched, because its English stays byte-identical for parity.
+  - The same text serves the toolbar tooltips, the command palette's subtitle and VoiceOver's help
+    (`accessibilityHint`), so it is written once.
+  - A test requires a description for every command the ribbon or toolbar shows. The rest (menus and
+    palette only) follow in R4. That is roughly 400 strings in all.
 - **Contrast and motion.** The ribbon uses DesignScaffold's tokens and semantic colours, so Increase Contrast,
   Reduce Transparency and dark mode follow macOS. It has no animations beyond the system's.
 
@@ -235,7 +250,7 @@ separate page.
 |---|---|---|
 | **Home: Themes strip** | Blank, then the built-in themes, then "Sample deck: Northern Lights" (deckcraft's Home has the same set), and *More themes* → New | `DCModel` `Theme.builtins`: DeckCraft, Harbor, Ember, Meadow, Nocturne, Paper, Coral Reef, Slate. These are deckcraft's own themes, with OFL fonts. The sample is DCEngine's sample deck |
 | **Home: Templates strip** | deckcraft's starter templates, and *More templates* → New | DCEngine `Templates.starters`: Briefing, Lesson, Pitch, Field Notes, Quarterly, Evening Talk (`templates.rs:26-160`) |
-| **Home: Recent / Favorites** | name, folder, last opened (relative), and a thumbnail. Row actions on hover and in a context menu: Favourite, Show in Finder, Share…, Remove from List. Missing files are greyed out with "(missing)" | Recents: **`NSDocumentController.recentDocumentURLs`**. The app already records into it (`AppControlHost.open` calls `noteNewRecentDocument`), but **no File › Open Recent menu exists yet** (`MenuTree` has none). S1 adds the standard one, so that menu, the Dock menu and the start screen show one list. Last opened: the file's `URLResourceValues` (`contentAccessDate`). Thumbnails: `QLThumbnailGenerator`, which our Quick Look extension serves for `.deckcraft` and `.pptx`. Favourites: bookmark data in `UiState.favorites` |
+| **Home: Recent** | name, folder, last opened (relative), and a thumbnail. Row actions in a context menu: Show in Finder, Share…, Remove from List. Missing files are greyed out with "(missing)" | Recents: **`NSDocumentController.recentDocumentURLs`**. The app already records into it (`AppControlHost.open` calls `noteNewRecentDocument`), but **no File › Open Recent menu exists yet** (`MenuTree` has none). S1 adds the standard one, so that menu, the Dock menu and the start screen show one list. Last opened: the file's `URLResourceValues` (`contentAccessDate`). Thumbnails: `QLThumbnailGenerator`, which our Quick Look extension serves for `.deckcraft` and `.pptx` |
 | **New** | Blank, every theme, every template, and the sample, as a grid. Search filters it | Templates through `Templates.matching(query)`, which already matches name, summary, theme and slide titles |
 | **Open** | *Open…* (the system panel), *Recover Unsaved Presentations* when AutoRecover holds any, and the recent list | `app.openDialog`; `file.recovery.open` |
 | **Buttons** | Cancel (Esc), and Create or Open (Return), whichever fits the selection. A double-click acts at once | `file.new {}`, `{theme}` or `{template}`; opening goes through `NSDocumentController.openDocument(withContentsOf:)` |
@@ -265,8 +280,8 @@ separate page.
     window has no canvas.
   - deckcraft's start-screen tests (`backstage/tests.rs:441-530`) are marked not applicable in DCApp's
     PORT-NOTES today ("the Mac has no start screen"). S1 ports them.
-- **Settings:** "Show the start screen when DeckCraftNative opens", on by default. Off restores today's
-  behaviour, an untitled presentation.
+- **Settings:** "Show the start screen when DeckCraftNative opens", on by default (decision 5). Off restores
+  today's behaviour, an untitled presentation.
 - **Scripts and the alpha gate.** The control channel keeps working with the start window open. `file.new`
   closes it.
   - `ui.inspect` already reports deckcraft's `home` and `backstage` keys, but they are hard-coded to
@@ -285,19 +300,18 @@ Settings › General gains a **Window layout** choice:
 | **Ribbon** | the QAT buttons at the leading edge, the title, then Search, Present, Comments and Share | shown | **closed by default; it becomes the task pane.** The ribbon's Format Pane, Selection Pane, Animation Pane, Design Ideas and Comments buttons open the matching inspector tab with `view.pane`, as PowerPoint's task panes open beside the slide. This needs no new code: `view.pane` already picks the tab |
 
 - View › Ribbon (⌥⌘R) switches the front window and saves the choice as the default for new windows.
-- "Show group titles" (off) and "Show the start screen at launch" (on) sit beside it.
-- The layout and the group-titles setting go in `UiState` (`layout`, `ribbonGroupTitles`), so `ui.inspect` and
-  `ui.set` reach them. The start-screen setting goes there too. The rows join the Settings dialog's General
+- "Show the start screen at launch" (on) sits beside it.
+- The layout goes in `UiState` (`layout`), so `ui.inspect` and `ui.set` reach it. The start-screen setting goes there too. The rows join the Settings dialog's General
   section (`DialogsForms` preferences rows), which applies changes live and restores them on Cancel.
 - **Today the Settings window has no layout setting.** It offers only Appearance, units and the editing options.
-- **The recommended default (open decision 1)** is to keep the **toolbar and inspector** as the default until
-  milestone R4's gate passes, then make **Ribbon** the default for new installs and keep existing users'
-  choice. The start screen is on by default from milestone S1.
+- **The default (decision 1):** the **toolbar and inspector** stay the default until milestone R4's gate
+  passes. After that, **Ribbon** is the default for new installs, and existing users keep their choice
+  (an existing `ui.json` without `layout` reads as the Mac layout). The start screen is on by default from S1.
 
 ## 9. Localisation and the pseudo-language width check
 
 - **New strings** go into String Catalogs, under the Wave 6 convention: tab titles, group titles, the
-  collapsed-group buttons, the start-screen copy and the Settings labels.
+  collapsed-group buttons, the tooltip descriptions, the start-screen copy and the Settings labels.
   - Tab and group titles get their own `Ribbon.xcstrings` in DCAppModel, keyed `ribbon.tab.<id>` and
     `ribbon.group.<tab>.<id>`. They need their own keys: "Layout" is a tab, a Home control and a Design control,
     and "Arrange" is both a group and a button.
@@ -323,12 +337,12 @@ entry. Screenshots are of **our app only**, taken with the control channel's `ui
 
 | # | Scope | Acceptance checks | How it is verified |
 |---|---|---|---|
-| **R0. One table** | `RibbonLayout` (data only), `CommandMenus` moved into DCAppModel, `CommandSymbols`, `RibbonMap` derived from `RibbonLayout`, and the deckcraft ribbon inventory with citations. No UI changes | `RibbonParityTests`: tabs, groups, order and commands equal to deckcraft at the pin. Every command resolves in the registry. The toolbar's menus are unchanged (the item-for-item `InspectorToolbarTests` still pass) | `swift test`. The app looks and behaves exactly as before, and the alpha gate proves it |
-| **S1. Start window** | `StartWindowController` (Home, New, Open, Search), rendered tiles with a cache, recents from NSDocumentController, Favourites, the launch rule, the Settings toggle, `app.backstage`/`app.home` routing; the "new" dialog window folded into it; File › Open Recent; deckcraft's start-screen tests ported | A launch with no file shows the start window and no untitled document. Create with each theme and template gives the same deck as `file.new` with the same parameters (compared with `document.inspect`). Recents match File › Open Recent. A missing file shows "(missing)" and does nothing when chosen. Esc closes. The setting turned off restores the untitled document | DCAppModel tests for the start model (sources, search, favourites, missing files, page memory). Control channel: `ui.inspect.home` / `backstage` / `startScreen`, `app.backstage {page}`, `file.new` closing it, and `ui.screenshot {window: "start"}`. A new alpha-gate step, "0. start screen → create from Harbor → one document", with a screenshot |
-| **R1. Static ribbon** | `RibbonView` in the titlebar accessory, all ten tabs at `.large`, buttons, toggles and splits through `AppModel.run`, enabled and toggle state from the session, View › Ribbon, the Settings layout choice, the leading QAT in ribbon layout | Every control runs its command with deckcraft's params: a test walks RibbonLayout and fires each `Cmd` against a scratch session. The toggles' state follows `format.state`. Switching layouts keeps the document, the selection and the undo stack | DCAppTests with a hosted window, as `InspectorToolbarTests`. Control channel: `view.ribbon`, `view.tab`, `ui.inspect.ribbon {tab, collapsed, layout}`, and a screenshot of each tab |
-| **R2. Contextual tabs and galleries** | The seven contextual tabs and the master tabs; galleries for themes, variants, transitions, animations, table styles, picture styles, quick styles, shapes and SmartArt layouts (with deckcraft's hover preview for SmartArt only); "›" expansion; the colour grids and spinners shared with the inspector | Selecting each object kind shows exactly deckcraft's tabs (the predicates are tested in the model), and never switches tabs. Choosing a gallery item is one undo step. The theme gallery renders the same tiles as the start screen | DCAppModel tests for the predicates and gallery sources. Control channel: select a shape, a picture, a table, a chart, SmartArt and media in turn, then `ui.inspect.ribbon.tabs`, with a screenshot of each contextual tab |
-| **R3. Folding, keyboard, accessibility** | `RibbonFit`, the measurement cache, collapsed-group popovers, tab overflow, the scroll fallback, minimising (⌘F1), focus sections, AX roles and names, the group-titles setting | `RibbonFit` unit tests: the fold order is monotonic as the width falls, Paste and Designer never fold, the selected tab never overflows, the same input gives the same output. In the app, every tab at 1600/1150/920/700 pt is laid out with nothing overlapping or clipped. VoiceOver reads every group name and split half. All of a tab is reachable with Full Keyboard Access alone | Control channel: `ui.resize` (it exists) at four widths, then `ui.inspect.ribbon.groups[*].size`, `truncated == []`, and screenshots. An Accessibility Inspector audit with no warnings on the ribbon, recorded in PORT-NOTES |
-| **R4. Localisation and polish** | `Ribbon.xcstrings`, the pseudo, double-length and right-to-left runs, the persistence of tab, minimised state, layout and QAT, the Share item, docs | The three pseudo runs give `truncated == []` at all four widths on every tab. A `ui.json` from before the ribbon loads with defaults. The alpha gate passes in **both** layouts (run twice, with `ui.set {layout}`) | `Tools/l10n/pseudo.sh` plus a new `Tools/app/ribbon-widths.sh` that drives the widths and checks `truncated`. Alpha gate ×2. Then open decision 1: which layout new installs get |
+| **R0. One table** | `RibbonLayout` (data only), `CommandMenus` moved into DCAppModel, `CommandSymbols`, `CommandHelp` (the table, empty to start), `RibbonMap` derived from `RibbonLayout`. No UI changes | `RibbonCoverageTests`: every command deckcraft's ribbon runs is placed or listed as left out with a reason. Every command resolves in the registry. The toolbar's menus are unchanged (the item-for-item `InspectorToolbarTests` still pass) | `swift test`. The app looks and behaves exactly as before, and the alpha gate proves it |
+| **S1. Start window** | `StartWindowController` (Home, New, Open, Search), rendered tiles with a cache, a plain recent list from NSDocumentController, the launch rule, the Settings toggle, `app.backstage`/`app.home` routing; the "new" dialog window folded into it; File › Open Recent; deckcraft's start-screen tests ported | A launch with no file shows the start window and no untitled document. Create with each theme and template gives the same deck as `file.new` with the same parameters (compared with `document.inspect`). Recents match File › Open Recent. A missing file shows "(missing)" and does nothing when chosen. Esc closes. The setting turned off restores the untitled document | DCAppModel tests for the start model (sources, search, missing files, page memory). Control channel: `ui.inspect.home` / `backstage` / `startScreen`, `app.backstage {page}`, `file.new` closing it, and `ui.screenshot {window: "start"}`. A new alpha-gate step, "0. start screen → create from Harbor → one document", with a screenshot |
+| **R1. Static ribbon** | `RibbonView` in the titlebar accessory, all ten tabs at `.large`, buttons, toggles and splits through `AppModel.run`, enabled and toggle state from the session, View › Ribbon, the Settings layout choice, the leading QAT in ribbon layout, **tooltip descriptions for every command the ribbon and toolbar show** | Every control runs its command with deckcraft's params: a test walks RibbonLayout and fires each `Cmd` against a scratch session. The toggles' state follows `format.state`. Switching layouts keeps the document, the selection and the undo stack. Every ribbon and toolbar command has a `CommandHelp` entry and a catalog string | DCAppTests with a hosted window, as `InspectorToolbarTests`. Control channel: `view.ribbon`, `view.tab`, `ui.inspect.ribbon {tab, collapsed, layout}`, and a screenshot of each tab |
+| **R2. Contextual tabs and galleries** | The seven contextual tabs and the master tabs; galleries for themes, variants, transitions, animations, table styles, picture styles, quick styles, shapes and SmartArt layouts; "›" expansion; the colour grids and spinners shared with the inspector | Selecting each object kind shows its contextual tabs (the predicates are tested in the model), and never switches tabs. Choosing a gallery item is one undo step. The theme gallery renders the same tiles as the start screen | DCAppModel tests for the predicates and gallery sources. Control channel: select a shape, a picture, a table, a chart, SmartArt and media in turn, then `ui.inspect.ribbon.tabs`, with a screenshot of each contextual tab |
+| **R3. Folding, keyboard, accessibility** | `RibbonFit`, the measurement cache, collapsed-group popovers, tab overflow, the scroll fallback, minimising (⌘F1), focus sections, AX roles and names | `RibbonFit` unit tests: the fold order is monotonic as the width falls, Paste and Designer never fold, the selected tab never overflows, the same input gives the same output. In the app, every tab at 1600/1150/920/700 pt is laid out with nothing overlapping or clipped. VoiceOver reads every group name and split half. All of a tab is reachable with Full Keyboard Access alone | Control channel: `ui.resize` (it exists) at four widths, then `ui.inspect.ribbon.groups[*].size`, `truncated == []`, and screenshots. An Accessibility Inspector audit with no warnings on the ribbon, recorded in PORT-NOTES |
+| **R4. Localisation and polish** | `Ribbon.xcstrings`, the remaining tooltip descriptions (menu- and palette-only commands), the pseudo, double-length and right-to-left runs, the persistence of tab, minimised state, layout and QAT, the Share item, docs; then **the ribbon becomes the default for new installs** (decision 1) | The three pseudo runs give `truncated == []` at all four widths on every tab. Every command in the palette has a description. A `ui.json` from before the ribbon loads as the Mac layout. A fresh `ui.json` gets the ribbon. The alpha gate passes in **both** layouts (run twice, with `ui.set {layout}`) | `Tools/l10n/pseudo.sh` plus a new `Tools/app/ribbon-widths.sh` that drives the widths and checks `truncated`. The catalog-completeness test over `help.*`. Alpha gate ×2 |
 
 **The order:** R0, then S1 and R1 side by side (they touch disjoint files: the start window under `DCApp/Start/`
 and `DCAppModel/Start*.swift`, the ribbon under `DCApp/Ribbon/` and `DCAppModel/Ribbon*.swift`), then R2 →
@@ -339,27 +353,43 @@ every gallery (§3) is a candidate after R4, not part of this plan.
 
 | Risk | Mitigation |
 |---|---|
-| **It reverses a recorded decision.** PLAN.md's "Decided" table and PORT-STATUS's 2026-10-26 decision say the ribbon is dropped, and the code comments in `UiState.swift` and `InspectorRibbonMap.swift` say the same | The reversal is partial and explicit: the ribbon is an *optional layout*, and the Mac layout stays fully supported. On approval, PLAN.md's row and PORT-STATUS's decisions get a dated amendment ("2026-10-27: the ribbon returns as an optional layout; Docs/plans/Ribbon-and-StartScreen.md"), and the comments are updated in R0 |
-| **Two UIs drift apart.** The ribbon and the inspector could each grow controls the other lacks, or behave differently | One `RibbonLayout` from which `RibbonMap` is derived, shared `CommandMenus`, shared control components, and the parity test. The alpha gate runs in both layouts from R4 |
+| **It reverses a recorded decision.** PLAN.md's "Decided" table and PORT-STATUS's 2026-10-26 decision said the ribbon is dropped, and the code comments in `UiState.swift` and `InspectorRibbonMap.swift` say the same | The reversal is partial and explicit: the ribbon is an *optional layout*, and the Mac layout stays fully supported. Approved 2026-10-27: PLAN.md's row and PORT-STATUS's decisions carry the dated amendment. The code comments are updated in R0 |
+| **Two UIs drift apart.** The ribbon and the inspector could each grow controls the other lacks, or behave differently | One `RibbonLayout` from which `RibbonMap` is derived, shared `CommandMenus`, shared control components, and the coverage test. The alpha gate runs in both layouts from R4 |
 | **The fold order looks like PowerPoint but is guessed.** Our widths and labels differ | `foldOrder` is data, tuned from screenshots of our own app at the four widths. The pseudo runs make sure it still holds with long strings |
 | **Window height.** The ribbon (about 90 pt) plus the toolbar takes vertical space on 13" displays | Minimising (⌘F1) leaves the tab row only. The ribbon layout puts insert items in the ribbon, not the toolbar, so the toolbar stays one row. Users of the Mac layout lose nothing |
 | **Performance.** Galleries rendered by DCRender, recent-file thumbnails, and per-selection enabled checks for about 200 controls | Tiles are rendered off the main thread and cached. Thumbnails come from Quick Look, which is asynchronous. Enabled state is computed once per session change, as the toolbar's validation is, not once per control per frame |
 | **A start screen at launch breaks scripted runs** | It never blocks: the control channel, `file.new`, files passed on the command line and `--sample` all bypass or close it. The alpha gate gets a start-screen step rather than an opt-out |
 | **Clean room.** Watching PowerPoint closely invites copying | Only behaviour is written down, in our own words (§2). Icons are SF Symbols or our own preset geometry. Tile art is our render of our themes. Nothing PowerPoint shows is captured into the repo or the fixtures. Review each milestone's screenshots for anything that looks like Microsoft's work |
-| **Upstream moves its ribbon** | `RibbonParityTests` and the pin-move routine in CLAUDE.md: diff `crates/ui-egui/src/ribbon*`, then update the inventory and the layout |
+| **Upstream moves its ribbon** | `RibbonCoverageTests` and the pin-move routine in CLAUDE.md: diff `crates/ui-egui/src/ribbon*`, then place any new commands |
+| **Tooltip text drifts toward PowerPoint's wording** | Descriptions are written from what our command does, never from PowerPoint's tooltips, and reviewed with the rest of each milestone |
 | **Recents from two sources.** deckcraft keeps `UiState.recent` with 12 paths; macOS keeps its own list | NSDocumentController is the source of truth. `UiState.recent` is still persisted but, today, never read or written; S1 writes it from NSDocumentController for `ui.inspect` parity |
 
-## 12. Open decisions for the operator
+## 12. Decisions (2026-10-27)
 
-1. **The default layout.** The recommendation is to keep the toolbar and inspector as the default until R4
-   passes, then make the ribbon the default for new installs and keep existing users' choice. The alternatives
-   are the ribbon as the default from R1, or the ribbon staying opt-in permanently.
-2. **Amending PLAN.md.** Approve the dated amendment to the "Decided" UI row and PORT-STATUS's 2026-10-26
-   decision. The text is in §11.
-3. **Tooltip descriptions.** deckcraft shows "label (shortcut)" only. Adding a one-line description per
-   command means about 400 new catalog strings, written in our own words. Should that happen now, or later?
-4. **AutoSave in the title bar.** Skipped, because `autosavesInPlace` is off in favour of AutoRecover
-   (EVALUATION.md §1). Should reconciling the two be scheduled, so that a real AutoSave switch can follow?
-5. **The start screen at launch.** The recommendation is on by default, with a Settings switch. Confirm, or
-   keep today's untitled document as the default.
-6. **Favourites.** They are new and deckcraft has none. Keep them, or match deckcraft's plain recent list?
+The operator answered the six open questions. Their note applies to the whole plan: *"We don't need to match
+100% but we would want someone familiar with Powerpoint to be comfortable in our UI"* (the guiding principle at
+the top).
+
+| # | Question | Decision | Where it lands |
+|---|---|---|---|
+| 1 | The default layout | **The recommendation, accepted.** The toolbar and inspector stay the default until R4 passes. Then new installs get the ribbon, and existing users keep their choice | §8; R4 |
+| 2 | Amending PLAN.md | **Approved.** PLAN.md's "Decided" UI row and PORT-STATUS's 2026-10-26 decision carry the dated amendment | PLAN.md, PORT-STATUS.md (done with this revision) |
+| 3 | Tooltip descriptions | **Add them.** One line per command, in our own words | §6; R1 for the ribbon's and toolbar's commands, R4 for the rest |
+| 4 | AutoSave in the title bar | **No switch. AutoRecover is sufficient.** Nothing is scheduled to change it | §3 |
+| 5 | The start screen at launch | **On by default, with the Settings switch** | §7, §8; S1 |
+| 6 | Favourites | **Dropped.** A plain recent list, as deckcraft has, because it is simpler | §3, §7; S1 |
+
+**Trimmed by the guiding principle** (they served exact parity, not comfort):
+- **The order-equality parity test** became a coverage test. Every deckcraft ribbon command must be placed, but
+  tab and group order may follow what PowerPoint users expect.
+- **The SmartArt-only hover preview** is gone. One gallery with a preview and the rest without is parity, not
+  comfort. Hover preview for every gallery stays a candidate after R4.
+- **Controls that can never work** (Screenshot, Ink to Text, Ink to Math, Cameo, Translate, Add-ins) are left out
+  instead of greyed out for good.
+- **The "Show group titles" setting** is gone. Captions stay hidden, as in PowerPoint for Mac, and accessibility
+  still names every group.
+- **Favourites**, by decision 6.
+
+Kept although they look like parity: deckcraft's command ids and params, `view.tab`, `view.collapseRibbon` and the
+`home`/`backstage` keys in `ui.inspect`. Those keep deckcraft's scripts and MCP prompts working, and they cost
+nothing on screen.
