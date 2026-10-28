@@ -233,7 +233,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **DCEngine: 549**, with 56 of deckcraft's pointer tests and 8 earlier tests completed.
   - **DCAutomation: 52**, with all 14 of `control_server.rs`' tests.
 - **The alpha gate** (deckcraft `docs/roadmap.md`), run in the app through the control channel with a
-  screenshot of every step (`Tools/app/alpha-gate.sh`): **18 of 18 checks pass.**
+  screenshot of every step (`Tools/app/alpha-gate.sh`): **16 of 16 checks pass.**
   1. build a deck, save, close, reopen;
   2. open a `.pptx`, edit it, save it back as `.pptx`;
   3. the show and presenter view;
@@ -297,7 +297,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - A pseudo-localisation pass found three clipped layouts and fixed them.
   - Tests keep the catalogs complete.
 - **Tests.** 2,139 in all, every one green and warning-free; Wave 6 added 89 (DCApp 50, the extensions 29, and more).
-  - The alpha gate passes 18 of 18 after the strings conversion.
+  - The alpha gate passes 16 of 16 after the strings conversion.
   - Release, render, transition and Metal parity pass in release.
 - **Fixed on the way.**
   - **Fonts.** The app found its fonts through a path into the source tree, so on any other Mac decks would have drawn
@@ -359,6 +359,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `1c75c98`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
     its ticket is stapled.
   - The published 0.1.1, run from its export, finds 0.1.2 through Check for Updates.
+- **0.1.3 (2026-10-27, not yet published).** vpx-swift 0.3.1: VP8 and untagged VP9 of 576 lines or fewer convert as
+  BT.601, as deckcraft and ffmpeg do (AB-A-0205; "VP9 and VP8 video" above). Nothing else changed.
 
 ## Pin moves
 
