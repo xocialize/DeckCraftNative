@@ -1,12 +1,12 @@
-// DCApp — what the App Intents do with a presentation file and no window: export it, read its outline, count
-// its slides. Each call reads the file into a session of its own, on an engine thread with a large stack (deep
-// groups recurse once per level, `EngineThread`), runs the engine's own commands (`file.export`), and drops the
-// session. Nothing here touches the app's session, its windows or AppKit, so it runs (and is tested) without
-// the app.
+// DCIntentsKit — what the App Intents do with a presentation file and no window: export it, read its outline,
+// count its slides. Each call reads the file into a session of its own, on a thread with a large stack (deep
+// groups recurse once per level: `LargeStack`), runs the engine's own commands (`file.export`), and drops the
+// session. Nothing here touches the app's session, its windows or AppKit, so it runs in the App Intents
+// extension (`Apps/DeckCraftNative/Extensions/Intents`), in the app, and in tests alike.
 import AppIntents
-import DCAutomation
 import DCCore
 import DCEngine
+import DCExtensionKit
 import Foundation
 import UniformTypeIdentifiers
 
@@ -17,11 +17,12 @@ public struct DeckIntentError: Error, CustomLocalizedStringResourceConvertible, 
     public var description: String { String(localized: localizedStringResource) }
 
     /// An engine failure shown as the engine words it (not translated: CLAUDE.md, String Catalogs).
-    static func engine(_ message: String) -> DeckIntentError {
+    public static func engine(_ message: String) -> DeckIntentError {
         DeckIntentError(LocalizedStringResource("\(message)", bundle: .atURL(Bundle.module.bundleURL), comment: "An engine error message, shown as is."))
     }
 
-    static func unreadable(_ name: String, _ message: String) -> DeckIntentError {
+    /// A file an intent was given that can't be read; `message` is the engine's reason.
+    public static func unreadable(_ name: String, _ message: String) -> DeckIntentError {
         DeckIntentError(LocalizedStringResource(
             "\(name) couldn't be opened: \(message)", bundle: .atURL(Bundle.module.bundleURL),
             comment: "A presentation file an intent was given can't be read. The first value is the file name, the second the engine's reason."
@@ -59,7 +60,7 @@ public struct PresentationInput: Sendable {
     }
 
     /// The file name without its extension: the stem of what an export writes.
-    var stem: String {
+    public var stem: String {
         let base = (name as NSString).lastPathComponent
         let stem = (base as NSString).deletingPathExtension
         return stem.isEmpty ? String(localized: "Presentation", bundle: .module, comment: "The file name an export uses when the input has none.") : stem
@@ -88,7 +89,7 @@ public struct ExportRequest: Sendable, Equatable {
     }
 
     /// The written file's extension.
-    var fileExtension: String {
+    public var fileExtension: String {
         switch format {
         case "jpeg": "jpg"
         default: format
@@ -96,7 +97,7 @@ public struct ExportRequest: Sendable, Equatable {
     }
 
     /// The written file's type.
-    var contentType: UTType {
+    public var contentType: UTType {
         switch format {
         case "pdf": .pdf
         case "png": .png
@@ -106,7 +107,7 @@ public struct ExportRequest: Sendable, Equatable {
     }
 
     /// `file.export`'s parameters for writing to `path` in a presentation of `count` slides.
-    func params(path: String, count: Int) throws(DeckIntentError) -> JSON {
+    public func params(path: String, count: Int) throws(DeckIntentError) -> JSON {
         var p: JSON = ["path": .string(path), "format": .string(format)]
         switch format {
         case "pdf":
@@ -131,29 +132,30 @@ public struct ExportRequest: Sendable, Equatable {
 
 /// The window-free engine work behind the export and read intents.
 public enum IntentsEngine {
-    /// One thread for every intent: each call has a session of its own, so they only need the stack.
-    static let thread = EngineThread(name: "dc.intents")
-
-    static func noSlide(_ n: Int, _ count: Int) -> DeckIntentError {
+    /// An intent was asked for a slide past the end of a presentation of `count` slides.
+    public static func noSlide(_ n: Int, _ count: Int) -> DeckIntentError {
         DeckIntentError(LocalizedStringResource(
             "There's no slide \(n): the presentation has \(count) slides.", bundle: .atURL(Bundle.module.bundleURL),
             comment: "An intent was asked for a slide past the end. The first value is the slide asked for (1-based), the second the slide count."
         ))
     }
 
-    /// Run `body` with `input` open as the active document of a session of its own, on the engine thread.
+    /// Run `body` with `input` open as the active document of a session of its own, on a thread of its own with
+    /// a `LargeStack.stackSize` stack (an extension and a Swift concurrency task get 512 KB). Each call has its own
+    /// session, so calls never share engine state and can run side by side.
     static func withDocument<T: Sendable>(_ input: PresentationInput, _ body: @escaping @Sendable (Session) throws(DeckIntentError) -> T) async throws(DeckIntentError) -> T {
-        let r: Result<T, DeckIntentError>? = await thread.run {
-            let s = Session()
-            do {
-                let (pres, _) = try FileCommands.openChecked(input.name, input.bytes)
-                FileCommands.addOpened(s, input.name, nil, pres)
-            } catch {
-                return .failure(DeckIntentError.unreadable(input.name, "\(error)"))
-            }
-            return Result { () throws(DeckIntentError) -> T in try body(s) }
+        let r: Result<T, DeckIntentError> = await withCheckedContinuation { (done: CheckedContinuation<Result<T, DeckIntentError>, Never>) in
+            LargeStack.async({ () -> Result<T, DeckIntentError> in
+                let s = Session()
+                do {
+                    let (pres, _) = try FileCommands.openChecked(input.name, input.bytes)
+                    FileCommands.addOpened(s, input.name, nil, pres)
+                } catch {
+                    return .failure(DeckIntentError.unreadable(input.name, "\(error)"))
+                }
+                return Result { () throws(DeckIntentError) -> T in try body(s) }
+            }, then: { done.resume(returning: $0) })
         }
-        guard let r else { throw DeckIntentError.engine("the engine thread stopped") }
         return try r.get()
     }
 

@@ -54,6 +54,8 @@ let package = Package(
         // L7: the app's Quick Look and Spotlight extensions (the appex targets in Apps/DeckCraftNative link these).
         .library(name: "DCQuickLook", targets: ["DCQuickLook"]),
         .library(name: "DCSpotlight", targets: ["DCSpotlight"]),
+        // L7: the file intents the App Intents extension runs (and the app lists).
+        .library(name: "DCIntentsKit", targets: ["DCIntentsKit"]),
         // Tests' access to the fixtures and the upstream pin
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
@@ -207,6 +209,7 @@ let package = Package(
             name: "DCApp",
             dependencies: [
                 "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore",
+                "DCIntentsKit",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
                 .product(name: "DesignScaffoldPicker", package: "DesignScaffold"),
@@ -216,7 +219,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DCAppTests",
-            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport"],
+            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport", "DCIntentsKit"],
             path: tests("DCApp", "DCAppTests")
         ),
         // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev
@@ -242,6 +245,20 @@ let package = Package(
             name: "DCExtensionsTests",
             dependencies: ["DCQuickLook", "DCSpotlight", "DCExtensionKit", "DCEngine", "DCRender", "DCModel", "DCZip", "DCCore", "DCTestSupport"],
             path: tests("DCExtensions", "DCExtensionsTests")
+        ),
+        // The file intents (Export Presentation, Get Outline, Get Slide Count) as an App Intents package: the App
+        // Intents extension runs them without launching the app, and DCApp includes them so the app's App
+        // Shortcuts can name them. No AppKit. Wave 6.
+        .target(
+            name: "DCIntentsKit",
+            dependencies: ["DCExtensionKit", "DCEngine", "DCCore"],
+            path: sources("DCExtensions", "DCIntentsKit"),
+            resources: [.process("Resources")]
+        ),
+        .testTarget(
+            name: "DCIntentsKitTests",
+            dependencies: ["DCIntentsKit", "DCEngine", "DCCore", "DCTestSupport"],
+            path: tests("DCExtensions", "DCIntentsKitTests")
         ),
 
         // MARK: DCTestSupport — the fixtures root and the upstream pin, for every test target.

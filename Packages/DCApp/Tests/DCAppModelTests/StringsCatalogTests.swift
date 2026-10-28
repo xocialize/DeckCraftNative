@@ -14,6 +14,10 @@ enum StringsPaths {
     static let sources = tests.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Sources")
     static let root = sources.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     static let app = root.appendingPathComponent("Apps/DeckCraftNative/App")
+    /// DCIntentsKit (the file intents) and the App Intents extension that runs them: the kit's run-time text is in
+    /// its own catalog, its App Intents metadata in the extension's (and the app's: both bundles list the intents).
+    static let intentsKit = root.appendingPathComponent("Packages/DCExtensions/Sources/DCIntentsKit")
+    static let intentsExtension = root.appendingPathComponent("Apps/DeckCraftNative/Extensions/Intents")
     static func catalog(_ module: String, _ table: String = "Localizable") -> URL {
         module == "App" ? app.appendingPathComponent("\(table).xcstrings")
             : sources.appendingPathComponent("\(module)/Resources/\(table).xcstrings")
@@ -240,6 +244,7 @@ enum SourceScan {
 @Suite struct StringsCatalogTests {
     static let modelFiles = SourceScan.swiftFiles(StringsPaths.sources.appendingPathComponent("DCAppModel"))
     static let appFiles = SourceScan.swiftFiles(StringsPaths.sources.appendingPathComponent("DCApp"))
+    static let intentsKitFiles = SourceScan.swiftFiles(StringsPaths.intentsKit)
 
     // MARK: Commands
 
@@ -368,11 +373,38 @@ enum SourceScan {
     /// The app catalog's entries are used by DCApp/Intents' main-bundle literals, the app target's files, or
     /// Xcode's App Shortcuts extraction (parameter summaries, `${…}`).
     @Test func everyAppCatalogEntryIsUsed() throws {
-        let literals = SourceScan.literals(Self.appFiles + SourceScan.swiftFiles(StringsPaths.app)).filter(\.mainBundle)
+        let literals = SourceScan.literals(Self.appFiles + Self.intentsKitFiles + SourceScan.swiftFiles(StringsPaths.app)).filter(\.mainBundle)
         let catalog = try Catalog(StringsPaths.catalog("App"))
         let unused = catalog.liveKeys.filter { key in !literals.contains { $0.matches(key) } }
         #expect(unused.isEmpty, "app catalog entries no code uses: \(unused)")
     }
+
+    /// DCIntentsKit's literals: run-time text (`bundle:`) in its own catalog; App Intents metadata (no `bundle:`, the
+    /// main bundle's) in both the App Intents extension's catalog and the app's, since each bundle lists the file
+    /// intents and looks their metadata up in itself. And every entry of the kit's and the extension's catalogs is used.
+    @Test func intentsKitAndExtensionCatalogs() throws {
+        let literals = SourceScan.literals(Self.intentsKitFiles + SourceScan.swiftFiles(StringsPaths.intentsExtension))
+        #expect(literals.count > 30, "only \(literals.count) localized literals found in DCIntentsKit")
+        let kitURL = StringsPaths.intentsKit.appendingPathComponent("Resources/Localizable.xcstrings")
+        let extURL = StringsPaths.intentsExtension.appendingPathComponent("Localizable.xcstrings")
+        let kit = try Catalog(kitURL), ext = try Catalog(extURL), app = try Catalog(StringsPaths.catalog("App"))
+        for (name, catalog, wanted) in [("DCIntentsKit", kit, literals.filter { !$0.mainBundle }),
+                                        ("the extension's", ext, literals.filter(\.mainBundle)),
+                                        ("the app's", app, literals.filter(\.mainBundle))] {
+            let keys = catalog.liveKeys
+            let missing = wanted.filter { lit in !keys.contains(where: lit.matches) }
+            #expect(missing.isEmpty, "\(name) catalog lacks (run Tools/l10n/sync.sh): \(missing.prefix(20))")
+        }
+        for (name, catalog, used) in [("DCIntentsKit", kit, literals.filter { !$0.mainBundle }), ("the extension's", ext, literals.filter(\.mainBundle))] {
+            let unused = catalog.liveKeys.filter { key in !used.contains { $0.matches(key) } }
+            #expect(unused.isEmpty, "\(name) catalog entries no code uses: \(unused)")
+        }
+        // The summaries Xcode extracts for the extension (`${…}`), and the plural variations of the kit's counts.
+        #expect(ext.entries["Export ${file} as ${format}"]?.value != nil)
+        #expect(json(kitURL).contains("Exported %lld file."))
+    }
+
+    private func json(_ url: URL) -> String { (try? String(contentsOf: url, encoding: .utf8)) ?? "" }
 
     /// Every App Shortcuts phrase in the app target is in AppShortcuts.xcstrings (Xcode's string sets).
     @Test func appShortcutsCatalogHasEveryPhrase() throws {

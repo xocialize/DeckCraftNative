@@ -4,6 +4,7 @@ import AppIntents
 import DCAppModel
 import DCCore
 import DCEngine
+import DCIntentsKit
 import Foundation
 
 /// A presentation open in DeckCraftNative (`DocState`, by its `uid`).

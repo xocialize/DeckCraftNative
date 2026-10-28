@@ -6,6 +6,7 @@ import AppKit
 import DCAppModel
 import DCCore
 import DCEngine
+import DCIntentsKit
 import DCModel
 import Foundation
 

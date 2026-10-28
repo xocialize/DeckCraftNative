@@ -1,0 +1,317 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "1 slide per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 slide per page"
+          }
+        }
+      }
+    },
+    "2 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 slides per page"
+          }
+        }
+      }
+    },
+    "3 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 slides per page"
+          }
+        }
+      }
+    },
+    "4 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 slides per page"
+          }
+        }
+      }
+    },
+    "6 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 slides per page"
+          }
+        }
+      }
+    },
+    "9 slides per page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9 slides per page"
+          }
+        }
+      }
+    },
+    "All Slides" : {
+      "comment" : "Export every slide as an image, one file each.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Slides"
+          }
+        }
+      }
+    },
+    "Export ${file} as ${format}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export ${file} as ${format}"
+          }
+        }
+      }
+    },
+    "Export Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Format"
+          }
+        }
+      }
+    },
+    "Export Presentation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Presentation"
+          }
+        }
+      }
+    },
+    "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "Format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
+    "Get Presentation Outline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Presentation Outline"
+          }
+        }
+      }
+    },
+    "Get Slide Count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Slide Count"
+          }
+        }
+      }
+    },
+    "Get the outline of ${file}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get the outline of ${file}"
+          }
+        }
+      }
+    },
+    "Get the slide count of ${file}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get the slide count of ${file}"
+          }
+        }
+      }
+    },
+    "Gets how many slides a presentation has. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets how many slides a presentation has. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window."
+          }
+        }
+      }
+    },
+    "Handouts" : {
+      "comment" : "PDF layout: several slides per page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handouts"
+          }
+        }
+      }
+    },
+    "JPEG Image" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG Image"
+          }
+        }
+      }
+    },
+    "Layout" : {
+      "comment" : "What a PDF export lays out.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "Notes Pages" : {
+      "comment" : "PDF layout: each slide with its speaker notes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Pages"
+          }
+        }
+      }
+    },
+    "PDF" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF"
+          }
+        }
+      }
+    },
+    "PDF Layout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF Layout"
+          }
+        }
+      }
+    },
+    "PNG Image" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PNG Image"
+          }
+        }
+      }
+    },
+    "PowerPoint (PPTX)" : {
+      "comment" : "A file format name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint (PPTX)"
+          }
+        }
+      }
+    },
+    "Presentation" : {
+      "comment" : "The presentation file an intent works on.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentation"
+          }
+        }
+      }
+    },
+    "Slide" : {
+      "comment" : "The slide to export as an image, from 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide"
+          }
+        }
+      }
+    },
+    "Slides" : {
+      "comment" : "PDF layout: one slide per page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides"
+          }
+        }
+      }
+    },
+    "Slides per Page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides per Page"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

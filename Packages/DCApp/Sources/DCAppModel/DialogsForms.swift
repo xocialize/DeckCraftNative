@@ -712,7 +712,7 @@ extension DialogController {
         case "themeColors":
             let left: [SchemeSlot] = [.dk1, .lt1, .dk2, .lt2, .hlink, .folHlink]
             let right: [SchemeSlot] = [.accent1, .accent2, .accent3, .accent4, .accent5, .accent6]
-            var r: [FormRow] = zip(left, right).map { a, b in .row([.color(label: a.label, key: a.xmlName), .color(label: b.label, key: b.xmlName)]) }
+            var r: [FormRow] = zip(left, right).map { a, b in .row([.color(label: L10n.colorLabel(a.label), key: a.xmlName), .color(label: L10n.colorLabel(b.label), key: b.xmlName)]) }
             r += [.text(label: L10n.text("Name:"), key: "schemeName"), .note(L10n.text("Applies to this presentation's theme colours."))]
             return r
         case "themeFonts":

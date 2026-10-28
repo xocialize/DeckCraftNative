@@ -1,0 +1,128 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+      "comment" : "An engine error message, shown as is.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "%@ couldn't be opened: %@" : {
+      "comment" : "A presentation file an intent was given can't be read. The first value is the file name, the second the engine's reason.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ couldn't be opened: %2$@"
+          }
+        }
+      }
+    },
+    "Exported %lld files." : {
+      "comment" : "Export Presentation finished. The value is how many files it wrote.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Exported %lld file."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Exported %lld files."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Presentation" : {
+      "comment" : "The file name an export uses when the input has none.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentation"
+          }
+        }
+      }
+    },
+    "The presentation has %lld slides." : {
+      "comment" : "Get Slide Count's answer.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The presentation has %lld slide."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The presentation has %lld slides."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "There's no slide %lld: the presentation has %lld slides." : {
+      "comment" : "An intent was asked for a slide past the end. The first value is the slide asked for (1-based), the second the slide count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There's no slide %1$lld: the presentation has %#@slides@."
+          },
+          "substitutions" : {
+            "slides" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg slide"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg slides"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "the file is empty or can't be read" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the file is empty or can't be read"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

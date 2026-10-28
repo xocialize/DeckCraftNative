@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Tools/l10n/l10n.py — helpers for the String Catalogs of DCAppModel and DCApp (see sync.sh).
 
-  split <stringsdata-dir> <Packages/DCApp/Sources>
-      Sorts the compiler's .stringsdata files by module (<dir>/DCAppModel, <dir>/DCApp), keeping only those
-      whose source file is in that module and still exists.
+  split <stringsdata-dir> <Packages/DCApp/Sources> [<Packages/DCExtensions/Sources>]
+      Sorts the compiler's .stringsdata files by module (<dir>/DCAppModel, <dir>/DCApp, <dir>/DCIntentsKit),
+      keeping only those whose source file is in that module and still exists; main-bundle literals go to
+      <dir>/App (the app) and, for DCIntentsKit's, to <dir>/Intents too (the App Intents extension).
   plurals <catalog.xcstrings> <plurals.json>
       Gives the keys listed in plurals.json (under the catalog's module) their English plural variations:
       `{one, other}` makes a top-level `plural` variation (a key with one argument); `{value, arg, spec, one,
@@ -112,13 +113,17 @@ def main_bundle_entries(data):
     return module, main
 
 
-def split(src_dir, sources):
+def split(src_dir, sources, extension_sources=None):
     """Sorts the .stringsdata files by catalog: <dir>/DCAppModel, <dir>/DCApp, and <dir>/App for the literals
     in DCApp that the main bundle looks up (App Intents metadata). Prints any main-bundle literal outside
-    DCApp/Intents: SwiftUI's `Text("…")` without `bundle:` is one, and a bug."""
-    for module in ("DCAppModel", "DCApp", "App"):
+    DCApp/Intents: SwiftUI's `Text("…")` without `bundle:` is one, and a bug. DCIntentsKit's (in
+    `extension_sources`) go to <dir>/DCIntentsKit, and its main-bundle literals (the file intents' metadata) to
+    both <dir>/App and <dir>/Intents: the app and the App Intents extension each list those intents, and each
+    looks their metadata up in its own main bundle."""
+    for module in ("DCAppModel", "DCApp", "App", "DCIntentsKit", "Intents"):
         os.makedirs(os.path.join(src_dir, module), exist_ok=True)
     root = os.path.realpath(sources)
+    kit = os.path.join(os.path.realpath(extension_sources), "DCIntentsKit") if extension_sources else None
     stray = []
     for name in sorted(os.listdir(src_dir)):
         path = os.path.join(src_dir, name)
@@ -139,6 +144,12 @@ def split(src_dir, sources):
                 dump(os.path.join(src_dir, "App", name), dict(data, tables=main))
                 if os.sep + "Intents" + os.sep not in source:
                     stray += [f"{source}:{e['location']['startingLine']}: {e['key']!r}" for es in main.values() for e in es]
+        elif kit and source.startswith(kit + os.sep):
+            module, main = main_bundle_entries(data)
+            dump(os.path.join(src_dir, "DCIntentsKit", name), dict(data, tables=module))
+            if main:
+                dump(os.path.join(src_dir, "App", "DCIntentsKit-" + name), dict(data, tables=main))
+                dump(os.path.join(src_dir, "Intents", name), dict(data, tables=main))
     if stray:
         print("Literals the main bundle would look up (add `bundle: .module`):", *stray, sep="\n  ", file=sys.stderr)
         sys.exit(1)

@@ -45,6 +45,23 @@
 		54939540A966B337B2604A00 /* poppins in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = D81F394E7A6D132BCF2DFC2C /* poppins */; };
 		EC9C80B5BC7E6FF896A964F3 /* roboto in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 8B4EA6DB5A6194A0F797BA5C /* roboto */; };
 		200A144668F56116B4C30610 /* latin-manifest.txt in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 65D8F32195CCA1C6BBE363DD /* latin-manifest.txt */; };
+		379270BBDA12195BE7FEAA5B /* DCIntentsKit in Frameworks */ = {isa = PBXBuildFile; productRef = D098948561786BAD06C7B1CE /* DCIntentsKit */; };
+		BC591ECDD59DBEEDCFFB2D29 /* DeckCraftIntents.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 82D116D067977471A155ECEA /* DeckCraftIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CAE29E28299E4AFD0B9586FA /* caladea in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 87370BBC30E636C76FBE8E6A /* caladea */; };
+		82498B520D767AF15E0E0430 /* carlito in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = E921607B842E7B48AB1466A5 /* carlito */; };
+		A984E173C13949B0CAE8492E /* inter in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 6AE27DCD8FDE211C28A5E014 /* inter */; };
+		5DACA9EE10F3837C45F3EF8C /* lato in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = B5DC8049851E1E86C134A527 /* lato */; };
+		AB4B9E35ADDFB0C90652D034 /* liberation-mono in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 2A595176F3CAA7408ACA0127 /* liberation-mono */; };
+		81F4B07B82AEEE30C493E8BD /* liberation-sans in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 285171C30EC26EB0077A96F3 /* liberation-sans */; };
+		0632248BF6D8FCFBA94FDF42 /* liberation-serif in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 618B6933268A6DF31FEA770F /* liberation-serif */; };
+		A0520565314FDEBCBF6316EF /* merriweather in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 0E6C5C6325984679DB24904F /* merriweather */; };
+		B4D9CDA7292BAE093DC322E4 /* montserrat in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 951320E24218037E22CCA7E1 /* montserrat */; };
+		F25364DB7295B58F861C2537 /* nunito-sans in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 8CCC75376F56EB5BA0E39737 /* nunito-sans */; };
+		AC13BF9280CED5FFCA21755F /* open-sans in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 89748AAFB9A50AC258878FB4 /* open-sans */; };
+		7258EBED9D73840E1DB26F07 /* playfair-display in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 3D901AC0B8AF80E5FFC3C6AC /* playfair-display */; };
+		0F13349DA51925F966C80E4F /* poppins in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = D81F394E7A6D132BCF2DFC2C /* poppins */; };
+		B38BF944F3EFF1AE3384C906 /* roboto in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 8B4EA6DB5A6194A0F797BA5C /* roboto */; };
+		641674B7A4DB3A05799698F0 /* latin-manifest.txt in Embed Latin Fonts */ = {isa = PBXBuildFile; fileRef = 65D8F32195CCA1C6BBE363DD /* latin-manifest.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +85,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5074090B462DDA186EBED1AE;
 			remoteInfo = DeckCraftSpotlight;
+		};
+		46B7643BB298A7E255316FD7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4DC844ABCCFC0D132D087C1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C076BA8C45FBA9A7A8F76595;
+			remoteInfo = DeckCraftIntents;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -135,6 +159,42 @@
 			name = "Embed Latin Fonts";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FDD2EEF0500E4118E26017D /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Extensions;
+			dstSubfolderSpec = 1;
+			files = (
+				BC591ECDD59DBEEDCFFB2D29 /* DeckCraftIntents.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E35283005A4F114AFD0658C /* Embed Latin Fonts */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = fonts;
+			dstSubfolderSpec = 7;
+			files = (
+				CAE29E28299E4AFD0B9586FA /* caladea in Embed Latin Fonts */,
+				82498B520D767AF15E0E0430 /* carlito in Embed Latin Fonts */,
+				A984E173C13949B0CAE8492E /* inter in Embed Latin Fonts */,
+				5DACA9EE10F3837C45F3EF8C /* lato in Embed Latin Fonts */,
+				AB4B9E35ADDFB0C90652D034 /* liberation-mono in Embed Latin Fonts */,
+				81F4B07B82AEEE30C493E8BD /* liberation-sans in Embed Latin Fonts */,
+				0632248BF6D8FCFBA94FDF42 /* liberation-serif in Embed Latin Fonts */,
+				A0520565314FDEBCBF6316EF /* merriweather in Embed Latin Fonts */,
+				B4D9CDA7292BAE093DC322E4 /* montserrat in Embed Latin Fonts */,
+				F25364DB7295B58F861C2537 /* nunito-sans in Embed Latin Fonts */,
+				AC13BF9280CED5FFCA21755F /* open-sans in Embed Latin Fonts */,
+				7258EBED9D73840E1DB26F07 /* playfair-display in Embed Latin Fonts */,
+				0F13349DA51925F966C80E4F /* poppins in Embed Latin Fonts */,
+				B38BF944F3EFF1AE3384C906 /* roboto in Embed Latin Fonts */,
+				641674B7A4DB3A05799698F0 /* latin-manifest.txt in Embed Latin Fonts */,
+			);
+			name = "Embed Latin Fonts";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +218,7 @@
 		D81F394E7A6D132BCF2DFC2C /* poppins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "poppins"; path = "../../../craft-fonts/fonts/poppins"; sourceTree = SOURCE_ROOT; };
 		8B4EA6DB5A6194A0F797BA5C /* roboto */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "roboto"; path = "../../../craft-fonts/fonts/roboto"; sourceTree = SOURCE_ROOT; };
 		65D8F32195CCA1C6BBE363DD /* latin-manifest.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "latin-manifest.txt"; path = "../../../craft-fonts/fonts/latin-manifest.txt"; sourceTree = SOURCE_ROOT; };
+		82D116D067977471A155ECEA /* DeckCraftIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = DeckCraftIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -179,6 +240,11 @@
 		ADEE1A329235CC2193A45396 /* Spotlight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Spotlight;
+			sourceTree = "<group>";
+		};
+		83C8AAD06390FB309963A6EE /* Intents */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Intents;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -216,6 +282,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FBB562A4FE737B1677DA010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				379270BBDA12195BE7FEAA5B /* DCIntentsKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -236,6 +310,7 @@
 				AE816C88C8EB66BDD07DDAD2 /* DeckCraftQuickLook.appex */,
 				4075E2B14FB23F3AE836D9A9 /* DeckCraftThumbnail.appex */,
 				B114082C05D7475E27D98CC8 /* DeckCraftSpotlight.appex */,
+				82D116D067977471A155ECEA /* DeckCraftIntents.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -246,6 +321,7 @@
 				0A5DCD34AD17D37E0B9FC32F /* QuickLook */,
 				A8480530025522BFCB29086C /* Thumbnail */,
 				ADEE1A329235CC2193A45396 /* Spotlight */,
+				83C8AAD06390FB309963A6EE /* Intents */,
 				44EECEE8122B3BA75433733E /* Latin Fonts */,
 			);
 			path = Extensions;
@@ -284,6 +360,7 @@
 				4F6F5CC3FCCF73F75AE9CCF4 /* Frameworks */,
 				55B558C7EF820E6E00E5993B /* Resources */,
 				E58C91FBD52F68818AC3AD70 /* Embed Foundation Extensions */,
+				3FDD2EEF0500E4118E26017D /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
@@ -291,6 +368,7 @@
 				A8092530C61A77246348B208 /* PBXTargetDependency */,
 				2EBB5524EEB6545BF134F9EE /* PBXTargetDependency */,
 				749409CDAD6E3FB184130EA3 /* PBXTargetDependency */,
+				764B5422652BA28009E0212C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				095FEE2E633C50D24407F2D6 /* App */,
@@ -374,6 +452,30 @@
 			productReference = B114082C05D7475E27D98CC8 /* DeckCraftSpotlight.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		C076BA8C45FBA9A7A8F76595 /* DeckCraftIntents */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A4923065AC039E5C695EFD7 /* Build configuration list for PBXNativeTarget "DeckCraftIntents" */;
+			buildPhases = (
+				EB3D1CF46F6660DBFA2478C0 /* Sources */,
+				3FBB562A4FE737B1677DA010 /* Frameworks */,
+				5A16F52E57280CE154486995 /* Resources */,
+				3E35283005A4F114AFD0658C /* Embed Latin Fonts */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				83C8AAD06390FB309963A6EE /* Intents */,
+			);
+			name = DeckCraftIntents;
+			packageProductDependencies = (
+				D098948561786BAD06C7B1CE /* DCIntentsKit */,
+			);
+			productName = DeckCraftIntents;
+			productReference = 82D116D067977471A155ECEA /* DeckCraftIntents.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -394,6 +496,9 @@
 						CreatedOnToolsVersion = 27.0;
 					};
 					5074090B462DDA186EBED1AE = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					C076BA8C45FBA9A7A8F76595 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
@@ -419,6 +524,7 @@
 				76CDC59F6F4DDB44CBCC815D /* DeckCraftQuickLook */,
 				F44D6483E19C4508C47A79BA /* DeckCraftThumbnail */,
 				5074090B462DDA186EBED1AE /* DeckCraftSpotlight */,
+				C076BA8C45FBA9A7A8F76595 /* DeckCraftIntents */,
 			);
 		};
 /* End PBXProject section */
@@ -447,6 +553,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B901D944740CE142ED8FCE56 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A16F52E57280CE154486995 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -484,6 +597,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB3D1CF46F6660DBFA2478C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -501,6 +621,11 @@
 			isa = PBXTargetDependency;
 			target = 5074090B462DDA186EBED1AE /* DeckCraftSpotlight */;
 			targetProxy = AD3F4C567AC2D5C1A2498652 /* PBXContainerItemProxy */;
+		};
+		764B5422652BA28009E0212C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C076BA8C45FBA9A7A8F76595 /* DeckCraftIntents */;
+			targetProxy = 46B7643BB298A7E255316FD7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -558,7 +683,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Support/Info.plist;
@@ -570,7 +695,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative;
 				PRODUCT_NAME = DeckCraftNative;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -586,7 +711,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Support/Info.plist;
@@ -598,7 +723,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative;
 				PRODUCT_NAME = DeckCraftNative;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -612,7 +737,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/QuickLook.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -624,7 +749,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.QuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -639,7 +764,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/QuickLook.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -651,7 +776,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.QuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -666,7 +791,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Thumbnail.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -678,7 +803,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Thumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -693,7 +818,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Thumbnail.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -705,7 +830,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Thumbnail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -720,7 +845,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Spotlight.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -732,7 +857,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Spotlight;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -747,7 +872,7 @@
 				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Spotlight.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = CFZS6RXUCP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -759,8 +884,62 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Spotlight;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		94F68C43B7407D5CE2EBE1FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Intents.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = CFZS6RXUCP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Extensions/Support/Intents-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DeckCraftNative Intents";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "A native port of DeckCraft (MIT OR Apache-2.0).";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Intents;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		730DDCB3F863822229648B01 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = Extensions/Support/Intents.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = CFZS6RXUCP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Extensions/Support/Intents-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DeckCraftNative Intents";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "A native port of DeckCraft (MIT OR Apache-2.0).";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xocialize.deckcraftnative.Intents;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -815,6 +994,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		9A4923065AC039E5C695EFD7 /* Build configuration list for PBXNativeTarget "DeckCraftIntents" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				94F68C43B7407D5CE2EBE1FA /* Debug */,
+				730DDCB3F863822229648B01 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -840,6 +1028,10 @@
 		658D72EA717ECF388FCCA379 /* DCSpotlight */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DCSpotlight;
+		};
+		D098948561786BAD06C7B1CE /* DCIntentsKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DCIntentsKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,9 +1,14 @@
 // DeckCraftNative — the App Shortcuts: phrases that run DeckCraftNative's intents from Spotlight, Siri and the
-// Shortcuts app with no setup. The intents are in the `DCApp` library (`Packages/DCApp/Sources/DCApp/Intents`);
-// the provider is here because App Shortcuts are read from the app target's own metadata, not merged from a
-// package's. App Intents metadata strings are in the main bundle (the metadata processor refuses any other).
+// Shortcuts app with no setup. The intents that act on the app's windows are in the `DCApp` library
+// (`Packages/DCApp/Sources/DCApp/Intents`); the file intents (Export Presentation, Get Outline, Get Slide Count) are
+// in `DCIntentsKit`, and the App Intents extension (`DeckCraftIntents.appex`) runs them without launching the app.
+// The provider is here because App Shortcuts are read from the app target's own metadata, not merged from a
+// package's, and each App Shortcut must map to an action in that metadata: the app lists DCIntentsKit's package
+// too (through DCApp's). App Intents metadata strings are in the main bundle (the metadata processor refuses any
+// other).
 import AppIntents
 import DCApp
+import DCIntentsKit
 
 /// The phrases that run the intents from Spotlight and Siri. Each names the app (`.applicationName`), as App
 /// Shortcuts require. Run DeckCraft Command is an action in Shortcuts only.

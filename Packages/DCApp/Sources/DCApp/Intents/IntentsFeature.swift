@@ -1,41 +1,16 @@
 // DCApp — the intents run in the app's own process from the control channel, so a script can check them end to
 // end in the built app without the Shortcuts app: `intents.run {intent, …parameters}` builds the real intent,
 // sets its parameters as Shortcuts would, starts its `perform()` and answers a token; `intents.result {token}`
-// answers once it finished: the files it wrote, the value it returned, or its error.
+// answers once it finished: the files it wrote, the value it returned, or its error. The file intents are
+// DCIntentsKit's (the App Intents extension runs them for Shortcuts); here they run in the app's process.
 //
 //   dccli app --port 4242 --method intents.run '{"intent":"export","file":"/path/deck.deckcraft","format":"pdf"}'
 //   dccli app --port 4242 --method intents.result '{"token":1}'
 import AppIntents
 import DCAutomation
 import DCCore
+import DCIntentsKit
 import Foundation
-
-/// What an intent run from the control channel produced: the values its `perform` reported.
-final class IntentsRun: @unchecked Sendable {
-    /// The run in progress on this task, if the control channel started it.
-    @TaskLocal static var current: IntentsRun?
-
-    /// The folder Export Presentation writes to while this run is current.
-    let directory: URL
-    private let lock = NSLock()
-    private var values: [JSON] = []
-
-    init(directory: URL) { self.directory = directory }
-
-    /// Record a value an intent returns (a no-op unless the control channel runs it).
-    static func report(_ value: JSON) {
-        guard let run = current else { return }
-        run.lock.lock()
-        run.values.append(value)
-        run.lock.unlock()
-    }
-
-    var reported: [JSON] {
-        lock.lock()
-        defer { lock.unlock() }
-        return values
-    }
-}
 
 @MainActor
 enum IntentsFeature {

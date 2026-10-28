@@ -337,6 +337,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `3335d96`, notarized, and accepted by Gatekeeper; an anonymous download matches its `.sha256`.
   - The published 0.1.0, run from its own DMG, finds 0.1.1 through Check for Updates.
 
+- **0.1.2 polish (2026-10-27, not yet published).**
+  - **App Intents extension:** Export Presentation, Get Outline and Get Slide Count live in a shared `DCIntentsKit`
+    module that a new `DeckCraftIntents` extension and the app both link (Apple's shared-framework pattern). macOS
+    prefers to run background intents from the extension, so they need no app or window. Its metadata and the
+    Developer ID export verify. Running a shortcut end to end needs a shortcut added in the Shortcuts app, which is
+    the user's step.
+  - **Theme Colors:** the colour rows form one aligned grid, and every well stays inside the sheet.
+  - **Colour names:** DCColor's slot, shade and standard colour names are translated at display
+    (`L10n.colorLabel`); the pseudo-language showed them bypassing the catalog.
+  - **Inspector choices:** Review, Animate, Arrange and Text box use `FittingPicker`, which measures whether the
+    segment titles fit the row and becomes a menu when they don't.
+  - **Status bar:** it sheds the zoom slider, then the view buttons, instead of clipping its zoom controls.
+  - **Control channel:** a ScreenCaptureKit capture that doesn't answer within 3 s falls back to the offscreen
+    drawing.
+  - **`release.sh`:** it never overwrites a released version's build. A tagged version must be bumped; a test build
+    of it goes to `<version>-test`.
+
 ## Pin moves
 
 ### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)

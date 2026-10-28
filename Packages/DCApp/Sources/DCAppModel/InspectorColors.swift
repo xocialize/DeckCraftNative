@@ -60,7 +60,7 @@ public enum InspectorColors {
 
     /// The theme grid: the ten theme colours, then five rows of their tints and shades.
     public static func themeGrid(_ scheme: ColorScheme) -> [[ColorSwatch]] {
-        var rows: [[ColorSwatch]] = [themeSlots.map { ColorSwatch(rgba: scheme.get($0), ref: .scheme(alias($0)), label: $0.label) }]
+        var rows: [[ColorSwatch]] = [themeSlots.map { ColorSwatch(rgba: scheme.get($0), ref: .scheme(alias($0)), label: L10n.colorLabel($0.label)) }]
         for row in 0 ..< 5 {
             var line: [ColorSwatch] = []
             for slot in themeSlots {
@@ -68,7 +68,7 @@ public enum InspectorColors {
                 guard let v = themeVariants(base).at(row) else { continue }
                 var r = ColorRef.scheme(alias(slot))
                 r.mods = v.transforms
-                line.append(ColorSwatch(rgba: applyTransforms(base, v.transforms), ref: r, label: v.label))
+                line.append(ColorSwatch(rgba: applyTransforms(base, v.transforms), ref: r, label: L10n.colorLabel(v.label)))
             }
             rows.append(line)
         }
@@ -77,7 +77,7 @@ public enum InspectorColors {
 
     /// The standard colours row.
     public static var standard: [ColorSwatch] {
-        standardColors.map { ColorSwatch(rgba: $0.color, ref: .rgb($0.color), label: $0.name) }
+        standardColors.map { ColorSwatch(rgba: $0.color, ref: .rgb($0.color), label: L10n.colorLabel($0.name)) }
     }
 
     /// "More Colors… #": a typed hex colour, nil when it isn't one.

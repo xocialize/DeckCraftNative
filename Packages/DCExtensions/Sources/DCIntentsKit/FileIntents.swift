@@ -1,6 +1,8 @@
-// DCApp — the intents that work on a presentation file without opening a window: Export Presentation, Get
-// Outline and Get Slide Count. Each reads the file into a session of its own (`IntentsEngine`); the app's
-// documents and windows are left alone.
+// DCIntentsKit — the intents that work on a presentation file without opening a window: Export Presentation,
+// Get Outline and Get Slide Count. Each reads the file into a session of its own (`IntentsEngine`). They run in
+// the App Intents extension (`DeckCraftIntents.appex`), so the app isn't launched for them; the app lists them
+// too (its App Shortcuts name them), and if it is already running the system may run them there, where they
+// leave its documents and windows alone. They only ever run in the background (`supportedModes`).
 import AppIntents
 import Foundation
 import UniformTypeIdentifiers
@@ -12,6 +14,13 @@ public struct ExportPresentationIntent: AppIntent {
     public static let description = IntentDescription(LocalizedStringResource(
         "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window."
     ))
+    /// Never in the foreground: nothing here needs a window (an App Intents extension always runs in the background).
+    public static let supportedModes: IntentModes = .background
+    /// Only in the App Intents extension, from macOS 27 (on macOS 26 the system already prefers the extension for a
+    /// background intent, but may use the app when it's running): the app lists these intents only so its App
+    /// Shortcuts can name them.
+    @available(macOS 27.0, *)
+    public static var allowedExecutionTargets: IntentExecutionTargets { .appIntentsExtension }
 
     @Parameter(
         title: LocalizedStringResource("Presentation", comment: "The presentation file an intent works on."),
@@ -86,6 +95,13 @@ public struct GetOutlineIntent: AppIntent {
     public static let description = IntentDescription(LocalizedStringResource(
         "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window."
     ))
+    /// Never in the foreground: nothing here needs a window (an App Intents extension always runs in the background).
+    public static let supportedModes: IntentModes = .background
+    /// Only in the App Intents extension, from macOS 27 (on macOS 26 the system already prefers the extension for a
+    /// background intent, but may use the app when it's running): the app lists these intents only so its App
+    /// Shortcuts can name them.
+    @available(macOS 27.0, *)
+    public static var allowedExecutionTargets: IntentExecutionTargets { .appIntentsExtension }
 
     @Parameter(
         title: LocalizedStringResource("Presentation", comment: "The presentation file an intent works on."),
@@ -112,6 +128,13 @@ public struct GetSlideCountIntent: AppIntent {
     public static let description = IntentDescription(LocalizedStringResource(
         "Gets how many slides a presentation has. The presentation isn't opened in a window."
     ))
+    /// Never in the foreground: nothing here needs a window (an App Intents extension always runs in the background).
+    public static let supportedModes: IntentModes = .background
+    /// Only in the App Intents extension, from macOS 27 (on macOS 26 the system already prefers the extension for a
+    /// background intent, but may use the app when it's running): the app lists these intents only so its App
+    /// Shortcuts can name them.
+    @available(macOS 27.0, *)
+    public static var allowedExecutionTargets: IntentExecutionTargets { .appIntentsExtension }
 
     @Parameter(
         title: LocalizedStringResource("Presentation", comment: "The presentation file an intent works on."),

@@ -52,6 +52,20 @@ enum AutomationFeature {
 
     // MARK: Screenshots (`capture.rs`, `save_screenshot`)
 
+    /// How long a ScreenCaptureKit capture may take before the offscreen drawing answers instead.
+    static let captureWait: TimeInterval = 3
+
+    /// Sends the first reply only.
+    @MainActor final class ReplyOnce {
+        private var reply: (@MainActor (JSON) -> Void)?
+        init(_ reply: @escaping @MainActor (JSON) -> Void) { self.reply = reply }
+        func send(_ v: JSON) {
+            guard let r = reply else { return }
+            reply = nil
+            r(v)
+        }
+    }
+
     /// The window must have been unchanged this long before capture (`SETTLE`).
     static let settle: Duration = .milliseconds(120)
     /// Bytes for one captured image (`MAX_IMAGE_BYTES`).
@@ -73,9 +87,15 @@ enum AutomationFeature {
                     return
                 }
                 let id = CGWindowID(window.windowNumber)
+                // ScreenCaptureKit can wait indefinitely (a binary the system hasn't cleared for capture yet):
+                // after `captureWait` the reply falls back to the offscreen drawing, and a late image is dropped.
+                let once = ReplyOnce(reply)
                 Task { @MainActor in
                     let image = await screenImage(id)
-                    reply(image.map { encode(NSBitmapImageRep(cgImage: $0), path) } ?? capture(window, path))
+                    once.send(image.map { encode(NSBitmapImageRep(cgImage: $0), path) } ?? capture(window, path))
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + captureWait) {
+                    MainActor.assumeIsolated { once.send(capture(window, path)) }
                 }
             }
         }

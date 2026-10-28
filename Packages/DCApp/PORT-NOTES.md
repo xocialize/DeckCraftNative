@@ -870,35 +870,69 @@ ported** by an area (cited), **ported** here (`DCAppModelTests/LibTests.swift`, 
 
 ## Intents (Wave 6: App Intents and App Shortcuts)
 
-New in the port (deckcraft has no counterpart). Code in `DCApp/Intents/`; the app target adds two files.
+New in the port (deckcraft has no counterpart). The intents that act on the app's windows are here, in
+`DCApp/Intents/`; the three that work on a file without a window are in **DCIntentsKit**
+(`Packages/DCExtensions/Sources/DCIntentsKit`, no AppKit) and run in the **App Intents extension**
+`DeckCraftIntents.appex`, so Shortcuts, Siri and Spotlight don't launch the app for them (DCExtensions/PORT-NOTES.md,
+"Intents extension"). The app target adds two files.
 
 | File | What |
 |---|---|
-| `DCApp/Intents/IntentsEngine.swift` | the window-free work: `PresentationInput` (an `IntentFile`'s bytes), `ExportRequest` (→ `file.export` params), `IntentsEngine.export`/`outline`/`slideCount` (a session of their own on an `EngineThread` named `dc.intents`, 32 MiB stack), `DeckIntentError` |
-| `DCApp/Intents/FileIntents.swift` | Export Presentation (PDF slides/notes/handouts with per-page, PPTX, PNG/JPEG of one slide or all; returns `[IntentFile]`), Get Presentation Outline, Get Slide Count: no window, no app session |
+| `DCIntentsKit/IntentsEngine.swift` | the window-free work: `PresentationInput` (an `IntentFile`'s bytes), `ExportRequest` (→ `file.export` params), `IntentsEngine.export`/`outline`/`slideCount` (a session of their own per call on a 32 MiB-stack thread, `LargeStack`), `DeckIntentError` |
+| `DCIntentsKit/FileIntents.swift` | Export Presentation (PDF slides/notes/handouts with per-page, PPTX, PNG/JPEG of one slide or all; returns `[IntentFile]`), Get Presentation Outline, Get Slide Count: `supportedModes = .background`, `allowedExecutionTargets = .appIntentsExtension` (macOS 27) |
+| `DCIntentsKit/IntentsFileOptions.swift` | Export's `AppEnum`s (format, PDF layout, per page) |
+| `DCIntentsKit/IntentsRun.swift` | `IntentsRun`: what an intent run from the control channel reported (a no-op elsewhere) |
+| `DCIntentsKit/IntentsKitPackage.swift` | `DCIntentsKitPackage: AppIntentsPackage`; `IntentsExtensionSupport.prepare()` (the extension's fonts) |
 | `DCApp/Intents/WindowIntents.swift` | Open Presentation, New Presentation (theme or starter), Start Slide Show (from a slide), Add Slide (layout, title, text), Run DeckCraft Command (id + JSON → JSON): main actor, through `AppModel.run` |
 | `DCApp/Intents/PresentationEntity.swift` | `PresentationEntity` (an open presentation, by `DocState.uid`) and its query; `IntentsHost` (activate, run, errors) |
-| `DCApp/Intents/IntentsOptions.swift` | the `AppEnum`s (format, PDF layout, per page, slide layout) and the options providers (themes, starters, command ids) |
-| `DCApp/Intents/IntentsPackage.swift` | `DCAppIntentsPackage: AppIntentsPackage` |
-| `DCApp/Intents/IntentsFeature.swift` | control methods `intents.run` / `intents.result`: run the real intents in the app's process (end-to-end checks without the Shortcuts app) |
+| `DCApp/Intents/IntentsOptions.swift` | the slide-layout `AppEnum` and the options providers (themes, starters, command ids) |
+| `DCApp/Intents/IntentsPackage.swift` | `DCAppIntentsPackage: AppIntentsPackage`, including `DCIntentsKitPackage` |
+| `DCApp/Intents/IntentsFeature.swift` | control methods `intents.run` / `intents.result`: run all eight real intents in the app's process (end-to-end checks without the Shortcuts app; the file intents run here too) |
 | `Apps/DeckCraftNative/App/DeckCraftIntentsPackage.swift` | the app's `AppIntentsPackage`, including `DCAppIntentsPackage`: what makes Xcode merge the package's intents into the app's `Metadata.appintents` |
 | `Apps/DeckCraftNative/App/DeckCraftIntentShortcuts.swift` | the `AppShortcutsProvider` (7 shortcuts, 2–3 phrases each). It must be in the app target: the merge takes actions, entities and enums from a package, not App Shortcuts (measured: the package's own metadata had 7 `autoShortcuts`, the app's 0, until it moved) |
 
-- **Metadata strings are in the main bundle.** `appintentsmetadataprocessor` rejects
-  `LocalizedStringResource(…, bundle: .atURL(Bundle.module.bundleURL))` in titles, descriptions, parameter titles,
-  enum and type display representations and short titles ("AppIntents requires 'LocalizedStringResource' to use the
-  main bundle"), so those are plain literals. Summaries (`ParameterSummaryString`) and phrases take no bundle at all.
-  Strings resolved at run time — errors, dialogs, an entity's display representation — use the package bundle,
-  per the String Catalog convention. Their catalog for translation belongs in the app target (open item).
+- **What macOS needs for extension intents named by the app's App Shortcuts** (Apple, "Configuring the runtime
+  behavior of your app intents", `IntentExecutionTargets`, and the metadata processor, measured 2026-10-27 with
+  Xcode 27.1 / macOS SDK 27.0 on macOS 27.2):
+  - The App Shortcuts provider stays in the app, and each `AppShortcut`'s intent must be an action in the **app's**
+    `Metadata.appintents` (the processor's "This AppShortcut does not map to a known action"). So the intent types are
+    in both bundles: in a shared module (DCIntentsKit) that the app links (through DCApp) and the extension links,
+    each with an `AppIntentsPackage` listing `DCIntentsKitPackage`. Apple: "If you place your app intent code in a
+    shared framework … use an app intents package"; the action identifier is the type name, the same in both.
+  - Which bundle runs it is the system's choice: it "prefers to run a background app intent from your app extension,
+    but might run it from your app if the app is already running", and "an app intent in your App Intents extension
+    always runs in the background". So the file intents say `supportedModes = .background` (macOS 26), and on macOS
+    27 `allowedExecutionTargets = .appIntentsExtension` (`IntentExecutionTargets` is macOS 27 API: the metadata
+    records `allowedTargets: [{extensionPointIdentifier: com.apple.appintents-extension}]`). The app's copy of the
+    intents is then only metadata for its App Shortcuts (and for `intents.run`, which calls `perform()` directly).
+  - The extension is an **ExtensionKit** extension (`com.apple.product-type.extensionkit-extension`, Info.plist
+    `EXAppExtensionAttributes.EXExtensionPointIdentifier = com.apple.appintents-extension`, `@main struct …:
+    AppIntentsExtension`, as Xcode's macOS "App Intents Extension" template), embedded in `Contents/Extensions`
+    (not `PlugIns`), sandboxed.
+  - Measured: the app's processor also reads every linked package's static metadata and the embedded extension's
+    (`DeckCraftNative.DependencyMetadataFileList`): with `DCAppIntentsPackage.includedPackages = []` the app's
+    metadata still listed the three file intents. The package is listed anyway, as Apple documents.
+- **Metadata strings are in the main bundle** — of whichever bundle lists the intent. `appintentsmetadataprocessor`
+  rejects `LocalizedStringResource(…, bundle: .atURL(Bundle.module.bundleURL))` in titles, descriptions, parameter
+  titles, enum and type display representations and short titles ("AppIntents requires 'LocalizedStringResource' to
+  use the main bundle"), so those are plain literals. Summaries (`ParameterSummaryString`) and phrases take no bundle
+  at all. DCIntentsKit's are therefore in **two** catalogs: the app's `App/Localizable.xcstrings` and the extension's
+  `Extensions/Intents/Localizable.xcstrings`. Strings resolved at run time — errors, dialogs, an entity's display
+  representation — use the package bundle, per the String Catalog convention (DCApp's, or DCIntentsKit's
+  `Resources/Localizable.xcstrings`, which the extension carries as `DeckCraftNative_DCIntentsKit.bundle`).
 - **Window-free.** Export and the read intents never touch `AppModel.session`: a fresh `Session` per call, opened from
   the bytes with `FileCommands.openChecked`/`addOpened`, `file.export` run on it, dropped.
-- **Tests:** `DCAppTests/IntentsTests.swift` (15): PDF slides/notes/handouts page counts, PPTX reopens with the same
-  slides, PNG of one slide and JPEG of all, a slide past the end fails before writing, outline equals deckcraft's
-  outline export (`content.md`), slide counts against the corpus (`.deckcraft` and `.pptx`), damaged files (garbage,
-  empty, a cut zip, a cut pptx) fail cleanly, Run DeckCraft Command (answers, bad JSON, non-object, unknown id, the
-  command's own failure, a UI command with no app), New Presentation's and Add Slide's parameters against the engine.
-- **Open:** a launch for a background intent also opens AppKit's untitled window (`applicationShouldOpenUntitledFile`);
-  an App Intents extension for the file intents (a project change) would avoid launching the app at all.
+- **Tests:** `DCIntentsKitTests/FileIntentsTests.swift` (12 in 2 suites; 9 moved from DCAppTests): PDF slides/notes/handouts page
+  counts, PPTX reopens with the same slides, PNG of one slide and JPEG of all, a slide past the end fails before
+  writing, outline equals deckcraft's outline export (`content.md`), slide counts against the corpus (`.deckcraft` and
+  `.pptx`), damaged files (garbage, empty, a cut zip, a cut pptx) fail cleanly, the export's parameters, an intent's
+  file parameter, background-only modes, the kit's run-time strings, control-channel runs. `DCAppTests/IntentsTests.swift`
+  (6): Run DeckCraft Command (answers, bad JSON, non-object, unknown id, the command's own failure, a UI command with
+  no app), the command ids, New Presentation's and Add Slide's parameters against the engine, the entity.
+  `StringsCatalogTests.intentsKitAndExtensionCatalogs`: the kit's, the extension's and the app's catalogs.
+- **Control channel check (2026-10-27):** `DeckCraftDev --control 7993 --sample` with `intents.run`: new (Harbor),
+  addSlide (→ 2), command `file.info`, open `sample.deckcraft` (8 slides), show from slide 2, slideCount (8), outline,
+  export (`sample.pdf`) all `ok`.
 
 ## Release and Updates (Wave 6, session A)
 
@@ -954,10 +988,12 @@ sizes, years and ids are passed as `String(n)`); Doubles are passed already form
 
 **The exception: App Intents metadata uses the main bundle.** The App Intents metadata processor refuses any
 other bundle, so intent titles, descriptions, parameter titles, enum and entity names and short titles in
-`DCApp/Intents/*.swift` and `Apps/DeckCraftNative/App/*Intent*.swift` are `LocalizedStringResource("…")` with no
-`bundle:`; their keys are in `Apps/DeckCraftNative/App/Localizable.xcstrings`, the App Shortcuts phrases in
-`App/AppShortcuts.xcstrings`. Intent error and dialog text that's built at run time uses
-`bundle: .atURL(Bundle.module.bundleURL)` and lives in DCApp's catalog.
+`DCApp/Intents/*.swift`, `DCIntentsKit` and `Apps/DeckCraftNative/App/*Intent*.swift` are `LocalizedStringResource("…")`
+with no `bundle:`; their keys are in `Apps/DeckCraftNative/App/Localizable.xcstrings`, the App Shortcuts phrases in
+`App/AppShortcuts.xcstrings`, and DCIntentsKit's also in the App Intents extension's own
+`Apps/DeckCraftNative/Extensions/Intents/Localizable.xcstrings` (its main bundle). Intent error and dialog text
+that's built at run time uses `bundle: .atURL(Bundle.module.bundleURL)` and lives in DCApp's catalog, or DCIntentsKit's
+(`Packages/DCExtensions/Sources/DCIntentsKit/Resources/Localizable.xcstrings`).
 
 | Catalog | Holds | Filled by |
 |---|---|---|
@@ -967,6 +1003,8 @@ other bundle, so intent titles, descriptions, parameter titles, enum and entity 
 | `Apps/DeckCraftNative/App/Localizable.xcstrings` | App Intents metadata (main bundle), parameter summaries | `Tools/l10n/sync.sh` (Xcode build) |
 | `Apps/DeckCraftNative/App/AppShortcuts.xcstrings` | App Shortcuts phrases | `Tools/l10n/sync.sh` (Xcode build) |
 | `Apps/DeckCraftNative/App/InfoPlist.xcstrings` | name, copyright, document and file type names | `Tools/l10n/sync.sh` (from the built Info.plist) |
+| `DCIntentsKit/Resources/Localizable.xcstrings` | the file intents' run-time text, plurals | `Tools/l10n/sync.sh` |
+| `Apps/DeckCraftNative/Extensions/Intents/Localizable.xcstrings` | the App Intents extension's main bundle: DCIntentsKit's metadata, its parameter summaries | `Tools/l10n/sync.sh` (Xcode build) |
 
 **Extraction is the compiler's.** A target with a String Catalog is compiled with string extraction on, and each
 file writes a `.stringsdata` (type-checked keys: `%lld` vs `%@`, and the `comment:`s). `sync.sh` builds DCApp

@@ -17,6 +17,11 @@
 #                                                             (no `bundle:`) and the app target's own files
 #   Apps/DeckCraftNative/App/AppShortcuts                     the App Shortcuts phrases
 #   Apps/DeckCraftNative/App/InfoPlist                        the built app's Info.plist (name, copyright, document types)
+#   Packages/DCExtensions/Sources/DCIntentsKit/Resources/Localizable
+#                                                             DCIntentsKit (bundle: .module): the file intents' run-time text
+#   Apps/DeckCraftNative/Extensions/Intents/Localizable       the App Intents extension's main bundle: DCIntentsKit's
+#                                                             App Intents metadata (no `bundle:`) and parameter summaries
+#                                                             (the app's catalog holds them too: both bundles list the intents)
 #
 # The Commands catalog is generated from the registry by `Tools/l10n/commands.sh`, not here.
 #
@@ -28,7 +33,9 @@ SCRATCH=${SCRATCH:-$ROOT/.build-strings}
 DERIVED=${DERIVED:-$HOME/Library/Caches/DeckCraftNative/xcode-strings}
 OUT=$SCRATCH/l10n-stringsdata
 SOURCES=$ROOT/Packages/DCApp/Sources
+EXT_SOURCES=$ROOT/Packages/DCExtensions/Sources
 APP=$ROOT/Apps/DeckCraftNative/App
+INTENTS_EXT=$ROOT/Apps/DeckCraftNative/Extensions/Intents
 L10N=(python3 -I "$ROOT/Tools/l10n/l10n.py")
 WITH_APP=1
 [[ ${1:-} == --no-app ]] && WITH_APP=0
@@ -42,10 +49,10 @@ fi
 # The .stringsdata of the last build (a file that wasn't recompiled keeps its earlier, still current one).
 rm -rf "$OUT"
 mkdir -p "$OUT"
-for module in DCAppModel DCApp; do
+for module in DCAppModel DCApp DCIntentsKit; do
     cp "$SCRATCH"/out/Intermediates.noindex/DeckCraftNative.build/Debug/$module-t.build/Objects-normal/*/*.stringsdata "$OUT"/
 done
-"${L10N[@]}" split "$OUT" "$SOURCES"
+"${L10N[@]}" split "$OUT" "$SOURCES" "$EXT_SOURCES"
 
 finish() {  # plurals, English values, counts
     "${L10N[@]}" plurals "$1" "$ROOT/Tools/l10n/plurals.json"
@@ -57,6 +64,8 @@ for module in DCAppModel DCApp; do
     xcrun xcstringstool sync "$SOURCES/$module/Resources/Localizable.xcstrings" --stringsdata "$OUT/$module"/*.stringsdata
     finish "$SOURCES/$module/Resources/Localizable.xcstrings"
 done
+xcrun xcstringstool sync "$EXT_SOURCES/DCIntentsKit/Resources/Localizable.xcstrings" --stringsdata "$OUT/DCIntentsKit"/*.stringsdata
+finish "$EXT_SOURCES/DCIntentsKit/Resources/Localizable.xcstrings"
 
 if (( WITH_APP )); then
     if ! log=$(xcodebuild -project "$ROOT/Apps/DeckCraftNative/DeckCraftNative.xcodeproj" -scheme DeckCraftNative \
@@ -73,4 +82,9 @@ if (( WITH_APP )); then
     "${L10N[@]}" stats "$APP/AppShortcuts.xcstrings"
     "${L10N[@]}" infoplist "$DERIVED/Build/Products/Debug/DeckCraftNative.app/Contents/Info.plist" "$APP/InfoPlist.xcstrings"
     "${L10N[@]}" stats "$APP/InfoPlist.xcstrings"
+    # The App Intents extension: DCIntentsKit's metadata literals and the summaries Xcode extracts for it.
+    extobjects=("$DERIVED"/Build/Intermediates.noindex/DeckCraftNative.build/Debug/DeckCraftIntents.build/Objects-normal/*)
+    extdata=("$extobjects[1]"/*.stringsdata(N) "$OUT"/Intents/*.stringsdata(N))
+    xcrun xcstringstool sync "$INTENTS_EXT/Localizable.xcstrings" --stringsdata "${extdata[@]}"
+    finish "$INTENTS_EXT/Localizable.xcstrings"
 fi

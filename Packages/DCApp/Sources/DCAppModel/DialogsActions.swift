@@ -957,7 +957,7 @@ enum DialogPayloads {
         var colors = JSONObject()
         for slot in SchemeSlot.theme {
             guard let rgb = Rgba.fromHex(String(rustTrim(d.value(slot.xmlName)))) else {
-                return .failure(CommandError(L10n.text("\(slot.label) needs a colour like #RRGGBB.")))
+                return .failure(CommandError(L10n.text("\(L10n.colorLabel(slot.label)) needs a colour like #RRGGBB.")))
             }
             colors.set(slot.xmlName, .string("#\(rgb.hex)"))
         }

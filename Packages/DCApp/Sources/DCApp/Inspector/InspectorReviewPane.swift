@@ -18,13 +18,11 @@ struct ReviewView: View {
         let pane = ctl.model.ui.pane
         let part = pane == "thesaurus" || pane == "revisions" ? pane ?? "comments" : "comments"
         Section {
-            Picker(String(localized: "Show", bundle: .module, comment: "Which part of the Review inspector to show"), selection: Binding(get: { part }, set: { ctl.run("view.pane", ["pane": .string($0)]) })) {
-                Text("Comments", bundle: .module).tag("comments")
-                Text("Thesaurus", bundle: .module).tag("thesaurus")
-                Text("Revisions", bundle: .module).tag("revisions")
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            FittingPicker(title: String(localized: "Show", bundle: .module, comment: "Which part of the Review inspector to show"), selection: Binding(get: { part }, set: { ctl.run("view.pane", ["pane": .string($0)]) }), options: [
+                (String(localized: "Comments", bundle: .module), "comments"),
+                (String(localized: "Thesaurus", bundle: .module), "thesaurus"),
+                (String(localized: "Revisions", bundle: .module), "revisions"),
+            ])
         }
         switch part {
         case "thesaurus": ThesaurusView(ctl: ctl)

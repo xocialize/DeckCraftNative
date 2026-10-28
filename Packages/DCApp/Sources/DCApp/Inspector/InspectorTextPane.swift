@@ -221,11 +221,8 @@ struct TextBoxSection: View {
             }
         }
         Section(String(localized: "Text Box", bundle: .module)) {
-            Picker(String(localized: "Vertical alignment", bundle: .module), selection: Binding(get: { InspectorText.anchor(sh) ?? "" }, set: { ctl.run("format.anchor", ["anchor": .string($0)]) })) {
-                if InspectorText.anchor(sh) == nil { Text(verbatim: "—").tag("") }
-                ForEach(InspectorText.anchors, id: \.1) { Text($0.0).tag($0.1) }
-            }
-            .pickerStyle(.segmented)
+            FittingPicker(title: String(localized: "Vertical alignment", bundle: .module), selection: Binding(get: { InspectorText.anchor(sh) ?? "" }, set: { ctl.run("format.anchor", ["anchor": .string($0)]) }),
+                options: (InspectorText.anchor(sh) == nil ? [("—", "")] : []) + InspectorText.anchors.map { ($0.0, $0.1) }, hidesLabel: false)
             Picker(String(localized: "Autofit", bundle: .module), selection: Binding(get: { autofit }, set: { ctl.run("format.autofit", ["mode": .string($0)]) })) {
                 ForEach(InspectorText.autofits, id: \.1) { Text($0.0).tag($0.1) }
             }

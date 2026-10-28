@@ -1,7 +1,8 @@
 # DCExtensions — notes
 
 The app's system extensions: a **Quick Look preview**, a **Quick Look thumbnail** and a **Spotlight importer** for
-`.deckcraft`, `.pptx`, `.potx` and `.ppsx`. Not a port: deckcraft has no system extensions (its macOS bundle,
+`.deckcraft`, `.pptx`, `.potx` and `.ppsx`, and an **App Intents extension** that runs the file intents (see
+"Intents extension" below). Not a port: deckcraft has no system extensions (its macOS bundle,
 `packaging/macos/Info.plist.in`, only declares the document types). **Status: Wave 6, done (2026-10-27).**
 
 ## Layout
@@ -11,13 +12,18 @@ The app's system extensions: a **Quick Look preview**, a **Quick Look thumbnail*
 | `Sources/DCExtensionKit` | `DeckReader` (a file through `FileCommands.openChecked` within a memory budget; the text-only read; the package thumbnail), `DeckLimits`, `DeckFileError`, `LargeStack` |
 | `Sources/DCQuickLook` | `QuickLookPreview` (the PDF and the message page), `QuickLookThumbnail` (the first slide), `Resources/Localizable.xcstrings` (the messages) |
 | `Sources/DCSpotlight` | `DeckIndex` (what Spotlight learns, and `apply(to:)` onto a `CSSearchableItemAttributeSet`) |
+| `Sources/DCIntentsKit` | the file intents (Export Presentation, Get Presentation Outline, Get Slide Count), `IntentsEngine`, `DCIntentsKitPackage`, `Resources/Localizable.xcstrings` (run-time text) |
+| `Tests/DCIntentsKitTests` | the file intents over the oracle corpus and damaged files |
 | `Tests/DCExtensionsTests` | over the oracle corpus and damaged files |
 | `Apps/DeckCraftNative/Extensions/{QuickLook,Thumbnail,Spotlight}` | the three principal classes, one file each (synchronized folders) |
-| `Apps/DeckCraftNative/Extensions/Support` | their `Info.plist`s (`NSExtension`) and entitlements |
+| `Apps/DeckCraftNative/Extensions/Intents` | the App Intents extension's `@main` (`DeckCraftIntentsExtension: AppIntentsExtension`), its `AppIntentsPackage` and its `Localizable.xcstrings` (the intents' metadata strings, its main bundle) |
+| `Apps/DeckCraftNative/Extensions/Support` | their `Info.plist`s (`NSExtension`; `EXAppExtensionAttributes` for the intents) and entitlements |
 
 The appex targets in `DeckCraftNative.xcodeproj` are `DeckCraftQuickLook` (`com.xocialize.deckcraftnative.QuickLook`,
 links DCQuickLook), `DeckCraftThumbnail` (`….Thumbnail`, DCQuickLook) and `DeckCraftSpotlight` (`….Spotlight`,
-DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation Extensions* phase.
+DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation Extensions* phase, and
+`DeckCraftIntents` (`….Intents`, links DCIntentsKit), an ExtensionKit extension embedded in `Contents/Extensions` by an
+*Embed ExtensionKit Extensions* phase.
 
 ## Decisions
 
@@ -120,3 +126,51 @@ DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation E
   (secinitd), and hangs in `_libsecinit_appsandbox` until the prompt is answered or times out (two minutes): Quick
   Look then shows its generic preview. Users of the release never have an ad hoc container; on a development Mac,
   move those containers to the Trash (or answer the prompt) after switching from ad hoc to Developer ID builds.
+
+## Intents extension (Wave 6, 2026-10-27)
+
+`DeckCraftIntents.appex` runs **Export Presentation, Get Presentation Outline and Get Slide Count** for Shortcuts,
+Siri and Spotlight in a process of its own, so the app isn't launched for them and AppKit opens no untitled window.
+The intents' code is DCIntentsKit (no AppKit; the app links it too, through DCApp). Why both bundles list the intents,
+and what macOS needs for the app's App Shortcuts to name them, is in DCApp/PORT-NOTES.md ("Intents").
+
+- **Target.** `com.apple.product-type.extensionkit-extension` (Xcode's macOS "App Intents Extension" template), bundle
+  id `com.xocialize.deckcraftnative.Intents`, Info.plist `EXAppExtensionAttributes` → `EXExtensionPointIdentifier =
+  com.apple.appintents-extension`, principal type `@main struct DeckCraftIntentsExtension: AppIntentsExtension`.
+  Hardened runtime, team CFZS6RXUCP, `MARKETING_VERSION`/`CURRENT_PROJECT_VERSION` equal to the app's.
+- **Embedding.** An *Embed ExtensionKit Extensions* copy phase into the app wrapper's `Contents/Extensions`
+  (`dstSubfolderSpec = 1`, `dstPath = Contents/Extensions`). With the products directory and `$(EXTENSIONS_FOLDER_PATH)`
+  (`dstSubfolderSpec = 16`) an archive warns "is an ExtensionKit extension and must be embedded in the parent app
+  bundle's Extensions directory, but is embedded in … BuildProductsPath/Release/…": during an archive the products
+  directory isn't where the app being archived is. The wrapper-relative phase builds and archives without warnings.
+- **Sandbox.** `app-sandbox` and `files.user-selected.read-only`: Shortcuts hands it the file (a URL with read access,
+  or the bytes, `PresentationInput`); the exports are written in its container's temporary folder and handed back as
+  `IntentFile`s.
+- **Fonts.** Export draws text (PDF and images), so the extension carries the Latin set like the Quick Look
+  extensions: a third *Embed Latin Fonts* phase (the same 14 families and `latin-manifest.txt`), and
+  `IntentsExtensionSupport.prepare()` (→ `ExtensionFonts.prepare()`) at launch. 25 MB in the export, like the preview's.
+- **Stack.** Each call runs on a 32 MB thread of its own (`LargeStack.async`), not on DCAutomation's `EngineThread`,
+  so the extension doesn't link the MCP SDK.
+- **Strings.** Metadata (titles, descriptions, parameter and enum names) is main-bundle text, so the extension has its
+  own `Extensions/Intents/Localizable.xcstrings` (30 entries, with the parameter summaries Xcode extracts for it); the
+  app's catalog keeps the same keys. Run-time text is DCIntentsKit's catalog. All from `Tools/l10n/sync.sh`.
+- **Registration.** `lsregister -f -R -trusted <app>` registers the app and its extension (`pluginkit -m -i
+  com.xocialize.deckcraftnative.Intents` lists it); without `-trusted` the app registered and the extension didn't
+  (`pluginkit -a` then listed it with a null version). Xcode's own build step registers with `-trusted`.
+
+### Verified (2026-10-27, Xcode 27.1, macOS 27.2)
+
+- `xcodebuild` Debug builds with no warnings from the new target; the appex's `Contents/Resources/Metadata.appintents`
+  lists `ExportPresentationIntent`, `GetOutlineIntent`, `GetSlideCountIntent` (and their three enums), each with
+  `supportedModes` background and `allowedTargets` the App Intents extension; the app's lists all eight and the 7
+  `autoShortcuts`.
+- `Tools/release.sh --allow-dirty` archives (no warnings), exports with the Developer ID and verifies
+  `DeckCraftNative.app/Contents/Extensions/DeckCraftIntents.appex` and its executable (strict signature, hardened
+  runtime, secure timestamp, no `get-task-allow`; entitlements sandbox + user-selected read-only); `spctl` accepts the
+  app (unnotarized, so only on this Mac).
+- The five app-bound intents and the three file intents through `intents.run` (DCApp/PORT-NOTES.md).
+- **Not yet verified: the Shortcuts end-to-end run.** The Shortcuts CLI can only run shortcuts already in the library
+  (`shortcuts run|list|view|sign`), and a shortcut file is added only by clicking *Add Shortcut* in the Shortcuts app.
+  A one-action shortcut (Export Presentation as PDF, the shortcut's input as the file) is built and signed
+  (`shortcuts sign --mode anyone`); after importing it once, the check is `shortcuts run "DeckCraft Export Test"
+  --input-path …/sample.deckcraft --output-path out.pdf` with `pgrep -x DeckCraftNative` before, during and after.

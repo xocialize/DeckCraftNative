@@ -21,12 +21,10 @@ struct AnimateView: View {
         let hasSel = !(ctl.doc?.selection.shapes.isEmpty ?? true)
         let shown = part ?? (hasSel ? "animations" : "transition")
         Section {
-            Picker(String(localized: "Show", bundle: .module, comment: "Which part of the Animate inspector to show"), selection: Binding(get: { shown }, set: { part = $0 })) {
-                Text("Animations", bundle: .module).tag("animations")
-                Text("Transition", bundle: .module).tag("transition")
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            FittingPicker(title: String(localized: "Show", bundle: .module, comment: "Which part of the Animate inspector to show"), selection: Binding(get: { shown }, set: { part = $0 }), options: [
+                (String(localized: "Animations", bundle: .module), "animations"),
+                (String(localized: "Transition", bundle: .module), "transition"),
+            ])
         }
         if shown == "transition" {
             TransitionView(ctl: ctl)

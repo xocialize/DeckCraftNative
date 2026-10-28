@@ -55,16 +55,16 @@ struct StatusBarView: View {
                         expired = s
                     }
             }
-            Spacer(minLength: 0)
-            toggle(String(localized: "Notes", bundle: .module, comment: "Status bar button: shows or hides the notes pane"), "note.text", on: model.ui.notes) { link.run("view.notes") }
-            toggle(String(localized: "Comments", bundle: .module, comment: "Status bar button: shows or hides the comments pane"), "text.bubble", on: model.ui.pane == "comments") { link.run("view.pane", ["pane": "comments", "toggle": true]) }
-            Divider().frame(height: Tokens.Space.l)
-            toggle(String(localized: "Normal", bundle: .module, comment: "The Normal view (status bar button)"), "rectangle.split.2x1", on: view == .normal || view == .outline) { link.run("view.normal") }
-            toggle(String(localized: "Slide Sorter", bundle: .module), "square.grid.2x2", on: view == .sorter) { link.run("view.sorter") }
-            toggle(String(localized: "Reading View", bundle: .module), "book", on: view == .reading) { link.run("view.reading") }
-            toggle(String(localized: "Slide Show", bundle: .module), "play.rectangle", on: false) { link.run("show.start", ["from": .integer(st?.selection.slide ?? 0)]) }
-            Divider().frame(height: Tokens.Space.l)
-            if view == .sorter { sorterZoom(model) } else { zoom(model) }
+            Spacer(minLength: Tokens.Space.s)
+            // The controls on the right never clip: in a narrow window they shed the zoom slider, then the view
+            // buttons, keeping the zoom percentage and Fit; they take their width before the status message.
+            ViewThatFits(in: .horizontal) {
+                controls(model, st, view, slider: true, views: true, panes: true)
+                controls(model, st, view, slider: false, views: true, panes: true)
+                controls(model, st, view, slider: false, views: false, panes: true)
+                controls(model, st, view, slider: false, views: false, panes: false)
+            }
+            .layoutPriority(1)
         }
         .font(Tokens.Font.caption)
         .foregroundStyle(Tokens.Color.secondaryLabel)
@@ -73,6 +73,27 @@ struct StatusBarView: View {
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         .clipped()
         .background(.bar)
+    }
+
+    /// The buttons and zoom on the right, with the zoom slider, the four view buttons and the two pane toggles
+    /// each optional.
+    private func controls(_ model: AppModel, _ st: DocState?, _ view: ViewMode, slider: Bool, views: Bool, panes: Bool) -> some View {
+        HStack(spacing: Tokens.Space.s) {
+            if panes {
+                toggle(String(localized: "Notes", bundle: .module, comment: "Status bar button: shows or hides the notes pane"), "note.text", on: model.ui.notes) { link.run("view.notes") }
+                toggle(String(localized: "Comments", bundle: .module, comment: "Status bar button: shows or hides the comments pane"), "text.bubble", on: model.ui.pane == "comments") { link.run("view.pane", ["pane": "comments", "toggle": true]) }
+                Divider().frame(height: Tokens.Space.l)
+            }
+            if views {
+                toggle(String(localized: "Normal", bundle: .module, comment: "The Normal view (status bar button)"), "rectangle.split.2x1", on: view == .normal || view == .outline) { link.run("view.normal") }
+                toggle(String(localized: "Slide Sorter", bundle: .module), "square.grid.2x2", on: view == .sorter) { link.run("view.sorter") }
+                toggle(String(localized: "Reading View", bundle: .module), "book", on: view == .reading) { link.run("view.reading") }
+                toggle(String(localized: "Slide Show", bundle: .module), "play.rectangle", on: false) { link.run("show.start", ["from": .integer(st?.selection.slide ?? 0)]) }
+                Divider().frame(height: Tokens.Space.l)
+            }
+            if view == .sorter { sorterZoom(model, slider: slider) } else { zoom(model, slider: slider) }
+        }
+        .fixedSize()
     }
 
     @ViewBuilder
@@ -120,19 +141,21 @@ struct StatusBarView: View {
     }
 
     @ViewBuilder
-    private func zoom(_ model: AppModel) -> some View {
+    private func zoom(_ model: AppModel, slider: Bool) -> some View {
         let z = model.ui.zoom ?? model.canvasScale
         let pct = Int((z * 100).rounded())
         Button { link.run("view.zoomOut") } label: { Image(systemName: "minus.magnifyingglass") }
             .buttonStyle(.plain).help(String(localized: "Zoom Out", bundle: .module)).accessibilityLabel(String(localized: "Zoom Out", bundle: .module))
-        Slider(value: Binding(
-            get: { StatusLogic.sliderValue(z) },
-            set: { link.run("view.zoom", ["percent": .double(StatusLogic.percent($0))]) }
-        ), in: StatusLogic.sliderRange)
-            .controlSize(.mini)
-            .frame(width: Tokens.Space.xxl * 3)
-            .accessibilityLabel(String(localized: "Zoom", bundle: .module, comment: "The zoom slider"))
-            .accessibilityValue(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage"))
+        if slider {
+            Slider(value: Binding(
+                get: { StatusLogic.sliderValue(z) },
+                set: { link.run("view.zoom", ["percent": .double(StatusLogic.percent($0))]) }
+            ), in: StatusLogic.sliderRange)
+                .controlSize(.mini)
+                .frame(width: Tokens.Space.xxl * 3)
+                .accessibilityLabel(String(localized: "Zoom", bundle: .module, comment: "The zoom slider"))
+                .accessibilityValue(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage"))
+        }
         Button { link.run("view.zoomIn") } label: { Image(systemName: "plus.magnifyingglass") }
             .buttonStyle(.plain).help(String(localized: "Zoom In", bundle: .module)).accessibilityLabel(String(localized: "Zoom In", bundle: .module))
         Button(String(localized: "\(pct)%", bundle: .module, comment: "A zoom percentage")) { link.run("view.zoomDialog") }
@@ -147,19 +170,21 @@ struct StatusBarView: View {
     }
 
     @ViewBuilder
-    private func sorterZoom(_ model: AppModel) -> some View {
+    private func sorterZoom(_ model: AppModel, slider: Bool) -> some View {
         let r = StatusLogic.sorterZoomRange
         Image(systemName: "square.grid.3x3").accessibilityHidden(true)
-        Slider(value: Binding(
-            get: { model.ui.sorterZoom },
-            set: { v in
-                model.ui.sorterZoom = min(max(v, r.lowerBound), r.upperBound)
-                model.changed()
-            }
-        ), in: r)
-            .controlSize(.mini)
-            .frame(width: Tokens.Space.xxl * 3)
-            .accessibilityLabel(String(localized: "Thumbnail size", bundle: .module))
+        if slider {
+            Slider(value: Binding(
+                get: { model.ui.sorterZoom },
+                set: { v in
+                    model.ui.sorterZoom = min(max(v, r.lowerBound), r.upperBound)
+                    model.changed()
+                }
+            ), in: r)
+                .controlSize(.mini)
+                .frame(width: Tokens.Space.xxl * 3)
+                .accessibilityLabel(String(localized: "Thumbnail size", bundle: .module))
+        }
         Image(systemName: "square.grid.2x2").accessibilityHidden(true)
     }
 }

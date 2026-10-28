@@ -36,11 +36,10 @@ struct ArrangeView: View {
                 IconToggle(symbol: "distribute.horizontal.center", help: String(localized: "Distribute Horizontally", bundle: .module), enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("horizontal") }
                 IconToggle(symbol: "distribute.vertical.center", help: String(localized: "Distribute Vertically", bundle: .module), enabled: ctl.enabled("arrange.distribute")) { ctl.distribute("vertical") }
             }
-            Picker(String(localized: "Align to", bundle: .module), selection: Binding(get: { ctl.alignsToSlide }, set: { ctl.setAlignTo(slide: $0) })) {
-                Text("Slide", bundle: .module, comment: "Align to: the slide").tag(true)
-                Text("Selected Objects", bundle: .module).tag(false)
-            }
-            .pickerStyle(.segmented)
+            FittingPicker(title: String(localized: "Align to", bundle: .module), selection: Binding(get: { ctl.alignsToSlide }, set: { ctl.setAlignTo(slide: $0) }), options: [
+                (String(localized: "Slide", bundle: .module, comment: "Align to: the slide"), true),
+                (String(localized: "Selected Objects", bundle: .module), false),
+            ], hidesLabel: false)
             .disabled(!ctl.enabled("arrange.align"))
         }
         Section(String(localized: "Group, Rotate and Flip", bundle: .module)) {

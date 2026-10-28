@@ -66,6 +66,12 @@ if [[ -n $(git -C "$root" status --porcelain) ]]; then
 fi
 
 out="$root/build/release/$version"
+# A released version's build (its tag exists) is never overwritten: a real release must bump the version first,
+# and a test build of an unbumped tree goes beside it.
+if git -C "$root" rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+  (( allow_dirty )) || fail "v$version is already released: bump DCAppVersion.current and MARKETING_VERSION first."
+  out="$root/build/release/$version-test"
+fi
 archive="$out/DeckCraftNative.xcarchive"
 rm -rf "$out"
 mkdir -p "$out" "$derived"

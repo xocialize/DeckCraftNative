@@ -21,8 +21,11 @@ struct DialogView: View {
             }
             ScrollView {
                 Form {
-                    ForEach(Array(controller.form.enumerated()), id: \.offset) { _, row in
-                        FormRowView(row: row, controller: controller)
+                    ForEach(Array(FormSegment.of(controller.form).enumerated()), id: \.offset) { _, segment in
+                        switch segment {
+                        case .row(let row): FormRowView(row: row, controller: controller)
+                        case .colors(let rows): ColorGridView(rows: rows, controller: controller)
+                        }
                     }
                 }
                 .formStyle(.columns)
@@ -68,6 +71,64 @@ struct DialogButtonView: View {
             Button(button.label, action: action).keyboardShortcut(.cancelAction).disabled(!button.enabled)
         case .normal:
             Button(button.label, action: action).disabled(!button.enabled)
+        }
+    }
+}
+
+/// A form's rows as drawn: consecutive rows made only of colour fields (Theme Colors' two columns) become one grid,
+/// so their labels, hex fields and wells line up in columns instead of each row laying out on its own.
+enum FormSegment {
+    case row(FormRow)
+    case colors([[(label: String, key: String)]])
+
+    static func of(_ rows: [FormRow]) -> [FormSegment] {
+        var out: [FormSegment] = []
+        for row in rows {
+            if case .row(let cells) = row, cells.count > 1 {
+                let colors = cells.compactMap { c -> (label: String, key: String)? in
+                    if case .color(let label, let key) = c { return (label, key) }
+                    return nil
+                }
+                if colors.count == cells.count {
+                    if case .colors(var grid) = out.last {
+                        grid.append(colors)
+                        out[out.count - 1] = .colors(grid)
+                    } else {
+                        out.append(.colors([colors]))
+                    }
+                    continue
+                }
+            }
+            out.append(.row(row))
+        }
+        return out
+    }
+}
+
+/// Rows of colour fields in aligned columns: label, hex field, well, for each column.
+struct ColorGridView: View {
+    let rows: [[(label: String, key: String)]]
+    let controller: DialogController
+
+    var body: some View {
+        Grid(alignment: .leading, horizontalSpacing: Tokens.Space.s, verticalSpacing: Tokens.Space.s) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                GridRow {
+                    ForEach(Array(row.enumerated()), id: \.offset) { _, c in
+                        Text(c.label).gridColumnAlignment(.trailing).lineLimit(1).fixedSize()
+                        TextField(c.label, text: Binding(get: { controller.current?.value(c.key) ?? "" }, set: { controller.set(c.key, $0) }))
+                            .textFieldStyle(.roundedBorder)
+                            .labelsHidden()
+                            .frame(width: Tokens.Layout.metricTileMinWidth * 0.7)
+                        ColorPicker(c.label, selection: Binding(
+                            get: { HexColor.color(controller.current?.value(c.key) ?? "") ?? Tokens.Color.fieldFill },
+                            set: { controller.set(c.key, HexColor.hex($0)) }
+                        ), supportsOpacity: false)
+                        .labelsHidden()
+                        .padding(.trailing, Tokens.Space.m)
+                    }
+                }
+            }
         }
     }
 }
