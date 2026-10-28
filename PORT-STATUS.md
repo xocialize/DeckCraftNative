@@ -323,9 +323,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   and the show and gets a poster on insert. DCMedia itself stays free of it (PLAN.md §10.4).
   - **Checked on deckcraft's own clips:** the frame times are deckcraft's, and the decoded pixels match ffmpeg's VP9
     and VP8 decoders to 0.25 levels. deckcraft reports VP8 unsupported, so here VP8 goes further than the oracle.
-  - **One divergence:** vpx-swift converts streams with no colour tag as BT.709, where VP8's specification, deckcraft
-    and ffmpeg use BT.601 for SD video. That is about 6 levels on these clips. It's asked of vpx-swift's owner
-    (AB-A-0205), and `CodecsTests` carries it as a known issue that flags the fix.
+  - **Colours, fixed in vpx-swift 0.3.1 (2026-10-27):** vpx-swift 0.3.0 converted streams with no colour tag as
+    BT.709, where VP8's specification, deckcraft and ffmpeg use BT.601 for SD video (about 6 levels on these clips).
+    Asked of its owner as AB-A-0205; 0.3.1 converts VP8 and untagged VP9 of 576 lines or fewer as BT.601 (deckcraft's
+    `Matrix::from_code` rule) and keeps BT.709 for untagged HD. DeckCraftNative requires 0.3.1, and `CodecsTests` now
+    checks every frame of both clips against ffmpeg's BT.601 conversion (0.30 levels) instead of a known issue.
   - libvpx's licence and patent grant ship in `Acknowledgements.txt` (`Tools/acknowledgements.sh` now picks up a
     package's `THIRD-PARTY-NOTICES`).
 - **PowerPoint sweep (2026-10-27).** `Tools/pptx/powerpoint-sweep.sh` exports every test deck with `dccli` (the 9

@@ -70,7 +70,7 @@ let package = Package(
         .package(url: "https://github.com/xocialize/DesignScaffold.git", from: "0.25.0"),
         // VP9 and VP8 decoding (libvpx, BSD-3), plugged into DCMedia's external-decoder seam by the app and dccli.
         // DCMedia itself stays free of it (PLAN.md §10.4, decided 2026-10-27).
-        .package(url: "https://github.com/xocialize/vpx-swift.git", from: "0.3.0"),
+        .package(url: "https://github.com/xocialize/vpx-swift.git", from: "0.3.1"),
     ],
     targets: [
         // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and

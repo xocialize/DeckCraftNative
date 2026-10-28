@@ -1,5 +1,5 @@
 {
-  "originHash" : "b4e02b4dc48cfa4ad41231601a53c9a0050b8bc745c86ede01c475a9788f2e39",
+  "originHash" : "f13f3ca8c3ea19f83407127d5146c59c195f7b226d2683f07065c23f95134fcc",
   "pins" : [
     {
       "identity" : "designscaffold",
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xocialize/vpx-swift.git",
       "state" : {
-        "revision" : "4d3f702901fbe2dc18c10644176e1c0d8c015d03",
-        "version" : "0.3.0"
+        "revision" : "73a87d03d899b33fca745768685cf7cffc839093",
+        "version" : "0.3.1"
       }
     }
   ],

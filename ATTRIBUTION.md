@@ -15,7 +15,7 @@ iconography, images, fonts, themes or templates.
 |---|---|---|---|---|
 | `Apps/DeckCraftNative/App/Assets.xcassets/AppIcon.appiconset/icon_{16,32,64,128,256,512}.png` | DeckCraft contributors | deckcraft `assets/app-icon/hicolor/<n>x<n>/apps/ai.storyteller.deckcraft.png` at pin `27009cd9`, unmodified (deckcraft `ATTRIBUTION.md`: rendered by DeckCraft from `assets/app-icon/icon-source.deckcraft`, shapes only) | MIT OR Apache-2.0 (deckcraft `LICENSE-MIT`, `LICENSE-APACHE`; © 2026 ArtCraft Team and the DeckCraft contributors) | The app icon (placeholder presentation board, as in deckcraft) |
 | `Apps/DeckCraftNative/App/Assets.xcassets/AppIcon.appiconset/icon_1024.png` | DeckCraft contributors | deckcraft `assets/app-icon/deckcraft-1024.png` at pin `27009cd9`, unmodified | MIT OR Apache-2.0 (as above) | The app icon at 512 pt @2x |
-| libvpx v1.16.0 (linked into the app and `dccli`, through vpx-swift 0.3.0) | The WebM Project authors; vpx-swift by xocialize | https://github.com/webmproject/libvpx; https://github.com/xocialize/vpx-swift | BSD-3-Clause with the WebM PATENTS grant (vpx-swift: BSD-3-Clause); both texts are in the app's `Acknowledgements.txt` | VP9 and VP8 video decoding |
+| libvpx v1.16.0 (linked into the app and `dccli`, through vpx-swift 0.3.1) | The WebM Project authors; vpx-swift by xocialize | https://github.com/webmproject/libvpx; https://github.com/xocialize/vpx-swift | BSD-3-Clause with the WebM PATENTS grant (vpx-swift: BSD-3-Clause); both texts are in the app's `Acknowledgements.txt` | VP9 and VP8 video decoding |
 
 ## Considered and not shipped
 
