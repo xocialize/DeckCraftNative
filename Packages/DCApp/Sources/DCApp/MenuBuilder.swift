@@ -119,6 +119,8 @@ extension AppController: NSMenuItemValidation {
     public func validateMenuItem(_ item: NSMenuItem) -> Bool {
         guard item.action == #selector(runCommand(_:)), let id = item.representedObject as? String else { return true }
         if id == "file.new" || id == "app.openDialog" || id == "app.about" || id == "app.preferences" { return true }
+        // View › Ribbon shows whether the window has the ribbon.
+        if id == "view.ribbon" { item.state = model.ui.layout == .ribbon ? .on : .off }
         if UICommands.contains(id) { return true }
         guard let spec = findCommand(id) else { return false }
         return spec.enabled(model.session) == nil

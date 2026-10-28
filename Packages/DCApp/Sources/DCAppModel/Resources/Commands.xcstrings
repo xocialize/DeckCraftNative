@@ -1993,6 +1993,1662 @@
         }
       }
     },
+    "help.animation.add" : {
+      "comment" : "What command animation.add does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add another animation to the selected object."
+          }
+        }
+      }
+    },
+    "help.animation.options" : {
+      "comment" : "What command animation.options does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the direction or variation of the animation."
+          }
+        }
+      }
+    },
+    "help.animation.painter" : {
+      "comment" : "What command animation.painter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy this object's animations, then click another object to give it the same."
+          }
+        }
+      }
+    },
+    "help.animation.preview" : {
+      "comment" : "What command animation.preview does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the slide's animations on the canvas."
+          }
+        }
+      }
+    },
+    "help.animation.set" : {
+      "comment" : "What command animation.set does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how the selected object enters, stands out, leaves or moves."
+          }
+        }
+      }
+    },
+    "help.animation.timing" : {
+      "comment" : "What command animation.timing does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set when the animation starts, how long it lasts and what starts it."
+          }
+        }
+      }
+    },
+    "help.app.compareDialog" : {
+      "comment" : "What command app.compareDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare this presentation with another version and review the differences."
+          }
+        }
+      }
+    },
+    "help.app.dialog:accessibility" : {
+      "comment" : "What command app.dialog:accessibility does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find things that make the presentation hard to read for people with disabilities."
+          }
+        }
+      }
+    },
+    "help.app.dialog:comment" : {
+      "comment" : "What command app.dialog:comment does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave a note on the slide for yourself or others."
+          }
+        }
+      }
+    },
+    "help.app.dialog:customShow" : {
+      "comment" : "What command app.dialog:customShow does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make a show from a chosen set of slides."
+          }
+        }
+      }
+    },
+    "help.app.dialog:equation" : {
+      "comment" : "What command app.dialog:equation does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a mathematical equation."
+          }
+        }
+      }
+    },
+    "help.app.dialog:headerFooter" : {
+      "comment" : "What command app.dialog:headerFooter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a footer, the date or slide numbers on every slide."
+          }
+        }
+      }
+    },
+    "help.app.dialog:hyperlink" : {
+      "comment" : "What command app.dialog:hyperlink does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link the selection to a web page, a file or another slide."
+          }
+        }
+      }
+    },
+    "help.app.dialog:language" : {
+      "comment" : "What command app.dialog:language does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the language used to check the selected text's spelling."
+          }
+        }
+      }
+    },
+    "help.app.dialog:setupShow" : {
+      "comment" : "What command app.dialog:setupShow does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the kind of show, the slides it plays and how it advances."
+          }
+        }
+      }
+    },
+    "help.app.dialog:smartart" : {
+      "comment" : "What command app.dialog:smartart does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a diagram that lays out a list, a process or a hierarchy."
+          }
+        }
+      }
+    },
+    "help.app.dialog:spelling" : {
+      "comment" : "What command app.dialog:spelling does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the presentation for misspelled words."
+          }
+        }
+      }
+    },
+    "help.app.dialog:symbol" : {
+      "comment" : "What command app.dialog:symbol does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert a character that isn't on the keyboard."
+          }
+        }
+      }
+    },
+    "help.app.exportDialog" : {
+      "comment" : "What command app.exportDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save a copy as a PDF, pictures, a video or another format."
+          }
+        }
+      }
+    },
+    "help.app.find" : {
+      "comment" : "What command app.find does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search the presentation for text."
+          }
+        }
+      }
+    },
+    "help.app.home" : {
+      "comment" : "What command app.home does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to the start screen."
+          }
+        }
+      }
+    },
+    "help.app.insertAudioDialog" : {
+      "comment" : "What command app.insertAudioDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place a sound from a file on the slide."
+          }
+        }
+      }
+    },
+    "help.app.insertPictureDialog" : {
+      "comment" : "What command app.insertPictureDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place a picture from a file on the slide."
+          }
+        }
+      }
+    },
+    "help.app.insertVideoDialog" : {
+      "comment" : "What command app.insertVideoDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place a video from a file on the slide."
+          }
+        }
+      }
+    },
+    "help.app.openDialog" : {
+      "comment" : "What command app.openDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a presentation from a file."
+          }
+        }
+      }
+    },
+    "help.app.palette" : {
+      "comment" : "What command app.palette does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find any command by typing part of its name."
+          }
+        }
+      }
+    },
+    "help.app.print" : {
+      "comment" : "What command app.print does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print the slides, handouts or notes."
+          }
+        }
+      }
+    },
+    "help.app.replace" : {
+      "comment" : "What command app.replace does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for text and replace it with other text."
+          }
+        }
+      }
+    },
+    "help.arrange.bringToFront" : {
+      "comment" : "What command arrange.bringToFront does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the order of overlapping objects, group them, align or rotate them."
+          }
+        }
+      }
+    },
+    "help.comment.delete" : {
+      "comment" : "What command comment.delete does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove the selected comment."
+          }
+        }
+      }
+    },
+    "help.comment.next" : {
+      "comment" : "What command comment.next does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to the next comment."
+          }
+        }
+      }
+    },
+    "help.comment.prev" : {
+      "comment" : "What command comment.prev does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to the comment before this one."
+          }
+        }
+      }
+    },
+    "help.design.background" : {
+      "comment" : "What command design.background does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a background style from the theme for every slide."
+          }
+        }
+      }
+    },
+    "help.design.colors" : {
+      "comment" : "What command design.colors does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the theme colours the presentation uses."
+          }
+        }
+      }
+    },
+    "help.design.effects" : {
+      "comment" : "What command design.effects does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how the theme's shapes are shaded and outlined."
+          }
+        }
+      }
+    },
+    "help.design.fonts" : {
+      "comment" : "What command design.fonts does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the pair of theme fonts for headings and body text."
+          }
+        }
+      }
+    },
+    "help.design.slideSize" : {
+      "comment" : "What command design.slideSize does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the slides' shape, such as widescreen or standard."
+          }
+        }
+      }
+    },
+    "help.design.theme" : {
+      "comment" : "What command design.theme does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give the whole presentation a theme's colours, fonts and backgrounds."
+          }
+        }
+      }
+    },
+    "help.design.variant" : {
+      "comment" : "What command design.variant does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use another colour set of the current theme."
+          }
+        }
+      }
+    },
+    "help.draw.inkToShape" : {
+      "comment" : "What command draw.inkToShape does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn freehand drawing into neat shapes."
+          }
+        }
+      }
+    },
+    "help.edit.copy" : {
+      "comment" : "What command edit.copy does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep a copy of the selection to paste elsewhere."
+          }
+        }
+      }
+    },
+    "help.edit.cut" : {
+      "comment" : "What command edit.cut does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove the selection and keep it to paste elsewhere."
+          }
+        }
+      }
+    },
+    "help.edit.paste" : {
+      "comment" : "What command edit.paste does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put what you last cut or copied at the selection."
+          }
+        }
+      }
+    },
+    "help.edit.redo" : {
+      "comment" : "What command edit.redo does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the change you took back again."
+          }
+        }
+      }
+    },
+    "help.edit.undo" : {
+      "comment" : "What command edit.undo does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take back the last change."
+          }
+        }
+      }
+    },
+    "help.file.new" : {
+      "comment" : "What command file.new does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a new presentation."
+          }
+        }
+      }
+    },
+    "help.file.save" : {
+      "comment" : "What command file.save does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save the presentation."
+          }
+        }
+      }
+    },
+    "help.format.alignCenter" : {
+      "comment" : "What command format.alignCenter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre the paragraph between the edges."
+          }
+        }
+      }
+    },
+    "help.format.alignLeft" : {
+      "comment" : "What command format.alignLeft does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line the paragraph up on the left edge."
+          }
+        }
+      }
+    },
+    "help.format.alignRight" : {
+      "comment" : "What command format.alignRight does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line the paragraph up on the right edge."
+          }
+        }
+      }
+    },
+    "help.format.anchor" : {
+      "comment" : "What command format.anchor does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place the text at the top, middle or bottom of its shape."
+          }
+        }
+      }
+    },
+    "help.format.bold" : {
+      "comment" : "What command format.bold does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the selected text bold."
+          }
+        }
+      }
+    },
+    "help.format.bullets" : {
+      "comment" : "What command format.bullets does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start each paragraph with a bullet."
+          }
+        }
+      }
+    },
+    "help.format.case" : {
+      "comment" : "What command format.case does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the selected text to upper, lower, sentence or title case."
+          }
+        }
+      }
+    },
+    "help.format.clear" : {
+      "comment" : "What command format.clear does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove the formatting from the selected text, leaving plain text."
+          }
+        }
+      }
+    },
+    "help.format.color" : {
+      "comment" : "What command format.color does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the colour of the selected text."
+          }
+        }
+      }
+    },
+    "help.format.columns" : {
+      "comment" : "What command format.columns does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Split the text box's text into columns."
+          }
+        }
+      }
+    },
+    "help.format.direction" : {
+      "comment" : "What command format.direction does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn or stack the text in its shape."
+          }
+        }
+      }
+    },
+    "help.format.font" : {
+      "comment" : "What command format.font does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the typeface for the selected text."
+          }
+        }
+      }
+    },
+    "help.format.fontDialog" : {
+      "comment" : "What command format.fontDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open every font setting for the selected text in one place."
+          }
+        }
+      }
+    },
+    "help.format.grow" : {
+      "comment" : "What command format.grow does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the selected text one step larger."
+          }
+        }
+      }
+    },
+    "help.format.highlight" : {
+      "comment" : "What command format.highlight does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark the selected text with a background colour."
+          }
+        }
+      }
+    },
+    "help.format.indent" : {
+      "comment" : "What command format.indent does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move the paragraph in one list level."
+          }
+        }
+      }
+    },
+    "help.format.italic" : {
+      "comment" : "What command format.italic does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slant the selected text."
+          }
+        }
+      }
+    },
+    "help.format.justify" : {
+      "comment" : "What command format.justify does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spread the paragraph's lines to both edges."
+          }
+        }
+      }
+    },
+    "help.format.lineSpacing" : {
+      "comment" : "What command format.lineSpacing does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the space between lines of text."
+          }
+        }
+      }
+    },
+    "help.format.numbering" : {
+      "comment" : "What command format.numbering does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number the paragraphs in order."
+          }
+        }
+      }
+    },
+    "help.format.outdent" : {
+      "comment" : "What command format.outdent does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move the paragraph out one list level."
+          }
+        }
+      }
+    },
+    "help.format.painter" : {
+      "comment" : "What command format.painter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick up the selection's formatting, then click text or a shape to give it the same look."
+          }
+        }
+      }
+    },
+    "help.format.paragraphDialog" : {
+      "comment" : "What command format.paragraphDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the indents, spacing and alignment settings for the paragraph."
+          }
+        }
+      }
+    },
+    "help.format.shrink" : {
+      "comment" : "What command format.shrink does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the selected text one step smaller."
+          }
+        }
+      }
+    },
+    "help.format.size" : {
+      "comment" : "What command format.size does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the size of the selected text in points."
+          }
+        }
+      }
+    },
+    "help.format.spacing" : {
+      "comment" : "What command format.spacing does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set how tightly the selected characters sit together."
+          }
+        }
+      }
+    },
+    "help.format.strikethrough" : {
+      "comment" : "What command format.strikethrough does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw a line through the selected text."
+          }
+        }
+      }
+    },
+    "help.format.subscript" : {
+      "comment" : "What command format.subscript does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lower the selected text below the line, smaller."
+          }
+        }
+      }
+    },
+    "help.format.superscript" : {
+      "comment" : "What command format.superscript does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raise the selected text above the line, smaller."
+          }
+        }
+      }
+    },
+    "help.format.underline" : {
+      "comment" : "What command format.underline does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw a line under the selected text."
+          }
+        }
+      }
+    },
+    "help.insert.actionButton" : {
+      "comment" : "What command insert.actionButton does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a button that goes to another slide or runs an action in the show."
+          }
+        }
+      }
+    },
+    "help.insert.chart" : {
+      "comment" : "What command insert.chart does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a chart drawn from data you can edit."
+          }
+        }
+      }
+    },
+    "help.insert.dateTime" : {
+      "comment" : "What command insert.dateTime does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the date and time on the slide."
+          }
+        }
+      }
+    },
+    "help.insert.icon" : {
+      "comment" : "What command insert.icon does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a simple drawn icon."
+          }
+        }
+      }
+    },
+    "help.insert.photoAlbum" : {
+      "comment" : "What command insert.photoAlbum does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make a presentation from a set of pictures, a few per slide."
+          }
+        }
+      }
+    },
+    "help.insert.slideNumber" : {
+      "comment" : "What command insert.slideNumber does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the slide's number on the slide."
+          }
+        }
+      }
+    },
+    "help.insert.table" : {
+      "comment" : "What command insert.table does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a table of rows and columns."
+          }
+        }
+      }
+    },
+    "help.insert.textBox" : {
+      "comment" : "What command insert.textBox does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a box you can type text in."
+          }
+        }
+      }
+    },
+    "help.insert.wordArt" : {
+      "comment" : "What command insert.wordArt does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add decorative text with a ready-made style."
+          }
+        }
+      }
+    },
+    "help.insert.zoom" : {
+      "comment" : "What command insert.zoom does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a thumbnail that jumps to another slide or section during the show."
+          }
+        }
+      }
+    },
+    "help.review.accept" : {
+      "comment" : "What command review.accept does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the changes found by Compare."
+          }
+        }
+      }
+    },
+    "help.review.endCompare" : {
+      "comment" : "What command review.endCompare does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop reviewing the differences and close the comparison."
+          }
+        }
+      }
+    },
+    "help.review.spelling" : {
+      "comment" : "What command review.spelling does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the presentation for misspelled words."
+          }
+        }
+      }
+    },
+    "help.review.thesaurusPane" : {
+      "comment" : "What command review.thesaurusPane does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look up words with a similar meaning."
+          }
+        }
+      }
+    },
+    "help.section.add" : {
+      "comment" : "What command section.add does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a section at the selected slide to organise the deck."
+          }
+        }
+      }
+    },
+    "help.shape.effects" : {
+      "comment" : "What command shape.effects does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a shadow, reflection, glow or soft edges to the shape."
+          }
+        }
+      }
+    },
+    "help.shape.fill" : {
+      "comment" : "What command shape.fill does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill the selected shape with a colour."
+          }
+        }
+      }
+    },
+    "help.shape.insert" : {
+      "comment" : "What command shape.insert does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw a ready-made shape: lines, arrows, stars, callouts and more."
+          }
+        }
+      }
+    },
+    "help.shape.line" : {
+      "comment" : "What command shape.line does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the colour of the selected shape's outline."
+          }
+        }
+      }
+    },
+    "help.shape.quickStyle" : {
+      "comment" : "What command shape.quickStyle does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give the shape a ready-made combination of fill, outline and effects."
+          }
+        }
+      }
+    },
+    "help.show.fromCurrent" : {
+      "comment" : "What command show.fromCurrent does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the slide show from the current slide."
+          }
+        }
+      }
+    },
+    "help.show.fromStart" : {
+      "comment" : "What command show.fromStart does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the slide show from the first slide."
+          }
+        }
+      }
+    },
+    "help.show.presenter" : {
+      "comment" : "What command show.presenter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Presenter View, with notes and the next slide on your own screen."
+          }
+        }
+      }
+    },
+    "help.show.setup" : {
+      "comment" : "What command show.setup does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how the show plays: its timings, narrations and media controls."
+          }
+        }
+      }
+    },
+    "help.show.start" : {
+      "comment" : "What command show.start does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the slide show."
+          }
+        }
+      }
+    },
+    "help.slide.hide" : {
+      "comment" : "What command slide.hide does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave the slide out of the slide show without deleting it."
+          }
+        }
+      }
+    },
+    "help.slide.layout" : {
+      "comment" : "What command slide.layout does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change how the slide's placeholders are arranged."
+          }
+        }
+      }
+    },
+    "help.slide.new" : {
+      "comment" : "What command slide.new does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a slide after the current one."
+          }
+        }
+      }
+    },
+    "help.slide.reset" : {
+      "comment" : "What command slide.reset does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put the slide's placeholders back where its layout has them."
+          }
+        }
+      }
+    },
+    "help.smartArt.fromText" : {
+      "comment" : "What command smartArt.fromText does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn the selected list into a SmartArt diagram."
+          }
+        }
+      }
+    },
+    "help.tool.ink" : {
+      "comment" : "What command tool.ink does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw freehand on the slide with this pen, or erase what you drew."
+          }
+        }
+      }
+    },
+    "help.tool.select" : {
+      "comment" : "What command tool.select does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go back to selecting and moving objects."
+          }
+        }
+      }
+    },
+    "help.transition.applyAll" : {
+      "comment" : "What command transition.applyAll does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give every slide this slide's transition and timing."
+          }
+        }
+      }
+    },
+    "help.transition.options" : {
+      "comment" : "What command transition.options does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the direction or variation of the transition."
+          }
+        }
+      }
+    },
+    "help.transition.set" : {
+      "comment" : "What command transition.set does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how this slide appears in the show."
+          }
+        }
+      }
+    },
+    "help.transition.sound" : {
+      "comment" : "What command transition.sound does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a sound as this slide appears."
+          }
+        }
+      }
+    },
+    "help.transition.timing" : {
+      "comment" : "What command transition.timing does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the transition's length and when the show moves to the next slide."
+          }
+        }
+      }
+    },
+    "help.view.dark" : {
+      "comment" : "What command view.dark does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the dark appearance."
+          }
+        }
+      }
+    },
+    "help.view.fit" : {
+      "comment" : "What command view.fit does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the whole slide in the window."
+          }
+        }
+      }
+    },
+    "help.view.grayscale" : {
+      "comment" : "What command view.grayscale does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the slides in shades of grey."
+          }
+        }
+      }
+    },
+    "help.view.gridlines" : {
+      "comment" : "What command view.gridlines does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a grid to line objects up."
+          }
+        }
+      }
+    },
+    "help.view.gridOptions" : {
+      "comment" : "What command view.gridOptions does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the grid's spacing and how objects snap."
+          }
+        }
+      }
+    },
+    "help.view.guides" : {
+      "comment" : "What command view.guides does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show guides you can drag to line objects up."
+          }
+        }
+      }
+    },
+    "help.view.handoutMaster" : {
+      "comment" : "What command view.handoutMaster does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit how printed handouts look."
+          }
+        }
+      }
+    },
+    "help.view.newWindow" : {
+      "comment" : "What command view.newWindow does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open another window on this presentation."
+          }
+        }
+      }
+    },
+    "help.view.normal" : {
+      "comment" : "What command view.normal does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit one slide at a time, with the slides beside it."
+          }
+        }
+      }
+    },
+    "help.view.notes" : {
+      "comment" : "What command view.notes does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the speaker notes under the slide."
+          }
+        }
+      }
+    },
+    "help.view.notesMaster" : {
+      "comment" : "What command view.notesMaster does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit how printed notes pages look."
+          }
+        }
+      }
+    },
+    "help.view.notesPage" : {
+      "comment" : "What command view.notesPage does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the slide's speaker notes on a printable page."
+          }
+        }
+      }
+    },
+    "help.view.outline" : {
+      "comment" : "What command view.outline does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the deck's text as an outline beside the slide."
+          }
+        }
+      }
+    },
+    "help.view.pane:animation" : {
+      "comment" : "What command view.pane:animation does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List the slide's animations in the order they play."
+          }
+        }
+      }
+    },
+    "help.view.pane:background" : {
+      "comment" : "What command view.pane:background does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the slide's background fill."
+          }
+        }
+      }
+    },
+    "help.view.pane:comments" : {
+      "comment" : "What command view.pane:comments does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the comments on this presentation."
+          }
+        }
+      }
+    },
+    "help.view.pane:designer" : {
+      "comment" : "What command view.pane:designer does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See layout ideas for the slide and apply one."
+          }
+        }
+      }
+    },
+    "help.view.pane:selection" : {
+      "comment" : "What command view.pane:selection does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List every object on the slide to select, hide or reorder them."
+          }
+        }
+      }
+    },
+    "help.view.reading" : {
+      "comment" : "What command view.reading does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the show in this window, without the editing tools."
+          }
+        }
+      }
+    },
+    "help.view.ribbon" : {
+      "comment" : "What command view.ribbon does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between the ribbon and the toolbar with the inspector."
+          }
+        }
+      }
+    },
+    "help.view.ruler" : {
+      "comment" : "What command view.ruler does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show rulers above and beside the slide."
+          }
+        }
+      }
+    },
+    "help.view.slideMaster" : {
+      "comment" : "What command view.slideMaster does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the master and layouts that every slide is built on."
+          }
+        }
+      }
+    },
+    "help.view.sorter" : {
+      "comment" : "What command view.sorter does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See every slide as a thumbnail to reorder them."
+          }
+        }
+      }
+    },
+    "help.view.zoomDialog" : {
+      "comment" : "What command view.zoomDialog does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how large the slide is shown."
+          }
+        }
+      }
+    },
     "insert.actionButton" : {
       "comment" : "The label of command insert.actionButton (Insert › Illustrations)",
       "extractionState" : "manual",
@@ -3117,6 +4773,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Replace…"
+          }
+        }
+      }
+    },
+    "menu.Ribbon" : {
+      "comment" : "An item of the View menu (runs view.ribbon)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon"
           }
         }
       }
@@ -5517,6 +7185,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reading View"
+          }
+        }
+      }
+    },
+    "view.ribbon" : {
+      "comment" : "The label of the app's command view.ribbon",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon"
           }
         }
       }

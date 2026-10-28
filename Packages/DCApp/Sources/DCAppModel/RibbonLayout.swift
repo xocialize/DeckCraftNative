@@ -104,6 +104,12 @@ public enum RibbonLayout {
         c(id, command, params, kind, title: title, sizes: [.medium, .small], also: also)
     }
 
+    /// An icon-only control (B I U, the alignments): never drawn with its label; the tooltip names it.
+    static func i(_ id: String, _ command: String, _ params: JSON = .emptyObject, _ kind: RibbonControl.Kind = .button,
+                  title: String? = nil, also: [String] = []) -> RibbonControl {
+        c(id, command, params, kind, title: title, sizes: [.small], also: also)
+    }
+
     static func g(_ id: String, _ title: String, fold: Int, _ controls: [RibbonControl]) -> RibbonGroup {
         RibbonGroup(id: id, title: title, foldOrder: fold, controls: controls)
     }
@@ -154,35 +160,35 @@ public enum RibbonLayout {
         g("home.font", "Font", fold: 1, [
             s("home.fontFamily", "format.font", .emptyObject, .dropdown(source: "fonts"), also: ["font.rescan"]),
             s("home.fontSize", "format.size", .emptyObject, .dropdown(source: "sizes")),
-            s("home.grow", "format.grow"),
-            s("home.shrink", "format.shrink"),
-            s("home.clear", "format.clear"),
-            s("home.bold", "format.bold", .emptyObject, .toggle(state: "bold")),
-            s("home.italic", "format.italic", .emptyObject, .toggle(state: "italic")),
-            s("home.underline", "format.underline", .emptyObject, .toggle(state: "underline")),
-            s("home.strikethrough", "format.strikethrough", .emptyObject, .toggle(state: "strike")),
-            s("home.superscript", "format.superscript", .emptyObject, .toggle(state: "superscript")),
-            s("home.subscript", "format.subscript", .emptyObject, .toggle(state: "subscript")),
-            s("home.spacing", "format.spacing", .emptyObject, .menu(nil), title: "Character Spacing"),
-            s("home.case", "format.case", .emptyObject, .menu(nil), title: "Change Case"),
-            s("home.highlight", "format.highlight", .emptyObject, .color),
-            s("home.fontColor", "format.color", .emptyObject, .color),
+            i("home.grow", "format.grow"),
+            i("home.shrink", "format.shrink"),
+            i("home.clear", "format.clear"),
+            i("home.bold", "format.bold", .emptyObject, .toggle(state: "bold")),
+            i("home.italic", "format.italic", .emptyObject, .toggle(state: "italic")),
+            i("home.underline", "format.underline", .emptyObject, .toggle(state: "underline")),
+            i("home.strikethrough", "format.strikethrough", .emptyObject, .toggle(state: "strike")),
+            i("home.superscript", "format.superscript", .emptyObject, .toggle(state: "superscript")),
+            i("home.subscript", "format.subscript", .emptyObject, .toggle(state: "subscript")),
+            i("home.spacing", "format.spacing", .emptyObject, .menu(nil), title: "Character Spacing"),
+            i("home.case", "format.case", .emptyObject, .menu(nil), title: "Change Case"),
+            i("home.highlight", "format.highlight", .emptyObject, .color),
+            i("home.fontColor", "format.color", .emptyObject, .color),
             s("home.fontDialog", "format.fontDialog"),
         ]),
         g("home.paragraph", "Paragraph", fold: 3, [
-            s("home.bullets", "format.bullets", .emptyObject, .split(nil), also: ["app.dialog"]),
-            s("home.numbering", "format.numbering", .emptyObject, .split(nil)),
-            s("home.outdent", "format.outdent"),
-            s("home.indent", "format.indent"),
-            s("home.lineSpacing", "format.lineSpacing", .emptyObject, .menu(nil), title: "Line Spacing", also: ["format.paragraphDialog", "app.dialog"]),
-            s("home.columns", "format.columns", .emptyObject, .menu(nil), title: "Columns"),
-            s("home.alignLeft", "format.alignLeft", .emptyObject, .toggle(state: "align")),
-            s("home.alignCenter", "format.alignCenter", .emptyObject, .toggle(state: "align")),
-            s("home.alignRight", "format.alignRight", .emptyObject, .toggle(state: "align")),
-            s("home.justify", "format.justify", .emptyObject, .toggle(state: "align")),
-            s("home.direction", "format.direction", .emptyObject, .menu(nil), title: "Text Direction"),
-            s("home.anchor", "format.anchor", .emptyObject, .menu(nil), title: "Align Text"),
-            s("home.convertSmartArt", "smartArt.fromText", .emptyObject, .menu(nil), title: "Convert to SmartArt"),
+            i("home.bullets", "format.bullets", .emptyObject, .split(nil), also: ["app.dialog"]),
+            i("home.numbering", "format.numbering", .emptyObject, .split(nil)),
+            i("home.outdent", "format.outdent"),
+            i("home.indent", "format.indent"),
+            i("home.lineSpacing", "format.lineSpacing", .emptyObject, .menu(nil), title: "Line Spacing", also: ["format.paragraphDialog", "app.dialog"]),
+            i("home.columns", "format.columns", .emptyObject, .menu(nil), title: "Columns"),
+            i("home.alignLeft", "format.alignLeft", .emptyObject, .toggle(state: "align")),
+            i("home.alignCenter", "format.alignCenter", .emptyObject, .toggle(state: "align")),
+            i("home.alignRight", "format.alignRight", .emptyObject, .toggle(state: "align")),
+            i("home.justify", "format.justify", .emptyObject, .toggle(state: "align")),
+            i("home.direction", "format.direction", .emptyObject, .menu(nil), title: "Text Direction"),
+            i("home.anchor", "format.anchor", .emptyObject, .menu(nil), title: "Align Text"),
+            i("home.convertSmartArt", "smartArt.fromText", .emptyObject, .menu(nil), title: "Convert to SmartArt"),
             s("home.paragraphDialog", "format.paragraphDialog"),
         ]),
         // PowerPoint's Home tab groups Picture, Shapes and Text Box together; deckcraft splits them into

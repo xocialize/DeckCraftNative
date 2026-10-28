@@ -105,6 +105,7 @@ extension DialogController {
         case "preferences":
             if d.params["before"] == nil { d.params = ["before": preferencesSnapshot()] }
             d.seed("appearance", model.ui.brightness.rawValue)
+            d.seed("layout", model.ui.layout.rawValue)
             d.seed("units", prefs.units == .centimeters ? "centimeters" : "inches")
             d.seed("smartGuides", prefs.smartGuides ? "1" : "0")
             d.seed("snapToGrid", prefs.snapToGrid ? "1" : "0")
@@ -558,6 +559,7 @@ extension DialogController {
             return [
                 .heading(L10n.text("General")),
                 .choice(label: L10n.text("Appearance:"), key: "appearance", options: [FormOption("system", L10n.text("System")), FormOption("light", L10n.text("Light")), FormOption("dark", L10n.text("Dark"))]),
+                .choice(label: L10n.text("Window layout:"), key: "layout", options: [FormOption("mac", L10n.text("Toolbar and inspector")), FormOption("ribbon", L10n.text("Ribbon"))]),
                 .radio(label: L10n.text("Measurement units:"), key: "units", options: [FormOption("inches", L10n.text("Inches")), FormOption("centimeters", L10n.text("Centimeters"))]),
                 .heading(L10n.text("Editing")),
                 .check(label: L10n.text("Show smart guides"), key: "smartGuides"), .check(label: L10n.text("Snap objects to grid"), key: "snapToGrid"),

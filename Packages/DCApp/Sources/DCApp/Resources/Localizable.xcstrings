@@ -1468,7 +1468,7 @@
       }
     },
     "Comments" : {
-      "comment" : "Status bar button: shows or hides the comments pane",
+      "comment" : "Status bar button: shows or hides the comments pane\nToolbar item: show the comments pane",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4412,6 +4412,17 @@
         }
       }
     },
+    "Present" : {
+      "comment" : "Toolbar item: play the slide show from the current slide",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Present"
+          }
+        }
+      }
+    },
     "Presenter View" : {
       "localizations" : {
         "en" : {
@@ -5023,6 +5034,16 @@
         }
       }
     },
+    "Ribbon tabs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon tabs"
+          }
+        }
+      }
+    },
     "Right Border" : {
       "localizations" : {
         "en" : {
@@ -5129,6 +5150,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scale Y"
+          }
+        }
+      }
+    },
+    "Search" : {
+      "comment" : "Toolbar item: find a command by name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
           }
         }
       }

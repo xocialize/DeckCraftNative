@@ -1,6 +1,7 @@
-// DCApp — one presentation's window (PLAN.md "Decided": a Keynote-like layout; the ribbon is dropped): the
-// slide navigator (or the outline) in the sidebar, the editing area, and the inspector, in a split view
-// with a toolbar whose items run registry commands (the Inspector area's `ToolbarCatalog`). The editing
+// DCApp — one presentation's window (PLAN.md "Decided", amended 2026-10-27: a Keynote-like layout by default, the
+// ribbon an optional one): the slide navigator (or the outline) in the sidebar, the editing area, and the inspector,
+// in a split view with a toolbar whose items run registry commands (the Inspector area's `ToolbarCatalog`). In the
+// ribbon layout the Ribbon area adds the ribbon under the toolbar and swaps the toolbar (`RibbonFeature`). The editing
 // area shows the view `UiState.view` asks for — Normal (the canvas over the notes pane), Outline (the
 // outline in the sidebar), Slide Sorter, Notes Page — over the status bar. The window's layout follows
 // deckcraft's `SlideApp::ui_inner` (`crates/ui-egui/src/lib.rs`, MIT OR Apache-2.0, © ArtCraft Team and the
@@ -31,6 +32,8 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSTo
     private var settingSidebar = false
     private var shownMode: SidebarMode?
     private var resizeObserver: (any NSObjectProtocol)?
+    /// The ribbon and the toolbar it replaced, while the window is in the ribbon layout (`RibbonFeature`).
+    var ribbon: RibbonAttachment?
 
     init(document: PresentationDocument) {
         presentation = document
@@ -84,6 +87,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSTo
             MainActor.assumeIsolated { self?.sidebarResized() }
         }
         refresh()
+        RibbonFeature.apply(self)
     }
 
     @available(*, unavailable)

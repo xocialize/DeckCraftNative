@@ -372,6 +372,17 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **The app is unchanged.** The toolbar reads the new tables, and a test pins its symbols and menus.
   - **Tests:** `RibbonCoverageTests` replaces the planned order-equality test. It checks that every command in
     deckcraft's `ribbon*.rs` has a control, and at the pin it rescans the sources.
+- **Ribbon R1: the static ribbon (2026-10-28).** The ribbon is an optional window layout: View › Ribbon (⌥⌘R) or
+  Settings › General › Window layout. The toolbar and inspector stay the default until R4. Details are in DCApp's PORT-NOTES, under "Ribbon".
+  - **What it shows:** the ten regular tabs, with the controls at their large size. Buttons, toggles, splits, menus, check boxes, spinners and colour
+    splits all run their registry command with deckcraft's parameters, and the enabled and toggle state come from the session.
+  - **Galleries** are menus until R2.
+  - **The window in the ribbon layout:** a toolbar with the Quick Access Toolbar's buttons at the leading edge, then Search, Present and Comments.
+    The inspector becomes the task pane.
+  - **Tooltips:** every command the ribbon and the toolbar show has a one-line description in our own words (decision 3),
+    translated as `help.*` in the Commands catalog.
+  - **Tests:** `RibbonModelTests` runs every control's commands against a scratch session (over 400), and
+    `RibbonWindowTests` switches a real window back and forth.
 
 ## Pin moves
 

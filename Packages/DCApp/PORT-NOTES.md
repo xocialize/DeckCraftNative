@@ -802,7 +802,7 @@ tables the toolbar now shares with it.
 | `RibbonLayout.swift` | The ribbon as data: 10 regular tabs and 10 contextual ones (named as `InspectorController.contextual()` names them), their groups (each with a `foldOrder` for §5) and controls (kind, sizes, a `CommandRef` with deckcraft's params, `also` for the commands a ribbon-only menu runs). Shared Arrange and Size groups for the object tabs. No labels: they come from the registry; a title only where the command doesn't name the control |
 | `CommandMenus.swift` | `CommandRef`, `CommandMenuEntry`, and the seven split menus the toolbar opens (New Slide, Shapes, Table, Chart, Picture, Media, Play), moved down from `ToolbarCatalog`; `ChartMenu` moved here from `InspectorObjectPanes.swift` |
 | `CommandSymbols.swift` | One command → SF Symbol table (by id, or `id:<id or pane param>`), and deckcraft's QAT icon names, both moved from `ToolbarCatalog` |
-| `CommandHelp.swift` | The tooltip descriptions' table (decision 3), empty: R1 writes the ribbon's and toolbar's, R4 the rest, translated as `help.<id>` in the Commands catalog |
+| `CommandHelp.swift` | The tooltip descriptions' table (decision 3), empty in R0: R1 writes the ribbon's and toolbar's, R4 the rest, translated as `help.<id>` in the Commands catalog |
 | `InspectorRibbonMap.swift` | Each group's commands are now derived: the RibbonLayout groups or controls it names, plus `extra` (what its Mac place runs beyond them), without the canvas's `tool.*`. None of the previous commands was lost; 19 groups gained commands their shared menus already ran (the table above is regenerated from it) |
 
 - **Arranged for PowerPoint users.** Home has PowerPoint's Insert group (Picture, Shapes, Text Box) before Drawing;
@@ -820,6 +820,41 @@ tables the toolbar now shares with it.
 - **For R1 and R2.** The ribbon-only menus (Paste, Section, Change Case, Line Spacing, Arrange, Align…) list their
   commands in `also`; R1 builds their entries. Record ▸ From Current Slide adds the current slide as `from` when it
   runs. Handout Master's Slides Per Page is UI state in deckcraft with no command; R2 gives it one.
+
+### R1: the static ribbon (done 2026-10-28)
+
+The ribbon is an optional window layout: View › Ribbon (⌥⌘R, the UI command `view.ribbon {on?}`), or
+Settings › General › Window layout. The toolbar and inspector stay the default until R4 (decision 1).
+
+| File | What it holds |
+|---|---|
+| `DCAppModel/RibbonModel.swift` | `WindowLayout`; the tab `UiState.tab` names (deckcraft's titles); each control's label, tooltip, symbol, enabled and toggle state; check boxes and spinners; what a click runs (`primary`, `press`); the columns a group is drawn in; `ui.inspect`'s `ribbon` |
+| `DCAppModel/RibbonMenus.swift` | The ribbon's own menus, with deckcraft's parameters: Paste, Layout, Section, the font list and sizes, Character Spacing, Change Case, Bullets, Numbering, Line Spacing, Columns, Text Direction, Align Text, Convert to SmartArt, Arrange, Shape Effects (`effects_menu`), Replace, Photo Album, Icons, Zoom, Action, WordArt, Themes, Variants, Colors, Fonts, Effects, Background Styles, Slide Size, Transitions, Effect Options, Sound, Animations, Add Animation, Trigger, Start, Accept, and Zoom |
+| `DCApp/Ribbon/RibbonView.swift` | The SwiftUI ribbon: the tab row and the selected tab's groups. Large controls are an icon over a label; small ones are three rows to a column; B I U and the alignments are icons only. Splits are a native split button, or for large ones an icon over a label that opens the menu. A double click on the shown tab minimises it (`view.collapseRibbon`) |
+| `DCApp/Ribbon/RibbonFeature.swift` | Every document window follows `UiState.layout`. In the ribbon layout a `RibbonContainerController` puts the ribbon above the split view, and `RibbonToolbar` has the Quick Access Toolbar's buttons at the leading edge, then the title, Search (`app.palette`), Present (`show.fromCurrent`) and Comments. The inspector closes and becomes the task pane |
+| `CommandHelp.swift` | The descriptions (decision 3), written in our own words, for every command the regular tabs, the toolbar and the QAT show (145 of them). They are keyed `id` or `id:<id or pane param>` and translated as `help.<key>` in the Commands catalog; `glyphs` and `tip` build the tooltip |
+| `CommandSymbols.swift` | A symbol for each ribbon control, by control id, over the command's |
+
+- **Galleries are menus in R1.** Themes, Variants, Transitions and Animations list their items by name; Quick
+  Styles opens the Format pane, which has the grid. R2 draws them as tiles.
+- **Colours** reuse the inspector's `ColorGrid`, and Shape Fill and Outline go through `InspectorController`, so the
+  last colour is shared. Spinners reuse `NumberField`.
+- **Not a titlebar accessory.** On macOS 26 a `.bottom` titlebar accessory sits only over the split view's content
+  section, beside the sidebar, and is clipped to about 40 pt. The ribbon is a view pinned to the safe area above the split view
+  instead. The split view, and what `InspectorFeature` reaches through `wc.split`, are unchanged.
+- **The layout is app-wide.** `UiState` is one for the app, as deckcraft's is, so View › Ribbon switches every
+  window and is the default for new ones.
+- **The window title** is hidden in the ribbon layout and shown as a toolbar item after the QAT buttons, so the
+  buttons can come first.
+- **Tests.**
+  - `RibbonModelTests` (DCAppModel), 9 tests:
+    - It walks every control of the ten tabs and runs what it can run against a scratch session: its button, every menu item, its check box both ways and its spinner. That is over 400 commands, and each one the ribbon shows enabled must succeed.
+    - Three commands are listed as needing a state the fixture doesn't make: Regroup, Paste Formatting and Edit Photo Album.
+    - It also covers the toggles following `format.state`, check boxes and spinners, switching layouts (the document, the selection and the undo stack are kept), and old `ui.json` files reading as the Mac layout.
+    - The rest check the tab names, the columns, and every command having a description.
+  - `RibbonWindowTests` (DCAppTests), 4 tests: the window swaps its content and toolbar back and forth; every group of every tab draws; every symbol is an SF Symbol; the toolbar's tooltips carry descriptions.
+- **Screenshots** of all ten tabs were taken through the control channel (`view.tab`, then `ui.screenshot`).
+  Contextual tabs, inline galleries and folding are R2 and R3.
 
 ## lib.rs tests
 

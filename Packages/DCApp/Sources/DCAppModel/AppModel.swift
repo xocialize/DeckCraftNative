@@ -131,6 +131,12 @@ public final class AppModel {
             ui.tab = tab
             ui.ribbonCollapsed = false
         case "view.collapseRibbon": ui.ribbonCollapsed.toggle()
+        case "view.ribbon":
+            let on = flag(p, ui.layout == .ribbon)
+            // In the ribbon layout the inspector is the task pane, closed until a ribbon button opens it (§8).
+            if on, ui.layout != .ribbon { ui.pane = nil }
+            ui.layout = on ? .ribbon : .mac
+            return .success(["layout": .string(ui.layout.rawValue)])
         case "view.dark":
             ui.brightness = flag(p, ui.brightness == .dark) ? .dark : .light
         case "view.grayscale": ui.grayscale = flag(p, ui.grayscale)

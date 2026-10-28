@@ -2,8 +2,9 @@
 // `crates/ui-egui/src/lib.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 //
 // The ribbon is an optional window layout (PLAN.md "Decided", amended 2026-10-27; Docs/plans/Ribbon-and-
-// StartScreen.md). Until it is drawn its fields are kept for the control channel: `ui.inspect` reports them and
-// `view.tab` / `view.collapseRibbon` answer, so scripts written against deckcraft keep working.
+// StartScreen.md): `layout` picks it, and `tab` / `ribbonCollapsed` are the tab it shows and whether it is minimised.
+// `ui.inspect` reports them and `view.tab` / `view.collapseRibbon` answer in either layout, so scripts written against
+// deckcraft keep working.
 import Foundation
 
 /// The editor's view (`ViewMode`).
@@ -21,6 +22,8 @@ public struct UiState: Codable, Sendable, Equatable {
     public var brightness: Brightness = .system
     public var tab = "Home"
     public var ribbonCollapsed = false
+    /// The window layout (View › Ribbon, Settings › General). A `ui.json` from before the ribbon reads as the Mac layout.
+    public var layout: WindowLayout = .mac
     public var view: ViewMode = .normal
     public var notes = true
     public var notesHeight: Double = 52
@@ -50,7 +53,7 @@ public struct UiState: Codable, Sendable, Equatable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case brightness, tab, ribbonCollapsed, view, notes, notesHeight, thumbsWidth, pane, paneWidth, ruler, gridlines,
+        case brightness, tab, ribbonCollapsed, layout, view, notes, notesHeight, thumbsWidth, pane, paneWidth, ruler, gridlines,
              handoutPerPage, guides, smartGuides, zoom, sorterZoom, recent, presenterView, uiScale, formatTab, grayscale
     }
 
@@ -62,6 +65,7 @@ public struct UiState: Codable, Sendable, Equatable {
         brightness = v(.brightness, d.brightness)
         tab = v(.tab, d.tab)
         ribbonCollapsed = v(.ribbonCollapsed, d.ribbonCollapsed)
+        layout = v(.layout, d.layout)
         view = v(.view, d.view)
         notes = v(.notes, d.notes)
         notesHeight = v(.notesHeight, d.notesHeight)

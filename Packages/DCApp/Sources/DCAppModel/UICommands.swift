@@ -34,6 +34,8 @@ public enum UICommands {
         .init(id: "review.thesaurusPane", label: "Thesaurus", shortcut: "Shift+F7", params: "{word?}: open the Thesaurus pane on the selected word"),
         .init(id: "view.tab", label: "Ribbon Tab", shortcut: nil, params: "{tab}"),
         .init(id: "view.collapseRibbon", label: "Collapse the Ribbon", shortcut: "Cmd+F1", params: "{}"),
+        // The app's own: the ribbon is an optional window layout here (Docs/plans/Ribbon-and-StartScreen.md §6).
+        .init(id: "view.ribbon", label: "Ribbon", shortcut: "Cmd+Alt+R", params: "{on?: bool}"),
         .init(id: "view.dark", label: "Dark Mode", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.grayscale", label: "Grayscale", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.newWindow", label: "New Window", shortcut: nil, params: "{on?: bool, slide?: index, delta?: int}"),

@@ -6,6 +6,7 @@ enum Features {
     static func installAll(_ app: AppController) {
         CanvasFeature.install(app)
         InspectorFeature.install(app)
+        RibbonFeature.install(app)
         DialogsFeature.install(app)
         ShowFeature.install(app)
         ViewsFeature.install(app)

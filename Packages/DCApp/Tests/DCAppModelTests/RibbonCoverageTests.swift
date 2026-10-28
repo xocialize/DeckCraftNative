@@ -201,7 +201,8 @@ import Testing
         #expect(CommandSymbols.symbol(CommandRef("app.dialog", ["id": "nothing"])) == nil)
         #expect(CommandSymbols.symbol(icon: "save") == "square.and.arrow.down")
         #expect(CommandSymbols.symbol(icon: "unknown") == "ellipsis.circle")
-        // R0 starts the descriptions table empty; R1 fills it.
-        #expect(CommandHelp.description("format.bold") == nil)
+        // R1 fills the descriptions (RibbonModelTests checks them); a command without one has none.
+        #expect(CommandHelp.description("format.bold") != nil)
+        #expect(CommandHelp.description("no.such") == nil)
     }
 }

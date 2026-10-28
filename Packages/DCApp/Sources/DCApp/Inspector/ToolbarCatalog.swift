@@ -142,7 +142,7 @@ enum ToolbarCatalog {
         }
         item.label = entry.label
         item.paletteLabel = entry.label
-        item.toolTip = tip(entry.command, entry.label)
+        item.toolTip = tooltip(entry.command, entry.params, entry.label)
         item.image = NSImage(systemSymbolName: symbol(entry.command, entry.params), accessibilityDescription: entry.label)
         item.target = ToolbarActions.shared
         item.action = #selector(ToolbarActions.run(_:))
@@ -154,6 +154,13 @@ enum ToolbarCatalog {
         guard let s = findCommand(id)?.shortcut ?? UICommands.find(id)?.shortcut else { return label }
         let keys = s.replacingOccurrences(of: "Cmd+", with: "⌘").replacingOccurrences(of: "Shift+", with: "⇧").replacingOccurrences(of: "Alt+", with: "⌥").replacingOccurrences(of: "Ctrl+", with: "⌃")
         return String(localized: "\(label) (\(keys))", bundle: .module, comment: "A toolbar tooltip: the command's label, then its keyboard shortcut in parentheses")
+    }
+
+    /// The tooltip with the command's description under it (decision 3, `CommandHelp`).
+    static func tooltip(_ id: String, _ params: JSON, _ label: String) -> String {
+        let head = tip(id, label)
+        guard let d = CommandHelp.description(CommandRef(id, params)) else { return head }
+        return "\(head)\n\(d)"
     }
 
     // MARK: Menus
@@ -214,7 +221,7 @@ enum ToolbarCatalog {
         let item = NSToolbarItem(itemIdentifier: id)
         item.label = q.label
         item.paletteLabel = q.label
-        item.toolTip = tip(q.id, q.label)
+        item.toolTip = tooltip(q.id, q.paramsJSON, q.label)
         item.image = NSImage(systemSymbolName: symbol(q.icon), accessibilityDescription: q.label)
             ?? NSImage(systemSymbolName: "ellipsis.circle", accessibilityDescription: q.label)
         item.target = ToolbarActions.shared
@@ -274,6 +281,7 @@ enum ToolbarCatalog {
                 (item as? NSMenuToolbarItem)?.menu = quickAccessMenu()
             }
         }
+        RibbonFeature.syncQAT()
     }
 }
 

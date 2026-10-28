@@ -23,6 +23,17 @@
         }
       }
     },
+    "%@  Bullet" : {
+      "comment" : "A bullet character, then 'Bullet'",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@  Bullet"
+          }
+        }
+      }
+    },
     "%@ (%lld slides)" : {
       "localizations" : {
         "en" : {
@@ -130,6 +141,27 @@
         }
       }
     },
+    "%@ pt" : {
+      "comment" : "A size in points",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pt"
+          }
+        }
+      }
+    },
+    "%@ pt glow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pt glow"
+          }
+        }
+      }
+    },
     "%@ was not applied: its slide was deleted" : {
       "comment" : "Status; the placeholder is a file name or Reuse Slides",
       "localizations" : {
@@ -180,6 +212,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld  (no title)"
+          }
+        }
+      }
+    },
+    "%lld Column(s)" : {
+      "comment" : "Columns menu: the number of text columns",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Column(s)"
           }
         }
       }
@@ -419,6 +462,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accent 6"
+          }
+        }
+      }
+    },
+    "Accept All Changes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accept All Changes"
           }
         }
       }
@@ -674,6 +727,36 @@
         }
       }
     },
+    "Align" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "Align Bottom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Bottom"
+          }
+        }
+      }
+    },
+    "Align Center" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Center"
+          }
+        }
+      }
+    },
     "Align Left" : {
       "localizations" : {
         "en" : {
@@ -684,12 +767,32 @@
         }
       }
     },
+    "Align Middle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Middle"
+          }
+        }
+      }
+    },
     "Align Right" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Align Right"
+          }
+        }
+      }
+    },
+    "Align Top" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Top"
           }
         }
       }
@@ -891,6 +994,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arrows at both ends"
+          }
+        }
+      }
+    },
+    "As One Object" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As One Object"
           }
         }
       }
@@ -1149,7 +1262,7 @@
       }
     },
     "Bottom" : {
-      "comment" : "text box inset\ntile alignment\nvertical text alignment",
+      "comment" : "A shadow\ntext box inset\ntile alignment\nvertical text alignment",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1249,12 +1362,32 @@
         }
       }
     },
+    "Bullets and Numbering…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bullets and Numbering…"
+          }
+        }
+      }
+    },
     "By (in)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "By (in)"
+          }
+        }
+      }
+    },
+    "By Paragraph" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Paragraph"
           }
         }
       }
@@ -1337,6 +1470,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Center"
+          }
+        }
+      }
+    },
+    "Centered" : {
+      "comment" : "A shadow",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centered"
           }
         }
       }
@@ -1763,6 +1907,26 @@
         }
       }
     },
+    "Customize Colors…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize Colors…"
+          }
+        }
+      }
+    },
+    "Customize Fonts…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize Fonts…"
+          }
+        }
+      }
+    },
     "Cut" : {
       "localizations" : {
         "en" : {
@@ -2152,6 +2316,26 @@
         }
       }
     },
+    "Distribute Horizontally" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribute Horizontally"
+          }
+        }
+      }
+    },
+    "Distribute Vertically" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribute Vertically"
+          }
+        }
+      }
+    },
     "Distributed" : {
       "localizations" : {
         "en" : {
@@ -2290,6 +2474,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duplicate Selected Slides"
+          }
+        }
+      }
+    },
+    "Dynamic Content" : {
+      "comment" : "A category of slide transitions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dynamic Content"
           }
         }
       }
@@ -2495,6 +2690,17 @@
         }
       }
     },
+    "Exciting" : {
+      "comment" : "A category of slide transitions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exciting"
+          }
+        }
+      }
+    },
     "Exit" : {
       "localizations" : {
         "en" : {
@@ -2676,6 +2882,7 @@
       }
     },
     "Fit" : {
+      "comment" : "Zoom menu: fit the slide to the window",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2977,6 +3184,17 @@
         }
       }
     },
+    "Full" : {
+      "comment" : "A reflection",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full"
+          }
+        }
+      }
+    },
     "Full Page Slides" : {
       "localizations" : {
         "en" : {
@@ -3013,6 +3231,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub's request limit was reached. Try again later."
+          }
+        }
+      }
+    },
+    "Glow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glow"
           }
         }
       }
@@ -3094,6 +3322,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guides"
+          }
+        }
+      }
+    },
+    "Half" : {
+      "comment" : "A reflection",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Half"
           }
         }
       }
@@ -3469,6 +3708,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ink to Shape"
+          }
+        }
+      }
+    },
+    "Inner" : {
+      "comment" : "A shadow",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inner"
           }
         }
       }
@@ -3948,6 +4198,16 @@
         }
       }
     },
+    "Line Spacing Options…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line Spacing Options…"
+          }
+        }
+      }
+    },
     "Line spacing" : {
       "localizations" : {
         "en" : {
@@ -4222,6 +4482,16 @@
         }
       }
     },
+    "More Columns…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Columns…"
+          }
+        }
+      }
+    },
     "More Contrast" : {
       "localizations" : {
         "en" : {
@@ -4358,6 +4628,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Next Slide"
+          }
+        }
+      }
+    },
+    "No Glow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Glow"
+          }
+        }
+      }
+    },
+    "No Reflection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Reflection"
+          }
+        }
+      }
+    },
+    "No Shadow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Shadow"
+          }
+        }
+      }
+    },
+    "No Soft Edges" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Soft Edges"
           }
         }
       }
@@ -4544,6 +4854,26 @@
         }
       }
     },
+    "On Click Sequence" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Click Sequence"
+          }
+        }
+      }
+    },
+    "On Click of %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Click of %@"
+          }
+        }
+      }
+    },
     "Open Arrow" : {
       "localizations" : {
         "en" : {
@@ -4601,6 +4931,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Out"
+          }
+        }
+      }
+    },
+    "Outer" : {
+      "comment" : "A shadow",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outer"
           }
         }
       }
@@ -4697,6 +5038,16 @@
         }
       }
     },
+    "Page Setup…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Setup…"
+          }
+        }
+      }
+    },
     "Paragraph" : {
       "localizations" : {
         "en" : {
@@ -4733,6 +5084,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paste"
+          }
+        }
+      }
+    },
+    "Paste Formatting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Formatting"
           }
         }
       }
@@ -4784,6 +5145,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Percent:"
+          }
+        }
+      }
+    },
+    "Perspective" : {
+      "comment" : "A shadow",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perspective"
           }
         }
       }
@@ -5143,12 +5515,32 @@
         }
       }
     },
+    "Reflection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection"
+          }
+        }
+      }
+    },
     "Rehearse Timings" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rehearse Timings"
+          }
+        }
+      }
+    },
+    "Reject All Changes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reject All Changes"
           }
         }
       }
@@ -5239,6 +5631,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Replace Font"
+          }
+        }
+      }
+    },
+    "Replace Fonts…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Fonts…"
           }
         }
       }
@@ -5345,6 +5747,16 @@
         }
       }
     },
+    "Reset Slide Background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Slide Background"
+          }
+        }
+      }
+    },
     "Resize shape to fit text" : {
       "localizations" : {
         "en" : {
@@ -5415,6 +5827,16 @@
         }
       }
     },
+    "Ribbon" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon"
+          }
+        }
+      }
+    },
     "Right" : {
       "comment" : "text box inset\ntile alignment",
       "localizations" : {
@@ -5422,6 +5844,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Right"
+          }
+        }
+      }
+    },
+    "Rotate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
           }
         }
       }
@@ -5805,6 +6237,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
+          }
+        }
+      }
+    },
+    "Shadow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shadow"
           }
         }
       }
@@ -6291,6 +6733,16 @@
         }
       }
     },
+    "Soft Edges" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soft Edges"
+          }
+        }
+      }
+    },
     "Solid" : {
       "comment" : "line dash",
       "localizations" : {
@@ -6494,6 +6946,16 @@
         }
       }
     },
+    "Standard (4:3)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard (4:3)"
+          }
+        }
+      }
+    },
     "Start at:" : {
       "localizations" : {
         "en" : {
@@ -6595,6 +7057,16 @@
         }
       }
     },
+    "Style %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style %lld"
+          }
+        }
+      }
+    },
     "Subject" : {
       "localizations" : {
         "en" : {
@@ -6611,6 +7083,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscript"
+          }
+        }
+      }
+    },
+    "Subtle" : {
+      "comment" : "A category of slide transitions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtle"
           }
         }
       }
@@ -7071,7 +7554,7 @@
       }
     },
     "Tight" : {
-      "comment" : "character spacing",
+      "comment" : "A reflection\ncharacter spacing",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7097,6 +7580,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "To slide:"
+          }
+        }
+      }
+    },
+    "Toolbar and inspector" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar and inspector"
           }
         }
       }
@@ -7457,6 +7950,16 @@
         }
       }
     },
+    "Widescreen (16:9)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widescreen (16:9)"
+          }
+        }
+      }
+    },
     "Width" : {
       "localizations" : {
         "en" : {
@@ -7507,6 +8010,16 @@
         }
       }
     },
+    "Window layout:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window layout:"
+          }
+        }
+      }
+    },
     "With" : {
       "localizations" : {
         "en" : {
@@ -7543,6 +8056,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WordArt"
+          }
+        }
+      }
+    },
+    "WordArt style %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WordArt style %lld"
           }
         }
       }
@@ -7615,6 +8138,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zoom…"
+          }
+        }
+      }
+    },
+    "[No Sound]" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[No Sound]"
+          }
+        }
+      }
+    },
+    "[Stop Previous Sound]" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Stop Previous Sound]"
           }
         }
       }

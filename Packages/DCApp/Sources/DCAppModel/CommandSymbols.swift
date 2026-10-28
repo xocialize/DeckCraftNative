@@ -24,6 +24,60 @@ public enum CommandSymbols {
         return table[c.id]
     }
 
+    /// The ribbon's controls, by control id: one command can be several controls (`show.start` previews, rehearses
+    /// and records), so a control's own symbol wins over its command's.
+    static let controls: [String: String] = [
+        "home.paste": "doc.on.clipboard", "home.cut": "scissors", "home.copy": "doc.on.doc",
+        "home.formatPainter": "paintbrush", "home.layout": "rectangle.split.3x1", "home.reset": "arrow.counterclockwise",
+        "home.section": "rectangle.split.1x2", "home.fontFamily": "textformat", "home.fontSize": "textformat.size",
+        "home.grow": "textformat.size.larger", "home.shrink": "textformat.size.smaller", "home.clear": "eraser",
+        "home.bold": "bold", "home.italic": "italic", "home.underline": "underline",
+        "home.strikethrough": "strikethrough", "home.superscript": "textformat.superscript", "home.subscript": "textformat.subscript",
+        "home.spacing": "character", "home.case": "textformat.alt", "home.highlight": "highlighter",
+        "home.fontColor": "paintbrush.pointed", "home.fontDialog": "ellipsis.rectangle", "home.bullets": "list.bullet",
+        "home.numbering": "list.number", "home.outdent": "decrease.indent", "home.indent": "increase.indent",
+        "home.lineSpacing": "arrow.up.and.down.text.horizontal", "home.columns": "rectangle.split.2x1", "home.alignLeft": "text.alignleft",
+        "home.alignCenter": "text.aligncenter", "home.alignRight": "text.alignright", "home.justify": "text.justify",
+        "home.direction": "rotate.right", "home.anchor": "align.vertical.center", "home.convertSmartArt": "rectangle.3.group",
+        "home.paragraphDialog": "paragraphsign", "home.arrange": "square.3.layers.3d", "home.quickStyles": "paintpalette",
+        "home.shapeFill": "drop.fill", "home.shapeOutline": "pencil.line", "home.shapeEffects": "sparkles",
+        "home.find": "magnifyingglass", "home.replace": "arrow.left.arrow.right", "home.selectionPane": "square.stack.3d.up",
+        "home.designer": "wand.and.stars", "insert.pictures": "photo.on.rectangle", "insert.photoAlbum": "photo.stack",
+        "insert.icons": "star.square", "insert.zoom": "plus.magnifyingglass", "insert.link": "link",
+        "insert.action": "cursorarrow.click", "insert.headerFooter": "rectangle.topthird.inset.filled", "insert.wordArt": "textformat.abc",
+        "insert.dateTime": "calendar", "insert.slideNumber": "number", "insert.equation": "function",
+        "insert.symbol": "keyboard", "insert.video": "film", "insert.audio": "speaker.wave.2",
+        "draw.select": "cursorarrow", "draw.eraser": "eraser", "draw.blackPen": "pencil.tip",
+        "draw.redPen": "pencil.tip", "draw.bluePen": "pencil.tip", "draw.pencil": "pencil",
+        "draw.highlighter": "highlighter", "draw.inkToShape": "scribble.variable", "design.themes": "paintpalette",
+        "design.variants": "swatchpalette", "design.colors": "circle.lefthalf.filled", "design.fonts": "textformat",
+        "design.effects": "sparkles", "design.background": "rectangle.fill", "design.slideSize": "aspectratio",
+        "design.formatBackground": "photo.artframe", "design.designer": "wand.and.stars", "transitions.preview": "play",
+        "transitions.gallery": "square.on.square", "transitions.effectOptions": "slider.horizontal.3", "transitions.sound": "speaker.wave.2",
+        "transitions.duration": "timer", "transitions.onClick": "cursorarrow.click", "transitions.after": "clock",
+        "transitions.applyAll": "square.grid.3x3", "animations.preview": "play", "animations.gallery": "sparkle",
+        "animations.effectOptions": "slider.horizontal.3", "animations.add": "plus.circle", "animations.pane": "list.bullet.below.rectangle",
+        "animations.trigger": "bolt", "animations.painter": "paintbrush", "animations.start": "play.circle",
+        "animations.duration": "timer", "animations.delay": "clock", "slideShow.fromStart": "play.rectangle",
+        "slideShow.fromCurrent": "play", "slideShow.presenter": "person.crop.rectangle", "slideShow.customShow": "list.star",
+        "slideShow.setUpShow": "gearshape", "slideShow.hide": "eye.slash", "slideShow.rehearse": "stopwatch",
+        "slideShow.useTimings": "timer", "slideShow.narrations": "mic", "slideShow.mediaControls": "playpause",
+        "record.fromBeginning": "record.circle", "record.fromCurrent": "record.circle", "review.spelling": "textformat.abc.dottedunderline",
+        "review.thesaurus": "book", "review.checkAccessibility": "accessibility", "review.language": "globe",
+        "review.newComment": "text.bubble", "review.delete": "trash", "review.previous": "chevron.left",
+        "review.next": "chevron.right", "review.showComments": "bubble.left.and.bubble.right", "review.compare": "doc.on.doc",
+        "review.accept": "checkmark.circle", "review.endReview": "xmark.circle", "view.normal": "sidebar.left",
+        "view.outline": "list.bullet.indent", "view.sorter": "square.grid.2x2", "view.notesPage": "note.text",
+        "view.reading": "book", "view.slideMaster": "rectangle.stack", "view.handoutMaster": "doc.text",
+        "view.notesMaster": "note.text", "view.ruler": "ruler", "view.gridlines": "grid",
+        "view.guides": "squareshape.split.2x2.dotted", "view.gridOptions": "slider.horizontal.3", "view.notes": "note.text",
+        "view.zoom": "plus.magnifyingglass", "view.fit": "arrow.up.left.and.arrow.down.right", "view.newWindow": "macwindow.badge.plus",
+        "view.grayscale": "circle.lefthalf.filled", "view.dark": "moon",
+    ]
+
+    /// The symbol for ribbon control `id`, if it has its own.
+    public static func symbol(control id: String) -> String? { controls[id] }
+
     /// deckcraft's QAT icon names as SF Symbols.
     public static func symbol(icon: String) -> String {
         switch icon {

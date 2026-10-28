@@ -271,6 +271,8 @@ enum SourceScan {
         for (key, label) in appNameLabels {
             if let (_, comment) = out[key] { out[key] = (label, comment + "; the app's own name, not deckcraft's") }
         }
+        // The one-line descriptions (decision 3): tooltips, the palette and VoiceOver hints.
+        for (key, text) in CommandHelp.english { out["help.\(key)"] = (text, "What command \(key) does, in one line: the second line of its tooltip and its VoiceOver hint") }
         return out
     }
 

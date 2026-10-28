@@ -902,7 +902,7 @@ extension DialogController {
 
     /// `preferences_snapshot`: what the Preferences dialog can change, as it was when it opened.
     func preferencesSnapshot() -> JSON {
-        ["brightness": .string(model.ui.brightness.rawValue), "uiScale": .num(model.ui.uiScale), "prefs": model.session.prefs.toJSON()]
+        ["brightness": .string(model.ui.brightness.rawValue), "uiScale": .num(model.ui.uiScale), "layout": .string(model.ui.layout.rawValue), "prefs": model.session.prefs.toJSON()]
     }
 
     /// `restore_preferences`: puts back what the Preferences dialog opened with (Cancel, Esc, the close button).
@@ -910,6 +910,7 @@ extension DialogController {
         guard let before = d.params["before"] else { return }
         if let b = before["brightness"]?.asStr.flatMap(Brightness.init(rawValue:)) { model.ui.brightness = b }
         if let s = before["uiScale"]?.asF64 { model.ui.uiScale = s }
+        if let l = before["layout"]?.asStr.flatMap(WindowLayout.init(rawValue:)), l != model.ui.layout { model.run("view.ribbon", ["on": .bool(l == .ribbon)]) }
         if let p = before["prefs"], let prefs = try? Prefs(fromJSON: p) { model.session.prefs = prefs }
         model.changed()
     }
@@ -920,6 +921,8 @@ extension DialogController {
         switch key {
         case "appearance":
             if let b = Brightness(rawValue: value) { model.ui.brightness = b }
+        case "layout":
+            if let l = WindowLayout(rawValue: value), l != model.ui.layout { model.run("view.ribbon", ["on": .bool(l == .ribbon)]) }
         case "units": model.session.prefs.units = value == "centimeters" ? .centimeters : .inches
         case "smartGuides":
             model.session.prefs.smartGuides = on
