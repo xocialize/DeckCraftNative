@@ -359,7 +359,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `1c75c98`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
     its ticket is stapled.
   - The published 0.1.1, run from its export, finds 0.1.2 through Check for Updates.
-- **0.1.3 (2026-10-27, not yet published).** vpx-swift 0.3.1: VP8 and untagged VP9 of 576 lines or fewer convert as
+- **Released as v0.1.3 (2026-10-27).** vpx-swift 0.3.1: VP8 and untagged VP9 of 576 lines or fewer convert as
   BT.601, as deckcraft and ffmpeg do (AB-A-0205; "VP9 and VP8 video" above). Nothing else changed.
 
 ## Pin moves

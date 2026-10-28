@@ -13,7 +13,7 @@ Wave 6. Sources: each package's `PORT-NOTES.md`, `PORT-STATUS.md`, `WAVE5-PLAN.m
 | Tests | **2,144** across the packages, every one green and warning-free; deckcraft's 2,081 `#[test]`s ported where they test behaviour the Mac app has (the rest are egui internals, listed per area) |
 | Parity with deckcraft | `.deckcraft` and `.pptx` byte-identical both ways over the oracle corpus (apart from the chart fix below); slides render at SSIMULACRA2 ≥ 89 to deckcraft's PNGs; transitions ≥ 89; the Metal show ≥ 91 to the CPU compositor; MCP, `dccli` and the pointer byte-identical |
 | The alpha gate | deckcraft's six core workflows run end to end in the app through the control channel: **16 of 16** checks |
-| Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`), published on GitHub, latest [v0.1.2](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.2); Quick Look, Spotlight, App Intents; String Catalogs |
+| Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`), published on GitHub, latest [v0.1.3](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.3); Quick Look, Spotlight, App Intents; String Catalogs |
 
 ## What became native
 
