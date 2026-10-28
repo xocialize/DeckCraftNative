@@ -341,8 +341,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **App Intents extension:** Export Presentation, Get Outline and Get Slide Count live in a shared `DCIntentsKit`
     module that a new `DeckCraftIntents` extension and the app both link (Apple's shared-framework pattern). macOS
     prefers to run background intents from the extension, so they need no app or window. Its metadata and the
-    Developer ID export verify. Running a shortcut end to end needs a shortcut added in the Shortcuts app, which is
-    the user's step.
+    notarized export verify. Through the Shortcuts app, with no app running, Export Presentation turned an 8-slide
+    deck into an 8-page PDF and the app never launched (DCExtensions/PORT-NOTES.md).
   - **Theme Colors:** the colour rows form one aligned grid, and every well stays inside the sheet.
   - **Colour names:** DCColor's slot, shade and standard colour names are translated at display
     (`L10n.colorLabel`); the pseudo-language showed them bypassing the catalog.

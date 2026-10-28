@@ -169,8 +169,18 @@ and what macOS needs for the app's App Shortcuts to name them, is in DCApp/PORT-
   runtime, secure timestamp, no `get-task-allow`; entitlements sandbox + user-selected read-only); `spctl` accepts the
   app (unnotarized, so only on this Mac).
 - The five app-bound intents and the three file intents through `intents.run` (DCApp/PORT-NOTES.md).
-- **Not yet verified: the Shortcuts end-to-end run.** The Shortcuts CLI can only run shortcuts already in the library
-  (`shortcuts run|list|view|sign`), and a shortcut file is added only by clicking *Add Shortcut* in the Shortcuts app.
-  A one-action shortcut (Export Presentation as PDF, the shortcut's input as the file) is built and signed
-  (`shortcuts sign --mode anyone`); after importing it once, the check is `shortcuts run "DeckCraft Export Test"
-  --input-path …/sample.deckcraft --output-path out.pdf` with `pgrep -x DeckCraftNative` before, during and after.
+- **The Shortcuts end-to-end run (2026-10-27, the notarized 0.1.2).** With no DeckCraftNative process running, a
+  one-action shortcut (Export Presentation as PDF, the shortcut's input as the file) exported the corpus
+  `sample.deckcraft` to an 8-page PDF (8 slides). The log shows `DeckCraftIntents` launched from the app's
+  `Contents/Extensions` and the action finishing without error, and `pgrep -x DeckCraftNative`, polled every 0.1 s
+  before, during and after, never found the app. The first run asks, as Shortcuts does for any app's action, whether
+  the shortcut may share the file with DeckCraftNative.
+  - **The app must be somewhere macOS trusts.** linkd skips a copy under `/private/tmp` ("is not trusted for
+    binding"), so its actions are missing (`WFActionErrorDomain` 14). The run passed with the export in
+    `~/Applications`, where a user installs it.
+  - **Stale records hijack the identifier.** An earlier run found the action through an Xcode archive build that no
+    longer existed (`…/ArchiveIntermediates/…/DeckCraftNative.app`). Shortcuts then failed to reach the extension:
+    "Unable to create a bundle record for com.xocialize.deckcraftnative.Intents … kLSApplicationNotFoundErr",
+    reported as `WFActionErrorDomain` 16. Only a developer Mac has such records; `lsregister -u <path>` removes them.
+  - The Shortcuts CLI only runs shortcuts already in the library (`shortcuts run|list|view|sign`), and a shortcut file
+    is added only by clicking *Add Shortcut*, which names it after the file (here "DeckCraft Export Test (signed)").
