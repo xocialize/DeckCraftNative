@@ -60,19 +60,23 @@ enum ToolbarCatalog {
     static let quickAccess = NSToolbarItem.Identifier("dc.quickAccess")
     static let qatPrefix = "qat:"
 
-    /// Command items: identifier, label, SF Symbol, the main command and its parameters.
-    static let commands: [(id: NSToolbarItem.Identifier, label: String, symbol: String, command: String, params: JSON)] = [
-        (newSlide, String(localized: "New Slide", bundle: .module), "plus.rectangle.on.rectangle", "slide.new", .emptyObject),
-        (shapes, String(localized: "Shape", bundle: .module, comment: "Toolbar item: insert a shape"), "square.on.circle", "shape.insert", ["preset": "rect"]),
-        (textBox, String(localized: "Text Box", bundle: .module), "textformat", "insert.textBox", .emptyObject),
-        (table, String(localized: "Table", bundle: .module), "tablecells", "insert.table", ["rows": 3, "cols": 3]),
-        (chart, String(localized: "Chart", bundle: .module), "chart.bar", "insert.chart", ["type": "Column"]),
-        (smartArt, String(localized: "SmartArt", bundle: .module), "rectangle.3.group", "app.dialog", ["id": "smartart"]),
-        (picture, String(localized: "Picture", bundle: .module), "photo", "app.insertPictureDialog", .emptyObject),
-        (media, String(localized: "Media", bundle: .module), "play.rectangle", "app.insertVideoDialog", .emptyObject),
-        (comment, String(localized: "Comment", bundle: .module, comment: "Toolbar item: add a comment"), "text.bubble", "app.dialog", ["id": "comment"]),
-        (play, String(localized: "Play", bundle: .module, comment: "Toolbar item: play the slide show"), "play.fill", "show.start", .emptyObject),
+    /// Command items: identifier, label, the main command and its parameters. Their SF Symbols come from
+    /// `CommandSymbols`.
+    static let commands: [(id: NSToolbarItem.Identifier, label: String, command: String, params: JSON)] = [
+        (newSlide, String(localized: "New Slide", bundle: .module), "slide.new", .emptyObject),
+        (shapes, String(localized: "Shape", bundle: .module, comment: "Toolbar item: insert a shape"), "shape.insert", ["preset": "rect"]),
+        (textBox, String(localized: "Text Box", bundle: .module), "insert.textBox", .emptyObject),
+        (table, String(localized: "Table", bundle: .module), "insert.table", ["rows": 3, "cols": 3]),
+        (chart, String(localized: "Chart", bundle: .module), "insert.chart", ["type": "Column"]),
+        (smartArt, String(localized: "SmartArt", bundle: .module), "app.dialog", ["id": "smartart"]),
+        (picture, String(localized: "Picture", bundle: .module), "app.insertPictureDialog", .emptyObject),
+        (media, String(localized: "Media", bundle: .module), "app.insertVideoDialog", .emptyObject),
+        (comment, String(localized: "Comment", bundle: .module, comment: "Toolbar item: add a comment"), "app.dialog", ["id": "comment"]),
+        (play, String(localized: "Play", bundle: .module, comment: "Toolbar item: play the slide show"), "show.start", .emptyObject),
     ]
+
+    /// An item's SF Symbol.
+    static func symbol(_ command: String, _ params: JSON) -> String { CommandSymbols.symbol(CommandRef(command, params)) ?? "ellipsis.circle" }
 
     /// Every item's main command, by identifier (the QAT's included).
     static var payloads: [String: ToolbarPayload] = {
@@ -139,7 +143,7 @@ enum ToolbarCatalog {
         item.label = entry.label
         item.paletteLabel = entry.label
         item.toolTip = tip(entry.command, entry.label)
-        item.image = NSImage(systemSymbolName: entry.symbol, accessibilityDescription: entry.label)
+        item.image = NSImage(systemSymbolName: symbol(entry.command, entry.params), accessibilityDescription: entry.label)
         item.target = ToolbarActions.shared
         item.action = #selector(ToolbarActions.run(_:))
         return item
@@ -170,67 +174,35 @@ enum ToolbarCatalog {
         return m
     }
 
+    /// The menu a split item opens (DCAppModel's `CommandMenus`).
+    static let menus: [NSToolbarItem.Identifier: CommandMenus.ID] = [
+        newSlide: .newSlide, shapes: .shapes, table: .table, chart: .chart, picture: .picture, media: .media, play: .play,
+    ]
+
     static func menu(for id: NSToolbarItem.Identifier) -> NSMenu? {
+        guard let m = menus[id] else { return nil }
         let menu = NSMenu()
-        switch id {
-        case newSlide:
-            // The layouts of the active presentation, read when the menu opens.
-            menu.delegate = LayoutMenuDelegate.shared
-        case shapes:
-            for cat in Preset.Category.all {
-                var items = Preset.catalog.filter { $0.category == cat }.map { menuItem($0.label, "shape.insert", ["preset": .string($0.name)], image: PresetIcons.image($0.name)) }
-                if cat == .lines {
-                    items.append(.separator())
-                    items += Tools.freeformTools.map { menuItem($0.1, "tool.shape", ["preset": .string($0.0)]) }
-                }
-                menu.addItem(submenu(cat.label, items))
-            }
-            menu.addItem(.separator())
-            var cats: [String] = []
-            for i in Icons.icons where !cats.contains(i.category) { cats.append(i.category) }
-            menu.addItem(submenu(String(localized: "Icons", bundle: .module), cats.map { c in submenu(c, Icons.icons.filter { $0.category == c }.map { menuItem($0.label, "insert.icon", ["name": .string($0.name)]) }) }))
-            menu.addItem(menuItem(String(localized: "WordArt", bundle: .module), "insert.wordArt"))
-            menu.addItem(.separator())
-            menu.addItem(submenu(String(localized: "Action Buttons", bundle: .module), InspectorShape.actionButtons.map {
-                menuItem(String(localized: "Action Button: \($0)", bundle: .module, comment: "An action button's kind follows: Home, Back, Next…"), "insert.actionButton", ["kind": .string($0)])
-            }))
-            menu.addItem(menuItem(String(localized: "Action Settings…", bundle: .module), "app.dialog", ["id": "action"]))
-            menu.addItem(menuItem(String(localized: "Link…", bundle: .module), "app.dialog", ["id": "hyperlink"]))
-            menu.addItem(.separator())
-            var draw = [menuItem(String(localized: "Select", bundle: .module, comment: "The selection tool"), "tool.select")]
-            draw += InspectorShape.pens.enumerated().map { menuItem($0.element.label, "tool.ink", ["pen": .integer($0.offset)]) }
-            draw += [.separator(), menuItem(String(localized: "Ink to Shape", bundle: .module), "draw.inkToShape")]
-            menu.addItem(submenu(String(localized: "Draw", bundle: .module, comment: "The Draw tools menu"), draw))
-        case table:
-            for n in [(2, 2), (3, 3), (4, 4), (3, 5), (5, 5), (8, 10)] {
-                menu.addItem(menuItem(String(localized: "\(n.1)×\(n.0) Table", bundle: .module, comment: "Columns × rows"), "insert.table", ["rows": .integer(n.0), "cols": .integer(n.1)]))
-            }
-            menu.addItem(.separator())
-            menu.addItem(menuItem(String(localized: "Insert Table…", bundle: .module), "app.dialog", ["id": "table"]))
-            menu.addItem(menuItem(String(localized: "Draw Table", bundle: .module), "tool.shape", ["preset": .string(Tools.drawTable)]))
-        case chart:
-            for (i, group) in ChartMenu.types.enumerated() {
-                if i > 0 { menu.addItem(.separator()) }
-                for k in group { menu.addItem(menuItem(k.label, "insert.chart", ["type": .string(ChartMenu.param(k))])) }
-            }
-        case picture:
-            menu.addItem(menuItem(String(localized: "Picture from File…", bundle: .module), "app.insertPictureDialog"))
-            menu.addItem(menuItem(String(localized: "New Photo Album…", bundle: .module), "insert.photoAlbum"))
-            menu.addItem(menuItem(String(localized: "Edit Photo Album…", bundle: .module), "insert.photoAlbumEdit"))
-        case media:
-            menu.addItem(menuItem(String(localized: "Video from File…", bundle: .module), "app.insertVideoDialog"))
-            menu.addItem(menuItem(String(localized: "Audio from File…", bundle: .module), "app.insertAudioDialog"))
-        case play:
-            menu.addItem(menuItem(String(localized: "Play from Start", bundle: .module), "show.fromStart"))
-            menu.addItem(menuItem(String(localized: "Play from Current Slide", bundle: .module), "show.fromCurrent"))
-            menu.addItem(.separator())
-            menu.addItem(menuItem(String(localized: "Presenter View", bundle: .module), "show.presenter"))
-            menu.addItem(menuItem(String(localized: "Rehearse Timings", bundle: .module), "show.start", ["rehearse": true]))
-            menu.addItem(menuItem(String(localized: "Set Up Slide Show…", bundle: .module), "app.dialog", ["id": "setupShow"]))
-        default:
-            return nil
-        }
+        // New Slide lists the active presentation's layouts, read when the menu opens.
+        if m == .newSlide { menu.delegate = LayoutMenuDelegate.shared } else { add(CommandMenus.entries(m), to: menu) }
         return menu
+    }
+
+    /// NSMenu items for command-menu entries.
+    static func add(_ entries: [CommandMenuEntry], to menu: NSMenu) {
+        for e in entries {
+            switch e {
+            case .item(let title, let c, let preset):
+                menu.addItem(menuItem(title, c.id, c.params, image: preset.flatMap { PresetIcons.image($0) }))
+            case .separator:
+                menu.addItem(.separator())
+            case .submenu(let title, let items):
+                let m = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+                let sub = NSMenu(title: title)
+                add(items, to: sub)
+                m.submenu = sub
+                menu.addItem(m)
+            }
+        }
     }
 
     // MARK: Quick Access Toolbar
@@ -251,25 +223,7 @@ enum ToolbarCatalog {
     }
 
     /// deckcraft's icon names as SF Symbols.
-    static func symbol(_ icon: String) -> String {
-        switch icon {
-        case "home": "house"
-        case "file": "doc"
-        case "folder": "folder"
-        case "save": "square.and.arrow.down"
-        case "print": "printer"
-        case "undo": "arrow.uturn.backward"
-        case "redo": "arrow.uturn.forward"
-        case "playFromStart": "play.rectangle"
-        case "search": "magnifyingglass"
-        case "spelling": "textformat.abc.dottedunderline"
-        case "export": "square.and.arrow.up"
-        case "table": "tablecells"
-        case "chart": "chart.bar"
-        case "picture": "photo"
-        default: "ellipsis.circle"
-        }
-    }
+    static func symbol(_ icon: String) -> String { CommandSymbols.symbol(icon: icon) }
 
     /// The Quick Access Toolbar item: its menu runs the buttons (`qat::show`) and customises them.
     static func quickAccessItem() -> NSToolbarItem {
@@ -331,14 +285,6 @@ final class LayoutMenuDelegate: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
         let layouts = AppController.shared?.model.session.activeDoc?.doc.masters.first?.layouts ?? []
-        for l in layouts { menu.addItem(ToolbarCatalog.menuItem(l.name, "slide.new", ["layout": .integer(l.id.rawValue)])) }
-        menu.addItem(.separator())
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Duplicate Selected Slides", bundle: .module), "slide.duplicate"))
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Slides from Outline…", bundle: .module), "app.dialog", ["id": "outline"]))
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Reuse Slides…", bundle: .module), "app.reuseSlidesDialog", ["keepFormatting": false]))
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Reuse Slides (Keep Source Formatting)…", bundle: .module), "app.reuseSlidesDialog", ["keepFormatting": true]))
-        menu.addItem(.separator())
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Add Section", bundle: .module), "section.add"))
-        menu.addItem(ToolbarCatalog.menuItem(String(localized: "Remove All Sections", bundle: .module), "section.removeAll"))
+        ToolbarCatalog.add(CommandMenus.entries(.newSlide, layouts: layouts), to: menu)
     }
 }

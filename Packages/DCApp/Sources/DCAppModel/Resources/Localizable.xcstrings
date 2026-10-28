@@ -184,6 +184,17 @@
         }
       }
     },
+    "%lld×%lld Table" : {
+      "comment" : "Columns × rows",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld×%2$lld Table"
+          }
+        }
+      }
+    },
     "%llu bytes" : {
       "localizations" : {
         "en" : {
@@ -347,6 +358,7 @@
       }
     },
     "Accent 1" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -357,6 +369,7 @@
       }
     },
     "Accent 2" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -367,6 +380,7 @@
       }
     },
     "Accent 3" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -377,6 +391,7 @@
       }
     },
     "Accent 4" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -387,6 +402,7 @@
       }
     },
     "Accent 5" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -397,6 +413,7 @@
       }
     },
     "Accent 6" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -416,12 +433,43 @@
         }
       }
     },
+    "Action Button: %@" : {
+      "comment" : "An action button's kind follows: Home, Back, Next…",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Button: %@"
+          }
+        }
+      }
+    },
+    "Action Buttons" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Buttons"
+          }
+        }
+      }
+    },
     "Action Settings" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Action Settings"
+          }
+        }
+      }
+    },
+    "Action Settings…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action Settings…"
           }
         }
       }
@@ -482,6 +530,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Point"
+          }
+        }
+      }
+    },
+    "Add Section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Section"
           }
         }
       }
@@ -857,6 +915,16 @@
         }
       }
     },
+    "Audio from File…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio from File…"
+          }
+        }
+      }
+    },
     "Author" : {
       "localizations" : {
         "en" : {
@@ -1019,6 +1087,7 @@
       }
     },
     "Blue" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1715,6 +1784,7 @@
       }
     },
     "Dark Blue" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1725,6 +1795,7 @@
       }
     },
     "Dark Red" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1775,6 +1846,7 @@
       }
     },
     "Darker 15%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1785,6 +1857,7 @@
       }
     },
     "Darker 25%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1795,6 +1868,7 @@
       }
     },
     "Darker 35%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1805,6 +1879,7 @@
       }
     },
     "Darker 5%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1815,6 +1890,7 @@
       }
     },
     "Darker 50%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2187,12 +2263,53 @@
         }
       }
     },
+    "Draw" : {
+      "comment" : "The Draw tools menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw"
+          }
+        }
+      }
+    },
+    "Draw Table" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw Table"
+          }
+        }
+      }
+    },
+    "Duplicate Selected Slides" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Selected Slides"
+          }
+        }
+      }
+    },
     "Edit Alt Text…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit Alt Text…"
+          }
+        }
+      }
+    },
+    "Edit Photo Album…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Photo Album…"
           }
         }
       }
@@ -2610,6 +2727,7 @@
       }
     },
     "Followed Hyperlink" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2930,6 +3048,7 @@
       }
     },
     "Green" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3244,6 +3363,7 @@
       }
     },
     "Hyperlink" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3259,6 +3379,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hyperlink to:"
+          }
+        }
+      }
+    },
+    "Icons" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons"
           }
         }
       }
@@ -3333,6 +3463,16 @@
         }
       }
     },
+    "Ink to Shape" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ink to Shape"
+          }
+        }
+      }
+    },
     "Insert" : {
       "localizations" : {
         "en" : {
@@ -3359,6 +3499,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Insert Table"
+          }
+        }
+      }
+    },
+    "Insert Table…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Table…"
           }
         }
       }
@@ -3649,6 +3799,7 @@
       }
     },
     "Light Blue" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3659,6 +3810,7 @@
       }
     },
     "Light Green" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3709,6 +3861,7 @@
       }
     },
     "Lighter 10%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3719,6 +3872,7 @@
       }
     },
     "Lighter 25%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3729,6 +3883,7 @@
       }
     },
     "Lighter 40%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3739,6 +3894,7 @@
       }
     },
     "Lighter 50%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3749,6 +3905,7 @@
       }
     },
     "Lighter 60%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3759,6 +3916,7 @@
       }
     },
     "Lighter 75%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3769,6 +3927,7 @@
       }
     },
     "Lighter 80%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3779,6 +3938,7 @@
       }
     },
     "Lighter 90%" : {
+      "comment" : "A shade of a theme colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4152,6 +4312,16 @@
         }
       }
     },
+    "New Photo Album…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Photo Album…"
+          }
+        }
+      }
+    },
     "New Presentation" : {
       "localizations" : {
         "en" : {
@@ -4395,6 +4565,7 @@
       }
     },
     "Orange" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4657,6 +4828,16 @@
         }
       }
     },
+    "Picture from File…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture from File…"
+          }
+        }
+      }
+    },
     "Picture layout" : {
       "localizations" : {
         "en" : {
@@ -4688,6 +4869,7 @@
       }
     },
     "Placeholder colour" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4723,6 +4905,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play From"
+          }
+        }
+      }
+    },
+    "Play from Current Slide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Current Slide"
+          }
+        }
+      }
+    },
+    "Play from Start" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play from Start"
           }
         }
       }
@@ -4819,6 +5021,16 @@
         }
       }
     },
+    "Presenter View" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presenter View"
+          }
+        }
+      }
+    },
     "Previewing animations" : {
       "localizations" : {
         "en" : {
@@ -4880,6 +5092,7 @@
       }
     },
     "Purple" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4910,6 +5123,7 @@
       }
     },
     "Red" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4929,12 +5143,32 @@
         }
       }
     },
+    "Rehearse Timings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rehearse Timings"
+          }
+        }
+      }
+    },
     "Remove" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove"
+          }
+        }
+      }
+    },
+    "Remove All Sections" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Sections"
           }
         }
       }
@@ -5131,12 +5365,32 @@
         }
       }
     },
+    "Reuse Slides (Keep Source Formatting)…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reuse Slides (Keep Source Formatting)…"
+          }
+        }
+      }
+    },
     "Reuse Slides needs the app" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reuse Slides needs the app"
+          }
+        }
+      }
+    },
+    "Reuse Slides…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reuse Slides…"
           }
         }
       }
@@ -5403,6 +5657,17 @@
         }
       }
     },
+    "Select" : {
+      "comment" : "The selection tool",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
     "Select All" : {
       "localizations" : {
         "en" : {
@@ -5510,6 +5775,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Set Up Slide Show"
+          }
+        }
+      }
+    },
+    "Set Up Slide Show…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Slide Show…"
           }
         }
       }
@@ -5841,6 +6116,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slides from Outline"
+          }
+        }
+      }
+    },
+    "Slides from Outline…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides from Outline…"
           }
         }
       }
@@ -6501,6 +6786,7 @@
       }
     },
     "Text/Background - Dark 1" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6511,6 +6797,7 @@
       }
     },
     "Text/Background - Dark 2" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6521,6 +6808,7 @@
       }
     },
     "Text/Background - Light 1" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6531,6 +6819,7 @@
       }
     },
     "Text/Background - Light 2" : {
+      "comment" : "A theme colour slot",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7088,6 +7377,16 @@
         }
       }
     },
+    "Video from File…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video from File…"
+          }
+        }
+      }
+    },
     "Wave" : {
       "localizations" : {
         "en" : {
@@ -7238,7 +7537,18 @@
         }
       }
     },
+    "WordArt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WordArt"
+          }
+        }
+      }
+    },
     "Yellow" : {
+      "comment" : "A standard colour",
       "localizations" : {
         "en" : {
           "stringUnit" : {

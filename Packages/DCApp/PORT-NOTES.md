@@ -2,7 +2,9 @@
 
 The Mac app: a rewrite of deckcraft's `crates/ui-egui` (about 42k lines) and `apps/deckcraft` in AppKit and
 SwiftUI, at the pin in `Tools/oracle/pin.env`. deckcraft's UI is the *behaviour* matched (commands, state,
-tests); the layout and idioms are the Mac's (PLAN.md "Decided": no ribbon). **Status: Wave 5, done (2026-10-27).**
+tests); the layout and idioms are the Mac's (PLAN.md "Decided"; amended 2026-10-27: the ribbon returns as an optional
+layout, [Docs/plans/Ribbon-and-StartScreen.md](../../Docs/plans/Ribbon-and-StartScreen.md)). **Status: Wave 5, done (2026-10-27); ribbon R0 done
+(2026-10-27, see "Ribbon").**
 The architecture, the areas and the rules are in [WAVE5-PLAN.md](../../WAVE5-PLAN.md).
 
 Two targets:
@@ -578,8 +580,8 @@ in-process windows):
 
 ## Inspector (task panes, the ribbon's formatting, the toolbar)
 
-The ribbon is dropped (PLAN.md, "Decided"). Its formatting groups and deckcraft's task panes live in the
-inspector beside the canvas, its insert and show controls in the window toolbar, and the rest in menus and
+In the Mac layout (the default; the ribbon is an optional layout from R1, see "Ribbon") the ribbon's formatting
+groups and deckcraft's task panes live in the inspector beside the canvas, its insert and show controls in the window toolbar, and the rest in menus and
 dialogs (the table below places every group). The inspector has five tabs, Keynote-like, in a segmented control
 with SF Symbols: **Format**, **Arrange**, **Animate**, **Slide** and **Review**. `ui.pane` (deckcraft's open
 task pane) chooses the tab, so `view.pane`, a command's `UiRequest.pane`, `ui.set` and the control channel open
@@ -625,9 +627,10 @@ selection, `format.state`, the slide's transition and animations, the theme. Vie
 | `ribbon.rs` `shape_format`, `arrange_group`, `size_group`, `smooth_corners_row` | `InspectorFormatPane.swift`, `InspectorArrangePane.swift` (`EditShapeSection`); `InspectorShape.swift` |
 | `ribbon.rs` `picture_format`, `compress_menu` | `InspectorFormatPane.swift` (`PictureView`) |
 | `ribbon.rs` `table_design`, `table_layout`, `chart_design`, `smartart_design`, `smartart_gallery`, `playback`, `chart_menu_types` | `InspectorObjectPanes.swift`; `InspectorTextPane.swift` (`SmartArtLayoutMenu`) |
-| `ribbon.rs` `insert`, `home`'s Slides and Drawing, `shapes_gallery`, `table_grid_picker`, `icon_library`, `photo_album_button`, `draw`, `slide_show`, `layout_menu`, `new_slide_menu`, `section_menu`, `zoom_menu` | `DCApp/Inspector/ToolbarCatalog.swift` (toolbar items and their menus); `InspectorSlidePane.swift` (`InsertZoomSection`, `SlideShowSection`) |
+| `ribbon.rs` `insert`, `home`'s Slides and Drawing, `shapes_gallery`, `table_grid_picker`, `icon_library`, `photo_album_button`, `draw`, `slide_show`, `layout_menu`, `new_slide_menu`, `section_menu`, `zoom_menu` | `DCAppModel/CommandMenus.swift` (the split items' menus, as data; `ChartMenu`); `DCApp/Inspector/ToolbarCatalog.swift` (the toolbar items, and the menus as NSMenus); `InspectorSlidePane.swift` (`InsertZoomSection`, `SlideShowSection`) |
 | `qat.rs` | `DCAppModel/InspectorQAT.swift` (`QatItem`, `QAT.command`, persistence); the toolbar's Quick Access item |
-| `ribbon.rs` (every group) | `DCAppModel/InspectorRibbonMap.swift` (the table below, checked by a test) |
+| `ribbon.rs` and `ribbon/*.rs` (every tab, group and control) | `DCAppModel/RibbonLayout.swift` (the ribbon as data, R0) |
+| `ribbon.rs` (every group) | `DCAppModel/InspectorRibbonMap.swift` (the table below, derived from `RibbonLayout`, checked by tests) |
 | — | `DCApp/Inspector/InspectorFeature.swift`: the shared `InspectorController`, `app.qat`, `ui.inspect`'s `inspector`, the inspector following `ui.pane` |
 
 ### UI commands and hooks
@@ -670,15 +673,15 @@ selection, `format.state`, the slide's transition and animations, the theme. Vie
 | Home | Clipboard | Edit menu (Cut, Copy, Paste, Paste and Match Formatting, Paste Special…); Format Painter and Paste Formatting: inspector Format (and ⇧⌘C) | `edit.paste`, `edit.pasteText`, `app.pasteSpecial`, `format.painterApply`, `edit.cut`, `edit.copy`, `format.painter` |
 | Home | Slides | toolbar: New Slide (split: layouts, Duplicate, Slides from Outline…, Reuse Slides…, sections); inspector Slide ▸ Slide (Layout, Reset) | `slide.new`, `slide.layout`, `slide.reset`, `section.add`, `section.removeAll`, `slide.duplicate`, `app.reuseSlidesDialog`, `app.dialog` |
 | Home | Font | inspector Format ▸ Text ▸ Font | `format.font`, `format.size`, `format.grow`, `format.shrink`, `format.clear`, `format.bold`, `format.italic`, `format.underline`, `format.strikethrough`, `format.superscript`, `format.subscript`, `format.spacing`, `format.case`, `format.highlight`, `format.color`, `format.fontDialog`, `font.rescan` |
-| Home | Paragraph | inspector Format ▸ Text ▸ Paragraph | `format.bullets`, `format.numbering`, `format.outdent`, `format.indent`, `format.lineSpacing`, `format.paragraphDialog`, `format.columns`, `format.alignLeft`, `format.alignCenter`, `format.alignRight`, `format.justify`, `format.direction`, `format.anchor`, `smartArt.fromText` |
-| Home | Picture | toolbar: Picture | `app.insertPictureDialog` |
-| Home | Drawing | toolbar: Shape, Text Box; inspector Format ▸ Fill & Line (Shape Styles: the Quick Styles grid) and Effects; Arrange tab | `shape.insert`, `insert.textBox`, `shape.quickStyle`, `shape.fill`, `shape.line`, `shape.effects` |
-| Home | Editing | Edit menu: Find…, Replace…; Replace Fonts… is a dialog; inspector Arrange ▸ Selection Pane | `app.find`, `app.replace`, `font.replace`, `view.pane` |
+| Home | Paragraph | inspector Format ▸ Text ▸ Paragraph | `format.bullets`, `format.numbering`, `format.outdent`, `format.indent`, `format.lineSpacing`, `format.paragraphDialog`, `format.columns`, `format.alignLeft`, `format.alignCenter`, `format.alignRight`, `format.justify`, `format.direction`, `format.anchor`, `smartArt.fromText`, `app.dialog` |
+| Home | Picture | toolbar: Picture | `app.insertPictureDialog`, `insert.photoAlbum`, `insert.photoAlbumEdit` |
+| Home | Drawing | toolbar: Shape, Text Box; inspector Format ▸ Fill & Line (Shape Styles: the Quick Styles grid) and Effects; Arrange tab | `shape.insert`, `insert.textBox`, `shape.quickStyle`, `shape.fill`, `shape.line`, `shape.effects`, `insert.icon`, `insert.wordArt`, `insert.actionButton`, `app.dialog`, `draw.inkToShape`, `arrange.bringToFront`, `arrange.sendToBack`, `arrange.bringForward`, `arrange.sendBackward`, `arrange.group`, `arrange.ungroup`, `arrange.regroup`, `arrange.align`, `arrange.distribute`, `arrange.rotateRight`, `arrange.rotateLeft`, `arrange.flipVertical`, `arrange.flipHorizontal` |
+| Home | Editing | Edit menu: Find…, Replace…; Replace Fonts… is a dialog; inspector Arrange ▸ Selection Pane | `app.find`, `app.replace`, `font.replace`, `view.pane`, `app.dialog` |
 | Home | Designer | inspector Slide ▸ Design Ideas | `design.applyIdea`, `design.theme`, `view.pane` |
-| Insert | Slides | toolbar: New Slide | `slide.new` |
+| Insert | Slides | toolbar: New Slide | `slide.new`, `slide.duplicate`, `app.dialog`, `app.reuseSlidesDialog`, `section.add`, `section.removeAll` |
 | Insert | Tables | toolbar: Table (split: sizes, Insert Table… dialog, Draw Table tool) | `insert.table`, `app.dialog` |
 | Insert | Images | toolbar: Picture (split: Picture from File…, New/Edit Photo Album…); Screenshot not available (as deckcraft) | `app.insertPictureDialog`, `insert.photoAlbum`, `insert.photoAlbumEdit` |
-| Insert | Illustrations | toolbar: Shape (split: the shapes gallery by category, freeform tools, Icons, WordArt), Chart (split: the chart types), SmartArt (dialog) | `shape.insert`, `insert.icon`, `insert.chart`, `insert.wordArt`, `app.dialog` |
+| Insert | Illustrations | toolbar: Shape (split: the shapes gallery by category, freeform tools, Icons, WordArt), Chart (split: the chart types), SmartArt (dialog) | `shape.insert`, `insert.icon`, `insert.chart`, `insert.wordArt`, `app.dialog`, `insert.actionButton`, `draw.inkToShape` |
 | Insert | Links | inspector Slide ▸ Insert Zoom (Slide, Section, Summary); toolbar Shape ▸ Action Buttons, Action Settings… and Link… (dialogs) | `insert.zoom`, `insert.actionButton`, `app.dialog` |
 | Insert | Comments | toolbar: Comment (dialog); inspector Review ▸ Comments | `app.dialog` |
 | Insert | Text | toolbar: Text Box; Insert menu: WordArt, Date and Time, Slide Number; Header & Footer is a dialog | `insert.textBox`, `insert.wordArt`, `insert.dateTime`, `insert.slideNumber`, `app.dialog` |
@@ -687,40 +690,40 @@ selection, `format.state`, the slide's transition and animations, the theme. Vie
 | Draw | Tools, Pens, Convert | toolbar Shape ▸ Draw (Select, the pens, Highlighter, Eraser: the session's ink tool; Ink to Shape); the canvas draws (Canvas area) | `draw.inkToShape` |
 | Design | Themes | inspector Slide ▸ Themes (gallery, Browse for Themes…) | `design.theme`, `app.browseThemeDialog` |
 | Design | Variants | inspector Slide ▸ Variants (gallery, Colors, Fonts, Effects, Background Styles; Customize… opens the dialogs) | `design.variant`, `design.colors`, `design.fonts`, `design.effects`, `design.background` |
-| Design | Customize | inspector Slide ▸ Slide (Slide Size; Page Setup… dialog) and Format Background | `design.slideSize`, `design.background`, `design.hideBackgroundGraphics`, `app.dialog` |
-| Design | Designer | inspector Slide ▸ Design Ideas | `design.applyIdea` |
+| Design | Customize | inspector Slide ▸ Slide (Slide Size; Page Setup… dialog) and Format Background | `design.slideSize`, `design.background`, `design.hideBackgroundGraphics`, `app.dialog`, `view.pane` |
+| Design | Designer | inspector Slide ▸ Design Ideas | `design.applyIdea`, `view.pane` |
 | Transitions | Preview | inspector Animate ▸ Transition ▸ Preview (plays the show from the slide) | `show.start` |
 | Transitions | Transition to This Slide | inspector Animate ▸ Transition (the gallery by category, Effect Options) | `transition.set`, `transition.options` |
 | Transitions | Timing | inspector Animate ▸ Transition ▸ Sound and Timing | `transition.sound`, `transition.timing`, `transition.applyAll` |
 | Animations | Preview | inspector Animate ▸ Animations ▸ Preview | `animation.preview` |
 | Animations | Animation | inspector Animate ▸ Animations (Effect, Effect Options, Sequence) | `animation.set`, `animation.options` |
-| Animations | Advanced Animation | inspector Animate ▸ Animations (Add Animation, Trigger, Animation Painter) and the Animation Pane | `animation.add`, `animation.timing`, `animation.painter`, `view.pane` |
+| Animations | Advanced Animation | inspector Animate ▸ Animations (Add Animation, Trigger, Animation Painter) and the Animation Pane | `animation.add`, `animation.timing`, `animation.painter`, `view.pane`, `animation.move`, `animation.remove` |
 | Animations | Timing | inspector Animate ▸ Timing (Start, Duration, Delay); the pane's context menu reorders and removes | `animation.timing`, `animation.move`, `animation.remove` |
 | Slide Show | Start Slide Show | toolbar: Play (split: Play from Start, from Current Slide, Presenter View, Set Up…); Slide Show menu | `show.start`, `show.fromStart`, `show.fromCurrent`, `show.presenter`, `app.dialog` |
-| Slide Show | Set Up | Slide Show menu; inspector Slide ▸ Slide (Hide Slide) and Slide Show (Set Up Slide Show…, Custom Shows… dialogs) | `slide.hide`, `app.dialog` |
+| Slide Show | Set Up | Slide Show menu; inspector Slide ▸ Slide (Hide Slide) and Slide Show (Set Up Slide Show…, Custom Shows… dialogs) | `slide.hide`, `app.dialog`, `show.start` |
 | Slide Show | Monitors | inspector Slide ▸ Slide Show (Presenter View, Use Timings, Play Narrations, Show Media Controls) | `show.presenter`, `show.setup` |
 | Record | Record | the show (Show area); Cameo and narration are not available (as deckcraft) | `show.start` |
 | Review | Proofing | inspector Review ▸ Proofing (Spelling…, Accessibility…, Language… dialogs) and Review ▸ Thesaurus | `app.dialog`, `review.thesaurusPane`, `review.replaceWord` |
 | Review | Compare | inspector Review ▸ Revisions (Accept, Reject, End Review); Compare… dialog | `app.compareDialog`, `review.accept`, `review.reject`, `review.endCompare` |
-| Review | Comments | inspector Review ▸ Comments (New Comment dialog, Previous, Next, Reply, Resolve, Delete) | `comment.prev`, `comment.next`, `comment.reply`, `comment.resolve`, `comment.delete`, `app.dialog` |
-| View | Presentation Views, Master Views, Show, Zoom, Window, Color | View menu (Views area); master views also in inspector Slide ▸ Master Views | `view.normal`, `view.outline`, `view.sorter`, `view.notesPage`, `view.slideMaster`, `view.handoutMaster`, `view.notesMaster`, `view.closeMaster`, `view.ruler`, `view.gridlines`, `view.guides`, `view.gridOptions`, `view.zoom`, `view.fit`, `view.newWindow`, `view.grayscale`, `view.dark` |
-| Shape Format | Insert Shapes | toolbar: Shape, Text Box; inspector Arrange ▸ Edit Shape (Change Shape, Edit Points, Smooth Corners, Merge Shapes) | `shape.insert`, `insert.textBox`, `shape.change`, `shape.editPoints`, `shape.smoothCorners`, `shape.merge` |
+| Review | Comments | inspector Review ▸ Comments (New Comment dialog, Previous, Next, Reply, Resolve, Delete) | `comment.prev`, `comment.next`, `comment.reply`, `comment.resolve`, `comment.delete`, `app.dialog`, `view.pane` |
+| View | Presentation Views, Master Views, Show, Zoom, Window, Color | View menu (Views area); master views also in inspector Slide ▸ Master Views | `view.normal`, `view.outline`, `view.sorter`, `view.notesPage`, `view.slideMaster`, `view.handoutMaster`, `view.notesMaster`, `view.closeMaster`, `view.ruler`, `view.gridlines`, `view.guides`, `view.gridOptions`, `view.zoom`, `view.fit`, `view.newWindow`, `view.grayscale`, `view.dark`, `view.reading`, `view.notes`, `view.zoomDialog` |
+| Shape Format | Insert Shapes | toolbar: Shape, Text Box; inspector Arrange ▸ Edit Shape (Change Shape, Edit Points, Smooth Corners, Merge Shapes) | `shape.insert`, `insert.textBox`, `shape.change`, `shape.editPoints`, `shape.smoothCorners`, `shape.merge`, `insert.icon`, `insert.wordArt`, `insert.actionButton`, `app.dialog`, `draw.inkToShape` |
 | Shape Format | Shape Styles | inspector Format ▸ Fill & Line (Shape Styles, fill, line) and Effects | `shape.quickStyle`, `shape.fill`, `shape.line`, `shape.effects`, `view.pane` |
 | Shape Format | WordArt Styles | inspector Format ▸ Text ▸ Text Fill and Text Effects (Text Outline, Shadow, Transform) | `format.color`, `format.textTransparency`, `format.textOutline`, `format.textShadow`, `format.textWarp` |
 | Shape Format | Accessibility | inspector Format ▸ Size ▸ Alt Text (and the Alt Text dialog) | `shape.altText`, `app.dialog` |
-| Shape Format | Arrange | inspector Arrange (order, align and distribute with Align to Slide, group, rotate, flip, the Selection Pane) | `arrange.bringForward`, `arrange.bringToFront`, `arrange.sendBackward`, `arrange.sendToBack`, `arrange.align`, `arrange.distribute`, `arrange.group`, `arrange.ungroup`, `arrange.regroup`, `arrange.rotateRight`, `arrange.rotateLeft`, `arrange.flipVertical`, `arrange.flipHorizontal`, `arrange.reorder`, `selection.select`, `selection.showAll`, `selection.hideAll`, `shape.visible`, `shape.lock`, `shape.rename` |
+| Shape Format | Arrange | inspector Arrange (order, align and distribute with Align to Slide, group, rotate, flip, the Selection Pane) | `arrange.bringForward`, `arrange.bringToFront`, `arrange.sendBackward`, `arrange.sendToBack`, `arrange.align`, `arrange.distribute`, `arrange.group`, `arrange.ungroup`, `arrange.regroup`, `arrange.rotateRight`, `arrange.rotateLeft`, `arrange.flipVertical`, `arrange.flipHorizontal`, `arrange.reorder`, `selection.select`, `selection.showAll`, `selection.hideAll`, `shape.visible`, `shape.lock`, `shape.rename`, `view.pane` |
 | Shape Format | Size | inspector Format ▸ Size and Arrange ▸ Size (Height, Width, Rotation, Position, Size and Position…) | `shape.resize`, `shape.rotate`, `shape.move`, `shape.sizePosition` |
 | Picture Format | Adjust | inspector Format ▸ Picture (Corrections, Remove Background, Recolor, Artistic Effects, Set Transparent Color, Change Picture, Reset, Compress) | `picture.removeBackground`, `picture.adjust`, `picture.recolor`, `picture.transparentColor`, `picture.artisticEffect`, `app.changePictureDialog`, `picture.reset`, `picture.compress` |
-| Picture Format | Picture Styles | inspector Format ▸ Picture ▸ Picture Styles (style, Picture Border) | `picture.style`, `shape.line` |
-| Picture Format | Size | inspector Format ▸ Picture ▸ Crop; Format ▸ Size | `picture.crop`, `shape.change` |
+| Picture Format | Picture Styles | inspector Format ▸ Picture ▸ Picture Styles (style, Picture Border) | `picture.style`, `shape.line`, `app.dialog`, `shape.altText` |
+| Picture Format | Size | inspector Format ▸ Picture ▸ Crop; Format ▸ Size | `picture.crop`, `shape.change`, `shape.resize`, `shape.sizePosition`, `shape.rotate`, `shape.move` |
 | Table Design | Table Style Options, Table Styles, Draw Borders | inspector Format ▸ Table (options, style, Shading, Borders with the pen, Draw Table and Eraser tools) | `table.options`, `table.style`, `table.cellFill`, `table.borders` |
 | Layout | Rows & Columns, Merge, Cell Size, Alignment | inspector Format ▸ Table | `table.deleteColumn`, `table.deleteRow`, `edit.delete`, `table.insertRowAbove`, `table.insertRowBelow`, `table.insertColumnLeft`, `table.insertColumnRight`, `table.merge`, `table.split`, `table.distributeRows`, `table.distributeColumns`, `table.cellAlign`, `table.cellMargins`, `format.alignLeft`, `format.alignCenter`, `format.alignRight` |
 | Chart Design | Type, Data | inspector Format ▸ Chart (Chart Type; Edit Data… dialog) | `chart.type`, `app.dialog` |
 | SmartArt Design | Create Graphic, Layouts, SmartArt Styles | inspector Format ▸ SmartArt (Text Pane, Add Shape, Promote, Demote, Insert Picture, Layouts, Convert, Colors, Style) | `view.pane`, `smartArt.addNode`, `smartArt.removeNode`, `smartArt.setNodes`, `smartArt.promote`, `smartArt.demote`, `app.smartArtPictureDialog`, `smartArt.layout`, `smartArt.toText`, `smartArt.toShapes`, `smartArt.colors`, `smartArt.style` |
 | Playback | Preview, Editing, Video Options, Volume | inspector Format ▸ Playback (Play/Pause, Trim… dialog, options, Volume) | `media.toggle`, `media.options`, `app.dialog` |
-| Slide Master | Edit Master, Master Layout, Edit Theme, Background, Close | inspector Slide ▸ Slide Master | `master.insertLayout`, `master.deleteLayout`, `master.preserve`, `master.placeholders`, `master.insertPlaceholder`, `design.theme`, `view.pane`, `view.closeMaster`, `app.dialog` |
-| Notes Master | Placeholders, Background, Close | inspector Slide ▸ Notes Master | `notes.placeholders`, `view.closeMaster` |
-| Handout Master | Page Setup, Placeholders, Background, Close | inspector Slide ▸ Handout Master | `handout.placeholders`, `view.closeMaster` |
+| Slide Master | Edit Master, Master Layout, Edit Theme, Background, Close | inspector Slide ▸ Slide Master | `master.insertLayout`, `master.deleteLayout`, `master.preserve`, `master.placeholders`, `master.insertPlaceholder`, `design.theme`, `view.pane`, `view.closeMaster`, `app.dialog`, `app.browseThemeDialog` |
+| Notes Master | Placeholders, Background, Close | inspector Slide ▸ Notes Master | `notes.placeholders`, `view.closeMaster`, `view.pane` |
+| Handout Master | Page Setup, Placeholders, Background, Close | inspector Slide ▸ Handout Master | `handout.placeholders`, `view.closeMaster`, `view.pane` |
 | Title bar | Quick Access Toolbar | toolbar items, customisable; app.qat adds and removes them | `app.qat` |
 | Title bar | Search, Present, Comments, Light/Dark | Help ▸ Command Palette; toolbar Play; toolbar Comment / Review tab; View ▸ Dark Mode | `app.palette`, `show.start`, `view.pane`, `view.dark` |
 
@@ -783,6 +786,40 @@ one).
 - Table Design's quick style gallery is a picker of all styles, without the painted tiles.
 - Recolor, Picture Styles and Artistic Effects are menus by name, without deckcraft's painted tiles.
 - No shared-file edits were needed.
+
+## Ribbon (Docs/plans/Ribbon-and-StartScreen.md)
+
+The ribbon returns as an optional window layout beside the inspector (PLAN.md "Decided", amended 2026-10-27).
+The guiding principle is the operator's: someone who knows PowerPoint should be comfortable, without a 100% match.
+
+### R0: one table (done 2026-10-27)
+
+No UI changes: the app looks and behaves as before. What landed is data the ribbon will draw from, and the
+tables the toolbar now shares with it.
+
+| File (DCAppModel) | What |
+|---|---|
+| `RibbonLayout.swift` | The ribbon as data: 10 regular tabs and 10 contextual ones (named as `InspectorController.contextual()` names them), their groups (each with a `foldOrder` for §5) and controls (kind, sizes, a `CommandRef` with deckcraft's params, `also` for the commands a ribbon-only menu runs). Shared Arrange and Size groups for the object tabs. No labels: they come from the registry; a title only where the command doesn't name the control |
+| `CommandMenus.swift` | `CommandRef`, `CommandMenuEntry`, and the seven split menus the toolbar opens (New Slide, Shapes, Table, Chart, Picture, Media, Play), moved down from `ToolbarCatalog`; `ChartMenu` moved here from `InspectorObjectPanes.swift` |
+| `CommandSymbols.swift` | One command → SF Symbol table (by id, or `id:<id or pane param>`), and deckcraft's QAT icon names, both moved from `ToolbarCatalog` |
+| `CommandHelp.swift` | The tooltip descriptions' table (decision 3), empty: R1 writes the ribbon's and toolbar's, R4 the rest, translated as `help.<id>` in the Commands catalog |
+| `InspectorRibbonMap.swift` | Each group's commands are now derived: the RibbonLayout groups or controls it names, plus `extra` (what its Mac place runs beyond them), without the canvas's `tool.*`. None of the previous commands was lost; 19 groups gained commands their shared menus already ran (the table above is regenerated from it) |
+
+- **Arranged for PowerPoint users.** Home has PowerPoint's Insert group (Picture, Shapes, Text Box) before Drawing;
+  Review puts Comments before Compare. Left out because they never work: Screenshot, Ink to Text and Ink to Math,
+  Cameo, Translate, Add-ins.
+- **Tests.** `RibbonCoverageTests` (DCAppModelTests, 9): every command deckcraft's ribbon runs has a control or is
+  left out with a reason (`format.state`, a query; `design.browseTheme`, an enabled check); the inventory equals
+  what `../deckcraft/crates/ui-egui/src/ribbon*` runs when that checkout is at the pin (it skips otherwise); every
+  ribbon and menu command is known; ids are unique; the tabs and contextual tabs; RibbonMap's ids resolve and
+  every ribbon group has a Mac place; the QAT offers `qat.rs`' commands; the symbols and help tables.
+  `InspectorToolbarTests.toolbarSymbolsAndMenusAreUnchanged` pins the toolbar's symbols and menus as they were.
+- **Strings.** About 25 menu strings moved with their code from DCApp's catalog to DCAppModel's
+  (`Tools/l10n/sync.sh --no-app`); their English is unchanged. Tab, group and control titles are English until
+  R4's `Ribbon.xcstrings`; nothing shows them yet.
+- **For R1 and R2.** The ribbon-only menus (Paste, Section, Change Case, Line Spacing, Arrange, Align…) list their
+  commands in `also`; R1 builds their entries. Record ▸ From Current Slide adds the current slide as `from` when it
+  runs. Handout Master's Slides Per Page is UI state in deckcraft with no command; R2 gives it one.
 
 ## lib.rs tests
 

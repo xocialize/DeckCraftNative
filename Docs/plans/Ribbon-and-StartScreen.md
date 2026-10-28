@@ -1,6 +1,6 @@
 # Ribbon and start screen
 
-**Status:** plan, draft 2, 2026-10-27: the operator's decisions are recorded (§12). Nothing is built yet; R0 waits for the go-ahead. · **Pin:** deckcraft `88c2ceff` · **Reads with:**
+**Status:** plan, draft 2, 2026-10-27: the operator's decisions are recorded (§12). **R0 is done** (2026-10-27; DCApp PORT-NOTES "Ribbon"). S1 and R1 wait for the go-ahead. · **Pin:** deckcraft `88c2ceff` · **Reads with:**
 [PLAN.md](../../PLAN.md), [PORT-STATUS.md](../../PORT-STATUS.md), [EVALUATION.md](../../EVALUATION.md), and
 DCApp's [PORT-NOTES.md](../../Packages/DCApp/PORT-NOTES.md) ("Inspector" and "Ribbon → Mac").
 

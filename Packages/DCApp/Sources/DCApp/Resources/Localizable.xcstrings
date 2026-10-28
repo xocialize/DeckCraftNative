@@ -376,17 +376,6 @@
         }
       }
     },
-    "%lld×%lld Table" : {
-      "comment" : "Columns × rows",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld×%2$lld Table"
-          }
-        }
-      }
-    },
     "+ Add" : {
       "localizations" : {
         "en" : {
@@ -476,37 +465,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accessibility Checker…"
-          }
-        }
-      }
-    },
-    "Action Button: %@" : {
-      "comment" : "An action button's kind follows: Home, Back, Next…",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action Button: %@"
-          }
-        }
-      }
-    },
-    "Action Buttons" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action Buttons"
-          }
-        }
-      }
-    },
-    "Action Settings…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action Settings…"
           }
         }
       }
@@ -920,16 +878,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "As One Object"
-          }
-        }
-      }
-    },
-    "Audio from File…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio from File…"
           }
         }
       }
@@ -2190,33 +2138,12 @@
         }
       }
     },
-    "Draw" : {
-      "comment" : "The Draw tools menu",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Draw"
-          }
-        }
-      }
-    },
     "Draw Table" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Draw Table"
-          }
-        }
-      }
-    },
-    "Duplicate Selected Slides" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duplicate Selected Slides"
           }
         }
       }
@@ -2288,16 +2215,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit Master"
-          }
-        }
-      }
-    },
-    "Edit Photo Album…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Photo Album…"
           }
         }
       }
@@ -3053,16 +2970,6 @@
         }
       }
     },
-    "Icons" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Icons"
-          }
-        }
-      }
-    },
     "Ideas for this slide" : {
       "localizations" : {
         "en" : {
@@ -3089,16 +2996,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Increase List Level"
-          }
-        }
-      }
-    },
-    "Ink to Shape" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ink to Shape"
           }
         }
       }
@@ -3191,16 +3088,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Insert Right"
-          }
-        }
-      }
-    },
-    "Insert Table…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Insert Table…"
           }
         }
       }
@@ -3446,16 +3333,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Line Spacing Options…"
-          }
-        }
-      }
-    },
-    "Link…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link…"
           }
         }
       }
@@ -3757,16 +3634,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New Comment"
-          }
-        }
-      }
-    },
-    "New Photo Album…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Photo Album…"
           }
         }
       }
@@ -4454,16 +4321,6 @@
         }
       }
     },
-    "Picture from File…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Picture from File…"
-          }
-        }
-      }
-    },
     "Picture source" : {
       "localizations" : {
         "en" : {
@@ -4521,26 +4378,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play Narrations"
-          }
-        }
-      }
-    },
-    "Play from Current Slide" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play from Current Slide"
-          }
-        }
-      }
-    },
-    "Play from Start" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play from Start"
           }
         }
       }
@@ -4853,16 +4690,6 @@
         }
       }
     },
-    "Rehearse Timings" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rehearse Timings"
-          }
-        }
-      }
-    },
     "Reject" : {
       "localizations" : {
         "en" : {
@@ -4900,16 +4727,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove"
-          }
-        }
-      }
-    },
-    "Remove All Sections" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove All Sections"
           }
         }
       }
@@ -5176,16 +4993,6 @@
         }
       }
     },
-    "Reuse Slides (Keep Source Formatting)…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reuse Slides (Keep Source Formatting)…"
-          }
-        }
-      }
-    },
     "Reuse Slides…" : {
       "localizations" : {
         "en" : {
@@ -5343,17 +5150,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search for a word"
-          }
-        }
-      }
-    },
-    "Select" : {
-      "comment" : "The selection tool",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select"
           }
         }
       }
@@ -6576,16 +6372,6 @@
         }
       }
     },
-    "Video from File…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video from File…"
-          }
-        }
-      }
-    },
     "Volume" : {
       "localizations" : {
         "en" : {
@@ -6665,16 +6451,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Window"
-          }
-        }
-      }
-    },
-    "WordArt" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WordArt"
           }
         }
       }

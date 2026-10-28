@@ -69,6 +69,24 @@ import Testing
         #expect(ChartMenu.param(.stackedColumn) == "StackedColumn")
     }
 
+    /// The items look as they did before their symbols and menus moved into DCAppModel (`CommandSymbols`,
+    /// `CommandMenus`): the same SF Symbols, and New Slide's menu still built from the presentation's layouts.
+    @Test func toolbarSymbolsAndMenusAreUnchanged() {
+        let expected: [NSToolbarItem.Identifier: String] = [
+            ToolbarCatalog.newSlide: "plus.rectangle.on.rectangle", ToolbarCatalog.shapes: "square.on.circle", ToolbarCatalog.textBox: "textformat",
+            ToolbarCatalog.table: "tablecells", ToolbarCatalog.chart: "chart.bar", ToolbarCatalog.smartArt: "rectangle.3.group",
+            ToolbarCatalog.picture: "photo", ToolbarCatalog.media: "play.rectangle", ToolbarCatalog.comment: "text.bubble", ToolbarCatalog.play: "play.fill",
+        ]
+        for c in ToolbarCatalog.commands { #expect(ToolbarCatalog.symbol(c.command, c.params) == expected[c.id], "\(c.id.rawValue)") }
+        #expect(ToolbarCatalog.commands.count == expected.count)
+        #expect(ToolbarCatalog.menu(for: ToolbarCatalog.newSlide)?.delegate === LayoutMenuDelegate.shared)
+        let menu = NSMenu()
+        LayoutMenuDelegate.shared.menuNeedsUpdate(menu)
+        #expect(Self.payloads(menu).map(\.1).suffix(6) == ["slide.duplicate", "app.dialog", "app.reuseSlidesDialog", "app.reuseSlidesDialog", "section.add", "section.removeAll"])
+        let play = Self.payloads(ToolbarCatalog.menu(for: ToolbarCatalog.play)).map(\.0)
+        #expect(play == ["Play from Start", "Play from Current Slide", "Presenter View", "Rehearse Timings", "Set Up Slide Show…"])
+    }
+
     // pattern_fill_tests.rs: every gallery preset is one DCRender draws.
     @Test func patternGalleryPresetsAreDrawable() {
         for name in InspectorFill.patternGallery { #expect(Pattern.presets.contains(name), "\(name)") }

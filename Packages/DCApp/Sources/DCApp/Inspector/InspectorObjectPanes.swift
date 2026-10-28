@@ -142,13 +142,7 @@ struct TableFormatView: View {
 
 // MARK: - Chart
 
-/// The chart types of Insert Chart and Change Chart Type (`chart_menu_types`): the main ones, then the
-/// Office 2016 types not already listed.
-enum ChartMenu {
-    static var types: [[ChartType]] { [ChartType.main, ChartType.office2016.filter { !ChartType.main.contains($0) }] }
-    /// Rust's `{:?}` of the type, the parameter deckcraft passes.
-    static func param(_ k: ChartType) -> String { k.rawValue.prefix(1).uppercased() + k.rawValue.dropFirst() }
-}
+// The chart types are `ChartMenu` (DCAppModel/CommandMenus.swift), which Insert Chart's menu uses too.
 
 struct ChartFormatView: View {
     let ctl: InspectorController

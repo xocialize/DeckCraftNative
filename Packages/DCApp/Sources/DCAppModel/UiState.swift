@@ -1,9 +1,9 @@
 // DCAppModel — the app's persisted UI state. Port of `UiState` and `ViewMode` in deckcraft
 // `crates/ui-egui/src/lib.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 //
-// The ribbon is dropped on the Mac (PLAN.md, "Decided"), but its fields stay: the control channel's
-// `ui.inspect` reports them and `view.tab` / `view.collapseRibbon` still answer, so scripts written
-// against deckcraft keep working.
+// The ribbon is an optional window layout (PLAN.md "Decided", amended 2026-10-27; Docs/plans/Ribbon-and-
+// StartScreen.md). Until it is drawn its fields are kept for the control channel: `ui.inspect` reports them and
+// `view.tab` / `view.collapseRibbon` answer, so scripts written against deckcraft keep working.
 import Foundation
 
 /// The editor's view (`ViewMode`).

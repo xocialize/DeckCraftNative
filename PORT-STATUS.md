@@ -361,6 +361,17 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - The published 0.1.1, run from its export, finds 0.1.2 through Check for Updates.
 - **Released as v0.1.3 (2026-10-27).** vpx-swift 0.3.1: VP8 and untagged VP9 of 576 lines or fewer convert as
   BT.601, as deckcraft and ffmpeg do (AB-A-0205; "VP9 and VP8 video" above). Nothing else changed.
+- **Ribbon R0: one table (2026-10-27).** This is the first milestone of
+  [Docs/plans/Ribbon-and-StartScreen.md](Docs/plans/Ribbon-and-StartScreen.md); details are in DCApp's PORT-NOTES, under "Ribbon".
+  - **`RibbonLayout`** in DCAppModel holds the ribbon as data: 10 tabs, 10 contextual tabs, groups with fold order,
+    and controls with their command, kind and sizes. It is arranged for someone who knows PowerPoint.
+  - **New tables:** `CommandMenus` holds the split menus, moved out of `ToolbarCatalog`. `CommandSymbols` holds the
+    SF Symbols. `CommandHelp` holds the descriptions and is empty until R1.
+  - **`RibbonMap`** is now derived from the layout. No command was lost; 19 rows gained commands that their menus
+    already ran.
+  - **The app is unchanged.** The toolbar reads the new tables, and a test pins its symbols and menus.
+  - **Tests:** `RibbonCoverageTests` replaces the planned order-equality test. It checks that every command in
+    deckcraft's `ribbon*.rs` has a control, and at the pin it rescans the sources.
 
 ## Pin moves
 
