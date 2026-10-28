@@ -175,6 +175,7 @@ and what macOS needs for the app's App Shortcuts to name them, is in DCApp/PORT-
   `Contents/Extensions` and the action finishing without error, and `pgrep -x DeckCraftNative`, polled every 0.1 s
   before, during and after, never found the app. The first run asks, as Shortcuts does for any app's action, whether
   the shortcut may share the file with DeckCraftNative.
+  `Tools/app/shortcuts-e2e.sh` repeats the run (`register <version>`, `run`, `cleanup`).
   - **The app must be somewhere macOS trusts.** linkd skips a copy under `/private/tmp` ("is not trusted for
     binding"), so its actions are missing (`WFActionErrorDomain` 14). The run passed with the export in
     `~/Applications`, where a user installs it.
