@@ -5,7 +5,7 @@ A native macOS presentation editor in Swift, AppKit, SwiftUI and Metal. It is a 
 keeps DeckCraft's engine and behaviour, file for file and command for command, and replaces the rest with macOS
 frameworks.
 
-**[Download DeckCraftNative 0.1.0](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
+**[Download DeckCraftNative 0.1.2](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
 later on Apple silicon. The app is signed with a Developer ID and notarized by Apple. It's an early preview.
 
 ## What it does
@@ -18,8 +18,8 @@ later on Apple silicon. The app is signed with a Developer ID and notarized by A
 - **Share:** export PDF (vector, with selectable text) of slides, notes or handouts, PNG, JPEG and animated GIF.
   Print with the same layouts.
 - **Review:** comments with replies, spelling and the thesaurus.
-- **macOS integration:** Quick Look previews and thumbnails, Shortcuts actions, Check for Updates, and an interface
-  ready for translation.
+- **macOS integration:** Quick Look previews and thumbnails, Shortcuts actions (exporting and reading a file run in
+  the background, without opening the app), Check for Updates, and an interface ready for translation.
 - **Automation:** every command can be scripted. The `dccli` tool runs command scripts, renders and converts files,
   and serves MCP. A running app answers on a local control channel (`--control PORT`).
 
@@ -68,7 +68,7 @@ wave and crate by crate, is in [PORT-STATUS.md](PORT-STATUS.md).
 | `DCEngine` | Session, history, the 330 commands, the pointer | `engine` |
 | `DCAutomation` | control channel, control server, MCP | `mcp`, the app's control server |
 | `DCApp` (`DCAppModel`, `DCApp`) | the Mac app | `ui-egui`, `apps/deckcraft` |
-| `DCExtensions` | Quick Look and Spotlight extensions | — |
+| `DCExtensions` | Quick Look, Spotlight and App Intents extensions | — |
 | `Apps/dccli` | the command-line tool | `apps/deckcraft-cli` |
 
 ## Build

@@ -337,7 +337,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `3335d96`, notarized, and accepted by Gatekeeper; an anonymous download matches its `.sha256`.
   - The published 0.1.0, run from its own DMG, finds 0.1.1 through Check for Updates.
 
-- **0.1.2 polish (2026-10-27, not yet published).**
+- **0.1.2 polish (2026-10-27).**
   - **App Intents extension:** Export Presentation, Get Outline and Get Slide Count live in a shared `DCIntentsKit`
     module that a new `DeckCraftIntents` extension and the app both link (Apple's shared-framework pattern). macOS
     prefers to run background intents from the extension, so they need no app or window. Its metadata and the
@@ -353,6 +353,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     drawing.
   - **`release.sh`:** it never overwrites a released version's build. A tagged version must be bumped; a test build
     of it goes to `<version>-test`.
+- **Released as [v0.1.2](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.2) (2026-10-27).**
+  - Built clean from `1c75c98`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
+    its ticket is stapled.
+  - The published 0.1.1, run from its export, finds 0.1.2 through Check for Updates.
 
 ## Pin moves
 
