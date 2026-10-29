@@ -437,6 +437,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Gate:** the alpha gate runs in either layout (`GATE_LAYOUT`, through the new `ui.set {layout}`).
   - **Fix:** zooming with legacy scroll bars kept the wrong middle. This was the intermittent
     `zoomingPastTheWindowScrollsAndKeepsTheMiddle`, and its test now covers both scroll-bar styles.
+- **0.1.4 (2026-10-29, not yet published).** The ribbon and the start window: R0–R4 and S1 above. New installs get the
+  ribbon; a `ui.json` from an earlier version keeps the Mac layout. Notes in `Docs/releases/0.1.4.md`.
 
 ## Pin moves
 
