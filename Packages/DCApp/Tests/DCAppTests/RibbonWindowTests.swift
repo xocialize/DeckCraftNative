@@ -83,11 +83,11 @@ import Testing
         let f = Fixture()
         f.layout(true)
         let container = try #require(f.wc.window?.contentViewController as? RibbonContainerController)
-        for tab in RibbonModel.tabs {
+        for tab in RibbonModel.tabs(f.model) {
             f.model.run("view.tab", ["tab": .string(tab.title)])
             container.host.rootView = RibbonView(model: f.model)
             container.host.layoutSubtreeIfNeeded()
-            #expect(RibbonModel.selected(f.model.ui).id == tab.id)
+            #expect(RibbonModel.selected(f.model).id == tab.id)
             let fmt = RibbonModel.formatState(f.model.session)
             for g in tab.groups {
                 let v = NSHostingView(rootView: RibbonGroupView(group: g, model: f.model, fmt: fmt))
@@ -97,9 +97,72 @@ import Testing
         f.layout(false)
     }
 
+    // R2: with each kind of object selected, its contextual tabs are in the tab row, tinted, and every group draws;
+    // the galleries draw their tiles and the "›" button.
+    @Test func theContextualTabsDraw() throws {
+        let f = Fixture()
+        f.layout(true)
+        let container = try #require(f.wc.window?.contentViewController as? RibbonContainerController)
+        let png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        let inserts: [(String, JSON)] = [
+            ("shape.insert", ["preset": "rect", "rect": [300, 100, 100, 100]]), ("insert.picture", ["data": .string(png), "name": "dot.png"]),
+            ("insert.table", ["rows": 2, "cols": 2]), ("insert.chart", ["type": "Column"]),
+            ("insert.smartArt", ["kind": "process", "items": ["Plan", "Build"]]),
+            ("insert.audio", ["data": .string(Cmd.base64Encode(Self.wav)), "name": "tone.wav"]),
+        ]
+        var seen = Set<String>()
+        for (id, params) in inserts {
+            f.model.run(id, params)
+            let tabs = RibbonModel.tabs(f.model).filter { $0.contextual != nil }
+            #expect(!tabs.isEmpty, "\(id) brings a contextual tab")
+            for tab in tabs {
+                seen.insert(tab.id)
+                f.model.run("view.tab", ["tab": .string(tab.title)])
+                container.host.rootView = RibbonView(model: f.model)
+                container.host.layoutSubtreeIfNeeded()
+                #expect(RibbonModel.selected(f.model).id == tab.id)
+                let fmt = RibbonModel.formatState(f.model.session)
+                for g in tab.groups {
+                    let v = NSHostingView(rootView: RibbonGroupView(group: g, model: f.model, fmt: fmt))
+                    #expect(v.fittingSize.width > 30 && v.fittingSize.height <= RibbonView.bodyHeight, "\(g.id) draws its controls")
+                }
+            }
+        }
+        #expect(seen.isSuperset(of: ["shapeFormat", "pictureFormat", "tableDesign", "tableLayout", "chartDesign", "smartArtDesign", "playback"]), "\(seen)")
+        // Nothing selected: the contextual tab gives way to Home.
+        f.model.run("edit.select", ["ids": []])
+        #expect(RibbonModel.selected(f.model).id == "home")
+        f.layout(false)
+    }
+
+    /// A short silent WAV: 8 kHz, 8-bit mono.
+    static var wav: [UInt8] {
+        let n: UInt32 = 800
+        func le32(_ v: UInt32) -> [UInt8] { [UInt8(v & 0xFF), UInt8((v >> 8) & 0xFF), UInt8((v >> 16) & 0xFF), UInt8(v >> 24)] }
+        func le16(_ v: UInt16) -> [UInt8] { [UInt8(v & 0xFF), UInt8(v >> 8)] }
+        return Array("RIFF".utf8) + le32(36 + n) + Array("WAVEfmt ".utf8) + le32(16) + le16(1) + le16(1) + le32(8000) + le32(8000)
+            + le16(1) + le16(8) + Array("data".utf8) + le32(n) + [UInt8](repeating: 128, count: Int(n))
+    }
+
+    // The "›" button's whole gallery, by category, and the Shapes grid draw for every source.
+    @Test func expandedGalleriesDraw() throws {
+        let f = Fixture()
+        f.model.run("insert.smartArt", ["kind": "process", "items": ["Plan", "Build"]])
+        for source in RibbonGalleries.sources {
+            let g = try #require(RibbonGalleries.gallery(source, f.model))
+            let v = NSHostingView(rootView: RibbonGalleryGrid(gallery: g, model: f.model) {})
+            #expect(v.fittingSize.width >= 400 && v.fittingSize.height > 40, "\(source)")
+            let control = try #require(RibbonModel.allTabs.flatMap { $0.groups.flatMap(\.controls) }.first { $0.kind == .gallery(source: source) }, "\(source)")
+            let strip = NSHostingView(rootView: RibbonGalleryView(control: control, model: f.model, enabled: true))
+            #expect(strip.fittingSize.height <= RibbonView.bodyHeight && strip.fittingSize.width > 60, "\(source) inline")
+        }
+        let shapes = NSHostingView(rootView: RibbonShapesGrid(entries: CommandMenus.entries(.shapes), model: f.model) {})
+        #expect(shapes.fittingSize.width >= 300 && shapes.fittingSize.height > 100)
+    }
+
     @Test func everyRibbonSymbolIsAnSFSymbol() {
         var missing: [String] = []
-        for tab in RibbonModel.tabs {
+        for tab in RibbonModel.allTabs {
             for g in tab.groups {
                 for c in g.controls where NSImage(systemSymbolName: RibbonModel.symbol(c), accessibilityDescription: nil) == nil {
                     missing.append("\(c.id): \(RibbonModel.symbol(c))")

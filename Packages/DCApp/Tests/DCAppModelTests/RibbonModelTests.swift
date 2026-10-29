@@ -52,16 +52,27 @@ final class AcceptingHost: AppHost {
     static func invocations(_ c: RibbonControl, _ m: AppModel) -> [CommandRef] {
         var refs: [CommandRef] = []
         if let p = RibbonModel.primary(c, m) { refs.append(p) }
-        // The font list is every installed family: a few of them say as much as all of them.
-        let menu = items(RibbonModel.menu(c, m))
-        refs += c.id == "home.fontFamily" ? Array(menu.prefix(4)) + menu.suffix(1) : menu
+        refs += items(RibbonModel.menu(c, m))
+        // A gallery's first tiles, and its last (R2).
+        if let g = RibbonGalleries.gallery(c, m) { refs += g.inlineItems.prefix(2).map(\.command) + (g.items.last.map { [$0.command] } ?? []) }
         switch c.kind {
         case .check: refs += [RibbonModel.check(c, true), RibbonModel.check(c, false)]
         case .spinner(let f): refs.append(RibbonModel.spin(c, f, 1.5))
         case .color: refs.append(CommandRef(c.command.id, ["color": "accent2"]))
         default: break
         }
-        return refs
+        return sampled(refs)
+    }
+
+    /// The first five and the last of each command a control runs. The shape menus alone hold 270 presets, and
+    /// every one walked costs a scratch session: a walk of each item kept the main actor busy for 25 seconds,
+    /// which starved the suites waiting on it (UpdatesCenterTests' ten-second settle).
+    static func sampled(_ refs: [CommandRef]) -> [CommandRef] {
+        var seen: [String: Int] = [:]
+        return refs.enumerated().filter { i, r in
+            seen[r.id, default: 0] += 1
+            return (seen[r.id] ?? 0) <= 5 || !refs[(i + 1)...].contains { $0.id == r.id }
+        }.map(\.element)
     }
 
     /// Commands the registry enables but that need a state this fixture doesn't make; they fail with that reason,
@@ -76,7 +87,7 @@ final class AcceptingHost: AppHost {
     @Test func everyControlRunsItsCommand() {
         var ran = 0, skipped: [String] = []
         let probe = Fixture()
-        for tab in RibbonModel.tabs {
+        for tab in RibbonLayout.regular {
             for g in tab.groups {
                 for c in g.controls {
                     let refs = Self.invocations(c, probe.model)
@@ -192,15 +203,17 @@ final class AcceptingHost: AppHost {
     }
 
     @Test func theSelectedTabIsDeckcraftsName() {
-        var ui = UiState()
-        #expect(RibbonModel.selected(ui).id == "home")
-        ui.tab = "Slide Show"
-        #expect(RibbonModel.selected(ui).id == "slideShow")
-        ui.tab = "review"
-        #expect(RibbonModel.selected(ui).id == "review")
-        // A contextual tab (R2) or anything else shows Home.
-        ui.tab = "Shape Format"
-        #expect(RibbonModel.selected(ui).id == "home")
+        let s = AppModel(session: Session.withNew())
+        #expect(RibbonModel.selected(s).id == "home")
+        s.ui.tab = "Slide Show"
+        #expect(RibbonModel.selected(s).id == "slideShow")
+        s.ui.tab = "review"
+        #expect(RibbonModel.selected(s).id == "review")
+        // A contextual tab the selection doesn't have, or anything else, shows Home.
+        s.ui.tab = "Shape Format"
+        #expect(RibbonModel.selected(s).id == "home")
+        s.ui.tab = "Nowhere"
+        #expect(RibbonModel.selected(s).id == "home")
         let m = AppModel(session: Session.withNew())
         m.run("view.tab", ["tab": "Design"])
         let r = RibbonModel.inspect(m)
@@ -210,7 +223,7 @@ final class AcceptingHost: AppHost {
     }
 
     @Test func groupsAreArrangedInColumns() {
-        for tab in RibbonModel.tabs {
+        for tab in RibbonModel.allTabs {
             for g in tab.groups {
                 let cols = RibbonModel.columns(g)
                 #expect(cols.flatMap { $0.flatMap { $0 } }.map(\.id) == g.controls.map(\.id), "\(g.id) keeps its order")
@@ -227,7 +240,7 @@ final class AcceptingHost: AppHost {
     // Decision 3: every command the ribbon's tabs show has a description, and every control a label and a tip.
     @Test func everyRibbonCommandHasADescription() {
         var missing: [String] = []
-        for tab in RibbonModel.tabs {
+        for tab in RibbonModel.allTabs {
             for g in tab.groups {
                 for c in g.controls {
                     if CommandHelp.description(c.command) == nil { missing.append("\(c.id) (\(c.command.id))") }

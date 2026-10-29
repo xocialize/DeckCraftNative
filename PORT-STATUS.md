@@ -398,6 +398,18 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     `ui.startScreen` method, and `ui.screenshot {window: "start"}` captures the window.
   - **Tests:** 33 new (`StartScreenTests`, `StartWindowTests`), including deckcraft's start-screen tests where they
     apply. The alpha gate gains step 0 and passes 18 of 18.
+- **Ribbon R2: contextual tabs and galleries (2026-10-28).** Details are in DCApp's PORT-NOTES, under "Ribbon" › "R2".
+  - **Contextual tabs:** Shape Format, Picture Format, Table Design and Layout, SmartArt Design, Chart Design, Playback,
+    and the three master tabs come after the regular tabs when the selection has their object, tinted with the accent
+    colour. They are never switched to: a tab that stops applying gives way to Home.
+  - **Galleries are tiles** with a "›" button for the whole gallery by category: themes (the start window's tiles),
+    variants, transitions, animations, table styles, picture styles, quick styles, SmartArt layouts and styles. The
+    Shapes buttons open a grid of the presets. Choosing a tile is one undo step.
+  - **Every contextual control** runs its command with deckcraft's parameters. The menus, check boxes and colour splits
+    come from deckcraft's tab files, and Height and Width use the Preferences unit.
+  - **New UI command:** `view.handoutSlides {count}` for Handout Master › Slides Per Page.
+  - **Tests:** `RibbonContextualTests` (9), which includes a walk of every contextual control with its object
+    selected (over 250 commands), and two more `RibbonWindowTests`.
 
 ## Pin moves
 

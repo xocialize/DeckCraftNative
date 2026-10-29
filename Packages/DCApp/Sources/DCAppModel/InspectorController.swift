@@ -104,33 +104,7 @@ public final class InspectorController {
     }
 
     /// `contextual`: the ribbon's contextual tabs for the selection, which the Format tab shows as sections.
-    public func contextual() -> [String] {
-        guard let st = doc else { return [] }
-        var v: [String] = []
-        switch st.selection.target {
-        case .handout: v.append("Handout Master")
-        case .notesMaster: v.append("Notes Master")
-        case .slides: break
-        default: v.append("Slide Master")
-        }
-        let shapes = st.selectedShapes
-        if shapes.contains(where: { s in
-            switch s.kind {
-            case .shape, .group, .connector: true
-            default: false
-            }
-        }) || st.selection.text != nil {
-            v.append("Shape Format")
-        }
-        if shapes.contains(where: { if case .picture = $0.kind { true } else { false } }) { v.append("Picture Format") }
-        if shapes.contains(where: { if case .table = $0.kind { true } else { false } }) || st.selection.text?.cell != nil {
-            v += ["Table Design", "Layout"]
-        }
-        if SmartArtCommands.selected(st) != nil { v.append("SmartArt Design") }
-        if shapes.contains(where: { if case .chart = $0.kind { true } else { false } }) { v.append("Chart Design") }
-        if shapes.contains(where: { if case .media = $0.kind { true } else { false } }) { v.append("Playback") }
-        return v
-    }
+    public func contextual() -> [String] { RibbonModel.contextual(doc) }
 
     /// The Format tab's sub-tabs for the selection: deckcraft's Format Shape tabs, plus Picture when a
     /// picture is selected and the contextual Table, Chart, SmartArt and Media tabs.

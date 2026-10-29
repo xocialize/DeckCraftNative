@@ -43,8 +43,9 @@ import Testing
         #expect(first?["id"]?.asStr == "view.normal")
         #expect(first?["ui"]?.asBool == true)
         #expect(first?["enabled"]?.asBool == true)
-        // deckcraft's 51, and view.ribbon (the ribbon layout, R1 of Docs/plans/Ribbon-and-StartScreen.md).
-        #expect(host.uiCommands.count == 52)
+        // deckcraft's 51, view.ribbon (the ribbon layout, R1 of Docs/plans/Ribbon-and-StartScreen.md) and
+        // view.handoutSlides (Slides Per Page, R2).
+        #expect(host.uiCommands.count == 53)
     }
 
     @Test func windowPointsAreYDown() {

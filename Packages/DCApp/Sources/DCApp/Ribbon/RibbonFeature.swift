@@ -80,6 +80,7 @@ final class RibbonContainerController: NSViewController {
 @MainActor
 enum RibbonFeature {
     static func install(_ app: AppController) {
+        RibbonModel.inspector = InspectorFeature.controller
         app.inspect("ribbon") { RibbonModel.inspect(app.model) }
         follow(app.model)
     }

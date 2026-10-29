@@ -73,10 +73,47 @@ public enum CommandSymbols {
         "view.guides": "squareshape.split.2x2.dotted", "view.gridOptions": "slider.horizontal.3", "view.notes": "note.text",
         "view.zoom": "plus.magnifyingglass", "view.fit": "arrow.up.left.and.arrow.down.right", "view.newWindow": "macwindow.badge.plus",
         "view.grayscale": "circle.lefthalf.filled", "view.dark": "moon",
+        // R2: the contextual tabs.
+        "shapeFormat.editShape": "pencil.and.outline", "shapeFormat.merge": "square.on.circle", "shapeFormat.quickStyles": "paintpalette",
+        "shapeFormat.fill": "drop.fill", "shapeFormat.outline": "pencil.line", "shapeFormat.effects": "sparkles",
+        "shapeFormat.textFill": "paintbrush.pointed", "shapeFormat.textOutline": "a.square", "shapeFormat.textEffects": "wand.and.rays",
+        "shapeFormat.altText": "text.below.photo", "shapeFormat.formatPane": "sidebar.right",
+        "pictureFormat.removeBackground": "person.crop.rectangle", "pictureFormat.corrections": "sun.max", "pictureFormat.color": "paintpalette",
+        "pictureFormat.artistic": "paintbrush", "pictureFormat.transparency": "circle.lefthalf.filled", "pictureFormat.change": "arrow.triangle.2.circlepath",
+        "pictureFormat.reset": "arrow.counterclockwise", "pictureFormat.compress": "arrow.down.right.and.arrow.up.left", "pictureFormat.gallery": "photo.artframe",
+        "pictureFormat.border": "square", "pictureFormat.altText": "text.below.photo", "pictureFormat.crop": "crop",
+        "tableDesign.gallery": "tablecells", "tableDesign.shading": "drop.fill", "tableDesign.borders": "squareshape.split.3x3",
+        "tableDesign.drawTable": "pencil", "tableDesign.eraser": "eraser",
+        "tableLayout.delete": "trash", "tableLayout.insertAbove": "arrow.up.to.line", "tableLayout.insertBelow": "arrow.down.to.line",
+        "tableLayout.insertLeft": "arrow.left.to.line", "tableLayout.insertRight": "arrow.right.to.line",
+        "tableLayout.merge": "arrow.right.and.line.vertical.and.arrow.left", "tableLayout.split": "arrow.left.and.line.vertical.and.arrow.right",
+        "tableLayout.distributeRows": "line.3.horizontal", "tableLayout.distributeColumns": "rectangle.split.3x1",
+        "tableLayout.alignLeft": "text.alignleft", "tableLayout.alignCenter": "text.aligncenter", "tableLayout.alignRight": "text.alignright",
+        "tableLayout.alignTop": "align.vertical.top", "tableLayout.alignMiddle": "align.vertical.center", "tableLayout.alignBottom": "align.vertical.bottom",
+        "tableLayout.margins": "rectangle.inset.filled",
+        "chartDesign.changeType": "chart.bar.xaxis", "chartDesign.editData": "tablecells",
+        "smartArtDesign.textPane": "list.bullet.rectangle", "smartArtDesign.addShape": "plus.rectangle", "smartArtDesign.promote": "arrow.left",
+        "smartArtDesign.demote": "arrow.right", "smartArtDesign.insertPicture": "photo", "smartArtDesign.layouts": "rectangle.3.group",
+        "smartArtDesign.convert": "arrow.triangle.2.circlepath", "smartArtDesign.colors": "paintpalette", "smartArtDesign.gallery": "cube",
+        "playback.play": "play.fill", "playback.trim": "scissors", "playback.volume": "speaker.wave.2",
+        "slideMaster.insertLayout": "rectangle.badge.plus", "slideMaster.delete": "trash", "slideMaster.rename": "character.cursor.ibeam",
+        "slideMaster.insertPlaceholder": "rectangle.dashed", "slideMaster.themes": "paintpalette", "slideMaster.background": "rectangle.fill",
+        "slideMaster.close": "xmark.rectangle", "notesMaster.background": "rectangle.fill", "notesMaster.close": "xmark.rectangle",
+        "handoutMaster.perPage": "square.grid.3x2", "handoutMaster.background": "rectangle.fill", "handoutMaster.close": "xmark.rectangle",
+    ]
+
+    /// The object tabs' shared Arrange and Size controls (`arrange.rs`), by the part of their id after the tab.
+    static let shared: [String: String] = [
+        "bringForward": "square.2.layers.3d.top.filled", "sendBackward": "square.2.layers.3d.bottom.filled", "selectionPane": "square.stack.3d.up",
+        "align": "align.horizontal.left", "group": "rectangle.3.group", "rotate": "rotate.right",
+        "height": "arrow.up.and.down", "width": "arrow.left.and.right", "sizePosition": "arrow.up.left.and.arrow.down.right",
     ]
 
     /// The symbol for ribbon control `id`, if it has its own.
-    public static func symbol(control id: String) -> String? { controls[id] }
+    public static func symbol(control id: String) -> String? {
+        if let s = controls[id] { return s }
+        return id.split(separator: ".").last.flatMap { shared[String($0)] }
+    }
 
     /// deckcraft's QAT icon names as SF Symbols.
     public static func symbol(icon: String) -> String {

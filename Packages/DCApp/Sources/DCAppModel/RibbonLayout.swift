@@ -444,7 +444,7 @@ public enum RibbonLayout {
         ]),
         g("shapeFormat.wordArt", "WordArt Styles", fold: 6, [
             s("shapeFormat.textFill", "format.color", .emptyObject, .color, title: "Text Fill", also: ["format.textTransparency"]),
-            s("shapeFormat.textOutline", "format.textOutline", .emptyObject, .menu(nil), title: "Text Outline"),
+            s("shapeFormat.textOutline", "format.textOutline", .emptyObject, .color, title: "Text Outline"),
             s("shapeFormat.textEffects", "format.textShadow", .emptyObject, .menu(nil), title: "Text Effects", also: ["format.textWarp"]),
         ]),
         g("shapeFormat.accessibility", "Accessibility", fold: 1, [
@@ -475,7 +475,7 @@ public enum RibbonLayout {
         ]),
         arrange("pictureFormat"),
         g("pictureFormat.crop", "Crop", fold: 2, [
-            c("pictureFormat.crop", "picture.crop", .emptyObject, .split(nil), title: "Crop", also: ["shape.change"]),
+            c("pictureFormat.crop", "picture.crop", .emptyObject, .menu(nil), title: "Crop", also: ["shape.change"]),
         ]),
         size("pictureFormat"),
     ])
@@ -521,9 +521,9 @@ public enum RibbonLayout {
             s("tableLayout.alignLeft", "format.alignLeft", .emptyObject, .toggle(state: "align")),
             s("tableLayout.alignCenter", "format.alignCenter", .emptyObject, .toggle(state: "align")),
             s("tableLayout.alignRight", "format.alignRight", .emptyObject, .toggle(state: "align")),
-            s("tableLayout.alignTop", "table.cellAlign", ["anchor": "top"], .toggle(state: "anchor"), title: "Align Top"),
-            s("tableLayout.alignMiddle", "table.cellAlign", ["anchor": "middle"], .toggle(state: "anchor"), title: "Center Vertically"),
-            s("tableLayout.alignBottom", "table.cellAlign", ["anchor": "bottom"], .toggle(state: "anchor"), title: "Align Bottom"),
+            s("tableLayout.alignTop", "table.cellAlign", ["anchor": "top"], title: "Align Top"),
+            s("tableLayout.alignMiddle", "table.cellAlign", ["anchor": "middle"], title: "Center Vertically"),
+            s("tableLayout.alignBottom", "table.cellAlign", ["anchor": "bottom"], title: "Align Bottom"),
             s("tableLayout.margins", "table.cellMargins", .emptyObject, .menu(nil), title: "Cell Margins"),
         ]),
         arrange("tableLayout"),
@@ -541,7 +541,7 @@ public enum RibbonLayout {
 
     static let smartArtDesign = RibbonTab(id: "smartArtDesign", title: "SmartArt Design", contextual: "SmartArt Design", groups: [
         g("smartArtDesign.create", "Create Graphic", fold: 3, [
-            c("smartArtDesign.textPane", "view.pane", ["pane": "smartart"], title: "Text Pane", also: ["smartArt.setNodes", "smartArt.removeNode"]),
+            c("smartArtDesign.textPane", "view.pane", ["pane": "smartart", "toggle": true], title: "Text Pane", also: ["smartArt.setNodes", "smartArt.removeNode"]),
             c("smartArtDesign.addShape", "smartArt.addNode", .emptyObject, .split(nil), title: "Add Shape"),
             s("smartArtDesign.promote", "smartArt.promote"),
             s("smartArtDesign.demote", "smartArt.demote"),
@@ -600,9 +600,7 @@ public enum RibbonLayout {
     ])
 
     static let notesMaster = RibbonTab(id: "notesMaster", title: "Notes Master", contextual: "Notes Master", groups: [
-        g("notesMaster.placeholders", "Placeholders", fold: 2, ["header", "slideImage", "footer", "date", "body", "pageNumber"].map {
-            s("notesMaster.\($0)", "notes.placeholders", .emptyObject, .check(field: $0))
-        }),
+        g("notesMaster.placeholders", "Placeholders", fold: 2, placeholderChecks("notesMaster", "notes.placeholders", ["header", "slideImage", "footer", "date", "body", "pageNumber"])),
         g("notesMaster.background", "Background", fold: 3, [
             c("notesMaster.background", "view.pane", ["pane": "background"], title: "Background Styles"),
         ]),
@@ -612,11 +610,12 @@ public enum RibbonLayout {
     ])
 
     /// Handout Master (`masters.rs` `handout_master`). deckcraft's Slides Per Page is UI state with no command;
-    /// R2 gives it one.
+    /// R2 gives it one, `view.handoutSlides`.
     static let handoutMaster = RibbonTab(id: "handoutMaster", title: "Handout Master", contextual: "Handout Master", groups: [
-        g("handoutMaster.placeholders", "Placeholders", fold: 2, ["header", "date", "footer", "pageNumber"].map {
-            s("handoutMaster.\($0)", "handout.placeholders", .emptyObject, .check(field: $0))
-        }),
+        g("handoutMaster.pageSetup", "Page Setup", fold: 1, [
+            c("handoutMaster.perPage", "view.handoutSlides", .emptyObject, .menu(nil), title: "Slides Per Page"),
+        ]),
+        g("handoutMaster.placeholders", "Placeholders", fold: 2, placeholderChecks("handoutMaster", "handout.placeholders", ["header", "date", "footer", "pageNumber"])),
         g("handoutMaster.background", "Background", fold: 3, [
             c("handoutMaster.background", "view.pane", ["pane": "background"], title: "Background Styles"),
         ]),
@@ -624,6 +623,12 @@ public enum RibbonLayout {
             c("handoutMaster.close", "view.closeMaster", sizes: [.large]),
         ]),
     ])
+
+    /// The notes and handout masters' placeholder check boxes, each named for its placeholder (`masters.rs`).
+    static func placeholderChecks(_ tab: String, _ command: String, _ fields: [String]) -> [RibbonControl] {
+        let titles = ["header": "Header", "slideImage": "Slide Image", "footer": "Footer", "date": "Date", "body": "Body", "pageNumber": "Page Number"]
+        return fields.map { s("\(tab).\($0)", command, .emptyObject, .check(field: $0), title: titles[$0] ?? $0) }
+    }
 
     // MARK: Lookups
 

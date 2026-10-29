@@ -2,9 +2,11 @@
 // when the toolbar has no such menu (the toolbar's are `CommandMenus`). Ports the menus of deckcraft
 // `crates/ui-egui/src/ribbon/{home,insert,design,transitions,animations,review,view}.rs` and `galleries.rs`'
 // `effects_menu` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors), with deckcraft's parameters.
-// Galleries are menus until R2 draws them as tiles; Quick Styles opens the Format pane, which has its grid.
+// R2 adds the contextual tabs' menus (`shape_format.rs`, `picture_format.rs`, `table.rs`, `chart.rs`, `smartart.rs`,
+// `playback.rs`, `masters.rs`); the galleries are tiles (`RibbonGalleries`).
 import DCCore
 import DCEngine
+import DCGeometry
 import DCModel
 import Foundation
 
@@ -169,9 +171,197 @@ public enum RibbonMenus {
         case "view.zoom":
             return [400, 200, 150, 100, 75, 66, 50, 33].map { .item("\($0)%", "view.zoom", ["percent": .integer($0)]) }
                 + [.item(String(localized: "Fit", bundle: .module, comment: "Zoom menu: fit the slide to the window"), "view.fit")]
+        // Shape Format (`shape_format.rs`)
+        case "shapeFormat.editShape":
+            var out: [CommandMenuEntry] = [.submenu(String(localized: "Change Shape", bundle: .module), changeShape), .separator,
+                                           .item(String(localized: "Edit Points", bundle: .module), "shape.editPoints", ["on": true])]
+            if let sh = doc.flatMap({ d in d.selection.shapes.first.flatMap { d.shape($0) } }), let radius = InspectorShape.cornerRadius(sh) {
+                out += [.separator, .submenu(String(localized: "Smooth Corners", bundle: .module), [0.0, 25, 50, 75, 100].map {
+                    .item("\(Int($0))%", "shape.smoothCorners", InspectorShape.smoothParams($0, radius: radius))
+                })]
+            }
+            return out
+        case "shapeFormat.merge":
+            return MergeCommands.ops.map { .item($0.1, "shape.merge", ["op": .string($0.0)]) }
+        case "shapeFormat.effects":
+            return effects
+        case "shapeFormat.textEffects":
+            return [
+                .item(String(localized: "Shadow", bundle: .module), "format.textShadow"),
+                .separator,
+                .submenu(String(localized: "Follow Path", bundle: .module), Warp.catalog.filter { Warp.isFollow($0.id) }.map { .item($0.label, "format.textWarp", ["preset": .string($0.id)]) }),
+                .submenu(String(localized: "Warp", bundle: .module), [.item(String(localized: "No Transform", bundle: .module), "format.textWarp", ["preset": "none"])]
+                    + Warp.catalog.filter { !Warp.isFollow($0.id) }.map { .item($0.label, "format.textWarp", ["preset": .string($0.id)]) }),
+            ]
+        // Picture Format (`picture_format.rs`)
+        case "pictureFormat.removeBackground":
+            return [
+                (20.0, String(localized: "Remove Background", bundle: .module)), (35.0, String(localized: "Remove More (looser)", bundle: .module)),
+                (10.0, String(localized: "Remove Less (tighter)", bundle: .module)),
+            ].map { .item($0.1, "picture.removeBackground", ["tolerance": .num($0.0)]) }
+        case "pictureFormat.corrections":
+            let steps = [-0.4, -0.2, 0.0, 0.2, 0.4]
+            return steps.map { .item(String(localized: "Brightness \(signedPercent($0))", bundle: .module), "picture.adjust", ["brightness": .num($0)]) }
+                + [.separator] + steps.map { .item(String(localized: "Contrast \(signedPercent($0))", bundle: .module), "picture.adjust", ["contrast": .num($0)]) }
+        case "pictureFormat.color":
+            return [0.0, 0.33, 0.66, 1.0, 1.5, 2.0, 3.0].map {
+                .item(String(localized: "Saturation \(Int(rustCast: ($0 * 100).rounded()))%", bundle: .module), "picture.adjust", ["saturation": .num($0)])
+            } + [.separator, .submenu(String(localized: "Recolor", bundle: .module), RecolorCommands.presets().map { .item($0.1, "picture.recolor", ["preset": .string($0.0)]) })]
+        case "pictureFormat.artistic":
+            return [.item(String(localized: "None", bundle: .module), "picture.artisticEffect", ["effect": "none"])]
+                + ArtisticCommands.effects.map { .item($0.1, "picture.artisticEffect", ["effect": .string($0.0)]) }
+        case "pictureFormat.transparency":
+            return [0.0, 0.15, 0.3, 0.5, 0.65, 0.8, 0.95].map { .item("\(Int(rustCast: ($0 * 100).rounded()))%", "picture.adjust", ["transparency": .num($0)]) }
+        case "pictureFormat.compress":
+            return compressions.map { .item($0.1, "picture.compress", ["ppi": .integer($0.0), "deleteCropped": true, "all": false]) }
+        case "pictureFormat.crop":
+            return [.submenu(String(localized: "Crop to Shape", bundle: .module), changeShape), .separator]
+                + [(0.1, String(localized: "Crop 10% each side", bundle: .module)), (0.2, String(localized: "Crop 20% each side", bundle: .module)),
+                   (0.0, String(localized: "Reset Crop", bundle: .module))].map {
+                    .item($0.1, "picture.crop", ["left": .num($0.0), "top": .num($0.0), "right": .num($0.0), "bottom": .num($0.0)])
+                }
+        // Table Design and Layout (`table.rs`)
+        case "tableDesign.borders":
+            let pen = RibbonModel.inspector?.tablePen ?? ["width": 1.0]
+            return tableBorders.map { which, label in
+                var p = pen
+                p.set("which", .string(which))
+                return .item(label, "table.borders", p)
+            }
+        case "tableLayout.delete":
+            return [
+                .item(String(localized: "Delete Columns", bundle: .module), "table.deleteColumn"),
+                .item(String(localized: "Delete Rows", bundle: .module), "table.deleteRow"),
+                .item(String(localized: "Delete Table", bundle: .module), "edit.delete"),
+            ]
+        case "tableLayout.margins":
+            return [
+                ("normal", String(localized: "Normal", bundle: .module, comment: "Table cell margins")), ("none", String(localized: "None", bundle: .module, comment: "Table cell margins")),
+                ("narrow", String(localized: "Narrow", bundle: .module, comment: "Table cell margins")), ("wide", String(localized: "Wide", bundle: .module, comment: "Table cell margins")),
+            ].map { .item($0.1, "table.cellMargins", ["preset": .string($0.0)]) }
+        // Chart Design (`chart.rs`): the chart's type, for the first selected shape.
+        case "chartDesign.changeType":
+            guard let first = doc?.selection.shapes.first else { return [] }
+            var out: [CommandMenuEntry] = []
+            for (i, group) in ChartMenu.types.enumerated() {
+                if i > 0 { out.append(.separator) }
+                out += group.map { .item($0.label, "chart.type", ["id": .integer(first.rawValue), "type": .string(ChartMenu.param($0))]) }
+            }
+            return out
+        // SmartArt Design (`smartart.rs`)
+        case "smartArtDesign.addShape":
+            guard let (gid, d) = doc.flatMap(SmartArtCommands.selected) else { return [] }
+            let index: JSON = d.nodes.isEmpty ? .null : .integer(smartArtRow(d))
+            return [
+                ("after", String(localized: "Add Shape After", bundle: .module)), ("before", String(localized: "Add Shape Before", bundle: .module)),
+                ("above", String(localized: "Add Shape Above", bundle: .module)), ("below", String(localized: "Add Shape Below", bundle: .module)),
+                ("assistant", String(localized: "Add Assistant", bundle: .module)),
+            ].map { .item($0.1, "smartArt.addNode", ["id": .integer(gid.rawValue), "index": index, "position": .string($0.0)]) }
+        case "smartArtDesign.convert":
+            guard let (gid, _) = doc.flatMap(SmartArtCommands.selected) else { return [] }
+            return [
+                .item(String(localized: "Convert to Text", bundle: .module), "smartArt.toText", ["id": .integer(gid.rawValue)]),
+                .item(String(localized: "Convert to Shapes", bundle: .module), "smartArt.toShapes", ["id": .integer(gid.rawValue)]),
+            ]
+        case "smartArtDesign.colors":
+            guard let (gid, _) = doc.flatMap(SmartArtCommands.selected) else { return [] }
+            var out: [CommandMenuEntry] = []
+            for (k, label) in SmartArtCommands.colors {
+                if k == "range23" || k == "accent1" || k == "accent1Grad" { out.append(.separator) }
+                out.append(.item(label, "smartArt.colors", ["id": .integer(gid.rawValue), "colors": .string(k)]))
+            }
+            return out
+        // Playback (`playback.rs`)
+        case "playback.volume":
+            return [
+                (0.25, String(localized: "Low", bundle: .module, comment: "Media volume")), (0.5, String(localized: "Medium", bundle: .module, comment: "Media volume")),
+                (1.0, String(localized: "High", bundle: .module, comment: "Media volume")), (0.0, String(localized: "Mute", bundle: .module, comment: "Media volume")),
+            ].map { .item($0.1, "media.options", ["volume": .num($0.0)]) }
+        // Masters (`masters.rs`)
+        case "slideMaster.insertPlaceholder":
+            return [
+                ("content", String(localized: "Content", bundle: .module, comment: "A placeholder kind")), ("text", String(localized: "Text", bundle: .module, comment: "A placeholder kind")),
+                ("picture", String(localized: "Picture", bundle: .module, comment: "A placeholder kind")), ("chart", String(localized: "Chart", bundle: .module, comment: "A placeholder kind")),
+                ("table", String(localized: "Table", bundle: .module, comment: "A placeholder kind")), ("media", String(localized: "Media", bundle: .module, comment: "A placeholder kind")),
+            ].map { .item($0.1, "master.insertPlaceholder", ["kind": .string($0.0)]) }
+        case "slideMaster.themes":
+            return builtinThemes().map { .item($0.name, "design.theme", ["name": .string($0.name)]) }
+                + [.separator, .item(L10n.commandLabel("app.browseThemeDialog", "Browse for Themes…"), "app.browseThemeDialog")]
+        case "handoutMaster.perPage":
+            return [1, 2, 3, 4, 6, 9].map {
+                .item($0 == 1 ? String(localized: "1 Slide", bundle: .module) : String(localized: "\($0) Slides", bundle: .module), "view.handoutSlides", ["count": .integer($0)])
+            }
         default:
             return arrangeControl(id, model)
         }
+    }
+
+    /// What an outline colour's popover has under its grid (`outline_menu`): Weight and Dashes, and Arrows for
+    /// a shape's outline. Picture Border has no Long Dash Dot, as in deckcraft.
+    public static func colorExtras(_ id: String) -> [CommandMenuEntry] {
+        guard RibbonLayout.control(id)?.command.id == "shape.line" else { return [] }
+        let weights: [CommandMenuEntry] = [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0, 4.5, 6.0].map {
+            .item(String(localized: "\(RibbonNumber.number($0)) pt", bundle: .module, comment: "A size in points"), "shape.line", ["width": .num($0)])
+        }
+        var dashes: [(String, String)] = [
+            ("solid", String(localized: "Solid", bundle: .module, comment: "A line dash")), ("sysDot", String(localized: "Round Dot", bundle: .module, comment: "A line dash")),
+            ("sysDash", String(localized: "Square Dot", bundle: .module, comment: "A line dash")), ("dash", String(localized: "Dash", bundle: .module, comment: "A line dash")),
+            ("dashDot", String(localized: "Dash Dot", bundle: .module, comment: "A line dash")), ("lgDash", String(localized: "Long Dash", bundle: .module, comment: "A line dash")),
+        ]
+        if id != "pictureFormat.border" { dashes.append(("lgDashDot", String(localized: "Long Dash Dot", bundle: .module, comment: "A line dash"))) }
+        var out: [CommandMenuEntry] = [
+            .submenu(String(localized: "Weight", bundle: .module, comment: "An outline's width"), weights),
+            .submenu(String(localized: "Dashes", bundle: .module), dashes.map { .item($0.1, "shape.line", ["dash": .string($0.0)]) }),
+        ]
+        if id != "pictureFormat.border" {
+            out.append(.submenu(String(localized: "Arrows", bundle: .module), [
+                ("none", "none", String(localized: "None", bundle: .module, comment: "No arrowheads")),
+                ("none", "triangle", String(localized: "Arrow at end", bundle: .module)), ("triangle", "none", String(localized: "Arrow at start", bundle: .module)),
+                ("triangle", "triangle", String(localized: "Arrows at both ends", bundle: .module)), ("none", "stealth", String(localized: "Stealth end", bundle: .module)),
+                ("oval", "oval", String(localized: "Oval ends", bundle: .module)),
+            ].map { .item($0.2, "shape.line", ["head": .string($0.0), "tail": .string($0.1)]) }))
+        }
+        return out
+    }
+
+    /// Change Shape and Crop to Shape: the presets by category, each `shape.change` (`shapes_gallery`'s caller).
+    static var changeShape: [CommandMenuEntry] {
+        Preset.Category.all.map { cat in
+            .submenu(cat.label, Preset.catalog.filter { $0.category == cat }.map { .item($0.label, CommandRef("shape.change", ["preset": .string($0.name)]), preset: $0.name) })
+        }
+    }
+
+    /// "+20%", "-40%", "+0%" (`{:+}%`).
+    static func signedPercent(_ v: Double) -> String {
+        let n = Int(rustCast: (v * 100).rounded())
+        return n < 0 ? "\(n)%" : "+\(n)%"
+    }
+
+    /// Compress Pictures' resolutions (`compress_menu`).
+    static var compressions: [(Int, String)] {
+        [
+            (330, String(localized: "HD (330 ppi): good quality for high-definition displays", bundle: .module)),
+            (220, String(localized: "Print (220 ppi): excellent quality on most printers and screens", bundle: .module)),
+            (150, String(localized: "Web (150 ppi): good for web pages and projectors", bundle: .module)),
+            (96, String(localized: "E-mail (96 ppi): minimise document size for sharing", bundle: .module)),
+        ]
+    }
+
+    /// Table Design › Borders (`table.rs`), each with the pen the Table pane sets.
+    static var tableBorders: [(String, String)] {
+        [
+            ("none", String(localized: "No Border", bundle: .module)), ("all", String(localized: "All Borders", bundle: .module)),
+            ("outside", String(localized: "Outside Borders", bundle: .module)), ("inside", String(localized: "Inside Borders", bundle: .module)),
+            ("top", String(localized: "Top Border", bundle: .module)), ("bottom", String(localized: "Bottom Border", bundle: .module)),
+            ("left", String(localized: "Left Border", bundle: .module)), ("right", String(localized: "Right Border", bundle: .module)),
+            ("insideH", String(localized: "Inside Horizontal Border", bundle: .module)), ("insideV", String(localized: "Inside Vertical Border", bundle: .module)),
+            ("diagDown", String(localized: "Diagonal Down Border", bundle: .module)), ("diagUp", String(localized: "Diagonal Up Border", bundle: .module)),
+        ]
+    }
+
+    /// The SmartArt Text Pane's current line, within the graphic (`smartart_row.min(n - 1)`).
+    static func smartArtRow(_ d: Diagram) -> Int {
+        Swift.min(RibbonModel.inspector?.smartartRow ?? 0, Swift.max(d.nodes.count - 1, 0))
     }
 
     /// The transition categories, as the Animate pane lists them.
@@ -251,8 +441,14 @@ public enum RibbonMenus {
                 .item($0 == 0 ? String(localized: "No Soft Edges", bundle: .module) : String(localized: "\(RibbonNumber.number($0)) pt", bundle: .module, comment: "A size in points"),
                       "shape.effects", ["softEdges": .num($0)])
             }),
+            .submenu(String(localized: "Bevel", bundle: .module), bevels.map { .item($0, "shape.effects", ["bevel": .string($0)]) }),
+            .separator,
+            .item(String(localized: "Format Shape…", bundle: .module), "view.pane", ["pane": "format", "tab": "effects"]),
         ]
     }
+
+    /// deckcraft's bevel presets, by their DrawingML names.
+    static let bevels = ["none", "circle", "relaxedInset", "cross", "coolSlant", "angle", "softRound", "convex", "slope", "divot", "riblet", "hardEdge", "artDeco"]
 }
 
 /// Numbers in menu titles as deckcraft writes them (`fmt_num`): two decimals at most, trailing zeros dropped.

@@ -915,6 +915,73 @@ restores), `AppController` (`applicationShouldOpenUntitledFile` asks `StartFeatu
   - The alpha gate's step 0 launches with nothing to open and checks that the window shows and no document exists.
     It then creates a deck from Harbor and checks for one document and a closed window, with a screenshot.
 
+### R2: contextual tabs and galleries (done 2026-10-28)
+
+The ten contextual tabs come after the regular ones when the selection has their object: Shape Format, Picture
+Format, Table Design and Layout, SmartArt Design, Chart Design, Playback, and the Slide, Notes and Handout Master
+tabs. Their titles are tinted with the accent colour. Galleries are tiles in the ribbon, with a "›" button for the
+rest.
+
+| File | What it holds |
+|---|---|
+| `DCAppModel/RibbonModel.swift` | `contextual` (`ribbon.rs` `contextual`, moved from `InspectorController`, which now calls it); `tabs(model)` (the regular tabs, then the contextual ones in that order); `selected(model)`; `settle`, which `AppModel.changed` calls: a contextual tab that no longer applies gives way to Home. The contextual check boxes (table style options, a clip's playback, Preserve, a master's title, footers and placeholders), Height and Width in the Preferences unit, Draw Table and Eraser, the colour defaults, and SmartArt's graphic and Text Pane line |
+| `DCAppModel/RibbonGalleries.swift` | Each gallery's items by category, the ones shown inline, the selection's, and the command a tile runs: themes, variants, transitions, animations, table styles, picture styles, quick styles, SmartArt layouts and SmartArt styles |
+| `DCAppModel/RibbonTileArt.swift` | The table-style and SmartArt tiles' pictures: DCRender's render of a sample table, or of `SmartArtCommands.preview`, in the presentation's theme. Pure and safe off the main thread |
+| `DCAppModel/RibbonMenus.swift` | The contextual tabs' menus, with deckcraft's parameters (`shape_format.rs`, `picture_format.rs`, `table.rs`, `chart.rs`, `smartart.rs`, `playback.rs`, `masters.rs`); Bevel and Format Shape… in Shape Effects; Weight, Dashes and Arrows under the outline colour grids (`colorExtras`) |
+| `DCApp/Ribbon/RibbonGallery.swift` | `RibbonGalleryView` (the inline row and "›"), `RibbonGalleryGrid` (the whole gallery by category, in a popover), the tiles, `RibbonArt` (renders the table and SmartArt tiles one at a time off the main thread and keeps them for the theme), and `RibbonShapesGrid` (`shapes_gallery`) |
+| `DCApp/Inspector/InspectorFormatPane.swift` | `QuickStyleTile`, now one view for the inspector's grid and the ribbon's gallery |
+
+- **Never switched to.**
+  - Selecting an object adds its tab and leaves the shown tab alone, as in deckcraft and PowerPoint.
+  - When the object is deselected, the tab gives way to Home (`ribbon.rs` `show`). Selecting it again stays on Home.
+  - Entering a master view adds its tab but doesn't show it. The spec found nothing in deckcraft that switches tabs.
+- **The theme gallery is the start window's tiles.** Each tile is `StartFeature.art`'s render of that theme's
+  title slide, so both show the same picture. Variants are `ThemeTile`s in the variant's colours.
+- **Tiles.**
+  - Transitions are an SF Symbol over the name.
+  - Animations are a star in the class's colour (a path for Motion Paths).
+  - Picture styles are drawn from `PictureStyleCommands.look`.
+  - Quick styles are the inspector's tile.
+  - Table styles and SmartArt are DCRender's, on white.
+  - No tile copies PowerPoint's art.
+  - There is no hover preview (§12).
+- **Inline rows** start at the selection's tile when it isn't among the first, as a gallery scrolled to it would.
+  Home › Quick Styles is a large button that opens the gallery, as PowerPoint's is; Shape Format's is inline.
+- **Slides Per Page** gets a UI command, `view.handoutSlides {count: 1|2|3|4|6|9}`. deckcraft keeps it as UI state
+  with no command, and a menu item needs one. The control channel's UI command count is 53.
+- **Changes from R0's table.**
+  - Crop is a menu (deckcraft's is not a split).
+  - Text Outline is a colour split.
+  - The table's vertical alignments are plain buttons (`format.state` has no anchor).
+  - Text Pane toggles.
+  - Handout Master has a Page Setup group.
+  - The notes and handout placeholder check boxes are named.
+- **Left to the inspector.**
+  - The Table pen's weight, style and colour: Borders uses the pen the Table pane sets.
+  - Text Fill's transparency slider.
+  - Set Transparent Color, which is an eyedropper on the canvas.
+  - Compress's options beyond the resolution.
+- **Tests.**
+  - `RibbonContextualTests` (DCAppModel), 9 tests:
+    - Each object kind shows its tabs, tested for each of the nine kinds.
+    - Tabs are never switched to.
+    - Every gallery has its sources.
+    - The theme tiles are the start window's.
+    - A gallery pick is one undo step and undoes in one.
+    - The tile renders come out as PNGs.
+    - It walks every contextual control with its object selected, over 250 commands. Each one the ribbon shows enabled must succeed, except seven listed as needing more state.
+    - Check boxes read their object.
+    - Height and Width use the Preferences unit.
+  - `RibbonWindowTests` gains two tests: every contextual tab draws with its object selected, and every expanded gallery and the Shapes grid draws.
+  - R1's walk now runs gallery picks too.
+  - Both walks run each command the first five times a control offers it, and the last time. Before this, R1's
+    walk ran all 1,368 items, the 270-preset shape menus among them, at about 17 ms of scratch session each.
+    That held the main actor for 25 s, past `UpdatesCenterTests`' 10 s wait for a check to report on it, so that
+    suite failed in R1's and R2's full runs and passed alone. That wait, and its download wait, are now 120 s. Both
+    return as soon as their condition holds.
+- **Screenshots**, through the control channel, of Shape Format, Picture Format, Table Design, Layout, Chart Design, SmartArt Design and the three master tabs, besides Design, Transitions and Animations with their tiles.
+  - `ui.screenshot` captures what was last drawn, which can be a redraw behind the last command. Wait a few seconds, or take the shot twice.
+
 ## lib.rs tests
 
 deckcraft's `crates/ui-egui/src/lib.rs` has 62 `#[test]`s (`mod tests`, at the pin). Each is triaged below: **already

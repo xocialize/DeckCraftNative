@@ -89,7 +89,7 @@ public enum RibbonMap {
         g("Playback", "Preview, Editing, Video Options, Volume", "inspector Format ▸ Playback (Play/Pause, Trim… dialog, options, Volume)", ["playback.preview", "playback.editing", "playback.options"]),
         g("Slide Master", "Edit Master, Master Layout, Edit Theme, Background, Close", "inspector Slide ▸ Slide Master", ["slideMaster.edit", "slideMaster.layout", "slideMaster.theme", "slideMaster.background", "slideMaster.close"]),
         g("Notes Master", "Placeholders, Background, Close", "inspector Slide ▸ Notes Master", ["notesMaster.placeholders", "notesMaster.background", "notesMaster.close"]),
-        g("Handout Master", "Page Setup, Placeholders, Background, Close", "inspector Slide ▸ Handout Master", ["handoutMaster.placeholders", "handoutMaster.background", "handoutMaster.close"]),
+        g("Handout Master", "Page Setup, Placeholders, Background, Close", "inspector Slide ▸ Handout Master", ["handoutMaster.pageSetup", "handoutMaster.placeholders", "handoutMaster.background", "handoutMaster.close"]),
         // Title bar
         g("Title bar", "Quick Access Toolbar", "toolbar items, customisable; `app.qat` adds and removes them", [], extra: ["app.qat"]),
         g("Title bar", "Search, Present, Comments, Light/Dark", "Help ▸ Command Palette; toolbar Play; toolbar Comment / Review tab; View ▸ Dark Mode", [], extra: ["app.palette", "show.start", "view.pane", "view.dark"]),

@@ -227,6 +227,16 @@
         }
       }
     },
+    "%lld Slides" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Slides"
+          }
+        }
+      }
+    },
     "%lld×%lld Table" : {
       "comment" : "Columns × rows",
       "localizations" : {
@@ -296,6 +306,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+ Series"
+          }
+        }
+      }
+    },
+    "1 Slide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Slide"
           }
         }
       }
@@ -557,6 +577,16 @@
         }
       }
     },
+    "Add Assistant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Assistant"
+          }
+        }
+      }
+    },
     "Add Horizontal Guide" : {
       "localizations" : {
         "en" : {
@@ -593,6 +623,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Section"
+          }
+        }
+      }
+    },
+    "Add Shape Above" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape Above"
+          }
+        }
+      }
+    },
+    "Add Shape After" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape After"
+          }
+        }
+      }
+    },
+    "Add Shape Before" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape Before"
+          }
+        }
+      }
+    },
+    "Add Shape Below" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape Below"
           }
         }
       }
@@ -813,6 +883,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alignment:"
+          }
+        }
+      }
+    },
+    "All Borders" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Borders"
           }
         }
       }
@@ -1272,6 +1352,16 @@
         }
       }
     },
+    "Bottom Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom Border"
+          }
+        }
+      }
+    },
     "Bottom Left" : {
       "localizations" : {
         "en" : {
@@ -1288,6 +1378,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bottom Right"
+          }
+        }
+      }
+    },
+    "Brightness %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brightness %@"
           }
         }
       }
@@ -1515,6 +1615,16 @@
         }
       }
     },
+    "Change Shape" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Shape"
+          }
+        }
+      }
+    },
     "Change to:" : {
       "localizations" : {
         "en" : {
@@ -1536,6 +1646,7 @@
       }
     },
     "Chart" : {
+      "comment" : "A placeholder kind",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1727,6 +1838,47 @@
         }
       }
     },
+    "Content" : {
+      "comment" : "A placeholder kind",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content"
+          }
+        }
+      }
+    },
+    "Contrast %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrast %@"
+          }
+        }
+      }
+    },
+    "Convert to Shapes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to Shapes"
+          }
+        }
+      }
+    },
+    "Convert to Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to Text"
+          }
+        }
+      }
+    },
     "Copied the path" : {
       "localizations" : {
         "en" : {
@@ -1813,6 +1965,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create New Theme Fonts"
+          }
+        }
+      }
+    },
+    "Crop 10% each side" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop 10% each side"
+          }
+        }
+      }
+    },
+    "Crop 20% each side" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop 20% each side"
+          }
+        }
+      }
+    },
+    "Crop to Shape" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop to Shape"
           }
         }
       }
@@ -1937,7 +2119,19 @@
         }
       }
     },
+    "Cycle" : {
+      "comment" : "A category of SmartArt layouts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cycle"
+          }
+        }
+      }
+    },
     "Dark" : {
+      "comment" : "A family of table styles",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2065,7 +2259,7 @@
       }
     },
     "Dash" : {
-      "comment" : "line dash style",
+      "comment" : "A line dash\nline dash style",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2076,6 +2270,7 @@
       }
     },
     "Dash Dot" : {
+      "comment" : "A line dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2121,6 +2316,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dashed vertical"
+          }
+        }
+      }
+    },
+    "Dashes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashes"
           }
         }
       }
@@ -2215,6 +2420,16 @@
         }
       }
     },
+    "Delete Columns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Columns"
+          }
+        }
+      }
+    },
     "Delete Point" : {
       "localizations" : {
         "en" : {
@@ -2235,12 +2450,52 @@
         }
       }
     },
+    "Delete Rows" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Rows"
+          }
+        }
+      }
+    },
     "Delete Segment" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Segment"
+          }
+        }
+      }
+    },
+    "Delete Table" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Table"
+          }
+        }
+      }
+    },
+    "Diagonal Down Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonal Down Border"
+          }
+        }
+      }
+    },
+    "Diagonal Up Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonal Up Border"
           }
         }
       }
@@ -2485,6 +2740,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dynamic Content"
+          }
+        }
+      }
+    },
+    "E-mail (96 ppi): minimise document size for sharing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail (96 ppi): minimise document size for sharing"
           }
         }
       }
@@ -2923,6 +3188,16 @@
         }
       }
     },
+    "Follow Path" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow Path"
+          }
+        }
+      }
+    },
     "Follow the layout" : {
       "localizations" : {
         "en" : {
@@ -3326,6 +3601,16 @@
         }
       }
     },
+    "HD (330 ppi): good quality for high-definition displays" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HD (330 ppi): good quality for high-definition displays"
+          }
+        }
+      }
+    },
     "Half" : {
       "comment" : "A reflection",
       "localizations" : {
@@ -3530,11 +3815,23 @@
       }
     },
     "Hierarchy" : {
+      "comment" : "A category of SmartArt layouts",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hierarchy"
+          }
+        }
+      }
+    },
+    "High" : {
+      "comment" : "Media volume",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
           }
         }
       }
@@ -3795,6 +4092,36 @@
         }
       }
     },
+    "Inside Borders" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inside Borders"
+          }
+        }
+      }
+    },
+    "Inside Horizontal Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inside Horizontal Border"
+          }
+        }
+      }
+    },
+    "Inside Vertical Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inside Vertical Border"
+          }
+        }
+      }
+    },
     "Inspect Presentation: before you share it, check it for things people with disabilities might find hard to read." : {
       "localizations" : {
         "en" : {
@@ -4008,6 +4335,16 @@
         }
       }
     },
+    "Left Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Border"
+          }
+        }
+      }
+    },
     "Less Brightness" : {
       "localizations" : {
         "en" : {
@@ -4039,6 +4376,7 @@
       }
     },
     "Light" : {
+      "comment" : "A family of table styles",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4238,6 +4576,17 @@
         }
       }
     },
+    "List" : {
+      "comment" : "A category of SmartArt layouts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
     "Lock" : {
       "localizations" : {
         "en" : {
@@ -4259,6 +4608,7 @@
       }
     },
     "Long Dash" : {
+      "comment" : "A line dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4269,6 +4619,7 @@
       }
     },
     "Long Dash Dot" : {
+      "comment" : "A line dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4305,6 +4656,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loose"
+          }
+        }
+      }
+    },
+    "Low" : {
+      "comment" : "Media volume",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
           }
         }
       }
@@ -4380,6 +4742,7 @@
       }
     },
     "Matrix" : {
+      "comment" : "A category of SmartArt layouts",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4410,6 +4773,7 @@
       }
     },
     "Media" : {
+      "comment" : "A placeholder kind",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4420,7 +4784,7 @@
       }
     },
     "Medium" : {
-      "comment" : "arrow size",
+      "comment" : "A family of table styles\nMedia volume\narrow size",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4542,12 +4906,34 @@
         }
       }
     },
+    "Mute" : {
+      "comment" : "Media volume",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute"
+          }
+        }
+      }
+    },
     "Name:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name:"
+          }
+        }
+      }
+    },
+    "Narrow" : {
+      "comment" : "Table cell margins",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Narrow"
           }
         }
       }
@@ -4632,6 +5018,16 @@
         }
       }
     },
+    "No Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Border"
+          }
+        }
+      }
+    },
     "No Glow" : {
       "localizations" : {
         "en" : {
@@ -4668,6 +5064,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Soft Edges"
+          }
+        }
+      }
+    },
+    "No Transform" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Transform"
           }
         }
       }
@@ -4723,7 +5129,7 @@
       }
     },
     "None" : {
-      "comment" : "no arrowheads\nno mirroring / no arrow",
+      "comment" : "No arrowheads\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4734,7 +5140,7 @@
       }
     },
     "Normal" : {
-      "comment" : "character spacing",
+      "comment" : "Table cell margins\ncharacter spacing",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4987,6 +5393,16 @@
         }
       }
     },
+    "Outside Borders" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outside Borders"
+          }
+        }
+      }
+    },
     "Oval" : {
       "comment" : "arrowhead kind",
       "localizations" : {
@@ -5181,6 +5597,7 @@
       }
     },
     "Picture" : {
+      "comment" : "A category of SmartArt layouts\nA placeholder kind",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5257,6 +5674,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plaid"
+          }
+        }
+      }
+    },
+    "Plain" : {
+      "comment" : "Table styles without colours",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain"
           }
         }
       }
@@ -5423,12 +5851,33 @@
         }
       }
     },
+    "Print (220 ppi): excellent quality on most printers and screens" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print (220 ppi): excellent quality on most printers and screens"
+          }
+        }
+      }
+    },
     "Print layout:" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Print layout:"
+          }
+        }
+      }
+    },
+    "Process" : {
+      "comment" : "A category of SmartArt layouts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Process"
           }
         }
       }
@@ -5475,11 +5924,22 @@
       }
     },
     "Pyramid" : {
+      "comment" : "A category of SmartArt layouts",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pyramid"
+          }
+        }
+      }
+    },
+    "Recolor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recolor"
           }
         }
       }
@@ -5545,6 +6005,17 @@
         }
       }
     },
+    "Relationship" : {
+      "comment" : "A category of SmartArt layouts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relationship"
+          }
+        }
+      }
+    },
     "Remove" : {
       "localizations" : {
         "en" : {
@@ -5561,6 +6032,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove All Sections"
+          }
+        }
+      }
+    },
+    "Remove Background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Background"
+          }
+        }
+      }
+    },
+    "Remove Less (tighter)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Less (tighter)"
+          }
+        }
+      }
+    },
+    "Remove More (looser)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove More (looser)"
           }
         }
       }
@@ -5737,6 +6238,16 @@
         }
       }
     },
+    "Reset Crop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Crop"
+          }
+        }
+      }
+    },
     "Reset Slide" : {
       "localizations" : {
         "en" : {
@@ -5848,6 +6359,16 @@
         }
       }
     },
+    "Right Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Border"
+          }
+        }
+      }
+    },
     "Rotate" : {
       "localizations" : {
         "en" : {
@@ -5940,6 +6461,7 @@
       }
     },
     "Round Dot" : {
+      "comment" : "A line dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5975,6 +6497,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sample deck: Northern Lights"
+          }
+        }
+      }
+    },
+    "Saturation %lld%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saturation %lld%%"
           }
         }
       }
@@ -6562,6 +7094,17 @@
         }
       }
     },
+    "Slides Per Page: %lld" : {
+      "comment" : "Handout Master: how many slides a handout page holds",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides Per Page: %lld"
+          }
+        }
+      }
+    },
     "Slides from Outline" : {
       "localizations" : {
         "en" : {
@@ -6703,6 +7246,16 @@
         }
       }
     },
+    "Smooth Corners" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smooth Corners"
+          }
+        }
+      }
+    },
     "Smooth Point" : {
       "localizations" : {
         "en" : {
@@ -6754,7 +7307,7 @@
       }
     },
     "Solid" : {
-      "comment" : "line dash",
+      "comment" : "A line dash\nline dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6936,6 +7489,7 @@
       }
     },
     "Square Dot" : {
+      "comment" : "A line dash",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7179,6 +7733,7 @@
       }
     },
     "Table" : {
+      "comment" : "A placeholder kind",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7229,6 +7784,7 @@
       }
     },
     "Text" : {
+      "comment" : "A placeholder kind",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7615,6 +8171,16 @@
         }
       }
     },
+    "Top Border" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top Border"
+          }
+        }
+      }
+    },
     "Top Left" : {
       "localizations" : {
         "en" : {
@@ -7890,6 +8456,16 @@
         }
       }
     },
+    "Warp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warp"
+          }
+        }
+      }
+    },
     "Wave" : {
       "localizations" : {
         "en" : {
@@ -7920,6 +8496,16 @@
         }
       }
     },
+    "Web (150 ppi): good for web pages and projectors" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web (150 ppi): good for web pages and projectors"
+          }
+        }
+      }
+    },
     "Web Page or File" : {
       "localizations" : {
         "en" : {
@@ -7930,12 +8516,34 @@
         }
       }
     },
+    "Weight" : {
+      "comment" : "An outline's width",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weight"
+          }
+        }
+      }
+    },
     "Whole presentation" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Whole presentation"
+          }
+        }
+      }
+    },
+    "Wide" : {
+      "comment" : "Table cell margins",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wide"
           }
         }
       }

@@ -36,6 +36,8 @@ public enum UICommands {
         .init(id: "view.collapseRibbon", label: "Collapse the Ribbon", shortcut: "Cmd+F1", params: "{}"),
         // The app's own: the ribbon is an optional window layout here (Docs/plans/Ribbon-and-StartScreen.md §6).
         .init(id: "view.ribbon", label: "Ribbon", shortcut: "Cmd+Alt+R", params: "{on?: bool}"),
+        // Handout Master › Slides Per Page: deckcraft keeps it as UI state with no command (R2 gives it one).
+        .init(id: "view.handoutSlides", label: "Slides Per Page", shortcut: nil, params: "{count: 1|2|3|4|6|9}"),
         .init(id: "view.dark", label: "Dark Mode", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.grayscale", label: "Grayscale", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.newWindow", label: "New Window", shortcut: nil, params: "{on?: bool, slide?: index, delta?: int}"),

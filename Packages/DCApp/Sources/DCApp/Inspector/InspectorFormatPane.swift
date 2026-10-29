@@ -610,9 +610,9 @@ struct QuickStyleGrid: View {
         Grid(horizontalSpacing: Tokens.Space.xs, verticalSpacing: Tokens.Space.xs) {
             ForEach(0 ..< InspectorShape.quickStyleRows, id: \.self) { row in
                 GridRow {
-                    ForEach(Array(InspectorShape.quickStyleSlots.enumerated()), id: \.offset) { col, slot in
+                    ForEach(0 ..< InspectorShape.quickStyleSlots.count, id: \.self) { col in
                         let index = InspectorShape.quickStyleIndex(row: row, column: col)
-                        Button { pick(index) } label: { tile(row, scheme.get(slot)) }
+                        Button { pick(index) } label: { QuickStyleTile(scheme: scheme, index: index).frame(height: Tokens.Space.xl) }
                             .buttonStyle(.plain)
                             .help(String(localized: "Style \(index + 1)", bundle: .module))
                             .accessibilityLabel(String(localized: "Quick Style \(index + 1)", bundle: .module))
@@ -621,10 +621,19 @@ struct QuickStyleGrid: View {
             }
         }
     }
+}
 
-    /// The tile as deckcraft paints it: outlined on the light colour, a light tint, a darker fill, or solid.
-    private func tile(_ row: Int, _ c: Rgba) -> some View {
-        let light = scheme.get(.lt1).swiftUI, dark = scheme.get(.dk1).swiftUI, accent = c.swiftUI
+/// One Quick Style tile as deckcraft paints it: outlined on the light colour, a light tint, a darker fill, or solid.
+/// The inspector's grid and the ribbon's gallery both draw it.
+struct QuickStyleTile: View {
+    let scheme: DCColor.ColorScheme
+    let index: Int
+
+    var body: some View {
+        let n = Swift.max(InspectorShape.quickStyleSlots.count, 1)
+        let row = index / n
+        let slot = InspectorShape.quickStyleSlots.at(index % n) ?? .accent1
+        let light = scheme.get(.lt1).swiftUI, dark = scheme.get(.dk1).swiftUI, accent = scheme.get(slot).swiftUI
         let shape = RoundedRectangle(cornerRadius: Tokens.Radius.control / 2)
         let (fill, stroke, text): (Color, Color, Color) = switch row {
         case 0: (light, accent, dark)
@@ -632,9 +641,8 @@ struct QuickStyleGrid: View {
         case 5: (accent.mix(with: dark, by: 0.25), light, light)
         default: (accent, accent.mix(with: dark, by: 0.3), light)
         }
-        return shape.fill(fill)
+        shape.fill(fill)
             .overlay(shape.strokeBorder(stroke, lineWidth: Tokens.Layout.hairline * 1.5))
             .overlay(Text(verbatim: "Abc").font(Tokens.Font.caption).foregroundStyle(text))
-            .frame(height: Tokens.Space.xl)
     }
 }

@@ -1,5 +1,6 @@
-// DCApp — the ribbon (Docs/plans/Ribbon-and-StartScreen.md §4, R1): the tab row and the selected tab's groups, drawn
-// from DCAppModel's `RibbonLayout` with what `RibbonModel` answers. Ports the drawing of deckcraft
+// DCApp — the ribbon (Docs/plans/Ribbon-and-StartScreen.md §4, R1, R2): the tab row, with the contextual tabs the
+// selection brings tinted, and the selected tab's groups, drawn from DCAppModel's `RibbonLayout` with what
+// `RibbonModel` answers. Ports the drawing of deckcraft
 // `crates/ui-egui/src/ribbon.rs` and `widgets.rs` (`big_button`, `small_button`, `split_menu`; MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors) with native controls: every control runs its registry command
 // through `ToolbarCatalog.perform`, as the toolbar's items do. Group captions are hidden, as PowerPoint for Mac
@@ -25,7 +26,7 @@ struct RibbonView: View {
     var body: some View {
         // `revision` bumps after every command: the toggles and the enabled state follow it.
         let _ = model.revision
-        let tab = RibbonModel.selected(model.ui)
+        let tab = RibbonModel.selected(model)
         let fmt = RibbonModel.formatState(model.session)
         VStack(spacing: 0) {
             tabRow(tab)
@@ -48,11 +49,13 @@ struct RibbonView: View {
 
     private func tabRow(_ selected: RibbonTab) -> some View {
         HStack(spacing: Tokens.Space.xs) {
-            ForEach(RibbonModel.tabs, id: \.id) { t in
+            ForEach(RibbonModel.tabs(model), id: \.id) { t in
                 let on = t.id == selected.id
                 Button { run(CommandRef("view.tab", ["tab": .string(t.title)])) } label: {
                     Text(t.title)
                         .fontWeight(on ? .semibold : .regular)
+                        // Contextual tabs are tinted with the accent colour (§3), as deckcraft's are.
+                        .foregroundStyle(t.contextual == nil ? Color.primary : Color.accentColor)
                         .padding(.horizontal, Tokens.Space.s)
                         .padding(.vertical, Tokens.Space.xs / 2)
                         .overlay(alignment: .bottom) {
@@ -118,6 +121,7 @@ struct RibbonControlView: View {
     let fmt: JSON
     let size: RibbonSize
     @State private var colorOpen = false
+    @State private var shapesOpen = false
 
     private var label: String { RibbonModel.label(control) }
     private var symbol: String { RibbonModel.symbol(control) }
@@ -137,7 +141,11 @@ struct RibbonControlView: View {
         case .split: split
         case .menu, .dropdown: menu
         case .gallery:
-            if RibbonModel.primary(control, model) != nil { button } else { menu }
+            if RibbonModel.inlineGallery(control) {
+                RibbonGalleryView(control: control, model: model, enabled: enabled)
+            } else {
+                RibbonGalleryButton(control: control, model: model) { VStack(spacing: 2) { icon(true); menuLabel }.frame(minWidth: 44, maxWidth: 80) }
+            }
         case .check: check
         case .spinner(let field): spinner(field)
         case .color: color
@@ -183,7 +191,9 @@ struct RibbonControlView: View {
     /// A split control: the main half runs the command, the arrow opens the menu. Large splits put the label and
     /// arrow under the icon, as PowerPoint's do; the others are a native split menu button.
     @ViewBuilder private var split: some View {
-        if size == .large {
+        if case .split(.shapes?) = control.kind {
+            shapes
+        } else if size == .large {
             VStack(spacing: 0) {
                 Button { RibbonActions.press(control, model) } label: { icon(true) }
                     .buttonStyle(.borderless)
@@ -200,6 +210,37 @@ struct RibbonControlView: View {
             .menuStyle(.borderlessButton)
             .fixedSize()
             .accessibilityLabel(label)
+        }
+    }
+
+    /// Shapes: the main half inserts a rectangle, the arrow opens the shapes grid (`shapes_gallery`).
+    private var shapes: some View {
+        let options = String(localized: "\(label) options", bundle: .module, comment: "A split button's menu half: the control's title, then 'options'")
+        return Group {
+            if size == .large {
+                VStack(spacing: 0) {
+                    Button { RibbonActions.press(control, model) } label: { icon(true) }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(label)
+                    Button { shapesOpen.toggle() } label: { menuLabel }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(options)
+                }
+                .frame(minWidth: 44, maxWidth: 76)
+            } else {
+                HStack(spacing: 0) {
+                    Button { RibbonActions.press(control, model) } label: { face }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(label)
+                    Button { shapesOpen.toggle() } label: { Image(systemName: "chevron.down").imageScale(.small) }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(options)
+                }
+                .fixedSize()
+            }
+        }
+        .popover(isPresented: $shapesOpen, arrowEdge: .bottom) {
+            RibbonShapesGrid(entries: RibbonModel.menu(control, model), model: model) { shapesOpen = false }
         }
     }
 
@@ -246,10 +287,11 @@ struct RibbonControlView: View {
     }
 
     private func spinner(_ field: String) -> some View {
-        NumberField(label: label, value: RibbonModel.spinnerValue(control, field, model) ?? 0, step: 0.25, suffix: " s", range: 0 ... 600) {
-            RibbonActions.run(RibbonModel.spin(control, field, $0))
+        let f = RibbonModel.spinnerFormat(control, model)
+        return NumberField(label: label, value: RibbonModel.spinnerValue(control, field, model) ?? 0, step: f.step, suffix: f.suffix, range: f.range) {
+            RibbonActions.run(RibbonModel.spin(control, field, $0, units: model.session.prefs.units))
         }
-        .frame(width: 150)
+        .frame(width: control.command.id == "shape.resize" ? 130 : 150)
     }
 
     /// A colour split (`color_split`): the main half reapplies the last colour, the arrow opens the colour grid.
@@ -259,7 +301,7 @@ struct RibbonControlView: View {
             Button {
                 switch control.command.id {
                 case "shape.fill": ctl?.shapeFillButton()
-                case "shape.line": ctl?.shapeOutlineButton()
+                case "shape.line" where control.id != "pictureFormat.border": ctl?.shapeOutlineButton()
                 default: RibbonActions.press(control, model)
                 }
             } label: { face }
@@ -269,19 +311,30 @@ struct RibbonControlView: View {
                 .buttonStyle(.borderless)
                 .accessibilityLabel(String(localized: "\(label) options", bundle: .module, comment: "A split button's menu half: the control's title, then 'options'"))
                 .popover(isPresented: $colorOpen, arrowEdge: .bottom) {
-                    ColorGrid(scheme: InspectorColors.scheme(model.session), noneLabel: noneLabel) { c in
-                        colorOpen = false
-                        pick(c, ctl)
+                    VStack(alignment: .leading, spacing: Tokens.Space.s) {
+                        ColorGrid(scheme: InspectorColors.scheme(model.session), noneLabel: noneLabel) { c in
+                            colorOpen = false
+                            pick(c, ctl)
+                        }
+                        // An outline's weight, dashes and arrows (`outline_menu`).
+                        let extras = RibbonMenus.colorExtras(control.id)
+                        if !extras.isEmpty {
+                            Divider()
+                            HStack { RibbonMenuItems(entries: extras, model: model) }.fixedSize()
+                        }
                     }
+                    .padding(extrasPadding)
                 }
         }
         .fixedSize()
     }
 
+    private var extrasPadding: CGFloat { RibbonMenus.colorExtras(control.id).isEmpty ? 0 : Tokens.Space.s }
+
     private var noneLabel: String? {
         switch control.command.id {
-        case "shape.fill": String(localized: "No Fill", bundle: .module)
-        case "shape.line": String(localized: "No Outline", bundle: .module)
+        case "shape.fill", "table.cellFill": String(localized: "No Fill", bundle: .module)
+        case "shape.line", "format.textOutline": String(localized: "No Outline", bundle: .module)
         case "format.highlight": String(localized: "No Color", bundle: .module)
         default: nil
         }
@@ -290,7 +343,11 @@ struct RibbonControlView: View {
     private func pick(_ c: ColorRef?, _ ctl: InspectorController?) {
         switch control.command.id {
         case "shape.fill": ctl?.pickFill(c)
+        // Picture Border is a frame of its own: it doesn't change the outline colour Shape Outline reapplies.
+        case "shape.line" where control.id == "pictureFormat.border":
+            RibbonActions.run(CommandRef("shape.line", c.map { ["color": InspectorColors.param($0)] } ?? ["none": true]))
         case "shape.line": ctl?.pickOutline(c)
+        case "table.cellFill": RibbonActions.run(CommandRef("table.cellFill", c.map { ["color": InspectorColors.param($0)] } ?? ["none": true]))
         default: RibbonActions.run(CommandRef(control.command.id, ["color": c.map(InspectorColors.param) ?? .null]))
         }
     }

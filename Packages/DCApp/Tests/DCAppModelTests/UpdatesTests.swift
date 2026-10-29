@@ -409,9 +409,11 @@ final class Seen: @unchecked Sendable {
         return (c, n)
     }
 
-    /// Waits until the running check has reported (`settle`).
+    /// Waits until the running check has reported (`settle`). The check reports on the main actor, which the
+    /// other main-actor suites hold for whole tests at a time in a full run, so the deadline is generous: a
+    /// passing check returns as soon as it reports.
     func settle(_ c: UpdateCenter) async {
-        let deadline = Date().addingTimeInterval(10)
+        let deadline = Date().addingTimeInterval(120)
         while c.isChecking && Date() < deadline { try? await Task.sleep(for: .milliseconds(5)) }
     }
 
@@ -547,7 +549,7 @@ final class Seen: @unchecked Sendable {
             return
         }
         #expect(c.progress != nil)
-        let deadline = Date().addingTimeInterval(10)
+        let deadline = Date().addingTimeInterval(120)
         while n.opened.isEmpty && Date() < deadline { try await Task.sleep(for: .milliseconds(5)) }
         let file = dir.appending(path: "DeckCraftNative-0.2.0.dmg")
         #expect(n.opened.map(\.standardizedFileURL) == [file.standardizedFileURL])

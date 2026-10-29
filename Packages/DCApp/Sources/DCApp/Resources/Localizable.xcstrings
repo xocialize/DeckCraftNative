@@ -3036,6 +3036,17 @@
         }
       }
     },
+    "Icons, WordArt and More" : {
+      "comment" : "The rest of the Shapes menu, under its grid",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons, WordArt and More"
+          }
+        }
+      }
+    },
     "Ideas for this slide" : {
       "localizations" : {
         "en" : {
@@ -3597,6 +3608,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mirror"
+          }
+        }
+      }
+    },
+    "More %@" : {
+      "comment" : "The button that expands a ribbon gallery",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More %@"
           }
         }
       }
@@ -5637,6 +5659,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show Slide"
+          }
+        }
+      }
+    },
+    "Show all %@" : {
+      "comment" : "The button that expands a ribbon gallery; the gallery's name follows",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show all %@"
           }
         }
       }
