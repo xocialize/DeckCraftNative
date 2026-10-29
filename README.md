@@ -5,7 +5,7 @@ A native macOS presentation editor in Swift, AppKit, SwiftUI and Metal. It is a 
 keeps DeckCraft's engine and behaviour, file for file and command for command, and replaces the rest with macOS
 frameworks.
 
-**[Download DeckCraftNative 0.1.3](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
+**[Download DeckCraftNative 0.1.4](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
 later on Apple silicon. The app is signed with a Developer ID and notarized by Apple. It's an early preview.
 
 ## What it does
