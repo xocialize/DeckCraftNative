@@ -23,6 +23,7 @@ final class OutlineViewController: NSViewController, NSTableViewDataSource, NSTa
     private var entries: [Int: OutlineEntry] = [:]
     private var lastWidth: CGFloat = 0
     private var lastSlide: Int?
+    private var observers: [any NSObjectProtocol] = []
 
     static let titleFont = NSFont.systemFont(ofSize: NSFont.systemFontSize + 1, weight: .semibold)
     static let bodyFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
@@ -54,10 +55,22 @@ final class OutlineViewController: NSViewController, NSTableViewDataSource, NSTa
         scroll.hasVerticalScroller = true
         scroll.drawsBackground = false
         view = scroll
+        // The scroll view retiles when it switches between overlay and legacy scrollers (a mouse plugged in or taken
+        // out, or AppKit settling it just after launch) without laying this view out. The scroller doesn't hide, so
+        // the width can't depend on the rows' heights. After 0.1.5 the rows kept heights measured wider and clipped
+        // text that wrapped onto more lines.
+        observers.append(NotificationCenter.default.addObserver(forName: NSView.frameDidChangeNotification, object: scroll.contentView, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.widthChanged() }
+        })
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
+        widthChanged()
+    }
+
+    /// Measure the rows again when the width they are laid out in changed.
+    private func widthChanged() {
         let w = scroll.contentSize.width
         if abs(w - lastWidth) > 0.5 {
             lastWidth = w

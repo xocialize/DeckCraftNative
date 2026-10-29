@@ -298,6 +298,39 @@ import Testing
         #expect(link.state?.selection.slide == 2)
     }
 
+    // After 0.1.5: a legacy scroller that comes in after the window opens narrows the outline, and its rows were left
+    // at the heights measured wider, too short for text that now wraps onto more lines.
+    @Test func outlineRowsFollowTheScrollerStyle() throws {
+        let s = Session()
+        try Sample.openSample(s)
+        let m = AppModel(session: s)
+        let uid = try #require(s.activeDoc?.uid)
+        let link = DocLink(model: m) { uid }
+        let outline = OutlineViewController(link: link)
+        let w = window(outline, NSSize(width: 240, height: 900))
+        defer { w.close() }
+        let st = try #require(link.state)
+        let e = try #require(OutlineLogic.entry(st.doc, 0))
+        outline.commit(0, shape: e.titleShape, old: e.title,
+                       text: "A long title that wraps onto several lines in a narrow outline, so a narrower column needs more of them")
+        outline.refresh()
+        outline.scroll.scrollerStyle = .overlay
+        w.layoutIfNeeded()
+        outline.table.layoutSubtreeIfNeeded()
+        let overlay = outline.table.rect(ofRow: 0).height
+        // AppKit retiles the scroll view for the new style without laying the outline out.
+        outline.scroll.scrollerStyle = .legacy
+        outline.scroll.tile()
+        outline.table.layoutSubtreeIfNeeded()
+        #expect(outline.table.rect(ofRow: 0).height > overlay)
+        let rows = outline.table.rows(in: outline.table.visibleRect)
+        #expect(rows.length > 0)
+        for row in rows.location ..< rows.location + rows.length {
+            let cell = try #require(outline.table.view(atColumn: 0, row: row, makeIfNecessary: false) as? OutlineRowView)
+            #expect(outline.table.rect(ofRow: row).height == cell.measure(width: outline.scroll.contentSize.width), "row \(row)")
+        }
+    }
+
     // MARK: Notes
 
     // status.rs notes_pane: an edited draft is saved to the slide it was written on when another slide shows

@@ -87,8 +87,9 @@ enum AutomationFeature {
                     return
                 }
                 // The window as the screen shows it (sidebar and inspector materials included) when the app
-                // may record the screen; else the views drawn offscreen, which leaves materials blank.
-                guard CGPreflightScreenCaptureAccess() else {
+                // may record the screen and no other app's window covers it; else the views drawn offscreen,
+                // which leaves materials blank.
+                guard CGPreflightScreenCaptureAccess(), !isCovered(window) else {
                     reply(capture(window, path))
                     return
                 }
@@ -98,7 +99,7 @@ enum AutomationFeature {
                 let once = ReplyOnce(reply)
                 Task { @MainActor in
                     let image = await screenImage(id)
-                    once.send(image.map { encode(NSBitmapImageRep(cgImage: $0), path) } ?? capture(window, path))
+                    once.send(image.map { encode(NSBitmapImageRep(cgImage: $0), path, source: "screen") } ?? capture(window, path))
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + captureWait) {
                     MainActor.assumeIsolated { once.send(capture(window, path)) }
@@ -120,6 +121,35 @@ enum AutomationFeature {
         return try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
     }
 
+    /// Whether another app's window covers part of `window`. ScreenCaptureKit then hands back the window as it was
+    /// last composited, not as it is: after 0.1.5, three captures of a window under this session's own app gave the
+    /// same frame while the window went from the Mac layout to the ribbon and back.
+    static func isCovered(_ window: NSWindow) -> Bool {
+        guard let main = NSScreen.screens.first,
+              let above = CGWindowListCopyWindowInfo([.optionOnScreenAboveWindow], CGWindowID(window.windowNumber)) as? [[String: Any]]
+        else { return false }
+        // Window-server bounds have their origin at the main display's top left, y down.
+        let f = window.frame
+        let rect = CGRect(x: f.minX, y: main.frame.maxY - f.maxY, width: f.width, height: f.height)
+        return covers(above, rect, pid: ProcessInfo.processInfo.processIdentifier)
+    }
+
+    /// Whether any of `windows` (the window server's descriptions of the windows above one) overlaps `rect`: a
+    /// visible window of another process, from the normal level up to the Dock's (the menu bar and the Dock are
+    /// above every window and never cover the part of it that is captured).
+    nonisolated static func covers(_ windows: [[String: Any]], _ rect: CGRect, pid: Int32) -> Bool {
+        let dock = Int(CGWindowLevelForKey(.dockWindow))
+        return windows.contains { w in
+            guard (w[kCGWindowOwnerPID as String] as? Int).map(Int32.init) != pid,
+                  let layer = w[kCGWindowLayer as String] as? Int, layer >= 0, layer < dock,
+                  (w[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+                  let d = w[kCGWindowBounds as String] as? NSDictionary,
+                  let b = CGRect(dictionaryRepresentation: d)
+            else { return false }
+            return b.intersects(rect)
+        }
+    }
+
     static func capture(_ window: NSWindow, _ path: String?) -> JSON {
         guard let frame = window.contentView?.superview ?? window.contentView else {
             return ["ok": false, "error": "no window to capture"]
@@ -130,24 +160,28 @@ enum AutomationFeature {
             return ["ok": false, "error": "the screenshot has no usable image size"]
         }
         frame.cacheDisplay(in: bounds, to: rep)
-        return encode(rep, path)
+        return encode(rep, path, source: "offscreen")
     }
 
-    /// `save_screenshot`: the PNG written to `path`, or inline.
-    static func encode(_ rep: NSBitmapImageRep, _ path: String?) -> JSON {
+    /// `save_screenshot`: the PNG written to `path`, or inline. `source` says how it was taken: `screen` (as the
+    /// screen shows it) or `offscreen` (the views drawn offscreen, materials blank).
+    static func encode(_ rep: NSBitmapImageRep, _ path: String?, source: String? = nil) -> JSON {
         if rep.pixelsWide * rep.pixelsHigh * 4 > maxImageBytes {
             return ["ok": false, "error": "the screenshot would exceed 128 MiB; use ui.render"]
         }
         guard let png = rep.representation(using: .png, properties: [:]), !png.isEmpty else {
             return ["ok": false, "error": "the screenshot could not be encoded"]
         }
-        let w = JSON.integer(rep.pixelsWide), h = JSON.integer(rep.pixelsHigh)
+        var result = JSONObject(["width": .integer(rep.pixelsWide), "height": .integer(rep.pixelsHigh)])
+        if let source { result.set("source", .string(source)) }
         guard let path else {
-            return ["ok": true, "result": ["width": w, "height": h, "png": .string(Cmd.base64Encode([UInt8](png)))]]
+            result.set("png", .string(Cmd.base64Encode([UInt8](png))))
+            return ["ok": true, "result": .object(result)]
         }
         do {
             try Data(png).write(to: URL(filePath: path))
-            return ["ok": true, "result": ["path": .string(path), "width": w, "height": h]]
+            result.set("path", .string(path))
+            return ["ok": true, "result": .object(result)]
         } catch {
             return ["ok": false, "error": .string(error.localizedDescription)]
         }

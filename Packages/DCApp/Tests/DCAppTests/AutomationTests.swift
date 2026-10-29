@@ -35,6 +35,27 @@ import Testing
         #expect(inline["ok"]?.asBool == true, "\(inline)")
         let text = try #require(inline["result"]?["png"]?.asStr)
         #expect(Cmd.base64Decode(text) == png, "the inline reply is the same PNG")
+        #expect(AutomationFeature.encode(rep, nil, source: "offscreen")["result"]?["source"]?.asStr == "offscreen")
+    }
+
+    // After 0.1.5: ScreenCaptureKit gave a covered window's last composited frame, so `ui.screenshot` draws a window
+    // that another app covers offscreen.
+    @Test func aWindowIsCoveredOnlyByAnotherAppsWindowOverIt() {
+        let rect = CGRect(x: 0, y: 1320, width: 1080, height: 740)
+        func window(pid: Int, layer: Int = 0, alpha: Double = 1, _ b: CGRect) -> [String: Any] {
+            [kCGWindowOwnerPID as String: pid, kCGWindowLayer as String: layer, kCGWindowAlpha as String: alpha,
+             kCGWindowBounds as String: b.dictionaryRepresentation]
+        }
+        let over = CGRect(x: 18, y: 30, width: 2616, height: 2039)
+        let me: Int32 = 100
+        #expect(AutomationFeature.covers([window(pid: 200, over)], rect, pid: me), "another app's window over it")
+        #expect(AutomationFeature.covers([window(pid: 200, layer: 3, CGRect(x: 1000, y: 2000, width: 200, height: 200))], rect, pid: me), "a floating panel over a corner")
+        #expect(!AutomationFeature.covers([window(pid: 100, over)], rect, pid: me), "the app's own window")
+        #expect(!AutomationFeature.covers([window(pid: 200, CGRect(x: 5200, y: 300, width: 1080, height: 740))], rect, pid: me), "beside it")
+        #expect(!AutomationFeature.covers([window(pid: 200, alpha: 0, over)], rect, pid: me), "transparent")
+        let menuBar = Int(CGWindowLevelForKey(.mainMenuWindow)), dock = Int(CGWindowLevelForKey(.dockWindow))
+        #expect(!AutomationFeature.covers([window(pid: 200, layer: menuBar, over), window(pid: 200, layer: dock, over)], rect, pid: me), "the menu bar and the Dock")
+        #expect(!AutomationFeature.covers([], rect, pid: me))
     }
 
     @Test func uiCommandsAreListedAsDeckcraftDoes() {

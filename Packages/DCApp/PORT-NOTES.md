@@ -1225,10 +1225,32 @@ walk found five bugs, all in 0.1.4 and all fixed here.
   - **Test:** `ViewsWindowTests.navigatorRowsFollowTheScrollerStyle` switches the style and retiles as AppKit does. It
     fails without the observer.
   - The Outline view also lays out at `contentSize.width` and may do the same. Not yet checked.
-- **Still to do:**
-  - The Accessibility Inspector audit.
-  - `ui.screenshot` returned stale frames during the walk. It showed the ring on Home after focus had moved, and the
-    ribbon after `ui.set {layout: mac}`. `screencapture -l` of the window was right.
+- **Still to do:** the Accessibility Inspector audit.
+
+### After 0.1.5 (2026-10-29)
+
+- **Outline rows a scroller too wide.** The Outline view had the navigator's bug. Its rows kept heights measured
+  before a legacy scroller came in, which here clips text that wraps onto more lines.
+  - **The fix:** the Outline view re-measures its rows when its clip view's frame changes, as the navigator does. Its
+    scroller never hides, so the width can't depend on the rows' heights, and `contentSize.width` stays.
+  - **Test:** `ViewsWindowTests.outlineRowsFollowTheScrollerStyle` gives the first slide a long title, switches the
+    style and retiles. It fails without the observer.
+  - In the running app, the Outline with legacy scrollers fits its text. It was opened after launch, so the launch case
+    is only covered by the test.
+- **`ui.screenshot` returned stale frames.** It happened whenever another app's window covered DeckCraft's.
+  ScreenCaptureKit then hands back the window as it was last composited, not as it is.
+  - **Measured:** the window was 98 % under this session's Claude window. Three captures were byte-identical while the
+    window went from the Mac layout to the ribbon and back, and `screencapture -l` showed each change. Moved clear of
+    other windows, 16 captures in a row matched `screencapture -l` exactly, with no wait after the change.
+  - **The fix:** `AutomationFeature.isCovered` reads the windows above DeckCraft's from the window server. When another
+    process's window overlaps it, at any level below the Dock's, the capture draws the views offscreen. That image is
+    current but leaves materials blank. `CGWindowListCreateImage`, which reads the window's own buffer as
+    `screencapture -l` does, is unavailable in this SDK.
+  - **The reply** carries `source`: `screen` (ScreenCaptureKit) or `offscreen`.
+  - **Test:** `AutomationTests.aWindowIsCoveredOnlyByAnotherAppsWindowOverIt` covers the overlap rule: another app's
+    window or panel counts; the app's own windows, windows beside it, transparent windows, the menu bar and the Dock
+    don't. Live, covered: 8 of 8 captures were offscreen and showed the right layout. Uncovered: `screen`, identical to
+    `screencapture -l`.
 
 ## lib.rs tests
 
