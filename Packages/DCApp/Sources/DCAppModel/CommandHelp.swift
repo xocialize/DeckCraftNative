@@ -155,6 +155,7 @@ public enum CommandHelp {
         "view.grayscale": "Show the slides in shades of grey.",
         "view.dark": "Use the dark appearance.",
         "view.ribbon": "Switch between the ribbon and the toolbar with the inspector.",
+        "view.focusRibbon": "Move the keyboard to the ribbon's tabs; Esc brings it back to the slide.",
         // File
         "file.new": "Start a new presentation.",
         "app.openDialog": "Open a presentation from a file.",

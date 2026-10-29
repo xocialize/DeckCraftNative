@@ -390,16 +390,25 @@ public enum RibbonModel {
 
     // MARK: Arrangement
 
-    /// The size R1 draws a control at: its largest. Folding to smaller sizes is R3 (§5).
+    /// The widest a large control's label is drawn, in two lines at most.
+    public static let largeLabelWidth: Double = 76
+    /// The widest a collapsed group's title is drawn, beside its arrow, in two lines at most.
+    public static let collapsedLabelWidth: Double = 66
+
+    /// A collapsed group's icon: its first control's.
+    public static func symbol(group g: RibbonGroup) -> String { g.controls.first.map(symbol) ?? "square.grid.2x2" }
+
+    /// A control's largest size, as a group drawn at `.large` draws it.
     public static func size(_ c: RibbonControl) -> RibbonSize { c.sizes.first ?? .medium }
 
     /// How many small controls share a row, and rows a column.
     static let rowLength = 7
     static let columnRows = 3
 
-    /// A group's controls in columns of rows: a large control is a column of its own; the others stack three rows
-    /// to a column, where a row is one labelled control or a run of icon-only ones (B I U, the alignments).
-    public static func columns(_ g: RibbonGroup) -> [[[RibbonControl]]] {
+    /// A group's controls in columns of rows, at the group's size `gs` (§5): a large control is a column of its own;
+    /// the others stack three rows to a column, where a row is one labelled control or a run of icon-only ones
+    /// (B I U, the alignments).
+    public static func columns(_ g: RibbonGroup, _ gs: GroupSize = .large) -> [[[RibbonControl]]] {
         var columns: [[[RibbonControl]]] = []
         var rows: [[RibbonControl]] = []
         var strip: [RibbonControl] = []
@@ -413,7 +422,7 @@ public enum RibbonModel {
             rows = []
         }
         for c in g.controls {
-            switch size(c) {
+            switch RibbonFit.size(c, gs) {
             case .large:
                 endColumn()
                 columns.append([[c]])

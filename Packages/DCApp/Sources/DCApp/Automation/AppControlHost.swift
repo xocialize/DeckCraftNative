@@ -167,6 +167,44 @@ final class AppControlHost: ControlHost {
             }
             keyDocumentWindow()?.setContentSize(NSSize(width: min(w, 16384), height: min(h, 16384)))
             return ok(.null)
+        case "ui.key":
+            // A key press sent to the key window, as the keyboard sends it (R3's keyboard checks): `key` is a
+            // character or one of the names below, `modifiers` any of command, option, shift, control.
+            guard let key = p["key"]?.asStr, let window = keyDocumentWindow() else { return err("missing key") }
+            let named: [String: (UInt16, Int)] = [
+                "tab": (48, 0x09), "return": (36, 0x0D), "space": (49, 0x20), "escape": (53, 0x1B), "delete": (51, 0x7F),
+                "left": (123, NSLeftArrowFunctionKey), "right": (124, NSRightArrowFunctionKey),
+                "down": (125, NSDownArrowFunctionKey), "up": (126, NSUpArrowFunctionKey), "f1": (122, NSF1FunctionKey),
+            ]
+            var flags: NSEvent.ModifierFlags = []
+            for m in p["modifiers"]?.asArray ?? [] {
+                switch m.asStr {
+                case "command": flags.insert(.command)
+                case "option": flags.insert(.option)
+                case "shift": flags.insert(.shift)
+                case "control": flags.insert(.control)
+                default: break
+                }
+            }
+            let code: UInt16
+            let chars: String
+            if let (c, u) = named[key.lowercased()], let scalar = Unicode.Scalar(u) {
+                code = c
+                chars = String(Character(scalar))
+                if u >= 0xF700 { flags.insert([.function, .numericPad]) }
+            } else if key.count == 1 {
+                code = 0
+                chars = key
+            } else {
+                return err("unknown key \(key)")
+            }
+            for type in [NSEvent.EventType.keyDown, .keyUp] {
+                guard let e = NSEvent.keyEvent(with: type, location: .zero, modifierFlags: flags, timestamp: ProcessInfo.processInfo.systemUptime,
+                                               windowNumber: window.windowNumber, context: nil, characters: chars,
+                                               charactersIgnoringModifiers: chars, isARepeat: false, keyCode: code) else { continue }
+                window.sendEvent(e)
+            }
+            return ok(.null)
         case "ui.focus":
             NSApp.activate()
             keyDocumentWindow()?.makeKeyAndOrderFront(nil)

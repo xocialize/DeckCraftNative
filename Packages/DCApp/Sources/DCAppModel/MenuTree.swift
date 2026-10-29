@@ -33,7 +33,9 @@ public enum MenuTree {
             ("Slide Master", "view.slideMaster"), ("Handout Master", "view.handoutMaster"), ("Notes Master", "view.notesMaster"),
             ("-", ""), ("Ruler", "view.ruler"), ("Gridlines", "view.gridlines"), ("Guides", "view.guides"),
             ("Grid Options…", "view.gridOptions"), ("-", ""), ("Zoom…", "view.zoomDialog"), ("Zoom In", "view.zoomIn"),
-            ("Zoom Out", "view.zoomOut"), ("Fit to Window", "view.fit"), ("-", ""), ("Ribbon", "view.ribbon"), ("New Window", "view.newWindow"),
+            ("Zoom Out", "view.zoomOut"), ("Fit to Window", "view.fit"), ("-", ""), ("Ribbon", "view.ribbon"), ("Collapse the Ribbon", "view.collapseRibbon"),
+            ("Move Focus to the Ribbon", "view.focusRibbon"),
+            ("New Window", "view.newWindow"),
         ]),
         menu("Insert", [
             ("New Slide", "slide.new"), ("Duplicate Slide", "slide.duplicate"), ("-", ""), ("Section", "section.add"),

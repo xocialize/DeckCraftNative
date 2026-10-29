@@ -61,7 +61,9 @@ final class UpdatesWindowStubProtocol: URLProtocol, @unchecked Sendable {
         let window = try #require(UpdatesFeature.window?.window)
         #expect(window.isVisible && window.sheetParent == nil, "a window of its own, not modal")
 
-        let deadline = Date().addingTimeInterval(10)
+        // The stub answers at once, but its answer comes back through the main actor, which other suites' window
+        // tests hold for seconds at a time (RibbonWindowTests lays out every tab at four widths).
+        let deadline = Date().addingTimeInterval(120)
         while center.isChecking && Date() < deadline { try await Task.sleep(for: .milliseconds(5)) }
         #expect(center.phase == .upToDate(current: "0.1.0"))
         window.close()   // (closing is Later: `theWindowLaysOutInEveryState`; other suites' apps may own the window by now)

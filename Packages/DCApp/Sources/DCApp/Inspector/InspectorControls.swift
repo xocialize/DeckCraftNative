@@ -41,9 +41,9 @@ struct NumberField: View {
                     .onSubmit(apply)
                     .onChange(of: focused) { _, now in if !now { apply() } }
                     .accessibilityLabel(String(localized: "\(label) value", bundle: .module, comment: "Accessibility label of a number field's text: the field's label, then 'value'"))
+                // Named by its own label: another `accessibilityLabel` made VoiceOver say it twice (R3's audit).
                 Stepper(label, onIncrement: { send(value + step) }, onDecrement: { send(value - step) })
                     .labelsHidden()
-                    .accessibilityLabel(label)
             }
         }
     }

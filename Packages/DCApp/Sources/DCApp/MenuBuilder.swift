@@ -121,6 +121,12 @@ extension AppController: NSMenuItemValidation {
         if id == "file.new" || id == "app.openDialog" || id == "app.about" || id == "app.preferences" { return true }
         // View › Ribbon shows whether the window has the ribbon.
         if id == "view.ribbon" { item.state = model.ui.layout == .ribbon ? .on : .off }
+        // Collapse the Ribbon (⌘F1) is ticked while minimised; it and Move Focus to the Ribbon (F6) only have a
+        // ribbon to act on in its layout.
+        if id == "view.collapseRibbon" || id == "view.focusRibbon" {
+            if id == "view.collapseRibbon" { item.state = model.ui.ribbonCollapsed ? .on : .off }
+            return model.ui.layout == .ribbon
+        }
         if UICommands.contains(id) { return true }
         guard let spec = findCommand(id) else { return false }
         return spec.enabled(model.session) == nil

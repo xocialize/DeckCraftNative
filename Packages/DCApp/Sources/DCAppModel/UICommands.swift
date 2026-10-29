@@ -32,10 +32,12 @@ public enum UICommands {
         .init(id: "view.fit", label: "Fit to Window", shortcut: nil, params: "{}"),
         .init(id: "view.pane", label: "Task Pane", shortcut: nil, params: "{pane: format|animation|selection|comments|designer|background|smartart|null}"),
         .init(id: "review.thesaurusPane", label: "Thesaurus", shortcut: "Shift+F7", params: "{word?}: open the Thesaurus pane on the selected word"),
-        .init(id: "view.tab", label: "Ribbon Tab", shortcut: nil, params: "{tab}"),
+        .init(id: "view.tab", label: "Ribbon Tab", shortcut: nil, params: "{tab, peek?: bool}"),
         .init(id: "view.collapseRibbon", label: "Collapse the Ribbon", shortcut: "Cmd+F1", params: "{}"),
         // The app's own: the ribbon is an optional window layout here (Docs/plans/Ribbon-and-StartScreen.md §6).
         .init(id: "view.ribbon", label: "Ribbon", shortcut: "Cmd+Alt+R", params: "{on?: bool}"),
+        // The keyboard's way into the ribbon (R3): the canvas keeps Tab for stepping through its shapes.
+        .init(id: "view.focusRibbon", label: "Move Focus to the Ribbon", shortcut: "F6", params: "{place?: tab:<id>|<control id>}"),
         // Handout Master › Slides Per Page: deckcraft keeps it as UI state with no command (R2 gives it one).
         .init(id: "view.handoutSlides", label: "Slides Per Page", shortcut: nil, params: "{count: 1|2|3|4|6|9}"),
         .init(id: "view.dark", label: "Dark Mode", shortcut: nil, params: "{on?: bool}"),

@@ -107,12 +107,13 @@ struct RibbonGalleryView: View {
     }
 }
 
-/// A gallery as a large button that opens the whole gallery (Home › Quick Styles).
+/// A gallery as a button that opens the whole gallery: Home › Quick Styles, and any gallery its group has folded.
 struct RibbonGalleryButton<Face: View>: View {
     let control: RibbonControl
     let model: AppModel
+    /// Open: the ribbon opens it from the keyboard too (⌥↓).
+    @Binding var open: Bool
     @ViewBuilder let face: () -> Face
-    @State private var open = false
 
     var body: some View {
         Button { open.toggle() } label: { face() }

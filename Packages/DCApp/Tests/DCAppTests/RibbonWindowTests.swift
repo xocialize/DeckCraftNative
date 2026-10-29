@@ -1,6 +1,7 @@
-// DCAppTests — R1 of Docs/plans/Ribbon-and-StartScreen.md in a window: switching a document window between the Mac
-// layout and the ribbon layout (the ribbon above the split view, the ribbon toolbar with the Quick Access Toolbar at
-// its leading edge), the ribbon drawing every tab, its symbols, and the toolbar's tooltip descriptions.
+// DCAppTests — R1 to R3 of Docs/plans/Ribbon-and-StartScreen.md in a window: switching a document window between the
+// Mac layout and the ribbon layout (the ribbon above the split view, the ribbon toolbar with the Quick Access Toolbar
+// at its leading edge), the ribbon drawing every tab, its symbols, the toolbar's tooltip descriptions, and every tab
+// folding cleanly at the four widths.
 import AppKit
 import DCAppModel
 import DCCore
@@ -158,6 +159,59 @@ import Testing
         }
         let shapes = NSHostingView(rootView: RibbonShapesGrid(entries: CommandMenus.entries(.shapes), model: f.model) {})
         #expect(shapes.fittingSize.width >= 300 && shapes.fittingSize.height > 100)
+    }
+
+    /// Lay the window's ribbon out at `width` and let SwiftUI report where it drew.
+    static func settle(_ f: Fixture, _ container: RibbonContainerController, width: CGFloat) {
+        f.wc.window?.setContentSize(NSSize(width: width, height: 700))
+        for _ in 0 ..< 4 {
+            f.wc.window?.contentView?.layoutSubtreeIfNeeded()
+            container.host.layoutSubtreeIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+    }
+
+    // R3: every tab, the contextual ones with their object selected, lays out at 1600, 1150, 920 and 700 points with
+    // nothing clipped or overlapping; the selected tab stays in the tab row; Paste and Designer stay large.
+    @Test func everyTabFoldsCleanlyAtTheFourWidths() throws {
+        let f = Fixture()
+        f.layout(true)
+        let container = try #require(f.wc.window?.contentViewController as? RibbonContainerController)
+        let png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        let objects: [(String, JSON)] = [
+            ("shape.insert", ["preset": "rect", "rect": [300, 100, 100, 100]]), ("insert.picture", ["data": .string(png), "name": "dot.png"]),
+            ("insert.table", ["rows": 2, "cols": 2]), ("insert.chart", ["type": "Column"]),
+            ("insert.smartArt", ["kind": "process", "items": ["Plan", "Build"]]),
+            ("insert.audio", ["data": .string(Cmd.base64Encode(Self.wav)), "name": "tone.wav"]),
+        ]
+        var checked = Set<String>()
+        func check(_ tabs: [RibbonTab]) {
+            for tab in tabs where !checked.contains(tab.id) {
+                checked.insert(tab.id)
+                f.model.run("view.tab", ["tab": .string(tab.title)])
+                for w in [1600.0, 1150, 920, 700] as [CGFloat] {
+                    Self.settle(f, container, width: w)
+                    let st = container.state
+                    let fit = RibbonMeasure.fit(tab, f.model, width: st.width)
+                    #expect(abs(st.width - w) < 1, "\(tab.id) at \(w): the ribbon is \(st.width) wide")
+                    #expect(RibbonFeature.truncated(tab, fit, st, body: true) == [], "\(tab.id) at \(w)")
+                    #expect(st.tabsShown.contains(tab.id), "\(tab.id) at \(w) went into »")
+                    #expect(fit.sizes["home.designer"] ?? .large == .large && fit.sizes["design.designer"] ?? .large == .large)
+                }
+            }
+        }
+        check(RibbonModel.tabs(f.model))
+        for (id, p) in objects {
+            f.model.run(id, p)
+            check(RibbonModel.tabs(f.model).filter { $0.contextual != nil })
+        }
+        for m in ["view.slideMaster", "view.notesMaster", "view.handoutMaster"] {
+            f.model.run(m)
+            check(RibbonModel.tabs(f.model).filter { $0.contextual != nil })
+            f.model.run("view.closeMaster")
+        }
+        #expect(checked.count == RibbonModel.allTabs.count, "\(Set(RibbonModel.allTabs.map(\.id)).subtracting(checked))")
+        f.layout(false)
     }
 
     @Test func everyRibbonSymbolIsAnSFSymbol() {

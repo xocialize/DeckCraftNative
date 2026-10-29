@@ -982,6 +982,111 @@ rest.
 - **Screenshots**, through the control channel, of Shape Format, Picture Format, Table Design, Layout, Chart Design, SmartArt Design and the three master tabs, besides Design, Transitions and Animations with their tiles.
   - `ui.screenshot` captures what was last drawn, which can be a redraw behind the last command. Wait a few seconds, or take the shot twice.
 
+### R3: folding, keyboard and accessibility (done 2026-10-28)
+
+The groups fold as the window narrows, tabs that don't fit go into "»", a minimised ribbon shows a clicked tab
+as a panel over the document, and the keyboard and VoiceOver reach every control. Group captions stay hidden, and
+there is no "Show group titles" setting (§12).
+
+| File | What it holds |
+|---|---|
+| `DCAppModel/RibbonFit.swift` | `GroupSize` (large, medium, small, collapsed); `RibbonFit.sizes` (the sizes a group can take: those that draw something differently, then collapsed, which a group with Paste never takes and a `foldOrder` 0 group never folds to); `RibbonFit.size` (a control's size in a group of a size); `RibbonFit.fit` (§5's order); `RibbonFit.tabs` (which tabs the row shows); `RibbonFocus` (the focusable places in reading order, and where each arrow key goes) |
+| `DCAppModel/RibbonModel.swift` | `columns(g, size)`: a group's columns at its fitted size; the label widths the truncation check uses; a collapsed group's icon |
+| `DCApp/Ribbon/RibbonView.swift` | `RibbonViewState` (per window: width, the transient panel, frames, focus); the fitted groups; `RibbonCollapsedGroup`; the "»" menu; `RibbonScroller` (the ‹ › chevrons); `RibbonMeasure` (each group's width at each size, measured once off screen per locale and system font size, then cached); keyboard focus; splits as two buttons; menus dropped below their control |
+| `DCApp/Ribbon/RibbonFeature.swift` | The container keeps the ribbon above the split view and grows it over the document for the transient panel; `ui.inspect`'s new `ribbon` keys; `view.focusRibbon` |
+| `DCApp/Automation/AppControlHost.swift` | `ui.key {key, modifiers}`: a key press sent to the key window |
+| `DCAppModel/UICommands.swift`, `MenuTree.swift`, `DCApp/MenuBuilder.swift` | View › Collapse the Ribbon (⌘F1, ticked while minimised) and View › Move Focus to the Ribbon (F6, the new `view.focusRibbon`); both act only in the ribbon layout |
+
+- **The fold order** is §5's: every group starts at its largest. While the groups are wider than the ribbon, the one with the
+  highest `foldOrder` that can still step down does, the rightmost on a tie. The steps don't depend on the width, only
+  how many are taken, so a narrower ribbon never draws a group larger. R0's `foldOrder` values hold up. On Home:
+  - at 1150 pt, Insert and Drawing collapse;
+  - at 920 pt, Slides and Paragraph do;
+  - at 700 pt, Font and Editing do, with Paste and Designer still large.
+
+  That is what PowerPoint for Mac does, give or take Editing. A group whose larger size would fit after later steps
+  stays folded; §5 doesn't re-expand.
+- **A group's sizes** are only those that draw something differently. For example, Font goes large, small (Font… loses its
+  label), then collapsed. A gallery in a group at medium or small becomes a button that opens the whole gallery.
+- **Collapsed groups** are a button named after the group, with its first control's icon, opening a popover that holds the
+  group at its largest. The popover closes when one of its commands runs.
+- **Tabs** that don't fit go into "»", from the tail. The selected tab takes the place of the last one that fits.
+- **The last resort**, when everything that can fold has folded: deckcraft's ‹ › chevrons, 160 points a click. The
+  window's minimum width (530 pt) is narrow enough to need them on Home.
+- **Minimised** (⌘F1, or a double click on the shown tab):
+  - A click on a tab shows its controls as a panel over the top of the document. The document doesn't move.
+  - The panel closes when one of its commands runs (through `RibbonActions.run`, a menu, or a colour), on Esc, on a
+    second click on the tab, or on a click outside it. Only a real click reaches the outside check: `ui.click`'s events
+    bypass AppKit's event monitor, so that case was not driven over the control channel.
+  - Clicking another tab shows that tab instead.
+  - `view.tab` gains `peek` for this: the tab changes and the ribbon stays minimised.
+- **Keyboard** (§6):
+  - The canvas keeps Tab for stepping through its shapes, so the keyboard's way in is F6 (`view.focusRibbon`,
+    Office's pane key). F6 moves to the shown tab in the tab row.
+  - Left and right move along the tab row, and down goes into the controls.
+  - In the controls, left and right move in reading order and up and down within a column; up from the top goes back
+    to the tabs.
+  - Return or Space runs the focused control, ⌥↓ opens a split's menu, and Esc goes back to the canvas.
+  - Each split's halves are separate stops.
+  - It needs Full Keyboard Access (System Settings › Keyboard › Keyboard Navigation), as buttons do everywhere in
+    macOS. Without it, `view.focusRibbon` says so.
+
+  One approach was tried and dropped, and never committed: making the controls focusable without Full Keyboard Access
+  (`.focusable()`). SwiftUI handed the keyboard to them whenever the window became key, which took it from the canvas
+  and looped AppKit's constraint passes until it threw.
+- **VoiceOver** (§6):
+  - The tabs are an `AXTabGroup` named "Ribbon tabs", of radio buttons; a contextual tab reads "Shape Format,
+    contextual". It is a segmented picker's representation: a radio group's stacks its buttons down the window.
+  - Each group is an `AXGroup` named after the group.
+  - Each split is two buttons, "Bullets" and "Bullets options".
+  - Toggles are check boxes. Disabled controls report as disabled and are kept.
+  - A gallery is a group named after it, with each tile a button carrying its name.
+  - A collapsed group is a button named after the group, with a hint, and "»" is a menu button, "More tabs".
+
+  These differ from §6: a gallery is a group, not an `AXList`, and a collapsed group is a button, not a pop-up button,
+  because it opens a popover, not a menu.
+- **The width check.** `ui.inspect`'s `ribbon` gains these keys:
+  - `width`, `scrolling`, `peek`, `focus`, `fullKeyboardAccess`, `keyWindow` and `firstResponder`;
+  - each group's `size`;
+  - `tabsShown`, `tabsOverflow`, and `tabRects` in `ui.click`'s coordinates;
+  - `truncated`, which lists every control or collapsed group drawn clipped by the ribbon, overlapping another, or
+    with a label longer than its two lines.
+- **Verified.**
+  - **The four widths.** Every one of the 20 tabs (the contextual and master tabs with their objects selected) at
+    1600, 1150, 920 and 700 pt has `truncated == []` and keeps the selected tab in the row. This was checked over the
+    control channel (`ui.resize`, then `ui.inspect`) and in `RibbonWindowTests`.
+    - The check caught one real defect: a collapsed "WordArt Styles" cut to one line. It is fixed, and collapsed titles
+      are now checked.
+  - **Screenshots** of our app only: Home at 1600, 1150, 920, 700 and 530 pt (scrolling), Shape Format at 920 pt,
+    and the transient panel.
+  - **VoiceOver's view.** The window's accessibility tree, read through the AX API from outside the app, as VoiceOver
+    reads it, for every tab at the four widths.
+    - No group, tab or control is unnamed. The only unnamed elements are the stepper arrows inside the
+      Height/Width/Duration incrementors, which are AppKit's own parts of a named incrementor.
+    - It found the steppers named twice ("Duration, Duration"); `NumberField` no longer labels its stepper again.
+    - SwiftUI builds this tree only when an assistive client asks, so it can't be read from inside a test.
+  - **The Accessibility Inspector audit was not run.** Its target pop-up can't be opened without taking over the
+    screen, so the AX walk above stands in for it. Running the audit against the ribbon is still to do.
+  - **Full Keyboard Access is off on this Mac**, and it is a system setting, so it was left alone. The arrow-key walk
+    is verified in the model: `RibbonFitTests` reaches every control and split half of every tab, at every fold size,
+    from the first place. F6 and the arrow keys have not been driven in the app with Full Keyboard Access on.
+- **Tests.**
+  - `RibbonFitTests` (DCAppModel), 7 tests:
+    - the fold order is monotonic as the width falls (every tab, eight sets of widths);
+    - Paste and Designer never fold;
+    - the order follows `foldOrder` with ties to the right, and the same input gives the same output;
+    - hostile widths don't trap;
+    - the selected tab never overflows (300 random rows);
+    - every control is reachable from the keyboard;
+    - a group's sizes are those that differ.
+  - `RibbonWindowTests` gains `everyTabFoldsCleanlyAtTheFourWidths`.
+    - It holds the main actor for about 13 s, spinning the run loop for SwiftUI's layout, and that delays the other
+      suites' main-actor work. `UpdatesWindowTests`' wait for its stubbed check timed out behind it at 10 s, so the
+      wait is now 120 s, as R2 did for `UpdatesCenterTests`.
+    - It can't sleep instead: once the test suspends, the ribbon's geometry reports stop arriving while other suites
+      run, and the width never updates.
+  - The UI command count is 54.
+
 ## lib.rs tests
 
 deckcraft's `crates/ui-egui/src/lib.rs` has 62 `#[test]`s (`mod tests`, at the pin). Each is triaged below: **already

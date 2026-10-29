@@ -4105,6 +4105,18 @@
         }
       }
     },
+    "help.view.focusRibbon" : {
+      "comment" : "What command view.focusRibbon does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move the keyboard to the ribbon's tabs; Esc brings it back to the slide."
+          }
+        }
+      }
+    },
     "help.view.grayscale" : {
       "comment" : "What command view.grayscale does, in one line: the second line of its tooltip and its VoiceOver hint",
       "extractionState" : "manual",
@@ -4945,6 +4957,18 @@
         }
       }
     },
+    "menu.Collapse the Ribbon" : {
+      "comment" : "An item of the View menu (runs view.collapseRibbon)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse the Ribbon"
+          }
+        }
+      }
+    },
     "menu.Command Palette" : {
       "comment" : "An item of the Help menu (runs app.palette)",
       "extractionState" : "manual",
@@ -5265,6 +5289,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Justify"
+          }
+        }
+      }
+    },
+    "menu.Move Focus to the Ribbon" : {
+      "comment" : "An item of the View menu (runs view.focusRibbon)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Focus to the Ribbon"
           }
         }
       }
@@ -7785,6 +7821,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fit to Window"
+          }
+        }
+      }
+    },
+    "view.focusRibbon" : {
+      "comment" : "The label of the app's command view.focusRibbon",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Focus to the Ribbon"
           }
         }
       }

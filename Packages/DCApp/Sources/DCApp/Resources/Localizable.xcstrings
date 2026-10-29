@@ -252,6 +252,17 @@
         }
       }
     },
+    "%@, contextual" : {
+      "comment" : "VoiceOver: a ribbon tab the selection brings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, contextual"
+          }
+        }
+      }
+    },
     "%@: DeckCraftNative can't open this kind of file" : {
       "comment" : "Status after a drop: the file's name, then the problem",
       "localizations" : {
@@ -3644,6 +3655,17 @@
         }
       }
     },
+    "More tabs" : {
+      "comment" : "The ribbon's » button listing the tabs that don't fit",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More tabs"
+          }
+        }
+      }
+    },
     "More templates" : {
       "comment" : "Start window: link to the New page",
       "localizations" : {
@@ -5385,6 +5407,26 @@
         }
       }
     },
+    "Scroll the ribbon left" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll the ribbon left"
+          }
+        }
+      }
+    },
+    "Scroll the ribbon right" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll the ribbon right"
+          }
+        }
+      }
+    },
     "Search" : {
       "comment" : "Toolbar item: find a command by name",
       "localizations" : {
@@ -5681,6 +5723,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "Shows the group's controls" : {
+      "comment" : "VoiceOver: a ribbon group folded into one button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the group's controls"
           }
         }
       }

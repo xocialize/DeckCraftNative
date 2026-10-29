@@ -410,6 +410,20 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **New UI command:** `view.handoutSlides {count}` for Handout Master › Slides Per Page.
   - **Tests:** `RibbonContextualTests` (9), which includes a walk of every contextual control with its object
     selected (over 250 commands), and two more `RibbonWindowTests`.
+- **Ribbon R3: folding, keyboard and accessibility (2026-10-28).** Details are in DCApp's PORT-NOTES, under "Ribbon" › "R3".
+  - **Folding:** groups step down through large, medium, small and collapsed as the window narrows, in `foldOrder`
+    (`RibbonFit`, a pure function, with widths measured once per group and size). Paste and Designer never fold. Tabs
+    that don't fit go into "»", never the selected one, and deckcraft's ‹ › chevrons are the last resort. Every tab
+    lays out at 1600, 1150, 920 and 700 pt with `ui.inspect.ribbon.truncated == []`.
+  - **Minimised (⌘F1):** a click on a tab shows its controls as a transient panel over the document.
+  - **Keyboard:** F6 (new UI command `view.focusRibbon`) moves to the tab row; the arrow keys, Return, ⌥↓ and Esc move,
+    run, open and leave. It needs Full Keyboard Access, which is off on the development Mac, so the walk is verified in
+    the model and not yet in the app.
+  - **VoiceOver:** the tabs are a tab group of radio buttons, groups are named, and splits are two buttons. Every tab
+    was read from outside the app at four widths with no unnamed control. The Accessibility Inspector audit itself was
+    not run: its target picker needs full-screen control.
+  - **Control channel:** `ui.key`, and `ui.inspect.ribbon` gains each group's `size`, `truncated`, `tabsShown`,
+    `tabsOverflow`, `tabRects`, `peek` and `focus`.
 
 ## Pin moves
 

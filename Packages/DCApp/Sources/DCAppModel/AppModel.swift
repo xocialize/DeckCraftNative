@@ -130,7 +130,8 @@ public final class AppModel {
         case "view.tab":
             guard let tab = p["tab"]?.asStr else { return .failure("missing `tab`") }
             ui.tab = tab
-            ui.ribbonCollapsed = false
+            // A minimised ribbon shows a clicked tab as a transient panel and stays minimised (`peek`, R3).
+            if p["peek"]?.asBool != true { ui.ribbonCollapsed = false }
         case "view.collapseRibbon": ui.ribbonCollapsed.toggle()
         case "view.handoutSlides":
             guard let n = p["count"]?.asU64, [1, 2, 3, 4, 6, 9].contains(n) else { return .failure("`count` is 1, 2, 3, 4, 6 or 9") }
