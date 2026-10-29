@@ -139,6 +139,11 @@ final class AppControlHost: ControlHost {
         case "ui.screenshot":
             return .screenshot(path: p["path"]?.asStr)
         case "ui.set":
+            if let l = p["layout"] {
+                // The window layout, as View › Ribbon and Settings set it (the alpha gate runs in both, R4).
+                guard let name = l.asStr, let layout = WindowLayout(rawValue: name) else { return err("layout is ribbon or mac") }
+                m.run("view.ribbon", ["on": .bool(layout == .ribbon)])
+            }
             if let t = p["tab"]?.asStr {
                 m.ui.tab = t
                 m.ui.ribbonCollapsed = false

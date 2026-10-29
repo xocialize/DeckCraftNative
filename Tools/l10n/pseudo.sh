@@ -14,6 +14,7 @@ swift build --package-path "$ROOT" --scratch-path "$SCRATCH" --product DeckCraft
 L10N=(python3 -I "$ROOT/Tools/l10n/l10n.py")
 "${L10N[@]}" pseudo "$SOURCES/DCAppModel/Resources/Localizable.xcstrings" "$PRODUCTS/DeckCraftNative_DCAppModel.bundle/Contents/Resources"
 "${L10N[@]}" pseudo "$SOURCES/DCAppModel/Resources/Commands.xcstrings" "$PRODUCTS/DeckCraftNative_DCAppModel.bundle/Contents/Resources"
+"${L10N[@]}" pseudo "$SOURCES/DCAppModel/Resources/Ribbon.xcstrings" "$PRODUCTS/DeckCraftNative_DCAppModel.bundle/Contents/Resources"
 "${L10N[@]}" pseudo "$SOURCES/DCApp/Resources/Localizable.xcstrings" "$PRODUCTS/DeckCraftNative_DCApp.bundle/Contents/Resources"
 # The resource bundles follow the language the main bundle picks (CFBundle doesn't mix localizations), and
 # DeckCraftDev's main bundle is its folder: give it an en-XA.lproj too.

@@ -231,18 +231,13 @@ enum RibbonFeature {
         }
         guard body else { return out }
         var drawn: [(String, CGRect)] = []
-        let caption = NSFont.preferredFont(forTextStyle: .caption1)
-        /// Whether `text` needs more than two lines of the caption font at `width`.
-        func overflows(_ text: String, _ width: Double) -> Bool {
-            let h = (text as NSString).boundingRect(with: NSSize(width: width, height: 1000), options: [.usesLineFragmentOrigin],
-                                                   attributes: [.font: caption]).height
-            return h > ceil(caption.boundingRectForFont.height * 2) + 1
-        }
+        /// Whether `text` needs more than two lines even at the widest its label is drawn.
+        func overflows(_ text: String, _ base: Double) -> Bool { !RibbonLabel.fits(text, RibbonLabel.width(text, base: base)) }
         for g in tab.groups {
             let gs = fit.sizes[g.id] ?? .large
             if gs == .collapsed {
                 if let f = st.frames[g.id] { drawn.append((g.id, f)) } else { out.append("\(g.id) (not drawn)") }
-                if overflows(g.title, RibbonModel.collapsedLabelWidth) { out.append("\(g.id) (label)") }
+                if overflows(RibbonModel.title(g), RibbonModel.collapsedLabelWidth) { out.append("\(g.id) (label)") }
                 continue
             }
             for c in g.controls {
@@ -277,13 +272,15 @@ enum RibbonFeature {
 }
 
 /// The ribbon layout's toolbar (§8): the Quick Access Toolbar's buttons at the leading edge, the window's title, then
-/// Search, Present and Comments. The window's own title is hidden so the buttons can come before it.
+/// Search, Present, Comments and Share. The window's own title is hidden so the buttons can come before it.
 @MainActor
 final class RibbonToolbar: NSObject, NSToolbarDelegate {
     static let title = NSToolbarItem.Identifier("dc.ribbon.title")
     static let search = NSToolbarItem.Identifier("dc.ribbon.search")
     static let present = NSToolbarItem.Identifier("dc.ribbon.present")
     static let comments = NSToolbarItem.Identifier("dc.ribbon.comments")
+    /// The Mac's share menu for the saved presentation (§3: there are no accounts or cloud, so nothing more).
+    static let share = NSToolbarItem.Identifier("dc.ribbon.share")
 
     /// Items: identifier, label, command and parameters.
     static let commands: [(id: NSToolbarItem.Identifier, label: String, command: String, params: JSON, symbol: String)] = [
@@ -294,9 +291,14 @@ final class RibbonToolbar: NSObject, NSToolbarDelegate {
 
     let titleField = NSTextField(labelWithString: "")
     private var titleObservation: NSKeyValueObservation?
+    private weak var window: NSWindow?
+
+    /// The file Share hands over: the presentation as last saved, or nil before it has been.
+    var shareURL: URL? { (window?.windowController?.document as? NSDocument)?.fileURL }
 
     /// Show `window`'s title in the toolbar while the ribbon layout hides the window's own.
     func follow(_ window: NSWindow) {
+        self.window = window
         titleField.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
         titleField.lineBreakMode = .byTruncatingMiddle
         titleField.stringValue = window.title
@@ -320,7 +322,7 @@ final class RibbonToolbar: NSObject, NSToolbarDelegate {
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        qatItems + [.flexibleSpace, Self.title, .flexibleSpace] + Self.commands.map(\.id)
+        qatItems + [.flexibleSpace, Self.title, .flexibleSpace] + Self.commands.map(\.id) + [Self.share]
     }
 
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] { toolbarDefaultItemIdentifiers(toolbar) }
@@ -334,6 +336,7 @@ final class RibbonToolbar: NSObject, NSToolbarDelegate {
             item.isBordered = false
             return item
         }
+        if id == Self.share { return shareItem() }
         guard let e = Self.commands.first(where: { $0.id == id }) else { return nil }
         ToolbarCatalog.payloads[id.rawValue] = ToolbarPayload(e.command, e.params)
         let item = NSToolbarItem(itemIdentifier: id)
@@ -344,5 +347,39 @@ final class RibbonToolbar: NSObject, NSToolbarDelegate {
         item.target = ToolbarActions.shared
         item.action = #selector(ToolbarActions.run(_:))
         return item
+    }
+}
+
+extension RibbonToolbar {
+    /// Share: a button, so the share menu has somewhere to open from. It is enabled once the presentation has a file.
+    func shareItem() -> NSToolbarItem {
+        let label = String(localized: "Share", bundle: .module, comment: "Toolbar item: share the saved presentation with the Mac's share menu")
+        let item = ShareToolbarItem(itemIdentifier: Self.share)
+        item.owner = self
+        let button = NSButton(image: NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: label) ?? NSImage(), target: self, action: #selector(share(_:)))
+        button.bezelStyle = .toolbar
+        button.setAccessibilityLabel(label)
+        item.view = button
+        item.label = label
+        item.paletteLabel = label
+        item.toolTip = String(localized: "Share\nSend the saved presentation by Mail, Messages, AirDrop or another app.", bundle: .module, comment: "Toolbar item's tooltip: its name, then what it does")
+        return item
+    }
+
+    @objc func share(_ sender: NSButton) {
+        guard let url = shareURL else { return }
+        NSSharingServicePicker(items: [url]).show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+    }
+}
+
+/// The Share toolbar item: enabled while its window's presentation has a file to share.
+@MainActor
+final class ShareToolbarItem: NSToolbarItem {
+    weak var owner: RibbonToolbar?
+
+    override func validate() {
+        let on = owner?.shareURL != nil
+        isEnabled = on
+        (view as? NSControl)?.isEnabled = on
     }
 }

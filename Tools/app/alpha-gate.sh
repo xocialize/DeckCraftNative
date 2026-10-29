@@ -4,6 +4,8 @@
 # window, is milestone S1's (Docs/plans/Ribbon-and-StartScreen.md §10): a launch with nothing to open shows it.
 #
 # Usage: Tools/app/alpha-gate.sh [OUT_DIR]   (builds DeckCraftDev and dccli into .build-gate first)
+# GATE_LAYOUT=ribbon|mac runs every workflow in that window layout (`ui.set {layout}` after each launch; R4 runs the
+# gate in both). Unset, the app starts as a new install does: the ribbon.
 # Every check prints PASS or FAIL; the exit status is the number of failures. Screenshots and the files the
 # workflows write land in OUT_DIR (default: a temporary folder, printed at the end).
 set -u
@@ -30,13 +32,19 @@ check() { # check NAME CONDITION-RESULT(0 = pass)
   if [ "$2" = 0 ]; then echo "PASS  $1"; else echo "FAIL  $1"; fails=$((fails + 1)); fi
 }
 shot() { method ui.screenshot "{\"path\":\"$OUT/$1.png\"}" >/dev/null; }
+LAYOUT=${GATE_LAYOUT:-}
 launch() {
   DECKCRAFT_NO_PREFS=1 DECKCRAFT_SHOW_WINDOWED=1 "$BIN/DeckCraftDev" --control $PORT "$@" >"$OUT/app.log" 2>&1 &
-  for i in {1..40}; do method ui.inspect '{}' >/dev/null 2>&1 && return 0; sleep 0.25; done
-  echo "the app didn't answer on port $PORT"; exit 98
+  for i in {1..40}; do method ui.inspect '{}' >/dev/null 2>&1 && break; sleep 0.25; done
+  method ui.inspect '{}' >/dev/null 2>&1 || { echo "the app didn't answer on port $PORT"; exit 98; }
+  [ -n "$LAYOUT" ] && method ui.set "{\"layout\":\"$LAYOUT\"}" >/dev/null
+  local now=$(method ui.inspect '{}' | jq_ "['ribbon']['layout']")
+  if [ -n "$LAYOUT" ] && [ "$now" != "$LAYOUT" ]; then echo "the layout is $now, not $LAYOUT"; exit 97; fi
+  return 0
 }
 quit() { method app.quit '{}' >/dev/null 2>&1; sleep 1; pkill -f "DeckCraftDev --control $PORT" 2>/dev/null; sleep 0.5; }
 
+echo "== layout: ${LAYOUT:-as a new install}"
 echo "== 0. Start screen → create from Harbor → one document"
 launch
 HOME_=$(method ui.inspect '{}' | jq_ "['startScreen']['shown']")

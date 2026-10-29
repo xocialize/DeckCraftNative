@@ -5642,6 +5642,28 @@
         }
       }
     },
+    "Share" : {
+      "comment" : "Toolbar item: share the saved presentation with the Mac's share menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
+    "Share\nSend the saved presentation by Mail, Messages, AirDrop or another app." : {
+      "comment" : "Toolbar item's tooltip: its name, then what it does",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share\nSend the saved presentation by Mail, Messages, AirDrop or another app."
+          }
+        }
+      }
+    },
     "Share…" : {
       "comment" : "Start window: a recent file's context menu",
       "localizations" : {

@@ -94,13 +94,31 @@ final class CanvasView: NSView {
     func relayout() {
         guard let scroll = enclosingScrollView, let st = document?.state, let model, let (viewport, scrolled, ins) = viewportInfo() else { return }
         let clip = scroll.contentView
-        let new = CanvasLayout.make(slide: pageSize(st), viewport: viewport, zoom: model.ui.zoom)
         let old = layoutInfo
+        var shown = viewport
+        var new = CanvasLayout.make(slide: pageSize(st), viewport: shown, zoom: model.ui.zoom)
+        // The document's new size can bring the scroll bars in or take them away. Legacy scroll bars (macOS shows
+        // them while a mouse is attached) take room from the viewport, so lay out again for the room that is
+        // left; twice at most, as their showing can flip back once.
+        for _ in 0 ..< 2 {
+            layoutInfo = new
+            if frame.size != new.documentSize { setFrameSize(new.documentSize) }
+            // Auto-hiding scroll bars are shown or hidden here, then tiling gives the clip view what is left.
+            scroll.reflectScrolledClipView(clip)
+            scroll.tile()
+            guard let now = viewportInfo()?.size, now != shown else { break }
+            shown = now
+            new = CanvasLayout.make(slide: pageSize(st), viewport: shown, zoom: model.ui.zoom)
+        }
         layoutInfo = new
         if frame.size != new.documentSize { setFrameSize(new.documentSize) }
         if let old, abs(old.scale - new.scale) > 1e-9 {
+            // What was at the pointer stays under it; what was in the middle of the view goes to the middle of the
+            // view as it is now, which scroll bars that came in have made smaller.
+            let shownNow = viewportInfo()?.size ?? shown
             let anchor = zoomAnchor ?? CGPoint(x: viewport.width / 2, y: viewport.height / 2)
-            let o = new.anchoredScroll(from: old, scroll: scrolled, anchor: anchor, viewport: viewport)
+            let target = zoomAnchor ?? CGPoint(x: shownNow.width / 2, y: shownNow.height / 2)
+            let o = new.anchoredScroll(from: old, scroll: scrolled, anchor: anchor, target: target, viewport: shownNow)
             clip.scroll(to: CGPoint(x: o.x - ins.left, y: o.y - ins.top))
             scroll.reflectScrolledClipView(clip)
         }

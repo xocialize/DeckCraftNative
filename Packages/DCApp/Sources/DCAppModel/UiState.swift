@@ -22,7 +22,8 @@ public struct UiState: Codable, Sendable, Equatable {
     public var brightness: Brightness = .system
     public var tab = "Home"
     public var ribbonCollapsed = false
-    /// The window layout (View › Ribbon, Settings › General). A `ui.json` from before the ribbon reads as the Mac layout.
+    /// The window layout (View › Ribbon, Settings › General). A `ui.json` from before the ribbon reads as the Mac
+    /// layout, so existing users keep it; a new install gets the ribbon (`newInstall`, decision 1).
     public var layout: WindowLayout = .mac
     public var view: ViewMode = .normal
     public var notes = true
@@ -55,6 +56,14 @@ public struct UiState: Codable, Sendable, Equatable {
     public var startPage = "home"
 
     public init() {}
+
+    /// What a first launch gets, with no `ui.json` to read (Ribbon-and-StartScreen decision 1, from R4): the ribbon.
+    /// `UiState()` keeps deckcraft's defaults, the Mac layout among them, for a `ui.json` that predates the ribbon.
+    public static var newInstall: UiState {
+        var s = UiState()
+        s.layout = .ribbon
+        return s
+    }
 
     enum CodingKeys: String, CodingKey {
         case brightness, tab, ribbonCollapsed, layout, view, notes, notesHeight, thumbsWidth, pane, paneWidth, ruler, gridlines,
@@ -125,9 +134,11 @@ public struct UiState: Codable, Sendable, Equatable {
         return s
     }
 
-    /// Read `ui.json`; a missing or unreadable file gives the defaults.
+    /// Read `ui.json`. No file means a new install (`newInstall`); one that can't be read gives the defaults, as
+    /// a file from before the ribbon would.
     public static func load(from url: URL) -> UiState {
-        guard let data = try? Data(contentsOf: url), let s = try? JSONDecoder().decode(UiState.self, from: data) else { return UiState() }
+        guard let data = try? Data(contentsOf: url) else { return FileManager.default.fileExists(atPath: url.path) ? UiState() : newInstall }
+        guard let s = try? JSONDecoder().decode(UiState.self, from: data) else { return UiState() }
         return s.sanitized()
     }
 

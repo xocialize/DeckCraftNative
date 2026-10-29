@@ -76,9 +76,15 @@ import Testing
         #expect(f.app.inspectors["canvas"]?()["scale"]?.asF64 == l.scale)
     }
 
-    // canvas.rs: zoom_commands_keep_the_middle_of_the_view; scroll_bars_pan_a_zoomed_slide (native scroll bars)
-    @Test func zoomingPastTheWindowScrollsAndKeepsTheMiddle() throws {
+    // canvas.rs: zoom_commands_keep_the_middle_of_the_view; scroll_bars_pan_a_zoomed_slide (native scroll bars).
+    // In both scroll bar styles: legacy scroll bars (shown while a mouse is attached) take room as the document
+    // grows past the window, and the slide used to be laid out for the room before they came (R4: a test that
+    // failed whenever the system's style was legacy).
+    @Test(arguments: [NSScroller.Style.overlay, .legacy])
+    func zoomingPastTheWindowScrollsAndKeepsTheMiddle(_ style: NSScroller.Style) throws {
         let f = Fixture()
+        f.vc.scroll.scrollerStyle = style
+        f.vc.refresh()
         let clip = f.vc.scroll.contentView
         let mid = CGPoint(x: clip.bounds.width / 2, y: clip.bounds.height / 2)
         let before = try #require(f.canvas.xf).toSlide(mid)
@@ -89,7 +95,10 @@ import Testing
         let l = try #require(f.canvas.layoutInfo)
         #expect(l.overflow(clip.bounds.size).width > 0, "the document grows past the window")
         #expect(f.canvas.frame.size == l.documentSize)
-        let now = try #require(f.canvas.xf).toSlide(CGPoint(x: mid.x + clip.bounds.minX, y: mid.y + clip.bounds.minY))
+        // The middle of the view as it is now: legacy scroll bars have taken 15–17 points from its right and bottom.
+        let middle = CGPoint(x: clip.bounds.width / 2, y: clip.bounds.height / 2)
+        #expect(style == .overlay ? middle == mid : middle.x < mid.x && middle.y < mid.y, "\(clip.bounds)")
+        let now = try #require(f.canvas.xf).toSlide(CGPoint(x: middle.x + clip.bounds.minX, y: middle.y + clip.bounds.minY))
         #expect(abs(now.x - before.x) < 1.5 && abs(now.y - before.y) < 1.5, "\(now) vs \(before)")
         f.model.run("view.fit")
         f.vc.refresh()

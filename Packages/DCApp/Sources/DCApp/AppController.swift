@@ -190,7 +190,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        if !Self.noPrefs { controller.model.ui = UiState.load(from: controller.supportDirectory.appending(path: "ui.json")) }
+        // Without prefs nothing is read, as on a first launch: the new-install state (the ribbon, decision 1).
+        controller.model.ui = Self.noPrefs ? .newInstall : UiState.load(from: controller.supportDirectory.appending(path: "ui.json"))
         NSApp.mainMenu = MenuBuilder.mainMenu(target: controller)
     }
 

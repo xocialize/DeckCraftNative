@@ -202,6 +202,31 @@ final class AcceptingHost: AppHost {
         #expect(back.layout == .ribbon)
     }
 
+    // R4 (decision 1): a fresh `ui.json` gets the ribbon; one from before the ribbon loads as the Mac layout; the tab,
+    // the minimised state and the layout come back as they were saved.
+    @Test func aNewInstallGetsTheRibbonAndOldStateKeepsTheMacLayout() throws {
+        let dir = FileManager.default.temporaryDirectory.appending(path: "dc-ui-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appending(path: "ui.json")
+        #expect(UiState.load(from: url).layout == .ribbon, "no ui.json: a new install")
+        #expect(UiState.load(from: url) == UiState.newInstall)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try Data(#"{"tab": "Insert", "ribbonCollapsed": true, "zoom": 1.5}"#.utf8).write(to: url)
+        let old = UiState.load(from: url)
+        #expect(old.layout == .mac && old.tab == "Insert" && old.ribbonCollapsed && old.zoom == 1.5, "before the ribbon")
+        try Data("not json".utf8).write(to: url)
+        #expect(UiState.load(from: url).layout == .mac, "a damaged file is an existing install's")
+        var s = UiState.newInstall
+        s.tab = "Slide Show"
+        s.ribbonCollapsed = true
+        s.save(to: url)
+        let back = UiState.load(from: url)
+        #expect(back.layout == .ribbon && back.tab == "Slide Show" && back.ribbonCollapsed)
+        s.layout = .mac
+        s.save(to: url)
+        #expect(UiState.load(from: url).layout == .mac, "a user who chose the Mac layout keeps it")
+    }
+
     @Test func theSelectedTabIsDeckcraftsName() {
         let s = AppModel(session: Session.withNew())
         #expect(RibbonModel.selected(s).id == "home")

@@ -81,12 +81,23 @@ public enum RibbonModel {
     /// The registry's English label for a command, or nil for the canvas tools.
     static func registryLabel(_ id: String) -> String? { findCommand(id)?.label ?? UICommands.find(id)?.label }
 
+    /// The Ribbon catalog's keys (§9): a tab's, a group's (its id names its tab), a control title's.
+    nonisolated public static func key(_ t: RibbonTab) -> String { "ribbon.tab.\(t.id)" }
+    nonisolated public static func key(_ g: RibbonGroup) -> String { "ribbon.group.\(g.id)" }
+    nonisolated public static func key(_ c: RibbonControl) -> String { "ribbon.control.\(c.id)" }
+
+    /// The tab's title to show, translated. `view.tab` and `ui.inspect` keep the English `title`.
+    nonisolated public static func title(_ t: RibbonTab) -> String { Bundle.module.localizedString(forKey: key(t), value: t.title, table: "Ribbon") }
+
+    /// The group's title to show, translated: VoiceOver's name for it and its button when it folds.
+    nonisolated public static func title(_ g: RibbonGroup) -> String { Bundle.module.localizedString(forKey: key(g), value: g.title, table: "Ribbon") }
+
     /// The control's label: its title, or its command's label as the Commands catalog has it.
     public static func label(_ c: RibbonControl) -> String {
         if c.id == "handoutMaster.perPage" {
             return String(localized: "Slides Per Page: \(inspector?.model.ui.handoutPerPage ?? 6)", bundle: .module, comment: "Handout Master: how many slides a handout page holds")
         }
-        if let t = c.title { return t }
+        if let t = c.title { return Bundle.module.localizedString(forKey: key(c), value: t, table: "Ribbon") }
         guard let l = registryLabel(c.command.id) else { return c.id }
         return L10n.commandLabel(c.command.id, l)
     }
@@ -442,7 +453,7 @@ public enum RibbonModel {
 
     // MARK: The control channel
 
-    /// `ui.inspect`'s `ribbon`: the layout, the tab, whether it is minimised, the tabs, and the shown tab's groups
+    /// `ui.inspect`'s `ribbon`: the layout, the tab (deckcraft's title, and its id), whether it is minimised, the tabs, and the shown tab's groups
     /// with each control's enabled and toggle state.
     public static func inspect(_ model: AppModel) -> JSON {
         let tab = selected(model)
@@ -460,7 +471,7 @@ public enum RibbonModel {
         }
         return [
             "layout": .string(model.ui.layout.rawValue), "shown": .bool(model.ui.layout == .ribbon), "tab": .string(tab.title),
-            "collapsed": .bool(model.ui.ribbonCollapsed), "tabs": .array(tabs(model).map { .string($0.title) }),
+            "tabId": .string(tab.id), "collapsed": .bool(model.ui.ribbonCollapsed), "tabs": .array(tabs(model).map { .string($0.title) }),
             "contextual": .array(contextual(model.session.activeDoc).map { .string($0) }), "groups": .array(groups),
         ]
     }

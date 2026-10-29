@@ -1087,6 +1087,82 @@ there is no "Show group titles" setting (§12).
       run, and the width never updates.
   - The UI command count is 54.
 
+### R4: localisation and polish (done 2026-10-28)
+
+The ribbon's own text is translatable, every command the palette lists says what it does, the ribbon holds up in
+longer and right-to-left languages, the toolbar gains Share, and **new installs get the ribbon** (decision 1).
+
+| File | What it holds |
+|---|---|
+| `DCAppModel/Resources/Ribbon.xcstrings` | 280 keys: `ribbon.tab.<id>`, `ribbon.group.<tab>.<id>` (a group's id names its tab) and `ribbon.control.<id>` for each control title that isn't its command's label. They need their own keys because one English word names several things ("Layout", "Arrange"). Generated, never hand-edited |
+| `DCAppModel/RibbonModel.swift` | `key(_:)` for a tab, group or control; `title(_:)` for a tab or group, translated. `view.tab` and `ui.inspect` keep deckcraft's English titles. `ui.inspect`'s `ribbon` gains `tabId` |
+| `DCAppModel/CommandHelp.swift` | 106 more descriptions, for the commands only the menus and the palette reach, written from what our command does |
+| `DCAppModel/UiState.swift` | `UiState.newInstall` (the ribbon). `load` gives it when there is no `ui.json`; a file without `layout`, or one that can't be read, keeps the Mac layout |
+| `DCApp/AppController.swift` | A launch with `DECKCRAFT_NO_PREFS` reads nothing, so it starts as a new install |
+| `DCApp/Ribbon/RibbonView.swift` | `RibbonLabel`: a large control's label and a collapsed group's title widen, up to twice their base width, until they fit in two lines |
+| `DCApp/Ribbon/RibbonFeature.swift` | Share (`ShareToolbarItem`); `truncated` measures labels with `RibbonLabel` |
+| `DCApp/Dialogs/DialogPresenter.swift` | The palette shows each command's description under its label |
+| `DCApp/Automation/AppControlHost.swift` | `ui.set {layout: ribbon or mac}` |
+| `DCApp/Canvas/CanvasView.swift`, `DCAppModel/CanvasGeometry.swift` | Zooming with legacy scroll bars keeps the middle (below) |
+| `Tools/app/ribbon-widths.sh` | The width check, in English, pseudo, double-length and right-to-left |
+| `Tools/app/alpha-gate.sh` | `GATE_LAYOUT=ribbon` or `mac` sets the layout after every launch, and stops if it doesn't take |
+| `Tools/l10n/commands.sh`, `pseudo.sh` | Write the Ribbon catalog too, and pseudo-localise it |
+
+- **Persistence.**
+  - The tab, the minimised state and the layout were already `UiState` fields, saved in `ui.json` at quit. R4 adds the
+    test that they come back as saved.
+  - The Quick Access Toolbar is kept in the app's defaults (`QAT.load` and `save`) and both layouts show the same one,
+    so it needed nothing new.
+- **The default (decision 1).**
+  - With no `ui.json`, a launch gets `UiState.newInstall`, which is the ribbon.
+  - A `ui.json` from before the ribbon has no `layout`, and it loads as the Mac layout, so existing users keep what
+    they have. A `ui.json` that can't be read also keeps the Mac layout, as an existing install's.
+  - `UiState()` keeps deckcraft's defaults, the Mac layout among them, and the tests build on it.
+- **Share** is the last item of the ribbon layout's toolbar, after Comments. It opens the Mac's share menu
+  (`NSSharingServicePicker`) for the presentation's file. It is disabled until the presentation has been saved,
+  because there are no accounts and no cloud to share an unsaved one through (§3).
+- **Descriptions.**
+  - Every command the palette can list has one: 238 commands, in the Commands catalog as `help.<id>`.
+  - `StringsCatalogTests.everyPaletteCommandHasADescription` checks them all, enabled or not, and
+    `commandsCatalogMatchesTheRegistry` keeps `help.*` in step with `CommandHelp`.
+  - The palette shows the description under each label, as §6 says.
+- **The width check** (`Tools/app/ribbon-widths.sh`).
+  - It lays out all 20 tabs, the contextual and master tabs with their objects selected, at 1600, 1150, 920 and 700
+    pt. At each width it fails on any `truncated` entry, a selected tab in "»", or a resize that didn't take.
+  - The pseudo run uses en-XA. The double-length run uses `-NSDoubleLocalizedStrings YES`. The right-to-left run
+    mirrors the ribbon, which then folds from the left.
+  - The en-XA tables `pseudo.sh` compiles stay in the built bundles, so the other runs remove them first. Before
+    that, the double-length run had been doubling the pseudo strings.
+  - The first double-length run failed 62 times. Every failure was a large control's label, or a collapsed group's
+    title, longer than two lines at its fixed width: "From Beginning From Beginning" in 76 pt.
+  - Labels now widen, as a ribbon button grows for a longer name in another language. The fold measures the wider
+    groups and folds them sooner.
+  - Result: English, pseudo, double-length and right-to-left all give `truncated == []` on every tab at all four
+    widths.
+- **The zoom test that failed about one run in six** (`CanvasViewTests.zoomingPastTheWindowScrollsAndKeepsTheMiddle`,
+  failing since before R3). It was a real bug, not a test-only flake.
+  - **The bug.** macOS draws legacy scroll bars, which take 15–17 pt, while a mouse is connected. When a zoom made the
+    document overflow, the canvas had laid the slide out for the room before the scroll bars came. Where the slide
+    still fitted on one axis, it was centred for the old room, and then shifted by half a scroll bar on the next
+    layout: 8.5 pt, which is 5.7 slide pt at 150 %.
+  - **Why it was intermittent.** `NSScroller.preferredScrollerStyle` read as overlay in some runs of the test target
+    and as legacy in others. Overlay scroll bars take no room, so those runs passed.
+  - **The fix.** After resizing the document, `relayout` shows or hides the scroll bars
+    (`reflectScrolledClipView`, `tile`) and lays out again for the room left, twice at most. A zoom then puts what
+    was in the middle of the view at the middle of the view as it now is (`anchoredScroll`'s new `target`); a
+    pointer zoom keeps the point under the pointer.
+  - **The test** now runs in both scroll-bar styles, set on the scroll view, so it no longer depends on the
+    system's. It measures at the middle of the view as it is after the zoom. The tolerance is unchanged, and the old
+    `relayout` fails the legacy case by 6.8 pt.
+- **Not done here, left for the operator by hand:** the Accessibility Inspector audit of the ribbon, and the walk
+  with Full Keyboard Access on (R3).
+- **Tests.**
+  - `StringsCatalogTests`: `ribbonCatalogMatchesTheLayout` (the catalog matches the layout, and the bundle has every
+    key) and `everyPaletteCommandHasADescription`.
+  - `RibbonModelTests.aNewInstallGetsTheRibbonAndOldStateKeepsTheMacLayout`.
+  - `RibbonWindowTests`: the toolbar ends with Share, disabled for an unsaved presentation.
+  - `CanvasViewTests.zoomingPastTheWindowScrollsAndKeepsTheMiddle`, in both scroll-bar styles.
+
 ## lib.rs tests
 
 deckcraft's `crates/ui-egui/src/lib.rs` has 62 `#[test]`s (`mod tests`, at the pin). Each is triaged below: **already

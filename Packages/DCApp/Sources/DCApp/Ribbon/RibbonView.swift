@@ -106,7 +106,7 @@ struct RibbonView: View {
 
     private func tabRow(_ selected: RibbonTab) -> some View {
         let all = RibbonModel.tabs(model)
-        let widths = all.map { Double(Self.tabWidth($0.title)) }
+        let widths = all.map { Double(Self.tabWidth(RibbonModel.title($0))) }
         let fit = RibbonFit.tabs(widths, selected: all.firstIndex { $0.id == selected.id }, available: Double(state.width - 2 * Tokens.Space.m),
                                  more: Double(Self.moreWidth))
         let shown = fit.shown.compactMap { all.at($0) }
@@ -130,7 +130,7 @@ struct RibbonView: View {
             }
             if !overflow.isEmpty {
                 Menu {
-                    ForEach(overflow, id: \.id) { t in Button(t.title) { pick(t) } }
+                    ForEach(overflow, id: \.id) { t in Button(RibbonModel.title(t)) { pick(t) } }
                 } label: { Text(verbatim: "»").frame(width: Self.moreWidth - 12) }
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.hidden)
@@ -149,7 +149,7 @@ struct RibbonView: View {
 
     private func tabButton(_ t: RibbonTab, on: Bool) -> some View {
         Button { pick(t) } label: {
-            Text(t.title)
+            Text(RibbonModel.title(t))
                 .fontWeight(on ? .semibold : .regular)
                 // Contextual tabs are tinted with the accent colour (§3), as deckcraft's are.
                 .foregroundStyle(t.contextual == nil ? Color.primary : Color.accentColor)
@@ -182,7 +182,7 @@ struct RibbonView: View {
     }
 
     static func spoken(_ t: RibbonTab) -> String {
-        t.contextual == nil ? t.title : String(localized: "\(t.title), contextual", bundle: .module, comment: "VoiceOver: a ribbon tab the selection brings")
+        t.contextual == nil ? RibbonModel.title(t) : String(localized: "\(RibbonModel.title(t)), contextual", bundle: .module, comment: "VoiceOver: a ribbon tab the selection brings")
     }
 
     /// The width a tab's button takes: its title, semibold (the widest it is drawn), and its padding.
@@ -405,7 +405,7 @@ struct RibbonGroupView: View {
         .frame(height: RibbonView.bodyHeight)
         .fixedSize(horizontal: true, vertical: false)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(group.title)
+        .accessibilityLabel(RibbonModel.title(group))
     }
 }
 
@@ -426,13 +426,13 @@ struct RibbonCollapsedGroup: View {
                 RibbonIcon(symbol: RibbonModel.symbol(group: group), large: true)
                 HStack(spacing: 2) {
                     // Two lines at most, wrapped rather than cut ("WordArt Styles").
-                    Text(group.title).font(.caption).lineLimit(2).multilineTextAlignment(.center)
+                    Text(RibbonModel.title(group)).font(.caption).lineLimit(2).multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                     Image(systemName: "chevron.down").font(.system(size: 7, weight: .semibold))
                 }
-                .frame(maxWidth: RibbonModel.collapsedLabelWidth + 11)
+                .frame(maxWidth: RibbonLabel.width(RibbonModel.title(group), base: RibbonModel.collapsedLabelWidth) + 11)
             }
-            .frame(minWidth: 44, maxWidth: 80)
+            .frame(minWidth: 44, maxWidth: RibbonLabel.width(RibbonModel.title(group), base: RibbonModel.collapsedLabelWidth) + 14)
         }
         .buttonStyle(.borderless)
         .ribbonFocused(focus, id)
@@ -440,8 +440,8 @@ struct RibbonCollapsedGroup: View {
         .padding(.vertical, Tokens.Space.xs)
         .frame(height: RibbonView.bodyHeight, alignment: .top)
         .fixedSize(horizontal: true, vertical: false)
-        .help(group.title)
-        .accessibilityLabel(group.title)
+        .help(RibbonModel.title(group))
+        .accessibilityLabel(RibbonModel.title(group))
         .accessibilityHint(String(localized: "Shows the group's controls", bundle: .module, comment: "VoiceOver: a ribbon group folded into one button"))
         .reportFrame(group.id, state)
         .popover(isPresented: $open, arrowEdge: .bottom) {
@@ -576,7 +576,7 @@ struct RibbonControlView: View {
             icon(true)
             Text(label).font(.caption).multilineTextAlignment(.center).lineLimit(2).fixedSize(horizontal: false, vertical: true)
         }
-        .frame(minWidth: 44, maxWidth: RibbonModel.largeLabelWidth)
+        .frame(minWidth: 44, maxWidth: RibbonLabel.width(label, base: RibbonModel.largeLabelWidth))
     }
 
     @ViewBuilder private var face: some View {
@@ -627,7 +627,7 @@ struct RibbonControlView: View {
                         .ribbonFocused(focus, menuID)
                         .accessibilityLabel(options)
                 }
-                .frame(minWidth: 44, maxWidth: RibbonModel.largeLabelWidth)
+                .frame(minWidth: 44, maxWidth: RibbonLabel.width(label, base: RibbonModel.largeLabelWidth))
             } else {
                 HStack(spacing: 0) {
                     Button { RibbonActions.press(control, model) } label: { face }
@@ -809,5 +809,34 @@ struct RibbonMenuItems: View {
                 Menu(title) { AnyView(RibbonMenuItems(entries: items, model: model)) }
             }
         }
+    }
+}
+
+/// How wide a two-line caption label is drawn (R4, §9): its base width, widened in steps until the text fits in two
+/// lines, as a ribbon button grows for a longer name in another language. It stops at twice the base; a label that
+/// still needs more lines is cut there, and `ui.inspect`'s `truncated` reports it.
+@MainActor
+enum RibbonLabel {
+    private static var cache: [String: Double] = [:]
+
+    static var caption: NSFont { NSFont.preferredFont(forTextStyle: .caption1) }
+
+    /// Whether `text` fits in two lines of the caption font at `width`.
+    static func fits(_ text: String, _ width: Double) -> Bool {
+        let font = caption
+        let h = (text as NSString).boundingRect(with: NSSize(width: width, height: 1000), options: [.usesLineFragmentOrigin],
+                                                 attributes: [.font: font]).height
+        return h <= ceil(font.boundingRectForFont.height * 2) + 1
+    }
+
+    /// The width `text` is drawn at, from `base` up to twice it.
+    static func width(_ text: String, base: Double) -> Double {
+        let key = "\(caption.pointSize)|\(base)|\(text)"
+        if let w = cache[key] { return w }
+        var w = base
+        while w < base * 2, !fits(text, w) { w += 4 }
+        if cache.count > 4096 { cache.removeAll() }
+        cache[key] = w
+        return w
     }
 }

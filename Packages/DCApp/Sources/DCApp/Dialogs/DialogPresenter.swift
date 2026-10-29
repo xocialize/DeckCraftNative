@@ -238,7 +238,13 @@ struct PaletteView: View {
                         ForEach(Array(controller.paletteItems.enumerated()), id: \.offset) { k, item in
                             Button { controller.paletteRun(item.id) } label: {
                                 HStack {
-                                    Text(item.label)
+                                    // The one-line description under the label (decision 3), as the tooltips have it.
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(item.label)
+                                        if let d = CommandHelp.description(item.id) {
+                                            Text(d).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel).lineLimit(1)
+                                        }
+                                    }
                                     Spacer()
                                     if let s = item.shortcut { Text(Self.pretty(s)).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.tertiaryLabel) }
                                 }
@@ -254,7 +260,7 @@ struct PaletteView: View {
                 }
                 .onChange(of: selection) { _, s in proxy.scrollTo(s) }
             }
-            .frame(height: Tokens.Layout.rowHeight * 8)
+            .frame(height: Tokens.Layout.rowHeight * 12)
         }
         .padding(Tokens.Space.m)
         .frame(width: Tokens.Layout.inspectorWidth * 1.6)

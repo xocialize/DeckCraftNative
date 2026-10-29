@@ -1,0 +1,3366 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "ribbon.control.animations.add" : {
+      "comment" : "A control in the Animations tab's Advanced Animation group (runs animation.add)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Animation"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.delay" : {
+      "comment" : "A control in the Animations tab's Timing group (runs animation.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delay"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.duration" : {
+      "comment" : "A control in the Animations tab's Timing group (runs animation.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.effectOptions" : {
+      "comment" : "A control in the Animations tab's Animation group (runs animation.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effect Options"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.gallery" : {
+      "comment" : "A control in the Animations tab's Animation group (runs animation.set)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animations"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.pane" : {
+      "comment" : "A control in the Animations tab's Advanced Animation group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.preview" : {
+      "comment" : "A control in the Animations tab's Preview group (runs animation.preview)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.start" : {
+      "comment" : "A control in the Animations tab's Timing group (runs animation.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
+    },
+    "ribbon.control.animations.trigger" : {
+      "comment" : "A control in the Animations tab's Advanced Animation group (runs animation.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trigger"
+          }
+        }
+      }
+    },
+    "ribbon.control.chartDesign.align" : {
+      "comment" : "A control in the Chart Design tab's Arrange group (runs arrange.align)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "ribbon.control.chartDesign.changeType" : {
+      "comment" : "A control in the Chart Design tab's Type group (runs chart.type)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Chart Type"
+          }
+        }
+      }
+    },
+    "ribbon.control.chartDesign.editData" : {
+      "comment" : "A control in the Chart Design tab's Data group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Data"
+          }
+        }
+      }
+    },
+    "ribbon.control.chartDesign.rotate" : {
+      "comment" : "A control in the Chart Design tab's Arrange group (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
+          }
+        }
+      }
+    },
+    "ribbon.control.chartDesign.selectionPane" : {
+      "comment" : "A control in the Chart Design tab's Arrange group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.background" : {
+      "comment" : "A control in the Design tab's Variants group (runs design.background)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.colors" : {
+      "comment" : "A control in the Design tab's Variants group (runs design.colors)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colors"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.designer" : {
+      "comment" : "A control in the Design tab's Designer group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Designer"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.effects" : {
+      "comment" : "A control in the Design tab's Variants group (runs design.effects)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effects"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.fonts" : {
+      "comment" : "A control in the Design tab's Variants group (runs design.fonts)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonts"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.formatBackground" : {
+      "comment" : "A control in the Design tab's Customize group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Background"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.slideSize" : {
+      "comment" : "A control in the Design tab's Customize group (runs design.slideSize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Size"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.themes" : {
+      "comment" : "A control in the Design tab's Themes group (runs design.theme)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Themes"
+          }
+        }
+      }
+    },
+    "ribbon.control.design.variants" : {
+      "comment" : "A control in the Design tab's Variants group (runs design.variant)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.blackPen" : {
+      "comment" : "A control in the Draw tab's Pens group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Black Pen"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.bluePen" : {
+      "comment" : "A control in the Draw tab's Pens group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue Pen"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.eraser" : {
+      "comment" : "A control in the Draw tab's Tools group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eraser"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.highlighter" : {
+      "comment" : "A control in the Draw tab's Pens group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highlighter"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.pencil" : {
+      "comment" : "A control in the Draw tab's Pens group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pencil"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.redPen" : {
+      "comment" : "A control in the Draw tab's Pens group (runs tool.ink)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red Pen"
+          }
+        }
+      }
+    },
+    "ribbon.control.draw.select" : {
+      "comment" : "A control in the Draw tab's Tools group (runs tool.select)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.background" : {
+      "comment" : "A control in the Handout Master tab's Background group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.date" : {
+      "comment" : "A control in the Handout Master tab's Placeholders group (runs handout.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.footer" : {
+      "comment" : "A control in the Handout Master tab's Placeholders group (runs handout.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Footer"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.header" : {
+      "comment" : "A control in the Handout Master tab's Placeholders group (runs handout.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Header"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.pageNumber" : {
+      "comment" : "A control in the Handout Master tab's Placeholders group (runs handout.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Number"
+          }
+        }
+      }
+    },
+    "ribbon.control.handoutMaster.perPage" : {
+      "comment" : "A control in the Handout Master tab's Page Setup group (runs view.handoutSlides)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides Per Page"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.anchor" : {
+      "comment" : "A control in the Home tab's Paragraph group (runs format.anchor)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Text"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.arrange" : {
+      "comment" : "A control in the Home tab's Drawing group (runs arrange.bringToFront)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.case" : {
+      "comment" : "A control in the Home tab's Font group (runs format.case)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Case"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.columns" : {
+      "comment" : "A control in the Home tab's Paragraph group (runs format.columns)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Columns"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.convertSmartArt" : {
+      "comment" : "A control in the Home tab's Paragraph group (runs smartArt.fromText)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert to SmartArt"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.designer" : {
+      "comment" : "A control in the Home tab's Designer group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Designer"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.direction" : {
+      "comment" : "A control in the Home tab's Paragraph group (runs format.direction)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Direction"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.layout" : {
+      "comment" : "A control in the Home tab's Slides group (runs slide.layout)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.lineSpacing" : {
+      "comment" : "A control in the Home tab's Paragraph group (runs format.lineSpacing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line Spacing"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.picture" : {
+      "comment" : "A control in the Home tab's Insert group (runs app.insertPictureDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.quickStyles" : {
+      "comment" : "A control in the Home tab's Drawing group (runs shape.quickStyle)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.section" : {
+      "comment" : "A control in the Home tab's Slides group (runs section.add)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Section"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.selectionPane" : {
+      "comment" : "A control in the Home tab's Editing group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.shapeEffects" : {
+      "comment" : "A control in the Home tab's Drawing group (runs shape.effects)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Effects"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.shapeFill" : {
+      "comment" : "A control in the Home tab's Drawing group (runs shape.fill)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Fill"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.shapeOutline" : {
+      "comment" : "A control in the Home tab's Drawing group (runs shape.line)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Outline"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.shapes" : {
+      "comment" : "A control in the Home tab's Insert group (runs shape.insert)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shapes"
+          }
+        }
+      }
+    },
+    "ribbon.control.home.spacing" : {
+      "comment" : "A control in the Home tab's Font group (runs format.spacing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Character Spacing"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.action" : {
+      "comment" : "A control in the Insert tab's Links group (runs insert.actionButton)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.audio" : {
+      "comment" : "A control in the Insert tab's Media group (runs app.insertAudioDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.chart" : {
+      "comment" : "A control in the Insert tab's Illustrations group (runs insert.chart)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.comment" : {
+      "comment" : "A control in the Insert tab's Comments group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.equation" : {
+      "comment" : "A control in the Insert tab's Symbols group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Equation"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.headerFooter" : {
+      "comment" : "A control in the Insert tab's Text group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Header & Footer"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.icons" : {
+      "comment" : "A control in the Insert tab's Illustrations group (runs insert.icon)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.link" : {
+      "comment" : "A control in the Insert tab's Links group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.pictures" : {
+      "comment" : "A control in the Insert tab's Images group (runs app.insertPictureDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.shapes" : {
+      "comment" : "A control in the Insert tab's Illustrations group (runs shape.insert)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shapes"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.smartArt" : {
+      "comment" : "A control in the Insert tab's Illustrations group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.symbol" : {
+      "comment" : "A control in the Insert tab's Symbols group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbol"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.table" : {
+      "comment" : "A control in the Insert tab's Tables group (runs insert.table)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.video" : {
+      "comment" : "A control in the Insert tab's Media group (runs app.insertVideoDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "ribbon.control.insert.zoom" : {
+      "comment" : "A control in the Insert tab's Links group (runs insert.zoom)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.background" : {
+      "comment" : "A control in the Notes Master tab's Background group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.body" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Body"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.date" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.footer" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Footer"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.header" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Header"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.pageNumber" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Number"
+          }
+        }
+      }
+    },
+    "ribbon.control.notesMaster.slideImage" : {
+      "comment" : "A control in the Notes Master tab's Placeholders group (runs notes.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Image"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.align" : {
+      "comment" : "A control in the Picture Format tab's Arrange group (runs arrange.align)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.altText" : {
+      "comment" : "A control in the Picture Format tab's Picture Styles group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt Text"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.artistic" : {
+      "comment" : "A control in the Picture Format tab's Adjust group (runs picture.artisticEffect)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Artistic Effects"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.border" : {
+      "comment" : "A control in the Picture Format tab's Picture Styles group (runs shape.line)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Border"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.color" : {
+      "comment" : "A control in the Picture Format tab's Adjust group (runs picture.recolor)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.corrections" : {
+      "comment" : "A control in the Picture Format tab's Adjust group (runs picture.adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corrections"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.crop" : {
+      "comment" : "A control in the Picture Format tab's Crop group (runs picture.crop)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.gallery" : {
+      "comment" : "A control in the Picture Format tab's Picture Styles group (runs picture.style)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.height" : {
+      "comment" : "A control in the Picture Format tab's Size group (runs shape.resize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.removeBackground" : {
+      "comment" : "A control in the Picture Format tab's Adjust group (runs picture.removeBackground)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Background"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.rotate" : {
+      "comment" : "A control in the Picture Format tab's Arrange group (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.selectionPane" : {
+      "comment" : "A control in the Picture Format tab's Arrange group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.transparency" : {
+      "comment" : "A control in the Picture Format tab's Adjust group (runs picture.adjust)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transparency"
+          }
+        }
+      }
+    },
+    "ribbon.control.pictureFormat.width" : {
+      "comment" : "A control in the Picture Format tab's Size group (runs shape.resize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Width"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.acrossSlides" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Across Slides"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.autoplay" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Automatically"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.fullScreen" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Full Screen"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.hide" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide During Show"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.loop" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loop until Stopped"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.play" : {
+      "comment" : "A control in the Playback tab's Preview group (runs media.toggle)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.rewind" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rewind after Playing"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.trim" : {
+      "comment" : "A control in the Playback tab's Editing group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trim"
+          }
+        }
+      }
+    },
+    "ribbon.control.playback.volume" : {
+      "comment" : "A control in the Playback tab's Options group (runs media.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        }
+      }
+    },
+    "ribbon.control.record.fromBeginning" : {
+      "comment" : "A control in the Record tab's Record group (runs show.start)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Beginning"
+          }
+        }
+      }
+    },
+    "ribbon.control.record.fromCurrent" : {
+      "comment" : "A control in the Record tab's Record group (runs show.start)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Current Slide"
+          }
+        }
+      }
+    },
+    "ribbon.control.review.checkAccessibility" : {
+      "comment" : "A control in the Review tab's Accessibility group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Accessibility"
+          }
+        }
+      }
+    },
+    "ribbon.control.review.language" : {
+      "comment" : "A control in the Review tab's Language group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
+    "ribbon.control.review.newComment" : {
+      "comment" : "A control in the Review tab's Comments group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Comment"
+          }
+        }
+      }
+    },
+    "ribbon.control.review.showComments" : {
+      "comment" : "A control in the Review tab's Comments group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Comments"
+          }
+        }
+      }
+    },
+    "ribbon.control.review.spelling" : {
+      "comment" : "A control in the Review tab's Proofing group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spelling"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.align" : {
+      "comment" : "A control in the Shape Format tab's Arrange group (runs arrange.align)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.altText" : {
+      "comment" : "A control in the Shape Format tab's Accessibility group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alt Text"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.editShape" : {
+      "comment" : "A control in the Shape Format tab's Insert Shapes group (runs shape.change)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Shape"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.effects" : {
+      "comment" : "A control in the Shape Format tab's Shape Styles group (runs shape.effects)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Effects"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.fill" : {
+      "comment" : "A control in the Shape Format tab's Shape Styles group (runs shape.fill)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Fill"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.formatPane" : {
+      "comment" : "A control in the Shape Format tab's Format Pane group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.height" : {
+      "comment" : "A control in the Shape Format tab's Size group (runs shape.resize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Height"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.merge" : {
+      "comment" : "A control in the Shape Format tab's Insert Shapes group (runs shape.merge)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge Shapes"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.outline" : {
+      "comment" : "A control in the Shape Format tab's Shape Styles group (runs shape.line)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Outline"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.quickStyles" : {
+      "comment" : "A control in the Shape Format tab's Shape Styles group (runs shape.quickStyle)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.rotate" : {
+      "comment" : "A control in the Shape Format tab's Arrange group (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.selectionPane" : {
+      "comment" : "A control in the Shape Format tab's Arrange group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.shapes" : {
+      "comment" : "A control in the Shape Format tab's Insert Shapes group (runs shape.insert)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shapes"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.textEffects" : {
+      "comment" : "A control in the Shape Format tab's WordArt Styles group (runs format.textShadow)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Effects"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.textFill" : {
+      "comment" : "A control in the Shape Format tab's WordArt Styles group (runs format.color)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Fill"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.textOutline" : {
+      "comment" : "A control in the Shape Format tab's WordArt Styles group (runs format.textOutline)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Outline"
+          }
+        }
+      }
+    },
+    "ribbon.control.shapeFormat.width" : {
+      "comment" : "A control in the Shape Format tab's Size group (runs shape.resize)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Width"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.background" : {
+      "comment" : "A control in the Slide Master tab's Background group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.footers" : {
+      "comment" : "A control in the Slide Master tab's Master Layout group (runs master.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Footers"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.insertPlaceholder" : {
+      "comment" : "A control in the Slide Master tab's Master Layout group (runs master.insertPlaceholder)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Placeholder"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.preserve" : {
+      "comment" : "A control in the Slide Master tab's Edit Master group (runs master.preserve)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preserve"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.rename" : {
+      "comment" : "A control in the Slide Master tab's Edit Master group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.themes" : {
+      "comment" : "A control in the Slide Master tab's Edit Theme group (runs design.theme)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Themes"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideMaster.title" : {
+      "comment" : "A control in the Slide Master tab's Master Layout group (runs master.placeholders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.customShow" : {
+      "comment" : "A control in the Slide Show tab's Start Slide Show group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Show"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.mediaControls" : {
+      "comment" : "A control in the Slide Show tab's Options group (runs show.setup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Media Controls"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.narrations" : {
+      "comment" : "A control in the Slide Show tab's Options group (runs show.setup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play Narrations"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.rehearse" : {
+      "comment" : "A control in the Slide Show tab's Set Up group (runs show.start)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rehearse Timings"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.setUpShow" : {
+      "comment" : "A control in the Slide Show tab's Set Up group (runs app.dialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Slide Show"
+          }
+        }
+      }
+    },
+    "ribbon.control.slideShow.useTimings" : {
+      "comment" : "A control in the Slide Show tab's Options group (runs show.setup)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Timings"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.addShape" : {
+      "comment" : "A control in the SmartArt Design tab's Create Graphic group (runs smartArt.addNode)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Shape"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.align" : {
+      "comment" : "A control in the SmartArt Design tab's Arrange group (runs arrange.align)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.colors" : {
+      "comment" : "A control in the SmartArt Design tab's SmartArt Styles group (runs smartArt.colors)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Colors"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.convert" : {
+      "comment" : "A control in the SmartArt Design tab's Layouts group (runs smartArt.toText)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.gallery" : {
+      "comment" : "A control in the SmartArt Design tab's SmartArt Styles group (runs smartArt.style)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.layouts" : {
+      "comment" : "A control in the SmartArt Design tab's Layouts group (runs smartArt.layout)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layouts"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.rotate" : {
+      "comment" : "A control in the SmartArt Design tab's Arrange group (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.selectionPane" : {
+      "comment" : "A control in the SmartArt Design tab's Arrange group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.smartArtDesign.textPane" : {
+      "comment" : "A control in the SmartArt Design tab's Create Graphic group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.bandedColumns" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banded Columns"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.bandedRows" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Banded Rows"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.borders" : {
+      "comment" : "A control in the Table Design tab's Table Styles group (runs table.borders)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borders"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.drawTable" : {
+      "comment" : "A control in the Table Design tab's Draw Borders group (runs tool.shape)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw Table"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.eraser" : {
+      "comment" : "A control in the Table Design tab's Draw Borders group (runs tool.shape)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eraser"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.firstColumn" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Column"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.gallery" : {
+      "comment" : "A control in the Table Design tab's Table Styles group (runs table.style)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Styles"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.headerRow" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Header Row"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.lastColumn" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Column"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.shading" : {
+      "comment" : "A control in the Table Design tab's Table Styles group (runs table.cellFill)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shading"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableDesign.totalRow" : {
+      "comment" : "A control in the Table Design tab's Table Style Options group (runs table.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Row"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.align" : {
+      "comment" : "A control in the Layout tab's Arrange group (runs arrange.align)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.alignBottom" : {
+      "comment" : "A control in the Layout tab's Alignment group (runs table.cellAlign)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Bottom"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.alignMiddle" : {
+      "comment" : "A control in the Layout tab's Alignment group (runs table.cellAlign)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center Vertically"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.alignTop" : {
+      "comment" : "A control in the Layout tab's Alignment group (runs table.cellAlign)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Align Top"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.delete" : {
+      "comment" : "A control in the Layout tab's Rows & Columns group (runs table.deleteRow)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.margins" : {
+      "comment" : "A control in the Layout tab's Alignment group (runs table.cellMargins)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cell Margins"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.rotate" : {
+      "comment" : "A control in the Layout tab's Arrange group (runs arrange.rotateRight)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotate"
+          }
+        }
+      }
+    },
+    "ribbon.control.tableLayout.selectionPane" : {
+      "comment" : "A control in the Layout tab's Arrange group (runs view.pane)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection Pane"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.after" : {
+      "comment" : "A control in the Transitions tab's Timing group (runs transition.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.duration" : {
+      "comment" : "A control in the Transitions tab's Timing group (runs transition.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.effectOptions" : {
+      "comment" : "A control in the Transitions tab's Transition to This Slide group (runs transition.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effect Options"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.gallery" : {
+      "comment" : "A control in the Transitions tab's Transition to This Slide group (runs transition.set)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transitions"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.onClick" : {
+      "comment" : "A control in the Transitions tab's Timing group (runs transition.timing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Mouse Click"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.preview" : {
+      "comment" : "A control in the Transitions tab's Preview group (runs show.start)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "ribbon.control.transitions.sound" : {
+      "comment" : "A control in the Transitions tab's Timing group (runs transition.sound)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound"
+          }
+        }
+      }
+    },
+    "ribbon.control.view.zoom" : {
+      "comment" : "A control in the View tab's Zoom group (runs view.zoomDialog)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "ribbon.group.animations.advanced" : {
+      "comment" : "A group of the Animations ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced Animation"
+          }
+        }
+      }
+    },
+    "ribbon.group.animations.animation" : {
+      "comment" : "A group of the Animations ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animation"
+          }
+        }
+      }
+    },
+    "ribbon.group.animations.preview" : {
+      "comment" : "A group of the Animations ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "ribbon.group.animations.timing" : {
+      "comment" : "A group of the Animations ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timing"
+          }
+        }
+      }
+    },
+    "ribbon.group.chartDesign.arrange" : {
+      "comment" : "A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.group.chartDesign.data" : {
+      "comment" : "A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        }
+      }
+    },
+    "ribbon.group.chartDesign.type" : {
+      "comment" : "A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
+    "ribbon.group.design.customize" : {
+      "comment" : "A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize"
+          }
+        }
+      }
+    },
+    "ribbon.group.design.designer" : {
+      "comment" : "A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Designer"
+          }
+        }
+      }
+    },
+    "ribbon.group.design.themes" : {
+      "comment" : "A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Themes"
+          }
+        }
+      }
+    },
+    "ribbon.group.design.variants" : {
+      "comment" : "A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        }
+      }
+    },
+    "ribbon.group.draw.convert" : {
+      "comment" : "A group of the Draw ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert"
+          }
+        }
+      }
+    },
+    "ribbon.group.draw.pens" : {
+      "comment" : "A group of the Draw ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pens"
+          }
+        }
+      }
+    },
+    "ribbon.group.draw.tools" : {
+      "comment" : "A group of the Draw ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tools"
+          }
+        }
+      }
+    },
+    "ribbon.group.handoutMaster.background" : {
+      "comment" : "A group of the Handout Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
+          }
+        }
+      }
+    },
+    "ribbon.group.handoutMaster.close" : {
+      "comment" : "A group of the Handout Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "ribbon.group.handoutMaster.pageSetup" : {
+      "comment" : "A group of the Handout Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Setup"
+          }
+        }
+      }
+    },
+    "ribbon.group.handoutMaster.placeholders" : {
+      "comment" : "A group of the Handout Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placeholders"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.clipboard" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clipboard"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.designer" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Designer"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.drawing" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drawing"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.editing" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editing"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.font" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.insert" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.paragraph" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paragraph"
+          }
+        }
+      }
+    },
+    "ribbon.group.home.slides" : {
+      "comment" : "A group of the Home ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.comments" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.illustrations" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Illustrations"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.images" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.links" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.media" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.slides" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slides"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.symbols" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbols"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.tables" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tables"
+          }
+        }
+      }
+    },
+    "ribbon.group.insert.text" : {
+      "comment" : "A group of the Insert ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "ribbon.group.notesMaster.background" : {
+      "comment" : "A group of the Notes Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
+          }
+        }
+      }
+    },
+    "ribbon.group.notesMaster.close" : {
+      "comment" : "A group of the Notes Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "ribbon.group.notesMaster.placeholders" : {
+      "comment" : "A group of the Notes Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placeholders"
+          }
+        }
+      }
+    },
+    "ribbon.group.pictureFormat.adjust" : {
+      "comment" : "A group of the Picture Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust"
+          }
+        }
+      }
+    },
+    "ribbon.group.pictureFormat.arrange" : {
+      "comment" : "A group of the Picture Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.group.pictureFormat.crop" : {
+      "comment" : "A group of the Picture Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop"
+          }
+        }
+      }
+    },
+    "ribbon.group.pictureFormat.size" : {
+      "comment" : "A group of the Picture Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "ribbon.group.pictureFormat.styles" : {
+      "comment" : "A group of the Picture Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Styles"
+          }
+        }
+      }
+    },
+    "ribbon.group.playback.editing" : {
+      "comment" : "A group of the Playback ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editing"
+          }
+        }
+      }
+    },
+    "ribbon.group.playback.options" : {
+      "comment" : "A group of the Playback ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
+    "ribbon.group.playback.preview" : {
+      "comment" : "A group of the Playback ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "ribbon.group.record.record" : {
+      "comment" : "A group of the Record ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.accessibility" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.comments" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.compare" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.language" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.proofing" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proofing"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.accessibility" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.arrange" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.insertShapes" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert Shapes"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.pane" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Pane"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.shapeStyles" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Styles"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.size" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "ribbon.group.shapeFormat.wordArt" : {
+      "comment" : "A group of the Shape Format ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WordArt Styles"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideMaster.background" : {
+      "comment" : "A group of the Slide Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideMaster.close" : {
+      "comment" : "A group of the Slide Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideMaster.edit" : {
+      "comment" : "A group of the Slide Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Master"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideMaster.layout" : {
+      "comment" : "A group of the Slide Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master Layout"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideMaster.theme" : {
+      "comment" : "A group of the Slide Master ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Theme"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideShow.options" : {
+      "comment" : "A group of the Slide Show ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideShow.setUp" : {
+      "comment" : "A group of the Slide Show ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up"
+          }
+        }
+      }
+    },
+    "ribbon.group.slideShow.start" : {
+      "comment" : "A group of the Slide Show ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Slide Show"
+          }
+        }
+      }
+    },
+    "ribbon.group.smartArtDesign.arrange" : {
+      "comment" : "A group of the SmartArt Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.group.smartArtDesign.create" : {
+      "comment" : "A group of the SmartArt Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Graphic"
+          }
+        }
+      }
+    },
+    "ribbon.group.smartArtDesign.layouts" : {
+      "comment" : "A group of the SmartArt Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layouts"
+          }
+        }
+      }
+    },
+    "ribbon.group.smartArtDesign.styles" : {
+      "comment" : "A group of the SmartArt Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt Styles"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableDesign.drawBorders" : {
+      "comment" : "A group of the Table Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw Borders"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableDesign.options" : {
+      "comment" : "A group of the Table Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Style Options"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableDesign.styles" : {
+      "comment" : "A group of the Table Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Styles"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableLayout.alignment" : {
+      "comment" : "A group of the Layout ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alignment"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableLayout.arrange" : {
+      "comment" : "A group of the Layout ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrange"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableLayout.cellSize" : {
+      "comment" : "A group of the Layout ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cell Size"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableLayout.merge" : {
+      "comment" : "A group of the Layout ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        }
+      }
+    },
+    "ribbon.group.tableLayout.rowsColumns" : {
+      "comment" : "A group of the Layout ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rows & Columns"
+          }
+        }
+      }
+    },
+    "ribbon.group.transitions.preview" : {
+      "comment" : "A group of the Transitions ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "ribbon.group.transitions.timing" : {
+      "comment" : "A group of the Transitions ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timing"
+          }
+        }
+      }
+    },
+    "ribbon.group.transitions.transition" : {
+      "comment" : "A group of the Transitions ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transition to This Slide"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.color" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.masters" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Master Views"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.show" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.views" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presentation Views"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.window" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window"
+          }
+        }
+      }
+    },
+    "ribbon.group.view.zoom" : {
+      "comment" : "A group of the View ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    },
+    "ribbon.tab.animations" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animations"
+          }
+        }
+      }
+    },
+    "ribbon.tab.chartDesign" : {
+      "comment" : "The contextual ribbon tab shown for Chart Design",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Design"
+          }
+        }
+      }
+    },
+    "ribbon.tab.design" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design"
+          }
+        }
+      }
+    },
+    "ribbon.tab.draw" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw"
+          }
+        }
+      }
+    },
+    "ribbon.tab.handoutMaster" : {
+      "comment" : "The contextual ribbon tab shown for Handout Master",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handout Master"
+          }
+        }
+      }
+    },
+    "ribbon.tab.home" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "ribbon.tab.insert" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insert"
+          }
+        }
+      }
+    },
+    "ribbon.tab.notesMaster" : {
+      "comment" : "The contextual ribbon tab shown for Notes Master",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes Master"
+          }
+        }
+      }
+    },
+    "ribbon.tab.pictureFormat" : {
+      "comment" : "The contextual ribbon tab shown for Picture Format",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture Format"
+          }
+        }
+      }
+    },
+    "ribbon.tab.playback" : {
+      "comment" : "The contextual ribbon tab shown for Playback",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playback"
+          }
+        }
+      }
+    },
+    "ribbon.tab.record" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record"
+          }
+        }
+      }
+    },
+    "ribbon.tab.review" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review"
+          }
+        }
+      }
+    },
+    "ribbon.tab.shapeFormat" : {
+      "comment" : "The contextual ribbon tab shown for Shape Format",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shape Format"
+          }
+        }
+      }
+    },
+    "ribbon.tab.slideMaster" : {
+      "comment" : "The contextual ribbon tab shown for Slide Master",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Master"
+          }
+        }
+      }
+    },
+    "ribbon.tab.slideShow" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide Show"
+          }
+        }
+      }
+    },
+    "ribbon.tab.smartArtDesign" : {
+      "comment" : "The contextual ribbon tab shown for SmartArt Design",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartArt Design"
+          }
+        }
+      }
+    },
+    "ribbon.tab.tableDesign" : {
+      "comment" : "The contextual ribbon tab shown for Table Design",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Table Design"
+          }
+        }
+      }
+    },
+    "ribbon.tab.tableLayout" : {
+      "comment" : "The contextual ribbon tab shown for Layout",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "ribbon.tab.transitions" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transitions"
+          }
+        }
+      }
+    },
+    "ribbon.tab.view" : {
+      "comment" : "A ribbon tab",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

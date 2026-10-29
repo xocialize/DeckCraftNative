@@ -69,12 +69,15 @@ public struct CanvasLayout: Sendable, Equatable {
         return CanvasLayout(documentSize: doc, slideRect: rect, scale: scale, fit: fit)
     }
 
-    /// The scroll origin that keeps the slide point under `anchor` (viewport coordinates) where it was,
-    /// going from `old` (scrolled to `scroll`) to this layout; clamped to the document (#106).
-    public func anchoredScroll(from old: CanvasLayout, scroll: CGPoint, anchor: CGPoint, viewport: CGSize) -> CGPoint {
+    /// The scroll origin that puts the slide point under `anchor` (viewport coordinates) at `target` (by default the
+    /// same place), going from `old` (scrolled to `scroll`) to this layout; clamped to the document (#106). A zoom
+    /// keeping the middle of the view targets the middle of the viewport it ends with, which legacy scroll bars make
+    /// smaller than the one it started from.
+    public func anchoredScroll(from old: CanvasLayout, scroll: CGPoint, anchor: CGPoint, target: CGPoint? = nil, viewport: CGSize) -> CGPoint {
         let s = old.scale > 0 ? old.scale : 1
         let at = CGPoint(x: (anchor.x + scroll.x - old.slideRect.minX) / s, y: (anchor.y + scroll.y - old.slideRect.minY) / s)
-        let raw = CGPoint(x: slideRect.minX + at.x * scale - anchor.x, y: slideRect.minY + at.y * scale - anchor.y)
+        let to = target ?? anchor
+        let raw = CGPoint(x: slideRect.minX + at.x * scale - to.x, y: slideRect.minY + at.y * scale - to.y)
         let over = overflow(viewport)
         func clamp(_ v: CGFloat, _ hi: CGFloat) -> CGFloat { v.isFinite ? min(max(v, 0), hi) : 0 }
         return CGPoint(x: clamp(raw.x, over.width), y: clamp(raw.y, over.height))

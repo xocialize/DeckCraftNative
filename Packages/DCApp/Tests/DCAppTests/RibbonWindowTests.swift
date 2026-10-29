@@ -53,11 +53,15 @@ import Testing
         #expect(window.toolbar?.identifier == "DeckCraftRibbon")
         #expect(window.titleVisibility == .hidden)
         let ids = window.toolbar?.items.map(\.itemIdentifier.rawValue) ?? []
-        // The Quick Access Toolbar's buttons come first, then the title, then Search, Present and Comments.
+        // The Quick Access Toolbar's buttons come first, then the title, then Search, Present, Comments and Share.
         let qat = (InspectorFeature.controller?.qat ?? QAT.defaults).map { ToolbarCatalog.qatPrefix + $0.identifier }
         #expect(Array(ids.prefix(qat.count)) == qat)
-        #expect(ids.suffix(3) == ["dc.ribbon.search", "dc.ribbon.present", "dc.ribbon.comments"])
+        #expect(ids.suffix(4) == ["dc.ribbon.search", "dc.ribbon.present", "dc.ribbon.comments", "dc.ribbon.share"])
         #expect(ids.contains("dc.ribbon.title"))
+        // Share hands over the saved file, so an unsaved presentation has nothing to share yet.
+        let share = try #require(window.toolbar?.items.first { $0.itemIdentifier == RibbonToolbar.share })
+        share.validate()
+        #expect(!share.isEnabled && share.view?.accessibilityLabel() == "Share")
         // The inspector is the task pane, closed until a pane is asked for.
         #expect(f.wc.split.splitViewItems.last?.isCollapsed == true)
         #expect(container.host.frame.height == RibbonView.height(collapsed: false))

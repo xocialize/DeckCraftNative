@@ -1,6 +1,6 @@
 # Ribbon and start screen
 
-**Status:** plan, draft 2, 2026-10-27: the operator's decisions are recorded (§12). **R0 is done** (2026-10-27) and **R1 is done** (2026-10-28; DCApp PORT-NOTES "Ribbon"). **S1 is done** (2026-10-28; PORT-NOTES "Ribbon" › "S1"). **R2 is done** (2026-10-28; PORT-NOTES "Ribbon" › "R2"). **R3 is done** (2026-10-28; PORT-NOTES "Ribbon" › "R3"). R4 waits for the go-ahead. · **Pin:** deckcraft `88c2ceff` · **Reads with:**
+**Status:** plan, draft 2, 2026-10-27: the operator's decisions are recorded (§12). **R0 is done** (2026-10-27) and **R1 is done** (2026-10-28; DCApp PORT-NOTES "Ribbon"). **S1 is done** (2026-10-28; PORT-NOTES "Ribbon" › "S1"). **R2 is done** (2026-10-28; PORT-NOTES "Ribbon" › "R2"). **R3 is done** (2026-10-28; PORT-NOTES "Ribbon" › "R3"). **R4 is done** (2026-10-28; PORT-NOTES "Ribbon" › "R4"): the ribbon is the default for new installs. The plan is complete; live hover preview for every gallery remains a candidate (§3). · **Pin:** deckcraft `88c2ceff` · **Reads with:**
 [PLAN.md](../../PLAN.md), [PORT-STATUS.md](../../PORT-STATUS.md), [EVALUATION.md](../../EVALUATION.md), and
 DCApp's [PORT-NOTES.md](../../Packages/DCApp/PORT-NOTES.md) ("Inspector" and "Ribbon → Mac").
 

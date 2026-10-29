@@ -278,16 +278,19 @@ enum SourceScan {
 
     /// Writes Commands.xcstrings from `expectedCommands()`, keeping the translations of keys still there
     /// (`Tools/l10n/commands.sh` runs this with DC_L10N_WRITE=1).
-    static func writeCommands() throws {
-        let url = StringsPaths.catalog("DCAppModel", "Commands")
+    static func writeCommands() throws { try write("Commands", expectedCommands()) }
+
+    /// Writes DCAppModel's catalog `table` from `expected` (key → English, comment). A key that's gone keeps its
+    /// translations, marked stale.
+    static func write(_ table: String, _ expected: [String: (String, String)]) throws {
+        let url = StringsPaths.catalog("DCAppModel", table)
         let old = (try? JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])?["strings"] as? [String: Any] ?? [:]
         var strings: [String: Any] = [:]
-        for (key, (value, comment)) in expectedCommands() {
+        for (key, (value, comment)) in expected {
             var locs = ((old[key] as? [String: Any])?["localizations"] as? [String: Any]) ?? [:]
             locs["en"] = ["stringUnit": ["state": "translated", "value": value]]
             strings[key] = ["comment": comment, "extractionState": "manual", "localizations": locs]
         }
-        // A key that's gone keeps its translations, marked stale.
         for (key, raw) in old where strings[key] == nil {
             guard var e = raw as? [String: Any], let locs = e["localizations"] as? [String: Any], locs.keys.contains(where: { $0 != "en" }) else { continue }
             e["extractionState"] = "stale"
@@ -299,10 +302,9 @@ enum SourceScan {
         try data.write(to: url)
     }
 
-    @Test func commandsCatalogMatchesTheRegistry() throws {
-        if ProcessInfo.processInfo.environment["DC_L10N_WRITE"] == "1" { try Self.writeCommands() }
-        let catalog = try Catalog(StringsPaths.catalog("DCAppModel", "Commands"))
-        let expected = Self.expectedCommands()
+    /// The problems with catalog `table` against `expected`: missing, different, stale or unused keys.
+    static func problems(_ table: String, _ expected: [String: (String, String)]) throws -> [String] {
+        let catalog = try Catalog(StringsPaths.catalog("DCAppModel", table))
         var problems: [String] = []
         for (key, (value, _)) in expected.sorted(by: { $0.key < $1.key }) {
             guard let e = catalog.entries[key] else { problems.append("missing \(key)"); continue }
@@ -310,7 +312,60 @@ enum SourceScan {
             if e.stale { problems.append("\(key) is marked stale") }
         }
         for key in catalog.liveKeys where expected[key] == nil { problems.append("unused \(key)") }
+        return problems
+    }
+
+    @Test func commandsCatalogMatchesTheRegistry() throws {
+        if ProcessInfo.processInfo.environment["DC_L10N_WRITE"] == "1" { try Self.writeCommands() }
+        let problems = try Self.problems("Commands", Self.expectedCommands())
         #expect(problems.isEmpty, "Commands.xcstrings is out of date (run Tools/l10n/commands.sh): \(problems.prefix(20))")
+    }
+
+    // MARK: Ribbon
+
+    /// The Ribbon catalog (Ribbon-and-StartScreen §9): every tab's and group's title, and each control title that
+    /// isn't its command's label. They have keys of their own because one English word names several things
+    /// ("Layout" is a tab and two controls; "Arrange" is a group and a button).
+    @MainActor static func expectedRibbon() -> [String: (String, String)] {
+        var out: [String: (String, String)] = [:]
+        for tab in RibbonModel.allTabs {
+            let kind = tab.contextual.map { "The contextual ribbon tab shown for \($0)" } ?? "A ribbon tab"
+            out[RibbonModel.key(tab)] = (tab.title, kind)
+            for g in tab.groups {
+                out[RibbonModel.key(g)] = (g.title, "A group of the \(tab.title) ribbon tab: VoiceOver's name for it, and its button when it folds")
+                for c in g.controls {
+                    if let t = c.title { out[RibbonModel.key(c)] = (t, "A control in the \(tab.title) tab's \(g.title) group (runs \(c.command.id))") }
+                }
+            }
+        }
+        return out
+    }
+
+    @MainActor @Test func ribbonCatalogMatchesTheLayout() throws {
+        if ProcessInfo.processInfo.environment["DC_L10N_WRITE"] == "1" { try Self.write("Ribbon", Self.expectedRibbon()) }
+        let problems = try Self.problems("Ribbon", Self.expectedRibbon())
+        #expect(problems.isEmpty, "Ribbon.xcstrings is out of date (run Tools/l10n/commands.sh): \(problems.prefix(20))")
+        // The titles the ribbon shows come from it.
+        let sentinel = "\u{1}missing"
+        for key in Self.expectedRibbon().keys.sorted() {
+            #expect(Bundle.module.localizedString(forKey: key, value: sentinel, table: "Ribbon") != sentinel, "\(key)")
+        }
+    }
+
+    /// R4: every command the palette can list has a one-line description (decision 3), and the Commands catalog
+    /// has it as `help.<id>`. The palette shows enabled commands only; this checks them all.
+    @Test func everyPaletteCommandHasADescription() throws {
+        let catalog = try Catalog(StringsPaths.catalog("DCAppModel", "Commands"))
+        let uiLabels = Set(UICommands.all.map(\.label))
+        let ids = commandSpecs().filter { !uiLabels.contains($0.label) && !Cmd.needsArguments($0.params) }.map(\.id)
+            + UICommands.all.filter { !Cmd.needsArguments($0.params) }.map(\.id)
+        #expect(ids.count >= 230, "\(ids.count) palette commands")
+        var missing: [String] = []
+        for id in ids {
+            guard let key = CommandHelp.key(CommandRef(id)) else { missing.append(id); continue }
+            if catalog.entries["help.\(key)"] == nil { missing.append("help.\(key)") }
+        }
+        #expect(missing.isEmpty, "palette commands without a description: \(missing)")
     }
 
     @Test func everyCommandHasACommandsEntry() throws {
