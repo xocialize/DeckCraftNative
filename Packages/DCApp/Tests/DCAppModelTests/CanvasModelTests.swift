@@ -101,6 +101,21 @@ import Testing
         #expect(abs(CanvasHandles.box(flipped).rotate.y - 170) < 1e-9)
     }
 
+    // A fitted slide's document is the viewport exactly. Its side plus the margins rounds a hair past the viewport at
+    // some sizes (481.00000000000006 for a 930×481 viewport), which brought legacy scroll bars in and flipped the fit
+    // on every relayout (0.1.4).
+    @Test func aFittedSlideNeverOverflowsByRounding() {
+        for slide in [Size(960, 540), Size(720, 540), Size(1000, 1000)] {
+            for vw in stride(from: 300.0, through: 1600, by: 1) {
+                for vh in [400.0, 464, 481, 517, 700, 911] {
+                    let v = CGSize(width: vw, height: vh)
+                    let l = CanvasLayout.make(slide: slide, viewport: v, zoom: nil)
+                    if l.documentSize != v { Issue.record("\(slide) in \(v): \(l.documentSize)"); return }
+                }
+            }
+        }
+    }
+
     // canvas.rs: wheel_and_pinch_zoom_keep_the_point_under_the_pointer, zoom_commands_keep_the_middle_of_the_view (#106)
     @Test func zoomKeepsThePointUnderTheAnchor() {
         let slide = Size(960, 540)

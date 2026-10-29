@@ -32,6 +32,8 @@ final class RibbonViewState {
     var openMenu: String?
     /// Where `view.focusRibbon` asked the keyboard to go.
     var focusRequest: String?
+    /// A key the container took before the focused control saw it (`RibbonContainerController.key(for:)`).
+    var keyRequest: RibbonKeyRequest?
     @ObservationIgnored var focus: String?
     @ObservationIgnored var scrolling = false
     /// Where each shown control was drawn, in the ribbon's coordinates (top left, points), with the view that drew it.
@@ -43,6 +45,17 @@ final class RibbonViewState {
     @ObservationIgnored var tabsOverflow: [String] = []
     @ObservationIgnored weak var host: NSView?
     @ObservationIgnored var onPeek: ((Bool) -> Void)?
+}
+
+/// The keys that move through the ribbon (§6): the arrows, ⌥↓ for a split's menu, Return, and Esc.
+enum RibbonKey: Equatable, Sendable {
+    case left, right, up, down, optionDown, activate, escape
+}
+
+/// One press of a `RibbonKey`; `seq` makes the same key pressed again a change.
+struct RibbonKeyRequest: Equatable {
+    var key: RibbonKey
+    var seq: Int
 }
 
 extension EnvironmentValues {
@@ -90,9 +103,20 @@ struct RibbonView: View {
         .controlSize(.small)
         .environment(\.ribbonState, state)
         .environment(\.ribbonFocus, $focus)
-        .onKeyPress(keys: [.leftArrow, .rightArrow, .upArrow, .downArrow]) { press in move(press, tab) }
+        .onKeyPress(keys: [.leftArrow, .rightArrow, .upArrow, .downArrow]) { press in
+            move(press.key == .leftArrow ? .left : press.key == .rightArrow ? .right : press.key == .upArrow ? .up
+                 : press.modifiers.contains(.option) ? .optionDown : .down, tab)
+        }
         .onKeyPress(.return) { activate(tab) }
         .onKeyPress(.escape) { escape() }
+        .onChange(of: state.keyRequest) { _, r in
+            switch r?.key {
+            case nil: break
+            case .activate: _ = activate(tab)
+            case .escape: _ = escape()
+            case let k?: _ = move(k, tab)
+            }
+        }
         .onChange(of: focus) { _, f in state.focus = f }
         .onChange(of: state.focusRequest) { _, r in
             guard let r else { return }
@@ -226,33 +250,34 @@ struct RibbonView: View {
     private func places(_ tab: RibbonTab) -> [[String]] {
         let tabs = state.tabsShown.map { ["tab:" + $0] }
         guard !model.ui.ribbonCollapsed || state.peek else { return tabs }
-        return RibbonFocus.columns(tab, RibbonMeasure.fit(tab, model, width: state.width).sizes)
+        let disabled = Set(tab.groups.flatMap(\.controls).filter { !RibbonModel.enabled($0, model) }.map(\.id))
+        return RibbonFocus.columns(tab, RibbonMeasure.fit(tab, model, width: state.width).sizes, disabled: disabled)
     }
 
     /// The arrow keys: along the tab row, or through the controls (left and right in reading order, up and down
     /// within a column). ⌥↓ on a split opens its menu; ↓ from a tab goes into the controls.
-    private func move(_ press: KeyPress, _ tab: RibbonTab) -> KeyPress.Result {
+    private func move(_ key: RibbonKey, _ tab: RibbonTab) -> KeyPress.Result {
         guard let f = focus else { return .ignored }
         if f.hasPrefix("tab:") {
             let row = state.tabsShown.map { "tab:" + $0 }
-            switch press.key {
-            case .leftArrow, .rightArrow:
-                guard let i = row.firstIndex(of: f), let to = row.at(i + (press.key == .leftArrow ? -1 : 1)) else { return .handled }
+            switch key {
+            case .left, .right:
+                guard let i = row.firstIndex(of: f), let to = row.at(i + (key == .left ? -1 : 1)) else { return .handled }
                 focus = to
-            case .downArrow:
+            case .down:
                 focus = RibbonFocus.next(nil, .first, in: places(tab))
             default: return .ignored
             }
             return .handled
         }
-        if press.key == .downArrow, press.modifiers.contains(.option) {
+        if key == .optionDown {
             state.openMenu = f.hasSuffix("#menu") ? String(f.dropLast(5)) : f
             return .handled
         }
-        let m: RibbonFocus.Move = switch press.key {
-        case .leftArrow: .left
-        case .rightArrow: .right
-        case .upArrow: .up
+        let m: RibbonFocus.Move = switch key {
+        case .left: .left
+        case .right: .right
+        case .up: .up
         default: .down
         }
         let cols = places(tab)
@@ -465,8 +490,19 @@ extension View {
     /// keyboard with Full Keyboard Access on, as everywhere in macOS (§6). The ribbon never makes them focusable
     /// itself: SwiftUI hands the keyboard to such a view when the window becomes key, which took it from the canvas
     /// and looped AppKit's constraint passes until it threw (R3, never committed).
+    /// Plain and borderless buttons draw no focus ring, so the focused control draws its own; without it the keyboard
+    /// moved through the ribbon unseen (0.1.4, with Full Keyboard Access on).
     @ViewBuilder func ribbonFocused(_ focus: FocusState<String?>.Binding?, _ id: String) -> some View {
-        if let focus { self.focused(focus, equals: id) } else { self }
+        if let focus {
+            self.focused(focus, equals: id)
+                .focusEffectDisabled()
+                .overlay {
+                    if focus.wrappedValue == id {
+                        RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 2)
+                            .padding(-2).allowsHitTesting(false).accessibilityHidden(true)
+                    }
+                }
+        } else { self }
     }
 
     /// Record where this was drawn, for `ui.inspect`'s `truncated`.
@@ -531,7 +567,9 @@ struct RibbonControlView: View {
             .onChange(of: state?.openMenu) { _, m in
                 guard m == control.id else { return }
                 state?.openMenu = nil
-                openMenu()
+                // A menu popped up inside SwiftUI's update came back at once, unseen (0.1.4: ⌥↓ on Paste's arrow did
+                // nothing while Space opened it); open it once the update is over.
+                DispatchQueue.main.async { openMenu() }
             }
     }
 

@@ -64,7 +64,10 @@ public struct CanvasLayout: Sendable, Equatable {
         // A zoom from outside the editor's own controls (settings, the control channel) is kept in range.
         let scale = zoom.flatMap { $0.isFinite && $0 > 0 ? min(max($0, UiState.zoomRange.lowerBound), UiState.zoomRange.upperBound) : nil } ?? fit
         let w = sw * scale, h = sh * scale
-        let doc = CGSize(width: max(vw, w + margin * 2), height: max(vh, h + margin * 2))
+        // A fitted slide's side plus its margins rounds to a hair past the viewport (481.00000000000006 for 481);
+        // legacy scroll bars would come in for it, shrink the viewport, and every relayout would flip the fit.
+        func extent(_ content: Double, _ view: Double) -> Double { content > view + 0.5 ? content : view }
+        let doc = CGSize(width: extent(w + margin * 2, vw), height: extent(h + margin * 2, vh))
         let rect = CGRect(x: (doc.width - w) / 2, y: (doc.height - h) / 2, width: w, height: h)
         return CanvasLayout(documentSize: doc, slideRect: rect, scale: scale, fit: fit)
     }

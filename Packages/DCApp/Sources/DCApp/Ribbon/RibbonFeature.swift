@@ -40,6 +40,7 @@ final class RibbonContainerController: NSViewController {
     private var top: NSLayoutConstraint?
     private var collapsed = false
     private var outside: Any?
+    private var keys: Any?
 
     init(split: NSSplitViewController, model: AppModel) {
         self.split = split
@@ -47,6 +48,37 @@ final class RibbonContainerController: NSViewController {
         super.init(nibName: nil, bundle: nil)
         state.host = host
         state.onPeek = { [weak self] in self?.setPeek($0) }
+        // The ribbon's splits, menus and borderless buttons are AppKit controls, which keep the arrow keys, Return
+        // and Esc from SwiftUI's key handlers: once the keyboard moved from the tab row onto Paste it stayed there
+        // (0.1.4). The keys are taken here first, while the keyboard is in the ribbon and not in a text field.
+        keys = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
+            let key = Self.key(for: e), window = e.window
+            let taken = MainActor.assumeIsolated { key.map { self?.take($0, in: window) == true } ?? false }
+            return taken ? nil : e
+        }
+    }
+
+    /// The ribbon key `e` is, or nil: the arrows, ⌥↓, Return (either) and Esc, with no other modifier.
+    nonisolated static func key(for e: NSEvent) -> RibbonKey? {
+        let mods = e.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.function, .numericPad, .capsLock])
+        let key: RibbonKey? = switch e.keyCode {
+        case 123: .left
+        case 124: .right
+        case 126: .up
+        case 125: mods == .option ? .optionDown : .down
+        case 36, 76: .activate
+        case 53: .escape
+        default: nil
+        }
+        guard let key, mods.isEmpty || key == .optionDown else { return nil }
+        return key
+    }
+
+    private func take(_ key: RibbonKey, in window: NSWindow?) -> Bool {
+        guard state.focus != nil, let w = host.window, window === w, let r = w.firstResponder as? NSView,
+              r.isDescendant(of: host), !(r is NSText) else { return false }
+        state.keyRequest = RibbonKeyRequest(key: key, seq: (state.keyRequest?.seq ?? 0) + 1)
+        return true
     }
 
     @available(*, unavailable)
@@ -107,6 +139,8 @@ final class RibbonContainerController: NSViewController {
 
     /// Give the split view back, for the Mac layout.
     func release() {
+        if let m = keys { NSEvent.removeMonitor(m) }
+        keys = nil
         state.peek = false
         split.view.removeFromSuperview()
         split.removeFromParent()

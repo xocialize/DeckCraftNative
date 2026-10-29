@@ -173,8 +173,10 @@ public enum RibbonFocus {
     }
 
     /// The focusable places of `tab` with its groups at `sizes`, in order, as columns: each column a list of places
-    /// top to bottom. Left and right step through the flattened order; up and down move within a column.
-    public static func columns(_ tab: RibbonTab, _ sizes: [String: GroupSize]) -> [[String]] {
+    /// top to bottom. Left and right step through the flattened order; up and down move within a column. Controls
+    /// in `disabled` are left out: a disabled control can't take focus, so stepping onto one (Format Painter with
+    /// nothing copied) sent the keyboard back to the start of its group (0.1.4).
+    public static func columns(_ tab: RibbonTab, _ sizes: [String: GroupSize], disabled: Set<String> = []) -> [[String]] {
         var out: [[String]] = []
         for g in tab.groups {
             let gs = sizes[g.id] ?? .large
@@ -185,7 +187,7 @@ public enum RibbonFocus {
             for column in RibbonModel.columns(g, gs) {
                 var places: [String] = []
                 for row in column {
-                    for c in row {
+                    for c in row where !disabled.contains(c.id) {
                         places.append(controlID(c))
                         if isSplit(c) { places.append(menuID(c)) }
                     }

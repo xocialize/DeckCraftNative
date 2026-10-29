@@ -443,6 +443,15 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `9404050`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
     its ticket is stapled.
   - The 0.1.3 build, run from its export, finds 0.1.4 through Check for Updates.
+- **After 0.1.4: the keyboard walk (2026-10-29).** The operator walked the ribbon with Full Keyboard Access on.
+  The walk found five bugs in 0.1.4, all fixed on main, unreleased. Details are in DCApp's PORT-NOTES, under "After
+  0.1.4".
+  - A fitted slide flipped between two zooms on every relayout when legacy scroll bars were shown.
+  - The ribbon showed no focus ring.
+  - The arrow keys stuck once an AppKit control had the keyboard.
+  - ⌥↓ opened no menu, and disabled controls trapped the arrow keys.
+  - Still to do: the Accessibility Inspector audit, and a blurred band over the top of the slide in the ribbon
+    layout.
 
 ## Pin moves
 

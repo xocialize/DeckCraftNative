@@ -218,6 +218,24 @@ import Testing
         f.layout(false)
     }
 
+    // The keys the container takes before the focused control sees them: AppKit's split, menu and borderless buttons
+    // kept the arrows, Return and Esc from SwiftUI, so the keyboard stuck on Paste (0.1.4). With the keyboard's own
+    // flags: the arrows carry function and numeric pad. Other modifiers leave the key to the app.
+    @Test func theRibbonsKeysAreTakenWithTheirModifiers() throws {
+        func key(_ code: UInt16, _ flags: NSEvent.ModifierFlags = []) -> RibbonKey? {
+            let arrow = (123 ... 126).contains(code)
+            let e = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: flags.union(arrow ? [.function, .numericPad] : []),
+                                     timestamp: 0, windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "",
+                                     isARepeat: false, keyCode: code)
+            return e.flatMap(RibbonContainerController.key(for:))
+        }
+        #expect(key(123) == .left && key(124) == .right && key(126) == .up && key(125) == .down)
+        #expect(key(125, .option) == .optionDown)
+        #expect(key(36) == .activate && key(76) == .activate && key(53) == .escape)
+        #expect(key(123, .shift) == nil && key(124, .command) == nil && key(126, .option) == nil, "the app's own shortcuts")
+        #expect(key(97) == nil && key(49) == nil, "F6 is the menu's; Space is the button's")
+    }
+
     @Test func everyRibbonSymbolIsAnSFSymbol() {
         var missing: [String] = []
         for tab in RibbonModel.allTabs {

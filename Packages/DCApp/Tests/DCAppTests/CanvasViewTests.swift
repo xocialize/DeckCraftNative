@@ -105,6 +105,27 @@ import Testing
         #expect(f.canvas.layoutInfo?.overflow(clip.bounds.size) == .zero)
     }
 
+    // With legacy scroll bars, a fitted slide keeps its zoom however often the canvas is laid out again. A fit that
+    // rounded a hair past the window brought the scroll bars in, and each relayout flipped between two zooms (0.1.4:
+    // the slide pulsed while the control channel was polled).
+    @Test func aFittedSlideKeepsItsZoomAcrossRelayouts() throws {
+        let f = Fixture()
+        f.vc.scroll.scrollerStyle = .legacy
+        // 930×481 is the window that showed it; the rest are sizes round it.
+        for size in [NSSize(width: 930, height: 481), NSSize(width: 1000, height: 481), NSSize(width: 930, height: 517),
+                     NSSize(width: 1200, height: 700), NSSize(width: 800, height: 600)] {
+            f.window.setContentSize(size)
+            f.vc.view.frame = f.window.contentView?.bounds ?? .zero
+            f.vc.view.layoutSubtreeIfNeeded()
+            f.vc.refresh()
+            let first = try #require(f.canvas.layoutInfo).scale
+            for _ in 0 ..< 3 { f.vc.refresh() }
+            let now = try #require(f.canvas.layoutInfo)
+            #expect(now.scale == first, "\(size): \(first) then \(now.scale)")
+            #expect(now.overflow(f.vc.scroll.contentView.bounds.size) == .zero, "\(size): no scroll bars")
+        }
+    }
+
     /// The slide is drawn (a recording of it, replayed), and View › Grayscale takes its colour out.
     @Test func theSlideIsDrawnAndGrayscaleTakesItsColourOut() throws {
         let f = Fixture()

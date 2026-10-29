@@ -1163,6 +1163,52 @@ longer and right-to-left languages, the toolbar gains Share, and **new installs 
   - `RibbonWindowTests`: the toolbar ends with Share, disabled for an unsaved presentation.
   - `CanvasViewTests.zoomingPastTheWindowScrollsAndKeepsTheMiddle`, in both scroll-bar styles.
 
+### After 0.1.4: the operator's keyboard walk (2026-10-29)
+
+The operator walked the ribbon with Full Keyboard Access on, in the 0.1.4 build and then in a development build. Real
+key events were also sent to the app (`CGEvent.postToPid`) and read back through `ui.inspect`'s `ribbon.focus`. The
+walk found five bugs, all in 0.1.4 and all fixed here.
+
+- **The fitted slide flipped between two zooms.** At some window sizes a fitted slide's side plus its margins comes out
+  a hair past the viewport (481.00000000000006 for 481). Legacy scroll bars then come in, the viewport shrinks, the
+  slide refits smaller and the scroll bars go away. R4's relayout loop ended each relayout on the other side, so every
+  relayout flipped the zoom: 78.7 % and 75.6 % at 930×481. Polling `ui.inspect` relays out, so the slide pulsed.
+  - **The fix:** `CanvasLayout.make` keeps the document the viewport's size unless the content is more than half a
+    point past it.
+  - **Tests:** `CanvasModelTests.aFittedSlideNeverOverflowsByRounding` (about 23,000 viewports) and
+    `CanvasViewTests.aFittedSlideKeepsItsZoomAcrossRelayouts` (legacy scroll bars, 930×481 among the sizes). Both fail
+    on the old code.
+- **No focus ring.** The ribbon's plain and borderless buttons draw none, so the keyboard moved through the ribbon
+  unseen. `ribbonFocused` now draws an accent ring round the focused control and turns SwiftUI's effect off.
+- **The arrow keys stuck on Paste.** The splits, menus and borderless buttons are AppKit controls. Once one had the
+  keyboard, it kept the arrows, Return and Esc from the ribbon's `onKeyPress` handlers. The tab row's plain buttons
+  didn't, so ↓ reached Paste and then nothing moved.
+  - **The fix:** `RibbonContainerController` takes those keys in a local key-down monitor first. It does so only while
+    the ribbon has focus and the responder isn't a text field, and passes each on as `RibbonViewState.keyRequest`.
+  - **Test:** `RibbonWindowTests.theRibbonsKeysAreTakenWithTheirModifiers`.
+- **→ cycled inside Clipboard.** Format Painter is disabled with nothing copied, and a disabled control can't take
+  focus, so stepping onto it sent the keyboard back to the start of the group. ↓ from Copy did the same.
+  - **The fix:** `RibbonFocus.columns` leaves out disabled controls. A group whose controls are all disabled, such as
+    Font with nothing selected, is skipped.
+  - **Test:** `RibbonFitTests.theKeyboardStepsPastDisabledControls`.
+- **⌥↓ opened no menu, while Space on the arrow did.** The menu popped up inside SwiftUI's update and came back at
+  once, unseen. It now opens just after the update.
+- **What works now, checked by the operator and by real keys:**
+  - fn+F6 or View › Move Focus to the Ribbon puts the ring on the selected tab.
+  - ← and → move along the tabs, and ↓ goes into the controls. ← and → then cross groups. ↑ and ↓ move within a column,
+    and ↑ from the top goes back to the tab.
+  - ⌥↓, Return or Space on an arrow opens its menu. Return on a tab selects it, and Esc goes back to the slide.
+- **What the walk showed is not a bug:**
+  - **F6 without fn.** The operator's keyboard sends the top row as media keys, so F6 alone never reaches the app.
+  - **The blue squares.** They are macOS's own Full Keyboard Access cursor, drawn beside the ribbon's ring. Space
+    presses what it surrounds.
+- **Still to do:**
+  - The Accessibility Inspector audit.
+  - A blurred band about 23 pt high over the top of the slide in the ribbon layout, probably macOS 26's scroll-edge
+    effect under the ribbon. Not yet looked at.
+  - `ui.screenshot` returned stale frames during the walk. It showed the ring on Home after focus had moved, and the
+    ribbon after `ui.set {layout: mac}`. `screencapture -l` of the window was right.
+
 ## lib.rs tests
 
 deckcraft's `crates/ui-egui/src/lib.rs` has 62 `#[test]`s (`mod tests`, at the pin). Each is triaged below: **already

@@ -163,6 +163,19 @@ import Testing
         }
     }
 
+    // A disabled control can't take focus, so the keyboard steps past it: from Copy, with Format Painter disabled,
+    // right goes on to the Slides group and down stays put (0.1.4 sent both back to the start of Clipboard).
+    @Test func theKeyboardStepsPastDisabledControls() throws {
+        let home = try #require(RibbonModel.allTabs.first { $0.id == "home" })
+        let all = RibbonFocus.columns(home, [:])
+        let cols = RibbonFocus.columns(home, [:], disabled: ["home.formatPainter"])
+        #expect(all.joined().contains("home.formatPainter") && !cols.joined().contains("home.formatPainter"))
+        let right = try #require(RibbonFocus.next("home.copy", .right, in: cols))
+        let slides = try #require(home.groups.first { $0.controls.contains { $0.id == "home.newSlide" } })
+        #expect(slides.controls.contains { RibbonFocus.controlID($0) == right || RibbonFocus.menuID($0) == right }, "\(right)")
+        #expect(RibbonFocus.next("home.copy", .down, in: cols) == nil)
+    }
+
     // §5: a group's sizes are those that draw something differently, largest first, then collapsed.
     @Test func aGroupsSizesAreThoseThatDiffer() throws {
         for tab in RibbonModel.allTabs {
