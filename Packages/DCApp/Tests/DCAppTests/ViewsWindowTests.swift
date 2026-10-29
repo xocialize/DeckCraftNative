@@ -64,6 +64,31 @@ import Testing
         #expect(nav.table.rect(ofRow: 0).height == thumb.height + 2 * NavigatorMetrics.pad)
     }
 
+    /// After 0.1.4 a legacy scroller came in after the window opened (AppKit settles the style just after launch) and
+    /// the rows kept heights measured without it. The rows follow the scroller's style, and are as wide with a legacy
+    /// scroller hidden as shown, so its coming and going can't change their heights.
+    @Test func navigatorRowsFollowTheScrollerStyle() throws {
+        let (_, link) = try model(12, sections: true)
+        let nav = NavigatorViewController(link: link)
+        let w = window(nav, NSSize(width: 236, height: 700))
+        defer { w.close() }
+        nav.refresh()
+        nav.scroll.scrollerStyle = .overlay
+        w.layoutIfNeeded()
+        let overlay = nav.table.rect(ofRow: 1).height
+        // AppKit retiles the scroll view for the new style without laying the navigator out.
+        nav.scroll.scrollerStyle = .legacy
+        nav.scroll.tile()
+        let bar = NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy)
+        #expect(nav.rowWidth == nav.scroll.frame.width - bar)
+        #expect(nav.table.rect(ofRow: 1).height < overlay)
+        for row in 0 ..< nav.table.numberOfRows {
+            #expect(nav.table.rect(ofRow: row).height == nav.tableView(nav.table, heightOfRow: row), "row \(row)")
+        }
+        nav.scroll.verticalScroller?.isHidden = true
+        #expect(nav.rowWidth == nav.scroll.frame.width - bar)
+    }
+
     // thumbs.rs: the navigator's clicks run the engine's selection; Return adds a slide; drag → slide.move
     @Test func navigatorClicksSelectThroughTheEngine() throws {
         let (m, link) = try model(4)

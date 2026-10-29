@@ -236,6 +236,55 @@ import Testing
         #expect(key(97) == nil && key(49) == nil, "F6 is the menu's; Space is the button's")
     }
 
+    // A window opened in the ribbon layout put the titlebar's blur (AppKit's scroll pocket) inside the split view,
+    // 52 points over the top of the slide (0.1.4). The ribbon layout's sidebar and inspector aren't full height, so the
+    // blur stays in the titlebar; the Mac layout gets its full-height sidebar back.
+    @Test func noTitlebarBlurCoversTheSlideBelowTheRibbon() throws {
+        _ = NSApplication.shared
+        let app = AppController()
+        app.syncSuspended += 1
+        app.model.ui = UiState()
+        app.model.run("file.new")
+        app.model.run("view.ribbon", ["on": .bool(true)])
+        let doc = PresentationDocument(adopting: app.model.session.activeDoc?.uid ?? 0)
+        let wc = DocumentWindowController(document: doc)
+        let window = try #require(wc.window)
+        window.isReleasedWhenClosed = false
+        defer { window.close() }
+        window.setContentSize(NSSize(width: 1080, height: 700))
+        // AppKit places the blur when the window first comes on screen.
+        wc.showWindow(nil)
+        func settle() {
+            for _ in 0 ..< 6 {
+                window.contentView?.layoutSubtreeIfNeeded()
+                window.displayIfNeeded()
+                RunLoop.main.run(until: Date().addingTimeInterval(0.03))
+            }
+        }
+        settle()
+        #expect(window.contentViewController is RibbonContainerController)
+        func pockets() -> [CGRect] {
+            var out: [CGRect] = []
+            func walk(_ v: NSView) {
+                if String(describing: type(of: v)) == "NSScrollPocket", v.bounds.width > 1, v.bounds.height > 1 { out.append(v.convert(v.bounds, to: nil)) }
+                v.subviews.forEach(walk)
+            }
+            window.contentView?.superview.map(walk)
+            return out
+        }
+        let canvas = wc.canvas.scroll.convert(wc.canvas.scroll.bounds, to: nil)
+        #expect(!canvas.isEmpty)
+        let over = pockets().filter { $0.intersects(canvas) }
+        #expect(over == [], "the canvas is \(canvas)")
+        #expect(wc.split.splitViewItems.allSatisfy { !$0.allowsFullHeightLayout })
+
+        app.model.run("view.ribbon", ["on": .bool(false)])
+        RibbonFeature.apply(wc)
+        settle()
+        #expect(window.contentViewController === wc.split)
+        #expect(wc.split.splitViewItems.allSatisfy { $0.allowsFullHeightLayout })
+    }
+
     @Test func everyRibbonSymbolIsAnSFSymbol() {
         var missing: [String] = []
         for tab in RibbonModel.allTabs {

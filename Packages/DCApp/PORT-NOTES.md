@@ -1202,10 +1202,31 @@ walk found five bugs, all in 0.1.4 and all fixed here.
   - **F6 without fn.** The operator's keyboard sends the top row as media keys, so F6 alone never reaches the app.
   - **The blue squares.** They are macOS's own Full Keyboard Access cursor, drawn beside the ribbon's ring. Space
     presses what it surrounds.
+- **The blurred band over the slide (fixed later the same day).** A window opened in the ribbon layout drew the
+  titlebar's blur, AppKit's 52-point scroll pocket, just under the ribbon. It covered the top 24 points of the slide at
+  1080×740. Switching to the Mac layout and back cleared it, which is why the walk saw it come and go.
+  - **Why:**
+    - AppKit places that blur once, when the window first comes on screen.
+    - With the split view as the window's content, it goes in the titlebar.
+    - With the split view below the ribbon, it went inside the split view, pinned to its top. The full-height sidebar
+      and inspector made AppKit treat the split view's top as under the titlebar.
+    - Resizing, relaying out and collapsing the sidebar left it where it was.
+  - **The fix:** the ribbon layout turns `allowsFullHeightLayout` off on the split view's items, and the Mac layout turns
+    it back on. The ribbon runs across the window, so the sidebar shouldn't run up under the titlebar anyway.
+  - **Test:** `RibbonWindowTests.noTitlebarBlurCoversTheSlideBelowTheRibbon` opens a window in the ribbon layout and
+    checks that no scroll pocket overlaps the canvas. It fails on the old code.
+- **Navigator rows a scroller too tall (found with the band).** AppKit settles a window's scroller style just after
+  launch, from overlay to legacy when a mouse is attached. The scroll view retiled without laying the navigator out, so
+  every thumbnail row kept the height measured 17 points wider: 126 points instead of 117.
+  - **The fix:** the navigator re-measures its rows when its clip view's frame changes.
+  - **Why it can't flip-flop:** the rows are laid out at `rowWidth`, the clip view's width with a legacy scroller
+    shown, even while it is hidden. A scroller coming or going doesn't change that width, so it can't change the rows'
+    heights and bring the scroller back, the canvas's loop above.
+  - **Test:** `ViewsWindowTests.navigatorRowsFollowTheScrollerStyle` switches the style and retiles as AppKit does. It
+    fails without the observer.
+  - The Outline view also lays out at `contentSize.width` and may do the same. Not yet checked.
 - **Still to do:**
   - The Accessibility Inspector audit.
-  - A blurred band about 23 pt high over the top of the slide in the ribbon layout, probably macOS 26's scroll-edge
-    effect under the ribbon. Not yet looked at.
   - `ui.screenshot` returned stale frames during the walk. It showed the ring on Home after focus had moved, and the
     ribbon after `ui.set {layout: mac}`. `screencapture -l` of the window was right.
 

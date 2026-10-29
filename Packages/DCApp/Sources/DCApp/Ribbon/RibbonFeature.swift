@@ -196,6 +196,10 @@ enum RibbonFeature {
             attachment.toolbar.follow(window)
             window.toolbar = attachment.toolbar.make()
             window.titleVisibility = .hidden
+            // The ribbon runs across the window, so the navigator and the inspector start below it, not full height.
+            // Left full height, a window opened in this layout put the titlebar's blur inside the split view, over the
+            // top 52 points of the slide (0.1.4).
+            wc.split.splitViewItems.forEach { $0.allowsFullHeightLayout = false }
             window.contentViewController = container
             container.setCollapsed(model.ui.ribbonCollapsed)
             window.setFrame(frame, display: true)
@@ -205,6 +209,7 @@ enum RibbonFeature {
             wc.ribbon = nil
             let frame = window.frame
             a.container.release()
+            wc.split.splitViewItems.forEach { $0.allowsFullHeightLayout = true }
             window.contentViewController = wc.split
             window.toolbar = a.macToolbar
             window.titleVisibility = .visible

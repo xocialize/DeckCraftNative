@@ -450,8 +450,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - The ribbon showed no focus ring.
   - The arrow keys stuck once an AppKit control had the keyboard.
   - ⌥↓ opened no menu, and disabled controls trapped the arrow keys.
-  - Still to do: the Accessibility Inspector audit, and a blurred band over the top of the slide in the ribbon
-    layout.
+  - A window opened in the ribbon layout drew the titlebar's blur over the top of the slide; the navigator's rows kept
+    heights measured before a legacy scroller came in. Both fixed later the same day.
+  - Still to do: the Accessibility Inspector audit.
 
 ## Pin moves
 

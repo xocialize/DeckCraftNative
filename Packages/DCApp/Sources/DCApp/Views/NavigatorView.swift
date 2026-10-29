@@ -105,6 +105,11 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
         observers.append(nc.addObserver(forName: NSView.boundsDidChangeNotification, object: scroll.contentView, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.scrolled() }
         })
+        // The scroll view retiles when it switches between overlay and legacy scrollers (a mouse plugged in or taken
+        // out, or AppKit settling it just after launch) without laying this view out.
+        observers.append(nc.addObserver(forName: NSView.frameDidChangeNotification, object: scroll.contentView, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.widthChanged() }
+        })
         observers.append(nc.addObserver(forName: .deckCraftThumbnailReady, object: nil, queue: .main) { [weak self] note in
             let uid = note.userInfo?["uid"] as? UInt64
             MainActor.assumeIsolated {
@@ -116,7 +121,20 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        let w = scroll.contentSize.width
+        widthChanged()
+    }
+
+    /// The width the rows are laid out in: the clip view's with a legacy scroller shown, even while it is hidden, so a
+    /// scroller coming or going never changes the rows' heights (which could bring it in and out again). After 0.1.4 a
+    /// legacy scroller came in after the window opened and the rows kept heights measured without it.
+    var rowWidth: CGFloat {
+        NSScrollView.contentSize(forFrameSize: scroll.frame.size, horizontalScrollerClass: nil, verticalScrollerClass: NSScroller.self,
+                                 borderType: scroll.borderType, controlSize: .regular, scrollerStyle: scroll.scrollerStyle).width
+    }
+
+    /// Re-measure the rows when their width changed.
+    private func widthChanged() {
+        let w = rowWidth
         guard abs(w - lastWidth) > 0.5 else { return }
         lastWidth = w
         if !items.isEmpty { table.noteHeightOfRows(withIndexesChanged: IndexSet(integersIn: 0 ..< items.count)) }
@@ -191,7 +209,7 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
     /// The thumbnail's size in points for a row width.
     func thumbSize(_ item: NavItem) -> CGSize {
         let aspect = link.state.map { slideAspect($0.doc) } ?? 0.5625
-        var w = max(40, scroll.contentSize.width - NavigatorMetrics.gutter - Tokens.Space.m)
+        var w = max(40, rowWidth - NavigatorMetrics.gutter - Tokens.Space.m)
         if case .layout = item { w = max(32, w - NavigatorMetrics.layoutIndent) }
         return CGSize(width: w.rounded(.down), height: (w * aspect).rounded())
     }
