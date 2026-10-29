@@ -462,6 +462,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - The Outline view's rows kept heights measured before a legacy scroller came in, as the navigator's had.
   - `ui.screenshot` returned stale frames while another app's window covered DeckCraft's. It now draws a covered
     window offscreen, and its reply says which capture it used (`source`).
+  - Spotlight, re-tested: with the notarized build in `/Applications`, and with the `CSExtensionLabel` key Xcode's
+    template adds (now in the importer's Info.plist), macOS still doesn't call the import extension for local files
+    (DCExtensions/PORT-NOTES.md).
   - Still to do: the Accessibility Inspector audit, held until the operator has time for it.
 
 ## Pin moves

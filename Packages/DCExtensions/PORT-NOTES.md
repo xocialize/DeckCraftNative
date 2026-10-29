@@ -120,6 +120,23 @@ DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation E
   - On this macOS, then, Spotlight can't be given a third-party presentation importer outside the system's own
     path. The extension stays (it is what Apple documents, and the indexing it does is the tested `DeckIndex`); the
     check, once the system calls it: copy a corpus deck somewhere indexed, `mdls -name kMDItemNumberOfPages <file>`.
+- **Spotlight re-tested (2026-10-29, macOS build 27.2): still not called.**
+  - **Notarized, in `/Applications`.** The 0.1.2 release was the elected copy (`pluginkit -m -v -i
+    com.xocialize.deckcraftnative.Spotlight`; the other registered copies in `build/release/` lose to it). A fresh
+    `.deckcraft` in `~/Documents` got type `ai.storyteller.deckcraft.presentation` and system attributes only;
+    `mdimport -t` says "with no plugIn".
+  - **`CSExtensionLabel`.** Xcode's Spotlight Import Extension template and both of Apple's import extensions
+    (PDFKit's `PDFImporter.appex`, FileDerivatives' `LegacyImporterHost.appex`) carry this top-level key, and ours
+    didn't: the comparison above looked only inside `NSExtension`. It was added (`DeckCraftSpotlightImporter`). A
+    Developer ID build with it, put in `/Applications` and elected, made no difference: `mdbulkimport` discovers
+    three import extensions (ours among them) and `mds` reran its BundleFinder, yet a deck copied after that was
+    still imported "with no plugIn" and no `DeckCraftSpotlight` process started. The key stays, since it is what the
+    template writes.
+  - **No third-party `.mdimporter` to compare.** `mdimport -L` lists Apple's own and the ones in GarageBand and
+    Xcode, the only app-bundled importers on this Mac, all Apple-signed.
+  - **Not tried: File Provider locations.** `~/Library/Spotlight/ExtensionsCache/fileProviderBundleMap.plist` maps
+    iCloud Drive's file provider, which suggests import extensions serve File Provider items. Testing that uploads a
+    deck to iCloud Drive, so it waits for the operator.
 - **A development trap: sandbox containers made by an ad hoc build.** An extension's container
   (`~/Library/Containers/com.xocialize.deckcraftnative.<QuickLook|Thumbnail|Spotlight>`) records the signer of the
   build that first ran. A later Developer ID build of the same extension "is not in ACL for container … prompting"

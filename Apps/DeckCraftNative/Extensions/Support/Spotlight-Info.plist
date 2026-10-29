@@ -20,5 +20,8 @@
     <key>NSExtensionPrincipalClass</key>
     <string>$(PRODUCT_MODULE_NAME).ImportExtension</string>
   </dict>
+  <!-- Xcode's Spotlight Import Extension template has this key, and so do Apple's own import extensions. -->
+  <key>CSExtensionLabel</key>
+  <string>DeckCraftSpotlightImporter</string>
 </dict>
 </plist>
