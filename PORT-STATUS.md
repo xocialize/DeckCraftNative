@@ -453,6 +453,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - A window opened in the ribbon layout drew the titlebar's blur over the top of the slide; the navigator's rows kept
     heights measured before a legacy scroller came in. Both fixed later the same day.
   - Still to do: the Accessibility Inspector audit.
+- **0.1.5 (2026-10-29, not yet published).** The keyboard-walk fixes above, from `8ad4bbc`. Notes in
+  `Docs/releases/0.1.5.md`.
 
 ## Pin moves
 

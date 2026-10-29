@@ -20,7 +20,7 @@ public enum DeckFormat {
     /// Format version written into the manifest.
     public static let version: UInt32 = 1
     /// Written as the manifest's `generator`.
-    public static let generator = "DeckCraftNative 0.1.4"
+    public static let generator = "DeckCraftNative 0.1.5"
     /// Largest entry inflated (guards against zip bombs).
     static let maxEntry: Int = 2 << 30
     /// All embedded media and chart sidecars together, inflated (#393).
