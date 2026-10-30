@@ -237,7 +237,8 @@ as ECMA-376: implement from the documents, never copy their text into code or do
   - **[MS-OSHARED]** holds the structures those three share.
 
   These belong in a wave after the app (Wave 7 or later), as a `DCPPT` reader that produces DCModel, and a
-  decryption step in front of DCPPTX. EMF/WMF ([MS-EMF], [MS-WMF], [MS-EMFPLUS]) aren't in the folder;
+  decryption step in front of DCPPTX. Planned on 2026-10-30 in
+  [Docs/plans/Legacy-PPT-and-Encryption.md](Docs/plans/Legacy-PPT-and-Encryption.md). EMF/WMF ([MS-EMF], [MS-WMF], [MS-EMFPLUS]) aren't in the folder;
   DCMetafile ports deckcraft's reader in Wave 2.
 - **`../pptx-swift-main`**: PPTXKit (MIT), about 8k lines of Swift. It is a read-only PPTX viewer built on
   ZIPFoundation, much narrower than deckcraft's `pptx` crate, which reads, writes and round-trips unknown parts.
