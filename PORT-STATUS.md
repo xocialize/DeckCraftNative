@@ -500,7 +500,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     - **Setting passwords:** File › Passwords… and Review › Protect Presentation, with PowerPoint's sheet.
     - **Saving:** as `.pptx` keeps the passwords; as `.deckcraft` drops them and says so.
     - **AutoRecover** keeps leaving protected presentations out.
-    - **Not checked:** PowerPoint opening a file we encrypted, which needs a person to type the password.
+    - **PowerPoint:** the operator opened a file we encrypted, with both passwords, in PowerPoint (2026-10-30).
+- **0.1.7 (2026-10-30, not yet published).** Opening and saving password-protected presentations (E1–E3 above).
+  Notes in `Docs/releases/0.1.7.md`.
 
 ## Pin moves
 

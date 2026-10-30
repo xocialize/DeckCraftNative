@@ -6,7 +6,7 @@ import Foundation
 public enum DCAppVersion {
     /// The version this build calls itself: the update check compares releases with it, and DeckCraftDev (no
     /// bundle, so no `CFBundleShortVersionString`) shows it in About.
-    public static let current = "0.1.6"
+    public static let current = "0.1.7"
 
     /// The running bundle's `CFBundleShortVersionString`, else `current`.
     public static func shown(_ info: [String: Any]? = Bundle.main.infoDictionary) -> String {

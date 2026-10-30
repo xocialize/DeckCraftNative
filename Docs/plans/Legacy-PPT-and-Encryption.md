@@ -159,8 +159,8 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
   HMAC, a version 4 compound file. The `\x06DataSpaces` streams match POI's byte for byte.
   - `Tools/legacy/check-encrypt.sh` has msoffcrypto-tool and POI decrypt every corpus deck we encrypt, with every
     kind of password. Both get the exact zip back.
-  - Not checked: PowerPoint opening a file we wrote. That needs a person to type the password, because rules keep me
-    from typing passwords into PowerPoint.
+  - PowerPoint opens a file we wrote: the operator opened one with both passwords (2026-10-30). That needed a
+    person to type the passwords, because rules keep me from typing passwords into PowerPoint.
 - **The password to modify** (`ModifyVerifier`): a SHA-512 verifier, 100,000 rounds, in `presentation.xml`. Its
   hash order (counter appended) was settled against PowerPoint's own files.
   - The engine writes it on save and reads it on open. Without the password, a file opens as an untitled
