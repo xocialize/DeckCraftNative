@@ -501,8 +501,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     - **Saving:** as `.pptx` keeps the passwords; as `.deckcraft` drops them and says so.
     - **AutoRecover** keeps leaving protected presentations out.
     - **PowerPoint:** the operator opened a file we encrypted, with both passwords, in PowerPoint (2026-10-30).
-- **0.1.7 (2026-10-30, not yet published).** Opening and saving password-protected presentations (E1–E3 above).
-  Notes in `Docs/releases/0.1.7.md`.
+- **Released as [v0.1.7](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.7) (2026-10-30).** Opening
+  and saving password-protected presentations (E1–E3 above). Notes in `Docs/releases/0.1.7.md`.
+  - Built clean from `b954f3e`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
+    its ticket is stapled.
+  - The installed 0.1.6 finds 0.1.7 through Check for Updates.
 
 ## Pin moves
 
