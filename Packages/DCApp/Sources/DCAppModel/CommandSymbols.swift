@@ -65,7 +65,7 @@ public enum CommandSymbols {
         "record.fromBeginning": "record.circle", "record.fromCurrent": "record.circle", "review.spelling": "textformat.abc.dottedunderline",
         "review.thesaurus": "book", "review.checkAccessibility": "accessibility", "review.language": "globe",
         "review.newComment": "text.bubble", "review.delete": "trash", "review.previous": "chevron.left",
-        "review.next": "chevron.right", "review.showComments": "bubble.left.and.bubble.right", "review.compare": "doc.on.doc",
+        "review.next": "chevron.right", "review.showComments": "bubble.left.and.bubble.right", "review.compare": "doc.on.doc", "review.protect": "lock", "file.passwords": "lock",
         "review.accept": "checkmark.circle", "review.endReview": "xmark.circle", "view.normal": "sidebar.left",
         "view.outline": "list.bullet.indent", "view.sorter": "square.grid.2x2", "view.notesPage": "note.text",
         "view.reading": "book", "view.slideMaster": "rectangle.stack", "view.handoutMaster": "doc.text",

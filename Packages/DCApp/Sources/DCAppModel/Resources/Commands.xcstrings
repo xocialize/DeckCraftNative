@@ -1177,6 +1177,18 @@
         }
       }
     },
+    "file.passwords" : {
+      "comment" : "The label of the app's command file.passwords",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords…"
+          }
+        }
+      }
+    },
     "file.properties" : {
       "comment" : "The label of command file.properties (File)",
       "extractionState" : "manual",
@@ -3117,6 +3129,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start a new presentation."
+          }
+        }
+      }
+    },
+    "help.file.passwords" : {
+      "comment" : "What command file.passwords does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set or remove the password to open (encrypts the saved .pptx) and the password to modify."
           }
         }
       }
@@ -6681,6 +6705,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragraph…"
+          }
+        }
+      }
+    },
+    "menu.Passwords…" : {
+      "comment" : "An item of the File menu (runs file.passwords)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords…"
           }
         }
       }

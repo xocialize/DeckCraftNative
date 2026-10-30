@@ -65,8 +65,9 @@ import Testing
         #expect(first?["ui"]?.asBool == true)
         #expect(first?["enabled"]?.asBool == true)
         // deckcraft's 51, view.ribbon (the ribbon layout, R1 of Docs/plans/Ribbon-and-StartScreen.md),
-        // view.handoutSlides (Slides Per Page, R2) and view.focusRibbon (F6, R3).
-        #expect(host.uiCommands.count == 54)
+        // view.handoutSlides (Slides Per Page, R2), view.focusRibbon (F6, R3) and file.passwords (File › Passwords…,
+        // Docs/plans/Legacy-PPT-and-Encryption.md E3).
+        #expect(host.uiCommands.count == 55)
     }
 
     @Test func windowPointsAreYDown() {

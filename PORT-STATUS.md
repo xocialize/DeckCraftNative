@@ -493,6 +493,14 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
       (`DCCLI_PASSWORD`) pass it, and the password stays in memory with the document.
     - **Until E3:** a protected presentation isn't saved, and AutoRecover leaves it out.
     - Details are in `Packages/DCOffCrypto/PORT-NOTES.md`.
+  - **E3 (2026-10-30): saving protected `.pptx`.**
+    - **Writing:** DCOffCrypto encrypts as PowerPoint 16 does, and msoffcrypto-tool and POI both decrypt what it
+      writes.
+    - **Password to modify:** written and read, with Read Only for people without it.
+    - **Setting passwords:** File › Passwords… and Review › Protect Presentation, with PowerPoint's sheet.
+    - **Saving:** as `.pptx` keeps the passwords; as `.deckcraft` drops them and says so.
+    - **AutoRecover** keeps leaving protected presentations out.
+    - **Not checked:** PowerPoint opening a file we encrypted, which needs a person to type the password.
 
 ## Pin moves
 

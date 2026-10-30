@@ -34,14 +34,22 @@ public struct LoadedFile: Sendable {
     public var native: Bool
     /// What the file had lost or damaged.
     public var damaged: Damage
-    /// The password a protected file was opened with.
+    /// The passwords a protected file was opened with.
     public var protection: DocProtection?
+    /// It has a password to modify that wasn't given: it opens as an untitled read-only copy.
+    public var readOnly: Bool = false
 }
 
-/// A password-protected presentation's password, kept with its open document (`DocState.protection`).
-public struct DocProtection: Sendable, Equatable {
-    public var password: String
-    public init(password: String) { self.password = password }
+/// What `FileCommands.openFile` read.
+public struct OpenedFile: Sendable {
+    public var presentation: Presentation
+    public var damage: Damage
+    /// The passwords given that open and modify it.
+    public var protection: DocProtection?
+    /// It has a password to modify (whether or not it was given).
+    public var modifyProtected: Bool
+    /// It has a password to modify that wasn't given.
+    public var readOnly: Bool { modifyProtected && protection?.modifyPassword == nil }
 }
 
 /// Rust's `std::path::Path` name helpers, on `/`-separated strings.
@@ -178,28 +186,40 @@ public enum FileCommands {
     /// `openPresentation`, plus what the file had lost or damaged. A password-protected file throws
     /// `passwordRequired`: `openProtected` takes its password.
     public static func openChecked(_ name: String, _ bytes: [UInt8]) throws -> (Presentation, Damage) {
-        let (p, damage, _) = try openProtected(name, bytes, password: nil)
-        return (p, damage)
+        let f = try openFile(name, bytes)
+        return (f.presentation, f.damage)
     }
 
-    /// `openChecked` for a file that may be password-protected: with its password, the presentation it holds, and
-    /// the password to keep with it. Without one it throws `passwordRequired`, with a wrong one `wrongPassword`.
-    public static func openProtected(_ name: String, _ bytes: [UInt8], password: String?) throws -> (Presentation, Damage, DocProtection?) {
+    /// `openChecked` for a file that may be password-protected. A password to open is needed for an encrypted file:
+    /// without one it throws `passwordRequired`, with a wrong one `wrongPassword`. A password to modify isn't: without
+    /// it the file opens read-only (`OpenedFile.readOnly`); a wrong one throws `wrongPassword`.
+    public static func openFile(_ name: String, _ bytes: [UInt8], password: String? = nil, modifyPassword: String? = nil) throws -> OpenedFile {
         if DeckFormat.sniff(bytes) {
             do {
                 let (p, media) = try DeckFormat.loadChecked(bytes)
-                return (p, Damage(media: media, slides: []), nil)
+                return OpenedFile(presentation: p, damage: Damage(media: media, slides: []), protection: nil, modifyProtected: false)
             } catch {
                 throw EngineError.other(error.description)
             }
         }
-        if let zip = try decryptIfProtected(name, bytes, password: password), let password {
-            guard PPTX.sniff(zip) else { throw EngineError.other("\(name): the protected file doesn't hold a presentation") }
-            let (p, slides) = try openOther(name, zip)
-            return (p, Damage(media: [], slides: slides), DocProtection(password: password))
+        var zip = bytes
+        var protection = DocProtection()
+        if let decrypted = try decryptIfProtected(name, bytes, password: password) {
+            guard PPTX.sniff(decrypted) else { throw EngineError.other("\(name): the protected file doesn't hold a presentation") }
+            zip = decrypted
+            protection.password = password
         }
-        let (p, slides) = try openOther(name, bytes)
-        return (p, Damage(media: [], slides: slides), nil)
+        var modifyProtected = false
+        if PPTX.sniff(zip), let verifier = Protection.verifier(inPackage: zip) {
+            modifyProtected = true
+            if let modifyPassword {
+                guard verifier.matches(modifyPassword) else { throw EngineError.wrongPassword(name) }
+                protection.modifyPassword = modifyPassword
+            }
+        }
+        let (p, slides) = try openOther(name, zip)
+        return OpenedFile(presentation: p, damage: Damage(media: [], slides: slides), protection: protection.orNil,
+                          modifyProtected: modifyProtected)
     }
 
     /// Whether `bytes` is a password-protected file a protected copy can be read from (a compound file holding an
@@ -296,20 +316,21 @@ public enum FileCommands {
     }
 
     /// Read and parse the presentation at `path` (with `password` for a password-protected one).
-    public static func readPresentationFile(_ path: String, password: String? = nil) throws -> LoadedFile {
+    public static func readPresentationFile(_ path: String, password: String? = nil, modifyPassword: String? = nil) throws -> LoadedFile {
         let bytes = try IO.readFile(path)
-        let (doc, damaged, protection) = try openProtected(path, bytes, password: password)
-        let native = DeckFormat.sniff(bytes) || PPTX.sniff(bytes) || protection != nil
-        return LoadedFile(path: path, doc: doc, native: native, damaged: damaged, protection: protection)
+        let f = try openFile(path, bytes, password: password, modifyPassword: modifyPassword)
+        let native = DeckFormat.sniff(bytes) || PPTX.sniff(bytes) || f.protection?.password != nil
+        return LoadedFile(path: path, doc: f.presentation, native: native, damaged: f.damage, protection: f.protection, readOnly: f.readOnly)
     }
 
     /// Add a loaded presentation as the active document: the shared end of `file.open` and `file.adopt`.
     /// A damaged file opens as an untitled repaired copy, so Save can't overwrite the original with the
     /// empty media.
     private static func adoptLoaded(_ s: Session, _ f: LoadedFile) throws -> JSON {
-        let keepPath = f.native && f.damaged.isEmpty
+        let keepPath = f.native && f.damaged.isEmpty && !f.readOnly
         let i = addOpened(s, f.path, keepPath ? f.path : nil, f.doc)
         s.documents.at(i)?.protection = f.protection
+        if f.readOnly, let st = s.documents.at(i) { st.title = "\(st.title) (Read-Only)" }
         try reportDamage(s, f.damaged)
         let st = try s.doc()
         var out: JSON = [
@@ -318,12 +339,14 @@ public enum FileCommands {
         ]
         // Only a protected file's reply says so, so every other reply stays deckcraft's, byte for byte.
         if f.protection != nil { out.set("protected", true) }
+        if f.readOnly { out.set("readOnly", true) }
         return out
     }
 
     @Sendable static func open(_ s: Session, _ p: JSON) throws -> JSON {
         guard let path = Cmd.strParam(p, "path") else { throw Cmd.bad("file.open", "missing `path`") }
-        return try adoptLoaded(s, readPresentationFile(path, password: Cmd.strParam(p, "password")))
+        return try adoptLoaded(s, readPresentationFile(path, password: Cmd.strParam(p, "password"),
+                                                       modifyPassword: Cmd.strParam(p, "modifyPassword")))
     }
 
     /// `file.adopt {path, token?}`: add the presentation a host read in the background and staged with
@@ -342,9 +365,10 @@ public enum FileCommands {
         guard let data = Cmd.strParam(p, "data").flatMap(Cmd.base64Decode) else {
             throw Cmd.bad("file.openBytes", "missing or invalid base64 `data`")
         }
-        let (doc, damaged, protection) = try openProtected(name, data, password: Cmd.strParam(p, "password"))
+        let f = try openFile(name, data, password: Cmd.strParam(p, "password"), modifyPassword: Cmd.strParam(p, "modifyPassword"))
+        let (doc, damaged) = (f.presentation, f.damage)
         let i = addOpened(s, name, nil, doc)
-        s.documents.at(i)?.protection = protection
+        s.documents.at(i)?.protection = f.protection
         try reportDamage(s, damaged)
         return try [
             "document": .integer(i), "missingFonts": s.doc().missingFonts.toJSON(), "damagedMedia": damaged.media.toJSON(),
@@ -492,6 +516,7 @@ public enum FileCommands {
     private static func markSaved(_ s: Session, _ path: String?) throws {
         let st = try s.docMut()
         st.savedDocRef = st.docRef
+        st.protectionEdited = false
         if let path { st.path = path }
         st.revision += 1
         if let dir = s.recoveryDir { Recovery.discard(dir, st.uid) }
@@ -505,10 +530,11 @@ public enum FileCommands {
             return ["needsPath": true]
         }
         let format = Cmd.strParam(p, "format") ?? formatForPath(path)
-        try refuseProtected(s.doc())
-        let bytes = try saveBytes(s.doc().doc, format)
+        let st = try s.doc()
+        let bytes = try Protection.fileBytes(st, format)
         try writeFile(path, bytes)
         try markSaved(s, path)
+        Protection.didSave(s, st, format)
         return ["path": .string(path), "bytes": .integer(bytes.count)]
     }
 
@@ -522,16 +548,8 @@ public enum FileCommands {
 
     @Sendable static func saveBytesCmd(_ s: Session, _ p: JSON) throws -> JSON {
         let format = Cmd.strParam(p, "format") ?? "deckcraft"
-        try refuseProtected(s.doc())
-        let bytes = try saveBytes(s.doc().doc, format)
+        let bytes = try Protection.fileBytes(s.doc(), format)
         return ["data": .string(Cmd.base64Encode(bytes)), "bytes": .integer(bytes.count)]
-    }
-
-    /// Until saving with a password arrives (the plan's E3), a password-protected presentation isn't saved: saved
-    /// without its password it would lose its protection silently. Exports (PDF, pictures) are still allowed.
-    public static func refuseProtected(_ st: DocState) throws {
-        guard st.protection != nil else { return }
-        throw EngineError.other("“\(st.title)” is password-protected. DeckCraft can't save password-protected presentations yet, so it doesn't save this one: saved without its password, it would no longer be protected.")
     }
 
     /// `scale` for rendering `doc`'s slides to an image: within 0.01–16, and small enough that the slide

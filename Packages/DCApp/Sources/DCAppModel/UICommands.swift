@@ -40,6 +40,9 @@ public enum UICommands {
         .init(id: "view.focusRibbon", label: "Move Focus to the Ribbon", shortcut: "F6", params: "{place?: tab:<id>|<control id>}"),
         // Handout Master › Slides Per Page: deckcraft keeps it as UI state with no command (R2 gives it one).
         .init(id: "view.handoutSlides", label: "Slides Per Page", shortcut: nil, params: "{count: 1|2|3|4|6|9}"),
+        // File › Passwords… and Review › Protect Presentation (Docs/plans/Legacy-PPT-and-Encryption.md, E3): deckcraft has
+        // no password protection.
+        .init(id: "file.passwords", label: "Passwords…", shortcut: nil, params: "{password?: string|null, modifyPassword?: string|null} (none: the Passwords sheet)"),
         .init(id: "view.dark", label: "Dark Mode", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.grayscale", label: "Grayscale", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.newWindow", label: "New Window", shortcut: nil, params: "{on?: bool, slide?: index, delta?: int}"),

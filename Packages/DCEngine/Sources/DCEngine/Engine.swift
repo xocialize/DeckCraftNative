@@ -332,6 +332,8 @@ public final class DocState {
     /// The password the file was opened with (Docs/plans/Legacy-PPT-and-Encryption.md §4.3). It lives only here, in
     /// memory: never in the presentation, a `.deckcraft`, AutoRecover, the journal or a command's reply.
     public var protection: DocProtection?
+    /// Its passwords were set or removed since it was saved (File › Passwords): it needs saving.
+    public var protectionEdited = false
 
     public init(_ doc: Presentation, path: String?, title: String) {
         let r = DocRef(doc)
@@ -356,6 +358,7 @@ public final class DocState {
         let c = DocState(doc, path: path, title: title)
         c.docRef = docRef
         c.protection = protection
+        c.protectionEdited = protectionEdited
         c.savedDocRef = savedDocRef
         c.selection = selection
         c.history = history
@@ -375,7 +378,7 @@ public final class DocState {
     /// The presentation as last saved.
     public var savedDoc: Presentation { savedDocRef.value }
 
-    public var isDirty: Bool { docRef !== savedDocRef }
+    public var isDirty: Bool { docRef !== savedDocRef || protectionEdited }
 
     /// The file's name without its extension, else the title.
     public var displayTitle: String {
@@ -897,10 +900,10 @@ public final class Session {
             pushUndo(st, HistoryEntry(label: spec.label, doc: old, selection: sel, vertexKind: vertexKind))
         }
         if spec.journal && outer {
-            // A password stays out of the journal.
+            // Passwords stay out of the journal.
             var recorded = params
-            if case .object(var o) = params, o["password"] != nil {
-                o.remove("password")
+            if case .object(var o) = params, o.keys.contains(where: { $0.lowercased().contains("password") }) {
+                for k in o.keys where k.lowercased().contains("password") { o.remove(k) }
                 recorded = .object(o)
             }
             journal.append((id, recorded))

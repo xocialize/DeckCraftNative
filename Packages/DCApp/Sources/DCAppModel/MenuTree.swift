@@ -20,6 +20,7 @@ public enum MenuTree {
             ("New Presentation", "file.new"), ("Open…", "app.openDialog"), ("-", ""),
             ("Close", "app.closePresentation"), ("Save", "file.save"), ("Save As…", "app.saveAsDialog"),
             ("Export…", "app.exportDialog"), ("Print…", "app.print"), ("-", ""), ("Properties", "file.properties"),
+            ("Passwords…", "file.passwords"),
         ]),
         menu("Edit", [
             ("Undo", "edit.undo"), ("Redo", "edit.redo"), ("-", ""), ("Cut", "edit.cut"), ("Copy", "edit.copy"),

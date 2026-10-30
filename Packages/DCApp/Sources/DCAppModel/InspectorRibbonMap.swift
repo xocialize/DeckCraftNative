@@ -68,6 +68,7 @@ public enum RibbonMap {
         g("Record", "Record", "the show (Show area); Cameo and narration are not available (as deckcraft)", ["record.record"]),
         // Review
         g("Review", "Proofing", "inspector Review ▸ Proofing (Spelling…, Accessibility…, Language… dialogs) and Review ▸ Thesaurus", ["review.proofing", "review.accessibility", "review.language"]),
+        g("Review", "Protect", "File ▸ Passwords… (the Passwords sheet)", ["review.protect"]),
         g("Review", "Compare", "inspector Review ▸ Revisions (Accept, Reject, End Review); Compare… dialog", ["review.compare"]),
         g("Review", "Comments", "inspector Review ▸ Comments (New Comment dialog, Previous, Next, Reply, Resolve, Delete)", ["review.comments"]),
         // View

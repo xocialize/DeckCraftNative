@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0, E1 and E2 are done** (§5, the milestone notes); E3 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** (§5, the milestone notes): encryption is ready for a release; P1 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -141,7 +141,7 @@ PORT-STATUS, as before.
 | **E0** | **Setup.** Install LibreOffice, a JDK with Apache POI, and msoffcrypto-tool in a venv (all outside the repo); download [MS-CFB] and [MS-OLEPS]. `Tools/legacy/` scripts that make every test file (§6.1), writing into `../DeckCraftNative-Fixtures/legacy/`, and the PowerPoint-protected set into its local cache. The PowerPoint observations of §2 | S | `Tools/legacy/make-fixtures.sh` regenerates the encrypted and `.ppt` sets from DeckCraft's own decks |
 | **E1** | **DCCFB.** Reader and writer, v3 and v4, mini stream, DIFAT beyond 109 entries, cycle and range guards, fuzzing. (DCPPTX's deckcraft-ported `CFB.swift` stays for parity; the engine and DeckReader move to DCCFB in E2) | S | Streams read back byte-for-byte against olefile on every fixture; files we write open in olefile and POI; fuzzed input never crashes or hangs |
 | **E2** | **Open protected `.pptx`.** Agile and Standard decryption, password verification, HMAC, the named refusals; `passwordRequired` through the engine, the app's password sheet, MCP/`dccli` `password`; AutoRecover off for protected documents; Quick Look's message unchanged | M | Every encrypted fixture (each producer and cipher, §6.1) opens with its password and matches the plaintext zip byte-for-byte; wrong passwords and tampered files fail cleanly |
-| **E3** | **Save protected `.pptx`.** The Agile writer, File › Passwords… and Review › Protect Presentation, keeping a file's password on Save, password to modify (`modifyVerifier`) with a Read Only choice on open, encrypted AutoRecover | M | msoffcrypto-tool and POI decrypt what we write to our own zip byte-for-byte; PowerPoint opens it with the password (`powerpoint-check.sh` learns to answer the prompt) |
+| **E3** | **Save protected `.pptx`.** The Agile writer, File › Passwords… and Review › Protect Presentation, keeping a file's password on Save, password to modify (`modifyVerifier`) with a Read Only choice on open. (Encrypted AutoRecover was decided against: protected presentations stay out of AutoRecover, E3 notes) | M | msoffcrypto-tool and POI decrypt what we write to our own zip byte-for-byte; PowerPoint opens it with the password (`powerpoint-check.sh` learns to answer the prompt) |
 | — | **Release**: E1–E3 ship on their own | | |
 | **P1** | **`.ppt` container.** Current User, the UserEditAtom chain and persist directory (newest wins; unreached records ignored), the record tree, RC4 CryptoAPI with the default password then the prompt; the document types, the converted banner and the import report. Slides open blank but counted, with slide size and notes size | M | Every `.ppt` fixture opens with the right slide count; the Govdocs1 crash run is clean |
 | **P2** | **Text, masters and slides.** Text in shapes and in the slide list, the paragraph and character runs, master text styles by text type and level, the font collection, colour schemes, placeholders and their inheritance, title/notes/handout masters, headers and footers with date fields ([MS-OSHARED] formats), notes pages, hyperlinks, backgrounds. The OOXML theme and layouts PowerPoint 2007+ embeds are used when present | L | Text per slide matches POI's dump and macOS's Office importer (`mdimport`) on every fixture |
@@ -152,6 +152,40 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### E3 notes (2026-10-30)
+
+- **Writing** (`OfficeCrypto.encrypt`): Agile as PowerPoint 16 writes it, AES-256, SHA-512, 100,000 rounds, the
+  HMAC, a version 4 compound file. The `\x06DataSpaces` streams match POI's byte for byte.
+  - `Tools/legacy/check-encrypt.sh` has msoffcrypto-tool and POI decrypt every corpus deck we encrypt, with every
+    kind of password. Both get the exact zip back.
+  - Not checked: PowerPoint opening a file we wrote. That needs a person to type the password, because rules keep me
+    from typing passwords into PowerPoint.
+- **The password to modify** (`ModifyVerifier`): a SHA-512 verifier, 100,000 rounds, in `presentation.xml`. Its
+  hash order (counter appended) was settled against PowerPoint's own files.
+  - The engine writes it on save and reads it on open. Without the password, a file opens as an untitled
+    "(Read-Only)" copy; `file.open {modifyPassword}` opens it for editing.
+  - The app asks like PowerPoint's *Password to Modify*: Modify, Read Only, Cancel.
+- **Saving:**
+  - As `.pptx`, `.potx` or `.ppsx`, a protected presentation keeps both passwords.
+  - As `.deckcraft` or an outline it can't, so the document has none afterwards and the status line says so.
+  - Exports are unprotected copies.
+- **Setting passwords:** File › Passwords… and Review › Protect Presentation (a new group) open the Passwords sheet,
+  with PowerPoint's two checkboxes and each password typed twice.
+  - Empty fields keep a password that's already set. A mismatch, an empty new password or more than 255 characters
+    asks again.
+  - `file.passwords {password?, modifyPassword?}` sets them from scripts and the control channel.
+  - A change makes the document need saving (`DocState.protectionEdited`).
+  - `file.passwords` is an app command, because the engine's command list is pinned to deckcraft's.
+- **Decided against: encrypted AutoRecover.** A protected presentation stays out of AutoRecover. Encrypted recovery
+  files would need a password prompt during crash recovery. The property that matters holds either way: a protected
+  presentation is never written in the clear.
+- **Checked live:**
+  - **Over the control channel:** set both passwords; save (the file is encrypted); reopen with no password (it asks),
+    with the open password only (it opens read-only), and with both (it opens for editing).
+  - **In the test build's windows:** the Passwords sheet, unticking a password, the Password to Modify prompt, and
+    Read Only giving a "(Read-Only)" window.
+  - **Not automated:** typing into the secure fields, which computer use can't do.
 
 ### E2 notes (2026-10-30)
 

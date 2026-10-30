@@ -156,6 +156,7 @@ public enum CommandHelp {
         "view.dark": "Use the dark appearance.",
         "view.ribbon": "Switch between the ribbon and the toolbar with the inspector.",
         "view.focusRibbon": "Move the keyboard to the ribbon's tabs; Esc brings it back to the slide.",
+        "file.passwords": "Set or remove the password to open (encrypts the saved .pptx) and the password to modify.",
         // File
         "file.new": "Start a new presentation.",
         "app.openDialog": "Open a presentation from a file.",

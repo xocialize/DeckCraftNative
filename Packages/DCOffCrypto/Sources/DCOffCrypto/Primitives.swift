@@ -74,6 +74,11 @@ enum AES {
         try run(key, nil, data, CCOptions(kCCOptionECBMode))
     }
 
+    /// Encrypts in CBC mode; the data must be whole 16-byte blocks.
+    static func encryptCBC(_ key: [UInt8], _ iv: [UInt8], _ data: [UInt8]) throws(OfficeCryptoError) -> [UInt8] {
+        try run(key, iv, data, CCOptions(0), op: CCOperation(kCCEncrypt))
+    }
+
     static func run(_ key: [UInt8], _ iv: [UInt8]?, _ data: [UInt8], _ options: CCOptions,
                     op: CCOperation = CCOperation(kCCDecrypt)) throws(OfficeCryptoError) -> [UInt8] {
         guard [16, 24, 32].contains(key.count) else { throw .damaged("an AES key of \(key.count) bytes") }

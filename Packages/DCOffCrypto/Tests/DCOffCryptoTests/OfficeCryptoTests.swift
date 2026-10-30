@@ -118,6 +118,58 @@ import Testing
         #expect(throws: OfficeCryptoError.unsupported("Extensible encryption")) { try OfficeCrypto.protectedPackage(try ext.bytes()) }
     }
 
+    // MARK: Writing
+
+    /// What we write, our reader opens: the zip back, PowerPoint's parameters, a version 4 compound file.
+    @Test func encryptedFilesRoundTrip() throws {
+        for size in [0, 1, 15, 16, 4095, 4096, 4097, 100_000] {
+            let zip = (0 ..< size).map { UInt8(truncatingIfNeeded: $0 &* 31 &+ 7) }
+            for pw in ["Password1", "Tëst-pässwörd", "key-🔑-2026", String(repeating: "p", count: 255)] {
+                let enc = try OfficeCrypto.encrypt(zip, password: pw)
+                let p = try #require(try OfficeCrypto.protectedPackage(enc))
+                #expect(p.method == OfficeCrypto.writtenMethod)
+                #expect(try p.decrypt(password: pw) == zip, "\(size) bytes")
+                #expect(throws: OfficeCryptoError.wrongPassword) { try p.decrypt(password: pw + "!") }
+                #expect(try CompoundFile(enc).majorVersion == 4)
+                if size > 4096 { break }
+            }
+        }
+        // Fresh salts and keys each time: the same input never encrypts the same way twice.
+        #expect(try OfficeCrypto.encrypt([1, 2, 3], password: "x") != OfficeCrypto.encrypt([1, 2, 3], password: "x"))
+    }
+
+    /// The data spaces are the specification's structures; Apache POI writes the same bytes.
+    @Test func theDataSpacesMatchPOIs() throws {
+        let f = try #require(try Self.encryptedFixtures().first { $0.file.hasSuffix("corpus-sample.poi-agile-aes256-sha512.pptx") },
+                             "no legacy fixtures")
+        let poi = try CompoundFile(try Self.bytes(f.file))
+        let ours = try CompoundFile(try OfficeCrypto.encrypt([1, 2, 3], password: "x"))
+        for s in ["\u{6}DataSpaces/Version", "\u{6}DataSpaces/DataSpaceMap", "\u{6}DataSpaces/DataSpaceInfo/StrongEncryptionDataSpace",
+                  "\u{6}DataSpaces/TransformInfo/StrongEncryptionTransform/\u{6}Primary"] {
+            #expect(try ours.stream(s) == poi.stream(s), "\(s)")
+        }
+    }
+
+    /// With `DCOFFCRYPTO_WRITE_DIR` set, writes encrypted files for other readers to check
+    /// (Tools/legacy/check-encrypt.sh runs msoffcrypto-tool and Apache POI over them): `<name>.pptx`, its
+    /// `<name>.plain` and its `<name>.password`.
+    @Test func writeFilesForOtherReaders() throws {
+        guard let dir = ProcessInfo.processInfo.environment["DCOFFCRYPTO_WRITE_DIR"], !dir.isEmpty else { return }
+        let out = URL(filePath: dir, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        let plain = try Self.encryptedFixtures().compactMap(\.plaintext)
+        var seen = Set<String>()
+        let passwords = ["Password1", "Tëst-pässwörd", "key-🔑-2026", String(repeating: "p", count: 255)]
+        for (i, rel) in plain.enumerated() where seen.insert(rel).inserted {
+            let zip = try Self.bytes(rel)
+            let pw = passwords[i % passwords.count]
+            let name = URL(filePath: rel).deletingPathExtension().lastPathComponent
+            try Data(try OfficeCrypto.encrypt(zip, password: pw)).write(to: out.appending(path: "\(name).pptx"))
+            try Data(zip).write(to: out.appending(path: "\(name).plain"))
+            try Data(pw.utf8).write(to: out.appending(path: "\(name).password"))
+        }
+    }
+
     /// The hostile fixtures, and seeded damage to each stream, end in an error or a result: never a trap or a hang.
     @Test func damagedInputFailsCleanly() throws {
         let dir = Self.legacy.appending(path: "hostile")

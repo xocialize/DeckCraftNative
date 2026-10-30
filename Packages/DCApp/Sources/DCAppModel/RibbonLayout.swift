@@ -384,6 +384,9 @@ public enum RibbonLayout {
             c("review.next", "comment.next"),
             c("review.showComments", "view.pane", ["pane": "comments"], title: "Show Comments", also: ["comment.reply", "comment.resolve"]),
         ]),
+        g("review.protect", "Protect", fold: 1, [
+            c("review.protect", "file.passwords", title: "Protect Presentation"),
+        ]),
         g("review.compare", "Compare", fold: 4, [
             c("review.compare", "app.compareDialog"),
             s("review.accept", "review.accept", ["all": true], .split(nil), also: ["review.reject"]),

@@ -1249,6 +1249,18 @@
         }
       }
     },
+    "ribbon.control.review.protect" : {
+      "comment" : "A control in the Review tab's Protect group (runs file.passwords)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protect Presentation"
+          }
+        }
+      }
+    },
     "ribbon.control.review.showComments" : {
       "comment" : "A control in the Review tab's Comments group (runs view.pane)",
       "extractionState" : "manual",
@@ -2685,6 +2697,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proofing"
+          }
+        }
+      }
+    },
+    "ribbon.group.review.protect" : {
+      "comment" : "A group of the Review ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protect"
           }
         }
       }

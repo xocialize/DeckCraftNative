@@ -43,6 +43,8 @@ public enum DocumentTypes {
 public final class PresentationDocument: NSDocument {
     /// The engine document this one shows (`DocState.uid`); 0 until read or adopted.
     public private(set) var uid: UInt64 = 0
+    /// It was opened read-only (a password to modify wasn't given): an untitled copy, so Save asks where.
+    private(set) var openedReadOnly = false
     var model: AppModel? { AppController.shared?.model }
 
     override public init() { super.init() }
@@ -83,15 +85,32 @@ public final class PresentationDocument: NSDocument {
         guard let model else { throw CocoaError(.fileReadUnknown) }
         let name = fileURL?.lastPathComponent ?? "Untitled.\(DocumentTypes.format(typeName) ?? "deckcraft")"
         let bytes = [UInt8](data)
-        // A password-protected file asks for its password until it opens or the person cancels (PasswordPrompt).
-        var password = PasswordPrompt.supplied
+        let shown = fileURL?.lastPathComponent ?? name
+        // A password-protected file asks for its passwords until it opens or the person cancels (PasswordPrompt):
+        // the password to open first, then the password to modify, which Read Only skips.
+        var password = PasswordPrompt.supplied, modify = PasswordPrompt.suppliedModify
         PasswordPrompt.supplied = nil
-        var wrong = false
+        PasswordPrompt.suppliedModify = nil
+        var wrongOpen = false, wrongModify = false, askingModify = false, readOnlyChosen = false
         while true {
             do {
-                let (pres, _, protection) = try FileCommands.openProtected(name, bytes, password: password)
-                let i = FileCommands.addOpened(model.session, name, fileURL?.path, pres)
-                model.session.documents.at(i)?.protection = protection
+                let f = try FileCommands.openFile(name, bytes, password: password, modifyPassword: modify)
+                if f.readOnly, !readOnlyChosen, PasswordPrompt.interactive {
+                    askingModify = true
+                    switch PasswordPrompt.askModify(shown, wrong: wrongModify) {
+                    case .cancel: throw CocoaError(.userCancelled)
+                    case .readOnly: readOnlyChosen = true
+                    case let .password(p):
+                        modify = p
+                        continue
+                    }
+                }
+                let i = FileCommands.addOpened(model.session, name, f.readOnly ? nil : fileURL?.path, f.presentation)
+                if let st = model.session.documents.at(i) {
+                    st.protection = f.protection
+                    if f.readOnly { st.title = "\(st.title) (Read-Only)" }
+                }
+                openedReadOnly = f.readOnly
                 uid = model.session.documents.at(i)?.uid ?? 0
                 return
             } catch let e as EngineError {
@@ -99,10 +118,14 @@ public final class PresentationDocument: NSDocument {
                 case .passwordRequired, .wrongPassword:
                     // The control channel's opens don't ask: the error goes back to the script.
                     guard PasswordPrompt.interactive else { break }
-                    if case .wrongPassword = e { wrong = true }
-                    guard let p = PasswordPrompt.ask(fileURL?.lastPathComponent ?? name, wrong: wrong) else {
-                        throw CocoaError(.userCancelled)
+                    if askingModify {
+                        // The password to open was right (the file was read): it's the password to modify that wasn't.
+                        wrongModify = true
+                        modify = nil
+                        continue
                     }
+                    if case .wrongPassword = e { wrongOpen = true }
+                    guard let p = PasswordPrompt.ask(shown, wrong: wrongOpen) else { throw CocoaError(.userCancelled) }
                     password = p
                     continue
                 default: break
@@ -122,8 +145,7 @@ public final class PresentationDocument: NSDocument {
     private func dataOnMain(_ typeName: String) throws -> Data {
         guard let st = state, let format = DocumentTypes.format(typeName) else { throw CocoaError(.fileWriteUnknown) }
         do {
-            try FileCommands.refuseProtected(st)
-            return Data(try FileCommands.saveBytes(st.doc, format))
+            return Data(try Protection.fileBytes(st, format))
         } catch {
             throw NSError(domain: "DeckCraft", code: 2, userInfo: [NSLocalizedDescriptionKey: "\(error)"])
         }
@@ -140,12 +162,18 @@ public final class PresentationDocument: NSDocument {
     nonisolated override public func writeSafely(to url: URL, ofType typeName: String, for saveOperation: NSDocument.SaveOperationType) throws {
         try super.writeSafely(to: url, ofType: typeName, for: saveOperation)
         guard Thread.isMainThread, saveOperation != .autosaveElsewhereOperation, saveOperation != .saveToOperation else { return }
-        MainActor.assumeIsolated { didSave(to: url) }
+        MainActor.assumeIsolated { didSave(to: url, ofType: typeName) }
     }
 
     /// The engine's document now matches the file: its path, title and saved revision.
-    private func didSave(to url: URL) {
+    private func didSave(to url: URL, ofType typeName: String) {
         guard let st = state else { return }
+        st.protectionEdited = false
+        // Saved in a format that can't keep its passwords (.deckcraft): the document has none now, and says so.
+        if st.protection != nil, let format = DocumentTypes.format(typeName), !Protection.keepsPasswords(format) {
+            st.protection = nil
+            model?.status = String(localized: "“\(url.deletingPathExtension().lastPathComponent)” was saved in a format that can't keep a password, so it isn't password-protected.", bundle: .module, comment: "Status line after saving a password-protected presentation as .deckcraft; %@ is the file name")
+        }
         st.path = url.path
         st.title = url.lastPathComponent
         st.savedDocRef = st.docRef
@@ -227,6 +255,11 @@ final class DocumentController: NSDocumentController {
         d.fileURL = url
         d.fileType = typeName
         try d.read(from: Data(contentsOf: url), ofType: typeName)
+        // A read-only copy (a password to modify wasn't given) is untitled, so Save can't overwrite the original.
+        if d.openedReadOnly {
+            d.fileURL = nil
+            d.displayName = d.state?.title
+        }
         return d
     }
 
