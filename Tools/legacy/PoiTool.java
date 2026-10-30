@@ -9,6 +9,9 @@
 //   decrypt-ooxml PASSWORD IN OUT.pptx    write the decrypted package; exit 2 on a wrong password
 //   encrypt-ppt PASSWORD IN.ppt OUT.ppt   re-save a .ppt encrypted with RC4 CryptoAPI
 //   dump-ppt IN.ppt [PASSWORD]            slides, shapes and text as JSON on stdout
+//   format-ppt IN.ppt [PASSWORD]          each text shape's paragraphs and runs with the formatting POI resolves
+//                                         through the master styles (alignment, margins, bullets, spacing, font,
+//                                         size, bold, italic, underline, colour), as JSON on stdout
 //   list-cfb IN                           a compound file's storages and streams (path, kind, size, sha256) as JSON,
 //                                         the shape of fixtures.py olefile-list
 import java.awt.geom.Rectangle2D;
@@ -67,6 +70,15 @@ public class PoiTool {
                 if (a.length == 3) Biff8EncryptionKey.setCurrentUserPassword(a[2]);
                 try (HSLFSlideShow ss = new HSLFSlideShow(new FileInputStream(a[1]))) {
                     System.out.println(dump(ss));
+                } finally {
+                    Biff8EncryptionKey.setCurrentUserPassword(null);
+                }
+            }
+            case "format-ppt" -> {
+                if (a.length < 2 || a.length > 3) usage();
+                if (a.length == 3) Biff8EncryptionKey.setCurrentUserPassword(a[2]);
+                try (HSLFSlideShow ss = new HSLFSlideShow(new FileInputStream(a[1]))) {
+                    System.out.println(format(ss));
                 } finally {
                     Biff8EncryptionKey.setCurrentUserPassword(null);
                 }
@@ -137,6 +149,72 @@ public class PoiTool {
         b.append(']');
     }
 
+    static String format(HSLFSlideShow ss) {
+        StringBuilder b = new StringBuilder("{\"slides\":[");
+        List<HSLFSlide> slides = ss.getSlides();
+        for (int i = 0; i < slides.size(); i++) {
+            if (i > 0) b.append(',');
+            b.append("{\"shapes\":[");
+            List<HSLFTextShape> texts = new ArrayList<>();
+            textShapes(slides.get(i).getShapes(), texts);
+            boolean first = true;
+            for (HSLFTextShape t : texts) {
+                if (t.getText() == null || t.getText().isBlank()) continue;
+                if (!first) b.append(',');
+                first = false;
+                b.append("{\"text\":").append(str(t.getText())).append(",\"paragraphs\":[");
+                List<HSLFTextParagraph> paras = t.getTextParagraphs();
+                for (int j = 0; j < paras.size(); j++) {
+                    HSLFTextParagraph p = paras.get(j);
+                    if (j > 0) b.append(',');
+                    b.append("{\"level\":").append(p.getIndentLevel())
+                     .append(",\"align\":").append(str(p.getTextAlign() == null ? null : p.getTextAlign().name()))
+                     .append(",\"leftMargin\":").append(num(p.getLeftMargin()))
+                     .append(",\"indent\":").append(num(p.getIndent()))
+                     .append(",\"bullet\":").append(p.isBullet())
+                     .append(",\"bulletChar\":").append(str(p.getBulletChar() == null ? null : p.getBulletChar().toString()))
+                     .append(",\"bulletFont\":").append(str(p.getBulletFont()))
+                     .append(",\"bulletSize\":").append(num(p.getBulletSize()))
+                     .append(",\"spaceBefore\":").append(num(p.getSpaceBefore()))
+                     .append(",\"spaceAfter\":").append(num(p.getSpaceAfter()))
+                     .append(",\"lineSpacing\":").append(num(p.getLineSpacing()))
+                     .append(",\"runs\":[");
+                    List<HSLFTextRun> runs = p.getTextRuns();
+                    for (int k = 0; k < runs.size(); k++) {
+                        HSLFTextRun r = runs.get(k);
+                        if (k > 0) b.append(',');
+                        String color = null;
+                        if (r.getFontColor() instanceof org.apache.poi.sl.usermodel.PaintStyle.SolidPaint sp && sp.getSolidColor().getColor() != null) {
+                            java.awt.Color c = sp.getSolidColor().getColor();
+                            color = String.format("%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
+                        }
+                        b.append("{\"text\":").append(str(r.getRawText()))
+                         .append(",\"font\":").append(str(r.getFontFamily()))
+                         .append(",\"size\":").append(num(r.getFontSize()))
+                         .append(",\"bold\":").append(r.isBold())
+                         .append(",\"italic\":").append(r.isItalic())
+                         .append(",\"underline\":").append(r.isUnderlined())
+                         .append(",\"color\":").append(str(color)).append('}');
+                    }
+                    b.append("]}");
+                }
+                b.append("]}");
+            }
+            b.append("]}");
+        }
+        return b.append("]}").toString();
+    }
+
+    /// The text shapes of a shape list in z-order, groups flattened.
+    static void textShapes(List<HSLFShape> list, List<HSLFTextShape> out) {
+        for (HSLFShape sh : list) {
+            if (sh instanceof HSLFGroupShape g) textShapes(g.getShapes(), out);
+            else if (sh instanceof HSLFTextShape t) out.add(t);
+        }
+    }
+
+    static String num(Double d) { return d == null ? "null" : String.format(Locale.ROOT, "%.3f", d); }
+
     static String str(String s) {
         if (s == null) return "null";
         StringBuilder b = new StringBuilder("\"");
@@ -154,7 +232,7 @@ public class PoiTool {
     }
 
     static void usage() {
-        System.err.println("usage: PoiTool encrypt-ooxml|decrypt-ooxml|encrypt-ppt|dump-ppt|list-cfb … (see the file's header)");
+        System.err.println("usage: PoiTool encrypt-ooxml|decrypt-ooxml|encrypt-ppt|dump-ppt|format-ppt|list-cfb … (see the file's header)");
         System.exit(64);
     }
 }

@@ -206,13 +206,26 @@ enum RT {
     static let textHeaderAtom: UInt16 = 0x0F9F
     static let textCharsAtom: UInt16 = 0x0FA0
     static let styleTextPropAtom: UInt16 = 0x0FA1
+    static let textRulerAtom: UInt16 = 0x0FA6
     static let textBytesAtom: UInt16 = 0x0FA8
+    static let textMasterStyleAtom: UInt16 = 0x0FA3
+    static let colorSchemeAtom: UInt16 = 0x07F0
+    static let headersFooters: UInt16 = 0x0FD9
+    static let headersFootersAtom: UInt16 = 0x0FDA
+    static let cString: UInt16 = 0x0FBA
+    static let externalObjectList: UInt16 = 0x0409
+    static let externalHyperlink: UInt16 = 0x0FD7
+    static let externalHyperlinkAtom: UInt16 = 0x0FD3
+    static let interactiveInfo: UInt16 = 0x0FF2
+    static let interactiveInfoAtom: UInt16 = 0x0FF3
+    static let textInteractiveInfoAtom: UInt16 = 0x0FDF
     // OfficeArt ([MS-ODRAW] 2.2): the drawing inside each slide.
     static let dgContainer: UInt16 = 0xF002
     static let spgrContainer: UInt16 = 0xF003
     static let spContainer: UInt16 = 0xF004
     static let fspgr: UInt16 = 0xF009
     static let fsp: UInt16 = 0xF00A
+    static let fopt: UInt16 = 0xF00B
     static let clientTextbox: UInt16 = 0xF00D
     static let childAnchor: UInt16 = 0xF00F
     static let clientAnchor: UInt16 = 0xF010

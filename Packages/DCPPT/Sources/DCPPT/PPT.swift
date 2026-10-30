@@ -3,8 +3,11 @@
 // the slide list (the SlideListWithTextContainer of instance 0, 2.4.14.3: one SlidePersistAtom per slide, in order).
 // Each slide is a slide of the default master's blank layout holding the file's text-bearing shapes and placeholders
 // (P2a: their text, paragraphs and character formatting, flattened out of groups), with its notes page's text as its
-// notes. Masters, colour schemes and the rest come in P2b–P5; the import report lists what isn't brought over.
+// notes. P2b adds the first main master's text styles, colour scheme and background to the default master, each
+// slide's own scheme and background, headers and footers, and hyperlinks. Shapes, pictures and the slide show come in
+// P3–P5; the import report lists what isn't brought over.
 import DCCFB
+import DCColor
 import DCGeometry
 import DCModel
 
@@ -67,18 +70,49 @@ public enum PPT {
             }
             if !slideRefs.isEmpty { slideRefs[slideRefs.count - 1].outline = PPTText.bodies(doc, pending) }
         }
-        let notesBodies = notesText(file, doc, children, fonts)
+
+        // The masters: the first main master's text styles (over the document's defaults), colour scheme and
+        // background become the DCModel master's.
+        let masters = Masters.read(file, doc, children)
+        let environment = children.first { $0.type == RT.environment }
+        let styles = MasterStyles.read(masters.main?.bytes ?? [], environment: environment, doc, master: masters.main?.record)
+        let masterScheme = masters.main.flatMap { Masters.scheme($0.bytes, $0.record) } ?? Self.defaultScheme
+        let base = TextContext(fonts: fonts, scheme: masterScheme, styles: styles)
+        let hyperlinks = Document.hyperlinks(doc, children)
 
         var p = blankPresentation(size, .default, false)
         p.notesSize = notes
+        if var m = p.masters.first {
+            m.titleStyle = styles.listStyle(0, base)
+            m.bodyStyle = styles.listStyle(1, base)
+            m.otherStyle = styles.listStyle(4, base)
+            m.theme.colors = Masters.themeColors(masterScheme, m.theme.colors)
+            if let main = masters.main, let bg = Masters.background(main.bytes, main.record, scheme: masterScheme) { m.background = bg }
+            p.masters[0] = m
+        }
+        p.defaultTextStyle = styles.listStyle(4, base)
+        if let hf = Document.headerFooter(doc, children) { p.headerFooter = hf }
+        let notesBodies = notesText(file, doc, children, base)
+
         let layout = layoutOfKind(p, .blank) ?? p.masters.first?.layouts.first?.id ?? LayoutId(0)
         var unread: [Int] = []
         for (i, entry) in slideRefs.enumerated() {
             // The deck can run out of ids only past millions of slides; a file can't make that many.
             guard var slide = newSlide(&p, layout) else { break }
             if let o = file.object(entry.ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {
+                let scheme = masters.scheme(slide: o, r) ?? masterScheme
+                let ctx = TextContext(fonts: fonts, scheme: scheme, styles: styles)
                 for drawn in Drawing.shapes(o, r) {
-                    if let shape = textShape(&p, o, drawn, outline: entry.outline, fonts: fonts) { slide.shapes.append(shape) }
+                    if let shape = textShape(&p, o, drawn, outline: entry.outline, ctx, hyperlinks) { slide.shapes.append(shape) }
+                }
+                let atom = Masters.slideAtom(o, r)
+                if let atom, atom.flags & 0x4 == 0, let bg = Masters.background(o, r, scheme: scheme) {
+                    // Its own background.
+                    slide.background = bg
+                } else if scheme != masterScheme, let atom, let (mb, mr) = masters.byId[atom.masterId],
+                          let bg = Masters.background(mb, mr, scheme: scheme) {
+                    // A master other than the one DCModel has, or other colours: that master's background, resolved.
+                    slide.background = bg
                 }
             } else {
                 unread.append(i + 1)
@@ -87,10 +121,16 @@ public enum PPT {
             p.slides.append(slide)
         }
         let report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["shapes without text", "pictures", "masters and layouts", "colour schemes",
+                               notImported: ["shapes without text", "pictures", "the master's own shapes", "picture backgrounds",
                                              "transitions and animations"])
         return (p, report)
     }
+
+    /// PowerPoint's default colour scheme (white background, black text), for a file without one.
+    static let defaultScheme: [Rgba] = [
+        .rgb(255, 255, 255), .rgb(0, 0, 0), .rgb(128, 128, 128), .rgb(0, 0, 0),
+        .rgb(187, 224, 227), .rgb(51, 51, 153), .rgb(0, 153, 153), .rgb(153, 204, 0),
+    ]
 
     /// The document's font collection ([MS-PPT] 2.9.8): FontEntityAtoms in the Environment's FontCollectionContainer,
     /// each a 32-character UTF-16 face name.
@@ -114,7 +154,7 @@ public enum PPT {
     /// Each notes page's text, by the id of the slide it belongs to: the notes list (SlideListWithTextContainer of
     /// instance 2) names the NotesContainers; each NotesAtom names its slide, and its notes-body placeholder holds the
     /// text.
-    static func notesText(_ file: PPTFile, _ b: [UInt8], _ document: [Record], _ fonts: [String]) -> [UInt32: TextBody] {
+    static func notesText(_ file: PPTFile, _ b: [UInt8], _ document: [Record], _ ctx: TextContext) -> [UInt32: TextBody] {
         guard let list = document.first(where: { $0.type == RT.slideListWithText && $0.instance == 2 }) else { return [:] }
         var out: [UInt32: TextBody] = [:]
         for r in list.children(b) where r.type == RT.slidePersistAtom && r.body.count >= 4 {
@@ -124,7 +164,7 @@ public enum PPT {
             let slideId = le32(o, atom.body.lowerBound)
             for drawn in Drawing.shapes(o, notes) where drawn.placeholder?.type == 0x0C {
                 if let text = PPTText.bodies(o, drawn.textbox).first, !text.chars.isEmpty {
-                    out[slideId] = text.body(fonts: fonts)
+                    out[slideId] = text.body(ctx)
                 }
             }
         }
@@ -133,7 +173,8 @@ public enum PPT {
 
     /// A slide shape for a drawn shape with text, or a placeholder: its box, placeholder and text. Other shapes come
     /// in P3.
-    static func textShape(_ p: inout Presentation, _ b: [UInt8], _ d: DrawnShape, outline: [PPTText], fonts: [String]) -> Shape? {
+    static func textShape(_ p: inout Presentation, _ b: [UInt8], _ d: DrawnShape, outline: [PPTText], _ ctx: TextContext,
+                          _ hyperlinks: [UInt32: Hyperlink]) -> Shape? {
         var text = PPTText.bodies(b, d.textbox).first
         if text == nil, let ref = d.textbox.first(where: { $0.type == RT.outlineTextRefAtom }), ref.body.count >= 4 {
             let i = Int(i32(b, ref.body.lowerBound))
@@ -153,7 +194,10 @@ public enum PPT {
             s.name = d.type == 202 ? "TextBox \(raw)" : "Shape \(raw)"
             s.textBox = d.type == 202
         }
-        s.text = text?.body(fonts: fonts) ?? TextBody()
+        var body = text?.body(ctx, hyperlinks: hyperlinks) ?? TextBody()
+        // Center title, center body, half and quarter body: their differences from title and body, on the shape.
+        if let t = text?.type, MasterStyles.baseType(t) != nil { body.listStyle = ctx.styles.listStyle(t, own: true, ctx) }
+        s.text = body
         return s
     }
 

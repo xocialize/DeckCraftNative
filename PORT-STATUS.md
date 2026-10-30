@@ -516,6 +516,16 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **P2a (2026-10-30): `.ppt` text.** Slides now carry their text-bearing shapes and placeholders, in place, with
     paragraphs, levels, alignment, bullets, and bold, italic, underline, size, font and RGB colour, plus their notes.
     They match POI's reading of every fixture and of PowerPoint's own files. Masters and colour schemes are P2b.
+  - **P2b (2026-10-30): `.ppt` masters and formatting.**
+    - **Formatting:** text takes its formatting from the master's styles by text type and level: typefaces, sizes,
+      colours, margins and hanging indents, spacing, and bullets. Scheme colours resolve.
+    - **The master:** its colour scheme becomes the theme's colours. Its background, and slides' own backgrounds,
+      come in as solid colours.
+    - **Also:** headers and footers, and hyperlinks.
+    - **Font lookups:** DCText caches the fallback order and document-face answers, cleared when a face is added.
+      Rendering the crash corpus had found text-heavy files taking over 30 s; they now take under a second.
+    - **Checked:** all 17,980 paragraph and run properties compared match POI's resolved formatting. The crash
+      corpus, with every slide rendered, is clean.
 
 ## Pin moves
 

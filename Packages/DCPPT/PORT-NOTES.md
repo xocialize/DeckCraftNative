@@ -77,3 +77,34 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
 - **Notes:** the notes-body placeholder (type 0x0C) of the NotesContainer whose NotesAtom names the slide.
 - **Checked:** POI's reading of every fixture and of PowerPoint's own files, slide by slide and shape by shape:
   text, boxes and notes all match.
+
+## P2b: masters, styles and the rest of the text (2026-10-30)
+
+- **`MasterStyles`:** the TextMasterStyleAtoms of the Environment, with the main master's over them, by text type and
+  level.
+  - A level takes what it doesn't set from the level above it, as PowerPoint writes and POI reads.
+  - Types 5–8 (center body, center title, half body, quarter body) are differences from title or body. A shape of
+    one of those types carries its differences as its own list style.
+- **`Masters`:**
+  - Master ids from the masters' slide list. Each slide's SlideAtom (masterIdRef at 12, SlideFlags at 20) says which
+    master it follows and whether it follows that master's scheme and background.
+  - Colour schemes come from ColorSchemeAtom instance 1.
+  - Backgrounds are the drawing's fBackground shape: its fill type and colour from the FOPT, solid only.
+  - `themeColors` maps the eight PowerPoint colours onto the theme's twelve.
+- **`Document`:** headers and footers (HeadersFootersContainer, instance 3), and hyperlinks (each ExHyperlink's
+  target and location).
+- **`Drawing`:** keeps each shape's simple FOPT properties, and finds the background shape.
+- **`PF` and `CF`** are shared by the text runs and the master styles.
+  - `PF` now reads every TextPFException field: bullet flags, character, font, size and colour; alignment; line
+    spacing and spacing before and after; margin and indent; and the default tab.
+  - `CF` adds the East Asian, complex-script and symbol font refs.
+  - Both convert to DCModel properties against a `TextContext`, which holds the fonts, the slide's scheme and the
+    master's styles.
+  - The indent is the bullet position minus the text position; for whichever of the two a paragraph doesn't set, the
+    value comes from the shape's TextRulerAtom, then the master.
+- **`PPTText.ruler`:** the TextRulerAtom's margins and indents by level.
+- **Checked:**
+  - `FormattingTests`: all 17,980 paragraph and run properties of every `.ppt` fixture and of PowerPoint's own files
+    match POI's `format-ppt`.
+  - The text and box test still passes.
+  - The crash corpus, with every slide rendered, is clean.

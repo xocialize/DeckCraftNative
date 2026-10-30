@@ -130,6 +130,10 @@ machine that runs the tests.
      `FontFace.ctFont(size:)`).
    - The Japanese UI font lists (`japanese_ui_fonts`, `japanese_document_fonts`) and `CraftFont`.
    - `fallback_for_filtered` and `set_system_fallback`: the filtered UI fallback.
+9. **Lookup caches (2026-10-30).** deckcraft sorts every loaded face for each fallback lookup and walks them
+   all for each document-face lookup. With the system fonts loaded, that made a text-heavy `.ppt` take over
+   30 s to render. Here the fallback order is sorted once and the document-face answer is kept per family and
+   style. Both are cleared whenever a face is added, so the answers are the same (`aFontAddedAfterALookupIsFound`).
 
 ## Port bugs found by the ported tests
 

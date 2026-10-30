@@ -15,7 +15,11 @@ public let missingFontFamily = "Calibri"
 
 public final class FontDB: Sendable {
     private struct State {
-        var faces: [FontFace] = []
+        var faces: [FontFace] = [] { didSet { fallbackOrder = nil; documentFaces = [:] } }
+        /// `faces` in fallback order (`loadedFallback`), made when first needed after a change.
+        var fallbackOrder: [FontFace]?
+        /// `documentFace` answers by family and style, until a face is added.
+        var documentFaces: [String: FontFace] = [:]
         /// Families (lower case) whose installed faces have been looked for.
         var loadedFamilies: Set<String> = []
         /// Characters no system font covers.
@@ -327,7 +331,18 @@ public final class FontDB: Sendable {
     /// The face a document's text in `family` is drawn with, as PowerPoint draws it: the family when it
     /// is installed or bundled, a metric-compatible stand-in, the family PowerPoint maps it to, else
     /// Calibri (Carlito).
+    ///
+    /// Not in deckcraft's shape: the answer is kept until a face is added. Each lookup walks every loaded face, and
+    /// text layout asks once per run, which with the system's fonts loaded was most of a slide's drawing time.
     public func documentFace(_ family: String, _ style: String) -> FontFace {
+        let key = family + "\u{0}" + style
+        if let f = state.withLock({ $0.documentFaces[key] }) { return f }
+        let f = resolveDocumentFace(family, style)
+        state.withLock { $0.documentFaces[key] = f }
+        return f
+    }
+
+    private func resolveDocumentFace(_ family: String, _ style: String) -> FontFace {
         if rustASCIILowercase(family) == rustASCIILowercase(fallbackFamily) || FontDB.hasMetricTwin(family)
             || FontDB.isOfficeCloudFont(family) || hasFamily(family) {
             return face(family, style)
@@ -361,13 +376,21 @@ public final class FontDB: Sendable {
         return nil
     }
 
+    /// Not in deckcraft's shape: deckcraft sorts the faces (lower-casing each family per comparison) on every call,
+    /// once per character no loaded font covers, which took 18 s for one slide of symbol-font text once the system's
+    /// fonts were loaded. The order is the same (a stable sort, `exclude` filtered out after it), kept until a face
+    /// is added.
     private func loadedFallback(_ c: Unicode.Scalar, _ exclude: UInt32, _ accept: (FontFace) -> Bool) -> FontFace? {
-        let order = faces.filter { $0.id != exclude }.enumerated().sorted { x, y in
-            let a = (rustASCIILowercase(x.element.family) != "inter", x.element.italic, Int(Swift.abs(x.element.weight - 400)))
-            let b = (rustASCIILowercase(y.element.family) != "inter", y.element.italic, Int(Swift.abs(y.element.weight - 400)))
-            return a != b ? lexLess(a, b) : x.offset < y.offset
+        let order = state.withLock { s in
+            if let o = s.fallbackOrder { return o }
+            let keyed = s.faces.map { f in (f, (rustASCIILowercase(f.family) != "inter", f.italic, Int(Swift.abs(f.weight - 400)))) }
+            let o = keyed.enumerated().sorted { x, y in
+                x.element.1 != y.element.1 ? lexLess(x.element.1, y.element.1) : x.offset < y.offset
+            }.map(\.element.0)
+            s.fallbackOrder = o
+            return o
         }
-        return order.first { $0.element.covers(c) && accept($0.element) }?.element
+        return order.first { $0.id != exclude && $0.covers(c) && accept($0) }
     }
 
     private func lexLess(_ a: (Bool, Bool, Int), _ b: (Bool, Bool, Int)) -> Bool {

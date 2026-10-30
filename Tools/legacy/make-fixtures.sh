@@ -7,7 +7,7 @@
 #   encrypted/   the corpus decks encrypted by Apache POI (Agile AES-256/SHA-512, Agile AES-128/SHA-1, Standard) and
 #                msoffcrypto-tool (Agile), and their .ppt encrypted by POI (RC4 CryptoAPI)
 #   hostile/     truncated, bit-flipped and chain-broken copies (fixtures.py mutate, fixed seed)
-#   reference/   what the independent readers say: POI's JSON dump and ppt2pptx's report of every .ppt, and
+#   reference/   what the independent readers say: POI's JSON dump (and its resolved formatting) and ppt2pptx's report of every .ppt, and
 #                olefile's listing of every compound file
 #   manifest.json  every file with its sha256, producer, method and password (.meta.json sidecars)
 #
@@ -102,6 +102,7 @@ for p in $out/ppt/*.ppt(N) $out/encrypted/*.ppt(N); do
   pass=()
   [[ -f $p.meta.json ]] && pass=($($py -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("password",""))' "$p.meta.json"))
   poi dump-ppt "$p" $pass > "$out/reference/${p:t}.poi.json" || print -u2 "POI couldn't read ${p:t}"
+  poi format-ppt "$p" $pass > "$out/reference/${p:t}.poi-format.json" || print -u2 "POI couldn't format ${p:t}"
   t=$(mktemp -d)
   "$tools/venv/bin/ppt2pptx" "$p" -o "$t/x.pptx" --report "$out/reference/${p:t}.ppt2pptx.json" ${pass:+--password} $pass >/dev/null 2>&1 || print -u2 "ppt2pptx couldn't read ${p:t}"
   rm -rf "$t"

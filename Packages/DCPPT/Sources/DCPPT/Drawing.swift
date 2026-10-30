@@ -18,6 +18,8 @@ struct DrawnShape {
     var placeholder: (type: UInt8, position: Int32)?
     /// The client textbox's records.
     var textbox: [Record] = []
+    /// The OfficeArtFOPT's simple properties ([MS-ODRAW] 2.3): property id → value (complex data isn't kept yet).
+    var props: [UInt16: UInt32] = [:]
 
     var isGroup: Bool { flags & 0x1 != 0 }
     var isDeleted: Bool { flags & 0x8 != 0 }
@@ -37,6 +39,18 @@ enum Drawing {
         var out: [DrawnShape] = []
         walk(b, root, transform: nil, depth: 0, into: &out)
         return out
+    }
+
+    /// The drawing's background shape (an OfficeArtSpContainer directly in the OfficeArtDgContainer, fBackground).
+    static func background(_ b: [UInt8], _ container: Record) -> DrawnShape? {
+        guard let drawing = container.children(b).first(where: { $0.type == RT.drawing }),
+              let dg = drawing.children(b).first(where: { $0.type == RT.dgContainer })
+        else { return nil }
+        for c in dg.children(b) where c.type == RT.spContainer {
+            let s = shape(b, c, transform: nil)
+            if s.flags & 0x400 != 0 { return s }
+        }
+        return nil
     }
 
     /// A child anchor's coordinates in slide coordinates: x' = x * sx + tx.
@@ -112,6 +126,15 @@ enum Drawing {
                 }
             case RT.clientTextbox:
                 s.textbox = r.children(b)
+            case RT.fopt:
+                // OfficeArtFOPTE entries: a 14-bit property id with fBid and fComplex flags, then a 32-bit value.
+                var q = p
+                for _ in 0 ..< Int(r.instance) {
+                    guard q + 6 <= r.body.upperBound else { break }
+                    let id = le16(b, q)
+                    if id & 0x8000 == 0 { s.props[id & 0x3FFF] = le32(b, q + 2) }
+                    q += 6
+                }
             default: continue
             }
         }

@@ -106,6 +106,20 @@ func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
         #expect(iso.face("DeckCraft Legacy", "Semibold").style == "Semibold")
     }
 
+    /// `documentFace` keeps its answers, and the fallback order is kept too; adding a font clears both, so a family
+    /// that was missing is found once it arrives (an embedded font, after the slide asked for it).
+    @Test func aFontAddedAfterALookupIsFound() throws {
+        let bytes = try #require(deckcraftFixture("fonts", "legacy-semibold.ttf"), "no deckcraft checkout")
+        let iso = FontDB(craftFontsDir: nil, systemFonts: false)
+        // With nothing loaded, the lookup settles on a last-resort face, the only one there is.
+        let before = iso.documentFace("DeckCraft Legacy Semibold", "Regular")
+        #expect(before.family != "DeckCraft Legacy")
+        #expect(iso.fallback(for: "A", excluding: before.id) == nil)
+        #expect(iso.addFont(bytes) == 1)
+        #expect(iso.documentFace("DeckCraft Legacy Semibold", "Regular").family == "DeckCraft Legacy")
+        #expect(iso.fallback(for: "A", excluding: before.id)?.family == "DeckCraft Legacy")
+    }
+
     @Test func missingDocumentFontsAreDrawnInCalibri() {
         for missing in ["Qqq Nonexistent", "Avenir Next Qqq", "", "Arimo Qqq"] {
             #expect(db.documentFace(missing, "Bold").family == db.face(missingFontFamily, "Bold").family, "\(missing)")
