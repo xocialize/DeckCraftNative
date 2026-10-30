@@ -147,21 +147,29 @@ DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation E
     was away loses its item and entity at the next launch.
   - **By body text in the panel: never.** No query on the notes' words lists the deck, instant results or the full
     list, whether the text is in `textContent`, `contentDescription` or `keywords`, and with the entity indexed too.
-  - **By meaning, through Siri: found, opened once.** The macOS 27 SDK adds App Intents' Spotlight side
+  - **By meaning, through Siri: found and opened.** The macOS 27 SDK adds App Intents' Spotlight side
     (`IndexedEntity`, `indexAppEntities`, and new in 27 `IndexedEntityQuery` and `relatedAppEntityIdentifier`), and
     WWDC26 session 343 says indexed entities get semantic search "depending on the App Intents domain". The entity
     adopts the presentation App Schema (`@AppEntity(schema: .presentation.document)`, its text through
     `@Property(indexingKey: \.textContent)`) and the schema's open intent (`@AppIntent(schema: .presentation.open)`,
     an `OpenIntent`); the metadata processor accepts both. Asked "open my presentation that mentions a marmalade
-    survey", Siri ran `OpenPresentationFileIntent` on the deck five times out of five (Shortcuts'
-    `WFLinkOpenEntityAction` in `BackgroundShortcutRunner`). The deck opened the first time only; in the other four
-    Shortcuts couldn't load the action's metadata (`LNMetadataProvider … Empty result`, "XPC retry failed"), the
-    intent never reached the app, and Siri answered that it couldn't find the presentation. Each of those followed a
-    fresh install of a rebuilt test copy, and Siri's tool registry was seen reindexing the app's tools
-    (`ToolKitIndexing`, "Failed to load a definition for com.xocialize.deckcraftnative"); waiting three minutes
-    didn't help. Asked "find my DeckCraftNative presentation about marmalade", Siri searched files only.
-  - **Next:** re-test opening from Siri on an install that hasn't been replaced (a release in `/Applications`), and
-    on later macOS 27 updates; if it still fails, file a Feedback with the `BackgroundShortcutRunner` log.
+    survey", Siri runs `OpenPresentationFileIntent` on the deck (Shortcuts' `WFLinkOpenEntityAction` in
+    `BackgroundShortcutRunner`). Asked "find my DeckCraftNative presentation about marmalade", Siri searched files
+    only.
+  - **Opening from Siri is reliable on an install that stays put (re-tested 2026-10-30).** The first test
+    (2026-10-29) opened the deck once in five: in the other four Shortcuts couldn't load the action's metadata
+    (`LNMetadataProvider … Empty result`, "XPC retry failed"), the intent never reached the app, and Siri answered
+    that it couldn't find the presentation. Each of those followed a fresh install of a rebuilt test copy, launched
+    by its executable with `DECKCRAFT_NO_PREFS`, while Siri's tool registry reindexed the app
+    (`ToolKitIndexing`). The re-test installed one Developer ID build of b4b79c3 in `/Applications`, launched it
+    through Launch Services, opened the deck once to index it, and asked five times without reinstalling: the deck
+    opened five times out of five, four with the app running and one with it quit (linkd cold-launched it in the
+    background, the intent ran, and the deck's window came to the front). `linkd` found the app's metadata
+    unchanged ("Found existing canonical bundle with matching hash, skipping"). Every run still logs "Failed to
+    load a definition for com.xocialize.deckcraftnative" and the same `LNMetadataProvider` errors, and Shortcuts
+    ends each run with `success: no` after the intent has run: noise, not the failure. So the 2026-10-29 failures
+    came from replacing the app between tries; a user's install is replaced only by an update, after which Siri
+    may need a while before it opens decks again.
 - **A development trap: sandbox containers made by an ad hoc build.** An extension's container
   (`~/Library/Containers/com.xocialize.deckcraftnative.<QuickLook|Thumbnail|Spotlight>`) records the signer of the
   build that first ran. A later Developer ID build of the same extension "is not in ACL for container … prompting"

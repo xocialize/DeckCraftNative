@@ -467,8 +467,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     (DCExtensions/PORT-NOTES.md).
   - Spotlight from the app: the app indexes the `.deckcraft` files it opens and saves (SpotlightFeature), as a Core
     Spotlight item and as an App Intents entity of the presentation App Schema. On macOS 27 Spotlight finds them by
-    name and opens them; it never matches their body text. Siri finds them by what they say, but opened one only once
-    in five tries (the system couldn't load the open action's metadata). Details in DCExtensions/PORT-NOTES.md.
+    name and opens them; it never matches their body text. Siri finds them by what they say and opens them: five in
+    five on 2026-10-30 with one build left installed in `/Applications`, including a cold launch. The first test's
+    failures (one in five) came from reinstalling the app between tries. Details in DCExtensions/PORT-NOTES.md.
   - Still to do: the Accessibility Inspector audit, held until the operator has time for it.
 
 ## Pin moves

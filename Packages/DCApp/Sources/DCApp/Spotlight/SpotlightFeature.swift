@@ -107,7 +107,7 @@ final class SpotlightIndexer {
         if x.title.isEmpty { a.title = name }
         a.contentURL = url
         a.lastUsedDate = now
-        // The same file's entity, which Siri finds and opens (the one build that opened a deck from Siri had both).
+        // The same file's entity, which Siri finds and opens.
         a.associateAppEntity(PresentationFileEntity(path: path, index: x))
         let item = CSSearchableItem(uniqueIdentifier: path, domainIdentifier: domain, attributeSet: a)
         item.expirationDate = now.addingTimeInterval(lifetime)
