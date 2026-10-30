@@ -1,8 +1,9 @@
 // DCPPT — a `.ppt` as a DCModel presentation. P1 (Docs/plans/Legacy-PPT-and-Encryption.md) reads the document: the
 // slide and notes size from the DocumentAtom ([MS-PPT] 2.4.2, in master units of 1/576 inch) and the slides from
 // the slide list (the SlideListWithTextContainer of instance 0, 2.4.14.3: one SlidePersistAtom per slide, in order).
-// Each slide becomes a blank slide of the default master; its content comes in P2–P5. What isn't brought over is
-// listed in the import report.
+// Each slide is a slide of the default master's blank layout holding the file's text-bearing shapes and placeholders
+// (P2a: their text, paragraphs and character formatting, flattened out of groups), with its notes page's text as its
+// notes. Masters, colour schemes and the rest come in P2b–P5; the import report lists what isn't brought over.
 import DCCFB
 import DCGeometry
 import DCModel
@@ -48,26 +49,138 @@ public enum PPT {
             notes = Size(points(i32(doc, b + 8), 540), points(i32(doc, b + 12), 720))
         }
 
-        // The slide list: SlidePersistAtoms in the SlideListWithTextContainer of instance 0.
-        var slideRefs: [UInt32] = []
+        let fonts = fontCollection(doc, children)
+
+        // The slide list: SlidePersistAtoms in the SlideListWithTextContainer of instance 0, each followed by its
+        // slide's outline text (what its placeholders' OutlineTextRefAtoms point at).
+        var slideRefs: [(ref: UInt32, slideId: UInt32, outline: [PPTText])] = []
         if let list = children.first(where: { $0.type == RT.slideListWithText && $0.instance == 0 }) {
-            for r in list.children(doc) where r.type == RT.slidePersistAtom && r.body.count >= 4 {
-                slideRefs.append(le32(doc, r.body.lowerBound))
+            var pending: [Record] = []
+            for r in list.children(doc) {
+                if r.type == RT.slidePersistAtom, r.body.count >= 16 {
+                    if !slideRefs.isEmpty { slideRefs[slideRefs.count - 1].outline = PPTText.bodies(doc, pending) }
+                    pending = []
+                    slideRefs.append((le32(doc, r.body.lowerBound), le32(doc, r.body.lowerBound + 12), []))
+                } else {
+                    pending.append(r)
+                }
             }
+            if !slideRefs.isEmpty { slideRefs[slideRefs.count - 1].outline = PPTText.bodies(doc, pending) }
         }
+        let notesBodies = notesText(file, doc, children, fonts)
 
         var p = blankPresentation(size, .default, false)
         p.notesSize = notes
         let layout = layoutOfKind(p, .blank) ?? p.masters.first?.layouts.first?.id ?? LayoutId(0)
         var unread: [Int] = []
-        for (i, ref) in slideRefs.enumerated() {
-            if let o = file.object(ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {} else { unread.append(i + 1) }
+        for (i, entry) in slideRefs.enumerated() {
             // The deck can run out of ids only past millions of slides; a file can't make that many.
-            guard let slide = newSlide(&p, layout) else { break }
+            guard var slide = newSlide(&p, layout) else { break }
+            if let o = file.object(entry.ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {
+                for drawn in Drawing.shapes(o, r) {
+                    if let shape = textShape(&p, o, drawn, outline: entry.outline, fonts: fonts) { slide.shapes.append(shape) }
+                }
+            } else {
+                unread.append(i + 1)
+            }
+            if let n = notesBodies[entry.slideId] { slide.notes = n }
             p.slides.append(slide)
         }
         let report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["text", "shapes", "pictures", "masters and layouts", "notes", "transitions and animations"])
+                               notImported: ["shapes without text", "pictures", "masters and layouts", "colour schemes",
+                                             "transitions and animations"])
         return (p, report)
+    }
+
+    /// The document's font collection ([MS-PPT] 2.9.8): FontEntityAtoms in the Environment's FontCollectionContainer,
+    /// each a 32-character UTF-16 face name.
+    static func fontCollection(_ b: [UInt8], _ document: [Record]) -> [String] {
+        guard let env = document.first(where: { $0.type == RT.environment }),
+              let fc = env.children(b).first(where: { $0.type == RT.fontCollection })
+        else { return [] }
+        return fc.children(b).filter { $0.type == RT.fontEntityAtom }.map { r in
+            var u: [UInt16] = []
+            var p = r.body.lowerBound
+            while p + 2 <= min(r.body.upperBound, r.body.lowerBound + 64) {
+                let c = le16(b, p)
+                if c == 0 { break }
+                u.append(c)
+                p += 2
+            }
+            return String(decoding: u, as: UTF16.self)
+        }
+    }
+
+    /// Each notes page's text, by the id of the slide it belongs to: the notes list (SlideListWithTextContainer of
+    /// instance 2) names the NotesContainers; each NotesAtom names its slide, and its notes-body placeholder holds the
+    /// text.
+    static func notesText(_ file: PPTFile, _ b: [UInt8], _ document: [Record], _ fonts: [String]) -> [UInt32: TextBody] {
+        guard let list = document.first(where: { $0.type == RT.slideListWithText && $0.instance == 2 }) else { return [:] }
+        var out: [UInt32: TextBody] = [:]
+        for r in list.children(b) where r.type == RT.slidePersistAtom && r.body.count >= 4 {
+            guard let o = file.object(le32(b, r.body.lowerBound)), let notes = Record(o, at: 0), notes.type == RT.notes,
+                  let atom = notes.children(o).first(where: { $0.type == RT.notesAtom }), atom.body.count >= 4
+            else { continue }
+            let slideId = le32(o, atom.body.lowerBound)
+            for drawn in Drawing.shapes(o, notes) where drawn.placeholder?.type == 0x0C {
+                if let text = PPTText.bodies(o, drawn.textbox).first, !text.chars.isEmpty {
+                    out[slideId] = text.body(fonts: fonts)
+                }
+            }
+        }
+        return out
+    }
+
+    /// A slide shape for a drawn shape with text, or a placeholder: its box, placeholder and text. Other shapes come
+    /// in P3.
+    static func textShape(_ p: inout Presentation, _ b: [UInt8], _ d: DrawnShape, outline: [PPTText], fonts: [String]) -> Shape? {
+        var text = PPTText.bodies(b, d.textbox).first
+        if text == nil, let ref = d.textbox.first(where: { $0.type == RT.outlineTextRefAtom }), ref.body.count >= 4 {
+            let i = Int(i32(b, ref.body.lowerBound))
+            if outline.indices.contains(i) { text = outline[i] }
+        }
+        let kind = d.placeholder.flatMap { placeholderKind($0.type) }
+        guard let rect = d.rect, text.map({ !$0.chars.isEmpty }) == true || kind != nil, let raw = p.allocId() else { return nil }
+        var s = Shape.default
+        s.id = ShapeId(raw)
+        s.xfrm = Xfrm(x: rect.x * pointsPerMasterUnit, y: rect.y * pointsPerMasterUnit, w: max(0, rect.w) * pointsPerMasterUnit,
+                      h: max(0, rect.h) * pointsPerMasterUnit, flipH: d.flipH, flipV: d.flipV)
+        s.geom = .preset(name: "rect", adj: [])
+        if let kind, let ph = d.placeholder {
+            s.ph = Placeholder(kind: kind.type, idx: ph.position > 0 ? UInt32(ph.position) : 0, vertical: kind.vertical)
+            s.name = "\(kind.type.rawValue.prefix(1).uppercased())\(kind.type.rawValue.dropFirst()) Placeholder \(raw)"
+        } else {
+            s.name = d.type == 202 ? "TextBox \(raw)" : "Shape \(raw)"
+            s.textBox = d.type == 202
+        }
+        s.text = text?.body(fonts: fonts) ?? TextBody()
+        return s
+    }
+
+    /// The DCModel placeholder for a PlaceholderEnum ([MS-PPT] 2.13.25).
+    static func placeholderKind(_ t: UInt8) -> (type: PhType, vertical: Bool)? {
+        switch t {
+        case 0x01, 0x0D: (.title, false)
+        case 0x03, 0x0F: (.ctrTitle, false)
+        case 0x02, 0x0E: (.body, false)
+        case 0x04, 0x10: (.subTitle, false)
+        case 0x11: (.title, true)
+        case 0x12: (.body, true)
+        case 0x13: (.obj, false)
+        case 0x19: (.obj, true)
+        case 0x14: (.chart, false)
+        case 0x15: (.table, false)
+        case 0x16: (.clipArt, false)
+        case 0x17: (.diagram, false)
+        case 0x18: (.media, false)
+        case 0x1A: (.picture, false)
+        case 0x07: (.date, false)
+        case 0x08: (.slideNum, false)
+        case 0x09: (.footer, false)
+        case 0x0A: (.header, false)
+        case 0x05, 0x0B: (.slideImage, false)
+        case 0x06, 0x0C: (.body, false)
+        default: nil
+        }
     }
 }

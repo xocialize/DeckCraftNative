@@ -46,6 +46,68 @@ import Testing
         }
     }
 
+    /// P2a: each slide's text, shape by shape in z-order, is what POI reads (paragraph marks and line breaks both as
+    /// newlines; empty shapes left out on both sides), and each text shape sits where POI puts it.
+    @Test func everySlidesTextIsWhatPOIReads() throws {
+        struct Dump: Decodable {
+            struct Shape: Decodable {
+                let text: String?
+                let x: Double, y: Double, w: Double, h: Double
+                let children: [Shape]?
+            }
+            struct Slide: Decodable { let shapes: [Shape]; let notes: String }
+            let slides: [Slide]
+        }
+        func flat(_ shapes: [Dump.Shape]) -> [Dump.Shape] { shapes.flatMap { s in s.children.map(flat) ?? [s] } }
+        func norm(_ t: String) -> String {
+            t.replacingOccurrences(of: "\r", with: "\n").replacingOccurrences(of: "\u{0B}", with: "\n")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        func ours(_ body: TextBody?) -> String {
+            norm((body?.paragraphs ?? []).map { p in p.runs.map { $0.kind == .break ? "\n" : $0.text }.joined() }.joined(separator: "\n"))
+        }
+        // The fixtures, and PowerPoint 16's own `.ppt` files when the local set is here (Tools/legacy/powerpoint-protect.sh;
+        // POI's reading of them is kept beside them, as `.poi.json`).
+        var cases: [(name: String, file: URL, ref: URL, password: String?)] = Self.manifest()
+            .filter { $0.kind == "ppt" || $0.kind == "encrypted-ppt" }
+            .map { f in
+                let name = URL(filePath: f.file).lastPathComponent
+                return (name, Self.legacy.appending(path: f.file), Self.legacy.appending(path: "reference/\(name).poi.json"),
+                        f.kind == "encrypted-ppt" ? f.password : nil)
+            }
+        try #require(cases.count >= 60, "no legacy fixtures")
+        let local = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Caches/DeckCraftNative/powerpoint-protected")
+        struct Meta: Decodable { let password: String }
+        for n in (try? FileManager.default.contentsOfDirectory(atPath: local.path))?.filter({ $0.hasSuffix(".ppt.poi.json") }) ?? [] {
+            let name = String(n.dropLast(".poi.json".count))
+            let meta = try JSONDecoder().decode(Meta.self, from: Data(contentsOf: local.appending(path: "\(name).meta.json")))
+            cases.append((name, local.appending(path: name), local.appending(path: n), meta.password))
+        }
+        var mismatches = 0
+        for c in cases {
+            let name = c.name
+            let ref = try JSONDecoder().decode(Dump.self, from: Data(contentsOf: c.ref))
+            let (p, _) = try PPT.importChecked(Array(try Data(contentsOf: c.file)), password: c.password)
+            for (i, (slide, theirs)) in zip(p.slides, ref.slides).enumerated() {
+                let want = flat(theirs.shapes).filter { !norm($0.text ?? "").isEmpty }
+                let got = slide.shapes.filter { !ours($0.text).isEmpty }
+                let wt = want.map { norm($0.text ?? "") }, gt = got.map { ours($0.text) }
+                if wt != gt {
+                    mismatches += 1
+                    Issue.record("\(name) slide \(i + 1) text:\n  POI:  \(wt)\n  ours: \(gt)")
+                    continue
+                }
+                for (w, g) in zip(want, got) {
+                    guard let x = g.xfrm else { continue }
+                    let close = abs(x.x - w.x) < 0.6 && abs(x.y - w.y) < 0.6 && abs(x.w - w.w) < 0.6 && abs(x.h - w.h) < 0.6
+                    if !close { Issue.record("\(name) slide \(i + 1) “\(w.text?.prefix(20) ?? "")”: POI \(w.x),\(w.y) \(w.w)×\(w.h), ours \(x.x),\(x.y) \(x.w)×\(x.h)") }
+                }
+                #expect(ours(slide.notes) == norm(theirs.notes), "\(name) slide \(i + 1) notes")
+            }
+        }
+        #expect(mismatches == 0)
+    }
+
     @Test func encryptedFilesNeedTheirPassword() throws {
         let f = try #require(Self.manifest().first { $0.file == "encrypted/corpus-sample.poi-rc4cryptoapi.ppt" }, "no legacy fixtures")
         let bytes = Array(try Data(contentsOf: Self.legacy.appending(path: f.file)))

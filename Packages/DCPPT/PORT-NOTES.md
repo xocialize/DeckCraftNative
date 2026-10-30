@@ -53,3 +53,27 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
     the status line says what was converted and what wasn't.
   - The app declares `com.microsoft.powerpoint.ppt`, `.pot` and `.pps` with the Viewer role, and the Open dialog
     and canvas drops accept them.
+
+## P2a: text (2026-10-30)
+
+- **`Drawing`:** each slide's OfficeArtDgContainer, walked in z-order.
+  - Group children are mapped through each group's FSPGR space into slide coordinates, groups nesting at most 64
+    deep.
+  - Deleted shapes are skipped.
+  - Each shape keeps its OfficeArtFSP id, type and flags, its client or child anchor, its PlaceholderAtom and its
+    client-textbox records.
+- **`PPTText`:** the TextHeaderAtom's type, the characters, and the StyleTextPropAtom.
+  - **Paragraph runs:** count, indent level, then a TextPFException whose present fields follow its masks in the
+    specification's order. They give bulletFlags, bulletChar, alignment and tab stops; the rest is stepped over.
+  - **Character runs:** count, then a TextCFException giving fontStyle (bold, italic, underline), fontRef, size, and
+    a colour (RGB when its index is 0xFE). The East Asian, ANSI and symbol font refs, position and the PP10/PP11
+    extension fields are stepped over.
+  - Both run arrays run until they cover the text plus one, and a run that would read past the record ends them.
+- **`PPT.textShape`:**
+  - A shape with text, or a placeholder, becomes a rectangle with its box (points = master units ÷ 8), its flips,
+    its placeholder and its text.
+  - Text reached through an OutlineTextRefAtom comes from the slide list's text for that slide.
+  - Shapes without text wait for P3.
+- **Notes:** the notes-body placeholder (type 0x0C) of the NotesContainer whose NotesAtom names the slide.
+- **Checked:** POI's reading of every fixture and of PowerPoint's own files, slide by slide and shape by shape:
+  text, boxes and notes all match.

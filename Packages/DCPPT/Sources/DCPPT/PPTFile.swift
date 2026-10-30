@@ -195,6 +195,28 @@ enum RT {
     static let currentUserAtom: UInt16 = 0x0FF6
     static let persistDirectoryAtom: UInt16 = 0x1772
     static let cryptSession10Container: UInt16 = 0x2F14
+    static let slideAtom: UInt16 = 0x03EF
+    static let notesAtom: UInt16 = 0x03F1
+    static let environment: UInt16 = 0x03F2
+    static let fontCollection: UInt16 = 0x07D5
+    static let fontEntityAtom: UInt16 = 0x0FB7
+    static let drawing: UInt16 = 0x040C
+    static let placeholderAtom: UInt16 = 0x0BC3
+    static let outlineTextRefAtom: UInt16 = 0x0F9E
+    static let textHeaderAtom: UInt16 = 0x0F9F
+    static let textCharsAtom: UInt16 = 0x0FA0
+    static let styleTextPropAtom: UInt16 = 0x0FA1
+    static let textBytesAtom: UInt16 = 0x0FA8
+    // OfficeArt ([MS-ODRAW] 2.2): the drawing inside each slide.
+    static let dgContainer: UInt16 = 0xF002
+    static let spgrContainer: UInt16 = 0xF003
+    static let spContainer: UInt16 = 0xF004
+    static let fspgr: UInt16 = 0xF009
+    static let fsp: UInt16 = 0xF00A
+    static let clientTextbox: UInt16 = 0xF00D
+    static let childAnchor: UInt16 = 0xF00F
+    static let clientAnchor: UInt16 = 0xF010
+    static let clientData: UInt16 = 0xF011
 }
 
 /// A record header ([MS-PPT] 2.3.1) and where its data is.

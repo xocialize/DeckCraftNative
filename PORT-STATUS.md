@@ -513,6 +513,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
       saying what isn't brought over yet. Content comes in P2–P5.
     - **The crash corpus:** of 207 real files, 205 open and 2 fail cleanly, with no crashes.
     - Details are in `Packages/DCPPT/PORT-NOTES.md`; not for a release until the content arrives.
+  - **P2a (2026-10-30): `.ppt` text.** Slides now carry their text-bearing shapes and placeholders, in place, with
+    paragraphs, levels, alignment, bullets, and bold, italic, underline, size, font and RGB colour, plus their notes.
+    They match POI's reading of every fixture and of PowerPoint's own files. Masters and colour schemes are P2b.
 
 ## Pin moves
 

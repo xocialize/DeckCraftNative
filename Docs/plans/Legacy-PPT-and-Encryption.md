@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1 is done** (§5, the milestone notes); P2 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1 and P2a are done** (§5, the milestone notes); P2b is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -144,7 +144,7 @@ PORT-STATUS, as before.
 | **E3** | **Save protected `.pptx`.** The Agile writer, File › Passwords… and Review › Protect Presentation, keeping a file's password on Save, password to modify (`modifyVerifier`) with a Read Only choice on open. (Encrypted AutoRecover was decided against: protected presentations stay out of AutoRecover, E3 notes) | M | msoffcrypto-tool and POI decrypt what we write to our own zip byte-for-byte; PowerPoint opens it with the password (`powerpoint-check.sh` learns to answer the prompt) |
 | — | **Release**: E1–E3 ship on their own | | |
 | **P1** | **`.ppt` container.** Current User, the UserEditAtom chain and persist directory (newest wins; unreached records ignored), the record tree, RC4 CryptoAPI with the default password then the prompt; the document types, the converted banner and the import report. Slides open blank but counted, with slide size and notes size | M | Every `.ppt` fixture opens with the right slide count; the Govdocs1 crash run is clean |
-| **P2** | **Text, masters and slides.** Text in shapes and in the slide list, the paragraph and character runs, master text styles by text type and level, the font collection, colour schemes, placeholders and their inheritance, title/notes/handout masters, headers and footers with date fields ([MS-OSHARED] formats), notes pages, hyperlinks, backgrounds. The OOXML theme and layouts PowerPoint 2007+ embeds are used when present | L | Text per slide matches POI's dump and macOS's Office importer (`mdimport`) on every fixture |
+| **P2** | **Text, masters and slides**, in two parts: **P2a** (done) the text-bearing shapes and placeholders with their text, paragraphs, levels, alignment, bullets and character formatting, and notes text; **P2b** the rest below. Text in shapes and in the slide list, the paragraph and character runs, master text styles by text type and level, the font collection, colour schemes, placeholders and their inheritance, title/notes/handout masters, headers and footers with date fields ([MS-OSHARED] formats), notes pages, hyperlinks, backgrounds. The OOXML theme and layouts PowerPoint 2007+ embeds are used when present | L | Text per slide matches POI's dump and macOS's Office importer (`mdimport`) on every fixture |
 | **P3** | **Shapes.** OfficeArt property tables, anchors, groups, the 203 shape types mapped to DCModel presets (a generated table with each adjust value rescaled from 21,600 units, checked shape by shape), freeforms, connectors, fill, line and shadow, WordArt, tables (a group flagged as a table) | L | Shape count, type and position per slide match POI's dump; the alpha gate's render check passes on converted decks |
 | **P4** | **Pictures and objects.** The BLIP store and the Pictures stream, zlib-compressed metafiles through DCMetafile, picture fills and bullets, PICT (§8), sounds and linked movies, OLE objects as `opaque` shapes with their preview, charts as their preview picture, comments | M | Every picture in the fixtures lands with the right bytes; the import report lists each object that became a picture |
 | **P5** | **Slide show.** Transitions; animations from the OOXML timing PowerPoint 2007+ embeds where present (DCPPTX's timing reader), then the PowerPoint 2002+ timing tree, then 97/2000 per-shape effects mapped to the nearest | L–XL | Transitions match by type and speed; a file's animations play in order with the right effects for the common entrance, emphasis and exit effects |
@@ -152,6 +152,37 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P2a notes (2026-10-30)
+
+- **The drawing** (`Drawing.swift`):
+  - Each slide's OfficeArt tree. A group's first shape gives the coordinate space its children's child anchors use;
+    top-level shapes use client anchors in master units.
+  - Groups are flattened into slide coordinates for now (P3 keeps them as groups).
+  - Each shape keeps its id, type, flips, PlaceholderAtom and client-textbox records.
+- **Text** (`Text.swift`):
+  - The TextHeaderAtom, then TextCharsAtom or TextBytesAtom, then the StyleTextPropAtom. Its paragraph and character
+    runs are walked field by field through the masks, so every exception is stepped over by its exact size.
+  - **Brought over:** paragraph levels, alignment, bullets on (with their character, or "•" when it needs a symbol
+    font) and off; and bold, italic, underline, size, the font from the document's font collection, and RGB colour.
+    Line breaks (U+000B) become line-break runs.
+  - Placeholder text reached through an OutlineTextRefAtom comes from the slide list's text for that slide.
+- **Slides:**
+  - The text-bearing shapes and placeholders, with their boxes.
+  - Placeholders get their DCModel type (PlaceholderEnum mapped) and index.
+  - Text boxes (shape type 202) are marked as such.
+- **Notes:** from the notes list (SlideListWithText of instance 2), each NotesAtom's slide and its notes-body
+  placeholder.
+- **Checked:**
+  - Every `.ppt` fixture, and PowerPoint 16's own 6 encrypted `.ppt`, against POI's reading, slide by slide and
+    shape by shape in z-order. They match on the text, the boxes (within 0.6 pt) and the notes.
+  - A PowerPoint file converted to `.pptx` keeps its levels, centred titles, sizes, bold and italic.
+  - The crash corpus is unchanged: 205 open, 2 fail cleanly, no crashes.
+- **Left for P2b:**
+  - The master and its text styles, which is where most typefaces and colours come from.
+  - Scheme colours.
+  - Paragraph margins and indents (hanging indents), spacing, and bullet fonts and sizes.
+  - Headers and footers, hyperlinks and backgrounds.
 
 ### P1 notes (2026-10-30)
 
