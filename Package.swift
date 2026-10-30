@@ -30,6 +30,7 @@ let package = Package(
         // L0
         .library(name: "DCCore", targets: ["DCCore"]),
         .library(name: "DCZip", targets: ["DCZip"]),
+        .library(name: "DCCFB", targets: ["DCCFB"]),
         .library(name: "DCGeometry", targets: ["DCGeometry"]),
         .library(name: "DCColor", targets: ["DCColor"]),
         .library(name: "DCMetafile", targets: ["DCMetafile"]),
@@ -82,6 +83,11 @@ let package = Package(
         // PhotoCraftNative. Used by DCFormat and DCPPTX.
         .target(name: "DCZip", path: sources("DCZip", "DCZip")),
         .testTarget(name: "DCZipTests", dependencies: ["DCZip"], path: tests("DCZip", "DCZipTests")),
+
+        // MARK: DCCFB — the Compound File Binary format ([MS-CFB]), read and written: the container of password-
+        // protected OOXML and of legacy .ppt (Docs/plans/Legacy-PPT-and-Encryption.md, E1). No dependencies.
+        .target(name: "DCCFB", path: sources("DCCFB", "DCCFB")),
+        .testTarget(name: "DCCFBTests", dependencies: ["DCCFB", "DCTestSupport"], path: tests("DCCFB", "DCCFBTests")),
 
         // MARK: DCFoundation — EMU/pt units, transforms, preset shapes, warps (deckcraft-geom);
         // RGB/HSL and DrawingML colour transforms (deckcraft-color). Wave 1.

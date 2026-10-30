@@ -7,7 +7,8 @@
 #   encrypted/   the corpus decks encrypted by Apache POI (Agile AES-256/SHA-512, Agile AES-128/SHA-1, Standard) and
 #                msoffcrypto-tool (Agile), and their .ppt encrypted by POI (RC4 CryptoAPI)
 #   hostile/     truncated, bit-flipped and chain-broken copies (fixtures.py mutate, fixed seed)
-#   reference/   what the independent readers say: POI's JSON dump and ppt2pptx's report of every .ppt
+#   reference/   what the independent readers say: POI's JSON dump and ppt2pptx's report of every .ppt, and
+#                olefile's listing of every compound file
 #   manifest.json  every file with its sha256, producer, method and password (.meta.json sidecars)
 #
 # Needs the tools from E0: LibreOffice in /Applications, Homebrew's openjdk, and ~/Library/Caches/DeckCraftNative/
@@ -99,6 +100,12 @@ for p in $out/ppt/*.ppt(N) $out/encrypted/*.ppt(N); do
   t=$(mktemp -d)
   "$tools/venv/bin/ppt2pptx" "$p" -o "$t/x.pptx" --report "$out/reference/${p:t}.ppt2pptx.json" ${pass:+--password} $pass >/dev/null 2>&1 || print -u2 "ppt2pptx couldn't read ${p:t}"
   rm -rf "$t"
+done
+
+# 4b. olefile's reading of every compound file, for DCCFB's tests.
+for c in $out/ppt/*.ppt(N) $out/encrypted/*(N); do
+  [[ $c == *.meta.json ]] && continue
+  $py -I $root/Tools/legacy/fixtures.py olefile-list "$c" > "$out/reference/${c:t}.olefile.json" || print -u2 "olefile couldn't read ${c:t}"
 done
 
 # 5. Hostile copies (fixed seed), from one file of each kind.

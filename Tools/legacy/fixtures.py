@@ -1,6 +1,8 @@
 # Helpers for Tools/legacy/make-fixtures.sh, run with the legacy-tools venv's Python (it has olefile):
 #
 #   fixtures.py describe FILE              the encryption a compound file declares, as JSON
+#   fixtures.py olefile-list FILE          olefile's reading of a compound file: every entry's path, kind, size and
+#                                          sha256, as JSON (DCCFB's tests compare their own reading with it)
 #   fixtures.py mutate SEED OUT_DIR FILE…  hostile copies of each FILE (truncated, bit-flipped, cyclic chains)
 #   fixtures.py manifest LEGACY_DIR        legacy/manifest.json from the files and their .meta.json sidecars
 #
@@ -47,6 +49,20 @@ def describe(path):
         if o.exists("PowerPoint Document"):
             out["ppt"] = True
     return out
+
+
+def olefile_list(path):
+    with olefile.OleFileIO(path) as o:
+        out = []
+        for p in o.listdir(streams=True, storages=True):
+            kind = o.get_type(p)
+            e = {"path": "/".join(p), "kind": {olefile.STGTY_STORAGE: "storage", olefile.STGTY_STREAM: "stream"}.get(kind, str(kind))}
+            if kind == olefile.STGTY_STREAM:
+                data = o.openstream(p).read()
+                e.update(size=len(data), sha256=hashlib.sha256(data).hexdigest())
+            out.append(e)
+        out.sort(key=lambda e: e["path"].lower())
+        return {"major": o.dll_version if hasattr(o, "dll_version") else None, "sectorSize": o.sectorsize, "entries": out}
 
 
 def mutate(seed, out_dir, files):
@@ -121,9 +137,11 @@ if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
     if cmd == "describe" and len(sys.argv) == 3:
         print(json.dumps(describe(sys.argv[2])))
+    elif cmd == "olefile-list" and len(sys.argv) == 3:
+        print(json.dumps(olefile_list(sys.argv[2]), ensure_ascii=False))
     elif cmd == "mutate" and len(sys.argv) >= 5:
         mutate(sys.argv[2], sys.argv[3], sys.argv[4:])
     elif cmd == "manifest" and len(sys.argv) == 3:
         manifest(sys.argv[2])
     else:
-        sys.exit("usage: fixtures.py describe FILE | mutate SEED OUT_DIR FILE… | manifest LEGACY_DIR")
+        sys.exit("usage: fixtures.py describe FILE | olefile-list FILE | mutate SEED OUT_DIR FILE… | manifest LEGACY_DIR")

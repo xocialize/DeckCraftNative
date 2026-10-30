@@ -483,6 +483,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   makes 363 test files from our own decks into the fixtures (every encrypted copy decrypts to its plaintext with two
   independent tools). With the operator watching, PowerPoint made 18 protected copies (kept local; Agile AES-256/SHA-512 for `.pptx`,
   RC4 CryptoAPI for `.ppt`), and its password prompts and File › Passwords… were observed (the plan's §2).
+  - **E1 (2026-10-30): DCCFB**, a new L0 target that reads and writes compound files, version 3 and 4. It reads
+    every compound file in the fixtures, and PowerPoint's own version 4 files, exactly as olefile does. The files it
+    writes open in olefile and POI. It survives the hostile fixtures, deckcraft's 400 CFB inputs and 6,000 seeded
+    mutations. Details are in `Packages/DCCFB/PORT-NOTES.md`.
 
 ## Pin moves
 

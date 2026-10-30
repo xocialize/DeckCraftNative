@@ -9,6 +9,8 @@
 //   decrypt-ooxml PASSWORD IN OUT.pptx    write the decrypted package; exit 2 on a wrong password
 //   encrypt-ppt PASSWORD IN.ppt OUT.ppt   re-save a .ppt encrypted with RC4 CryptoAPI
 //   dump-ppt IN.ppt [PASSWORD]            slides, shapes and text as JSON on stdout
+//   list-cfb IN                           a compound file's storages and streams (path, kind, size, sha256) as JSON,
+//                                         the shape of fixtures.py olefile-list
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.nio.file.*;
@@ -16,6 +18,10 @@ import java.util.*;
 import org.apache.poi.hslf.usermodel.*;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.poifs.crypt.*;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+import org.apache.poi.poifs.filesystem.Entry;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 public class PoiTool {
@@ -65,7 +71,33 @@ public class PoiTool {
                     Biff8EncryptionKey.setCurrentUserPassword(null);
                 }
             }
+            case "list-cfb" -> {
+                if (a.length != 2) usage();
+                try (POIFSFileSystem fs = new POIFSFileSystem(new File(a[1]), true)) {
+                    List<String> rows = new ArrayList<>();
+                    list(fs.getRoot(), "", rows);
+                    rows.sort(Comparator.comparing(r -> r.substring(9, r.indexOf('"', 9)).toLowerCase(Locale.ROOT)));
+                    System.out.println("{\"entries\":[" + String.join(",", rows) + "]}");
+                }
+            }
             default -> usage();
+        }
+    }
+
+    static void list(DirectoryEntry dir, String prefix, List<String> rows) throws Exception {
+        for (Iterator<Entry> it = dir.getEntries(); it.hasNext(); ) {
+            Entry e = it.next();
+            String path = prefix.isEmpty() ? e.getName() : prefix + "/" + e.getName();
+            if (e instanceof DirectoryEntry d) {
+                rows.add("{\"path\":" + str(path) + ",\"kind\":\"storage\"}");
+                list(d, path, rows);
+            } else if (e instanceof DocumentEntry doc) {
+                byte[] data;
+                try (DocumentInputStream in = new DocumentInputStream(doc)) { data = in.readAllBytes(); }
+                StringBuilder h = new StringBuilder();
+                for (byte x : java.security.MessageDigest.getInstance("SHA-256").digest(data)) h.append(String.format("%02x", x));
+                rows.add("{\"path\":" + str(path) + ",\"kind\":\"stream\",\"size\":" + data.length + ",\"sha256\":\"" + h + "\"}");
+            }
         }
     }
 
@@ -122,7 +154,7 @@ public class PoiTool {
     }
 
     static void usage() {
-        System.err.println("usage: PoiTool encrypt-ooxml|decrypt-ooxml|encrypt-ppt|dump-ppt … (see the file's header)");
+        System.err.println("usage: PoiTool encrypt-ooxml|decrypt-ooxml|encrypt-ppt|dump-ppt|list-cfb … (see the file's header)");
         System.exit(64);
     }
 }

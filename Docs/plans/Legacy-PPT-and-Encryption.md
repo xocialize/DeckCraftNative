@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 is done** (§5, E0 notes); E1 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 and E1 are done** (§5, the milestone notes); E2 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -83,7 +83,7 @@ each prompt was opened and cancelled (or answered with Read Only).
 
 | Target | Layer | Depends on | Holds |
 |---|---|---|---|
-| **DCCFB** | L0 | DCCore | The compound file: header (v3 512-byte and v4 4096-byte sectors), DIFAT, FAT, mini FAT and mini stream, the directory tree (walked by child/sibling links, names compared case-insensitively). **Reader and writer**: the writer is needed to save encrypted `.pptx` (E3). Every sector id bounds-checked, every chain cycle-checked, sizes capped. `DCPPTX/CFB.swift` moves here and `CFB.isEncrypted` becomes a query on the reader |
+| **DCCFB** | L0 | nothing | The compound file: header (v3 512-byte and v4 4096-byte sectors), DIFAT, FAT, mini FAT and mini stream, the directory tree (walked by child/sibling links, names compared case-insensitively). **Reader and writer**: the writer is needed to save encrypted `.pptx` (E3). Every sector id bounds-checked, every chain cycle-checked, sizes capped. `DCPPTX/CFB.swift` stays: it is deckcraft's sniffer and 400 parity vectors pin its behaviour; the engine moves to DCCFB in E2 |
 | **DCOffCrypto** | L1 | DCCore, DCCFB, CommonCrypto | [MS-OFFCRYPTO]: the `EncryptionInfo` parsers (Agile XML, Standard binary, RC4 CryptoAPI), key derivation, password verification, segment decryption, the Agile HMAC integrity check, the Agile writer, and RC4 CryptoAPI block decryption for `.ppt`. Pure functions over bytes; cancellable; no logging of passwords or keys |
 | **DCPPT** | L4 | DCModel, DCGeometry, DCColor, DCCore, DCZip, DCCFB, DCOffCrypto, DCPPTX | [MS-PPT] + [MS-ODRAW] → `Presentation`, plus an import report. DCPPTX only for its readers of the round-trip OOXML parts a `.ppt` may embed (theme, layouts, timing, §5 P2/P5) |
 
@@ -139,7 +139,7 @@ PORT-STATUS, as before.
 | # | Milestone | Size | Done when |
 |---|---|---|---|
 | **E0** | **Setup.** Install LibreOffice, a JDK with Apache POI, and msoffcrypto-tool in a venv (all outside the repo); download [MS-CFB] and [MS-OLEPS]. `Tools/legacy/` scripts that make every test file (§6.1), writing into `../DeckCraftNative-Fixtures/legacy/`, and the PowerPoint-protected set into its local cache. The PowerPoint observations of §2 | S | `Tools/legacy/make-fixtures.sh` regenerates the encrypted and `.ppt` sets from DeckCraft's own decks |
-| **E1** | **DCCFB.** Reader and writer, v3 and v4, mini stream, DIFAT beyond 109 entries, cycle and range guards, fuzzing. CFB.swift moves in; DCPPTX and DeckReader use it | S | Streams read back byte-for-byte against olefile on every fixture; files we write open in olefile and POI; fuzzed input never crashes or hangs |
+| **E1** | **DCCFB.** Reader and writer, v3 and v4, mini stream, DIFAT beyond 109 entries, cycle and range guards, fuzzing. (DCPPTX's deckcraft-ported `CFB.swift` stays for parity; the engine and DeckReader move to DCCFB in E2) | S | Streams read back byte-for-byte against olefile on every fixture; files we write open in olefile and POI; fuzzed input never crashes or hangs |
 | **E2** | **Open protected `.pptx`.** Agile and Standard decryption, password verification, HMAC, the named refusals; `passwordRequired` through the engine, the app's password sheet, MCP/`dccli` `password`; AutoRecover off for protected documents; Quick Look's message unchanged | M | Every encrypted fixture (each producer and cipher, §6.1) opens with its password and matches the plaintext zip byte-for-byte; wrong passwords and tampered files fail cleanly |
 | **E3** | **Save protected `.pptx`.** The Agile writer, File › Passwords… and Review › Protect Presentation, keeping a file's password on Save, password to modify (`modifyVerifier`) with a Read Only choice on open, encrypted AutoRecover | M | msoffcrypto-tool and POI decrypt what we write to our own zip byte-for-byte; PowerPoint opens it with the password (`powerpoint-check.sh` learns to answer the prompt) |
 | — | **Release**: E1–E3 ship on their own | | |
@@ -152,6 +152,22 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### E1 notes (2026-10-30)
+
+- **DCCFB** (`Packages/DCCFB`, its PORT-NOTES): `CompoundFile` reads, `CompoundFileWriter` writes, version 3 or 4.
+  It has no dependencies. 12 tests: round trips at every size boundary in both versions, a DIFAT, names ordered
+  as [MS-CFB] 2.6.4 says, and damaged input from three sources (the hostile fixtures, deckcraft's 400 CFB parity
+  inputs, and 6,000 seeded mutations). None traps or hangs.
+- **Against olefile:** all 105 compound files in the fixtures, and PowerPoint's 15 protected copies, read with the
+  same entries and the same bytes. The references come from `fixtures.py olefile-list`, now part of
+  `make-fixtures.sh`.
+- **What we write:** `Tools/legacy/check-cfb-writer.sh` has olefile and POI (`PoiTool list-cfb`) read five written
+  files. Both see every entry with its bytes.
+- **Found:** PowerPoint 16 writes its protected `.pptx` as **version 4** (4096-byte sectors), where POI and
+  msoffcrypto-tool write version 3. E3 picks the version our encrypted files use.
+- **A change from the plan:** DCPPTX's `CFB.swift` stays. It is deckcraft's sniffer, pinned by parity vectors,
+  including its fallback scan for stream names in a file it can't walk. The engine's sniffing moves to DCCFB in E2.
 
 ### E0 notes (2026-10-30)
 
