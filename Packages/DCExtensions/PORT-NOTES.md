@@ -137,6 +137,31 @@ DCSpotlight), embedded in the app's `Contents/PlugIns` by an *Embed Foundation E
   - **Not tried: File Provider locations.** `~/Library/Spotlight/ExtensionsCache/fileProviderBundleMap.plist` maps
     iCloud Drive's file provider, which suggests import extensions serve File Provider items. Testing that uploads a
     deck to iCloud Drive, so it waits for the operator.
+- **Indexing from the app instead (2026-10-29, macOS 27.2, Xcode 27.1).** DCApp's `SpotlightFeature` indexes each
+  `.deckcraft` file the app opens or saves (its saved revision, from memory, with `DeckIndex`), as a Core Spotlight
+  item and as a `PresentationFileEntity`. On macOS 27 Spotlight and Siri are one panel, run by `com.apple.campo`;
+  a query with no instant hit offers "Ask Siri". Measured with a Developer ID test build and a deck whose notes hold
+  made-up words:
+  - **By name: works.** The item is Spotlight's top hit for the file's name, under a DeckCraftNative category, and
+    choosing it opens the deck (`CSSearchableItemActionType` → `NSDocumentController`). A file deleted while the app
+    was away loses its item and entity at the next launch.
+  - **By body text in the panel: never.** No query on the notes' words lists the deck, instant results or the full
+    list, whether the text is in `textContent`, `contentDescription` or `keywords`, and with the entity indexed too.
+  - **By meaning, through Siri: found, opened once.** The macOS 27 SDK adds App Intents' Spotlight side
+    (`IndexedEntity`, `indexAppEntities`, and new in 27 `IndexedEntityQuery` and `relatedAppEntityIdentifier`), and
+    WWDC26 session 343 says indexed entities get semantic search "depending on the App Intents domain". The entity
+    adopts the presentation App Schema (`@AppEntity(schema: .presentation.document)`, its text through
+    `@Property(indexingKey: \.textContent)`) and the schema's open intent (`@AppIntent(schema: .presentation.open)`,
+    an `OpenIntent`); the metadata processor accepts both. Asked "open my presentation that mentions a marmalade
+    survey", Siri ran `OpenPresentationFileIntent` on the deck five times out of five (Shortcuts'
+    `WFLinkOpenEntityAction` in `BackgroundShortcutRunner`). The deck opened the first time only; in the other four
+    Shortcuts couldn't load the action's metadata (`LNMetadataProvider … Empty result`, "XPC retry failed"), the
+    intent never reached the app, and Siri answered that it couldn't find the presentation. Each of those followed a
+    fresh install of a rebuilt test copy, and Siri's tool registry was seen reindexing the app's tools
+    (`ToolKitIndexing`, "Failed to load a definition for com.xocialize.deckcraftnative"); waiting three minutes
+    didn't help. Asked "find my DeckCraftNative presentation about marmalade", Siri searched files only.
+  - **Next:** re-test opening from Siri on an install that hasn't been replaced (a release in `/Applications`), and
+    on later macOS 27 updates; if it still fails, file a Feedback with the `BackgroundShortcutRunner` log.
 - **A development trap: sandbox containers made by an ad hoc build.** An extension's container
   (`~/Library/Containers/com.xocialize.deckcraftnative.<QuickLook|Thumbnail|Spotlight>`) records the signer of the
   build that first ran. A later Developer ID build of the same extension "is not in ACL for container … prompting"

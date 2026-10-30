@@ -465,6 +465,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Spotlight, re-tested: with the notarized build in `/Applications`, and with the `CSExtensionLabel` key Xcode's
     template adds (now in the importer's Info.plist), macOS still doesn't call the import extension for local files
     (DCExtensions/PORT-NOTES.md).
+  - Spotlight from the app: the app indexes the `.deckcraft` files it opens and saves (SpotlightFeature), as a Core
+    Spotlight item and as an App Intents entity of the presentation App Schema. On macOS 27 Spotlight finds them by
+    name and opens them; it never matches their body text. Siri finds them by what they say, but opened one only once
+    in five tries (the system couldn't load the open action's metadata). Details in DCExtensions/PORT-NOTES.md.
   - Still to do: the Accessibility Inspector audit, held until the operator has time for it.
 
 ## Pin moves

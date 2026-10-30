@@ -209,7 +209,7 @@ let package = Package(
             name: "DCApp",
             dependencies: [
                 "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore",
-                "DCIntentsKit",
+                "DCIntentsKit", "DCSpotlight",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
                 .product(name: "DesignScaffoldPicker", package: "DesignScaffold"),
@@ -219,7 +219,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DCAppTests",
-            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport", "DCIntentsKit"],
+            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport", "DCIntentsKit", "DCSpotlight"],
             path: tests("DCApp", "DCAppTests")
         ),
         // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev

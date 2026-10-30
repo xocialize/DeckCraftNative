@@ -13,6 +13,7 @@ enum Features {
         AutomationFeature.install(app)
         UpdatesFeature.install(app)
         IntentsFeature.install(app)
+        SpotlightFeature.install(app)
         // After Show: the start window's `ui.screenshot {window: "start"}` hands every other window to Show's.
         StartFeature.install(app)
     }

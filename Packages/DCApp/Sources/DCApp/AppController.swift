@@ -214,6 +214,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// `DECKCRAFT_NO_PREFS`: neither read nor write `ui.json` (deckcraft's switch, for tests and scripted runs).
     static var noPrefs: Bool { ProcessInfo.processInfo.environment["DECKCRAFT_NO_PREFS"] != nil }
 
+    /// A Spotlight result for a presentation the app indexed was chosen (SpotlightFeature).
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any NSUserActivityRestoring]) -> Void) -> Bool {
+        SpotlightFeature.continueActivity(userActivity)
+    }
+
     /// AppKit asks only when nothing else (Finder, the command line, `--sample`) opened a document: the start
     /// window opens instead of an untitled presentation while Settings has it on.
     func applicationShouldOpenUntitledFile(_ sender: NSApplication) -> Bool {
