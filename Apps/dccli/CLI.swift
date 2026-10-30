@@ -217,7 +217,15 @@ enum CLI {
             return
         }
         if let p = input {
-            let opened = try execute(s, "file.open", ["path": .string(p)])
+            // A password-protected input's password comes from the environment, not the command line, so it stays
+            // out of shell history and the process list.
+            var params: JSON = ["path": .string(p)]
+            if let pw = ProcessInfo.processInfo.environment["DCCLI_PASSWORD"] { params.set("password", .string(pw)) }
+            let opened: JSON
+            do { opened = try s.execute("file.open", params) } catch {
+                if case .passwordRequired = error { throw CLIFailure("\(error) (set DCCLI_PASSWORD)") }
+                throw CLIFailure(error.description)
+            }
             warnIfDamaged(p, opened)
         } else {
             _ = try execute(s, "file.new", .emptyObject)

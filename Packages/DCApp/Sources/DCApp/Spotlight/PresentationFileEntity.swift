@@ -28,7 +28,8 @@ public struct PresentationFileEntity: IndexedEntity {
     }
 
     public var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: "\(name)")
+        // The file's name, shown as it is: not a key to look up in a String Catalog.
+        DisplayRepresentation(title: LocalizedStringResource(stringLiteral: name))
     }
 
     public var attributeSet: CSSearchableItemAttributeSet {

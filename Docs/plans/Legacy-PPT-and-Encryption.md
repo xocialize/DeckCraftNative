@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 and E1 are done** (§5, the milestone notes); E2 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0, E1 and E2 are done** (§5, the milestone notes); E3 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,40 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### E2 notes (2026-10-30)
+
+- **DCOffCrypto** (`Packages/DCOffCrypto`, its PORT-NOTES): Agile and Standard decryption with CommonCrypto, the
+  HMAC integrity check, and refusals by name for Extensible and IRM files. It has 8 tests, which decrypt:
+  - all 36 encrypted `.pptx` fixtures, to their exact plaintext;
+  - PowerPoint's 9 protected copies, to msoffcrypto-tool's bytes.
+
+  Wrong passwords, tampering, cancelling and seeded damage fail cleanly.
+- **The engine:**
+  - `FileCommands.openProtected` reads a protected file, and `file.open` and `file.openBytes` take `password`.
+  - The new errors are `EngineError.passwordRequired` and `wrongPassword`.
+  - The password lives in `DocState.protection` only. A `password` parameter is dropped from the journal, and a
+    reply says `"protected": true` only for a protected file, so every other reply stays deckcraft's byte for
+    byte.
+  - The commands' parameter text stays deckcraft's, because a registry parity test pins it.
+- **Until E3:**
+  - Save, Save As and `file.saveBytes` refuse a protected presentation, with a reason, rather than drop its password.
+  - AutoRecover leaves it out.
+  - Exports still work.
+- **The app:**
+  - **The prompt:** `PasswordPrompt` asks before the document's window, naming the file, with a secure field,
+    Cancel and Open. It asks again after a wrong password, and Cancel opens nothing, with no error.
+  - **The control channel:** `app.open {path, password}` never prompts, and `ui.inspect`'s documents carry
+    `protected`.
+  - **dccli:** reads `DCCLI_PASSWORD`.
+- **Checked live:**
+  - In the development build, over the control channel: no password, a wrong one, the right one (it opens, marked
+    protected), and Save refused.
+  - In a signed test build: the prompt appears and Cancel works. Typing into the prompt couldn't be automated,
+    because computer use is blocked while secure input is active. Entering the password by hand is the one step
+    left for the operator.
+- **Fixed on the way:** `Tools/l10n/sync.sh` had stopped since `b4b79c3`: the Spotlight entity's display title was
+  a string literal that `l10n.py` takes for a main-bundle lookup. It's now built from the file name.
 
 ### E1 notes (2026-10-30)
 

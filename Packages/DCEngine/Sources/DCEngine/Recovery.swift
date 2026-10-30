@@ -135,7 +135,9 @@ public enum Recovery {
         claimDir(dir)
         var n = 0
         for d in s.documents {
-            if !d.isDirty {
+            // A password-protected presentation isn't written out in the clear (Docs/plans/Legacy-PPT-and-Encryption.md
+            // §4.3): AutoRecover leaves it out until it can write an encrypted copy.
+            if !d.isDirty || d.protection != nil {
                 discard(dir, d.uid)
                 continue
             }

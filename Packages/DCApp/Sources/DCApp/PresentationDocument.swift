@@ -82,12 +82,35 @@ public final class PresentationDocument: NSDocument {
     private func readOnMain(_ data: Data, _ typeName: String) throws {
         guard let model else { throw CocoaError(.fileReadUnknown) }
         let name = fileURL?.lastPathComponent ?? "Untitled.\(DocumentTypes.format(typeName) ?? "deckcraft")"
-        do {
-            let (pres, _) = try FileCommands.openChecked(name, [UInt8](data))
-            let i = FileCommands.addOpened(model.session, name, fileURL?.path, pres)
-            uid = model.session.documents.at(i)?.uid ?? 0
-        } catch {
-            throw NSError(domain: "DeckCraft", code: 1, userInfo: [NSLocalizedDescriptionKey: "\(error)"])
+        let bytes = [UInt8](data)
+        // A password-protected file asks for its password until it opens or the person cancels (PasswordPrompt).
+        var password = PasswordPrompt.supplied
+        PasswordPrompt.supplied = nil
+        var wrong = false
+        while true {
+            do {
+                let (pres, _, protection) = try FileCommands.openProtected(name, bytes, password: password)
+                let i = FileCommands.addOpened(model.session, name, fileURL?.path, pres)
+                model.session.documents.at(i)?.protection = protection
+                uid = model.session.documents.at(i)?.uid ?? 0
+                return
+            } catch let e as EngineError {
+                switch e {
+                case .passwordRequired, .wrongPassword:
+                    // The control channel's opens don't ask: the error goes back to the script.
+                    guard PasswordPrompt.interactive else { break }
+                    if case .wrongPassword = e { wrong = true }
+                    guard let p = PasswordPrompt.ask(fileURL?.lastPathComponent ?? name, wrong: wrong) else {
+                        throw CocoaError(.userCancelled)
+                    }
+                    password = p
+                    continue
+                default: break
+                }
+                throw NSError(domain: "DeckCraft", code: 1, userInfo: [NSLocalizedDescriptionKey: "\(e)"])
+            } catch {
+                throw NSError(domain: "DeckCraft", code: 1, userInfo: [NSLocalizedDescriptionKey: "\(error)"])
+            }
         }
     }
 
@@ -99,6 +122,7 @@ public final class PresentationDocument: NSDocument {
     private func dataOnMain(_ typeName: String) throws -> Data {
         guard let st = state, let format = DocumentTypes.format(typeName) else { throw CocoaError(.fileWriteUnknown) }
         do {
+            try FileCommands.refuseProtected(st)
             return Data(try FileCommands.saveBytes(st.doc, format))
         } catch {
             throw NSError(domain: "DeckCraft", code: 2, userInfo: [NSLocalizedDescriptionKey: "\(error)"])

@@ -54,6 +54,15 @@ EOF
   local pj mj
   pj=$($py -I -c 'import json,sys; print(json.dumps(sys.argv[1], ensure_ascii=False))' "$open_pw")
   mj=$($py -I -c 'import json,sys; print(json.dumps(sys.argv[1], ensure_ascii=False))' "$modify_pw")
+  # olefile's listing (DCCFB's tests) and msoffcrypto-tool's plaintext digest (DCOffCrypto's tests) of a protected file.
+  if [[ -n $open_pw && $fmt == pptx ]]; then
+    "$py" -I "$root/Tools/legacy/fixtures.py" olefile-list "$dst" > "$dst.olefile.json"
+    local plain=$(mktemp)
+    "${py:h}/msoffcrypto-tool" -p "$open_pw" "$dst" "$plain" && shasum -a 256 "$plain" | awk '{print $1}' > "$dst.plain.sha256"
+    rm -f "$plain"
+  elif [[ $fmt == ppt ]]; then
+    "$py" -I "$root/Tools/legacy/fixtures.py" olefile-list "$dst" > "$dst.olefile.json"
+  fi
   print -r -- "{\"kind\":\"powerpoint-protected\",\"from\":\"${src#$fix/}\",\"producer\":\"Microsoft PowerPoint $ver\",\"format\":\"$fmt\",\"password\":$pj,\"modifyPassword\":$mj,\"describe\":$($py -I $root/Tools/legacy/fixtures.py describe "$dst")}" > "$dst.meta.json"
 }
 

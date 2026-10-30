@@ -5,6 +5,7 @@ import DCCore
 import DCFormat
 import DCGeometry
 import DCModel
+import DCOffCrypto
 import DCPPTX
 import DCRender
 import Foundation
@@ -33,6 +34,14 @@ public struct LoadedFile: Sendable {
     public var native: Bool
     /// What the file had lost or damaged.
     public var damaged: Damage
+    /// The password a protected file was opened with.
+    public var protection: DocProtection?
+}
+
+/// A password-protected presentation's password, kept with its open document (`DocState.protection`).
+public struct DocProtection: Sendable, Equatable {
+    public var password: String
+    public init(password: String) { self.password = password }
 }
 
 /// Rust's `std::path::Path` name helpers, on `/`-separated strings.
@@ -166,18 +175,52 @@ public enum FileCommands {
         try openChecked(name, bytes).0
     }
 
-    /// `openPresentation`, plus what the file had lost or damaged.
+    /// `openPresentation`, plus what the file had lost or damaged. A password-protected file throws
+    /// `passwordRequired`: `openProtected` takes its password.
     public static func openChecked(_ name: String, _ bytes: [UInt8]) throws -> (Presentation, Damage) {
+        let (p, damage, _) = try openProtected(name, bytes, password: nil)
+        return (p, damage)
+    }
+
+    /// `openChecked` for a file that may be password-protected: with its password, the presentation it holds, and
+    /// the password to keep with it. Without one it throws `passwordRequired`, with a wrong one `wrongPassword`.
+    public static func openProtected(_ name: String, _ bytes: [UInt8], password: String?) throws -> (Presentation, Damage, DocProtection?) {
         if DeckFormat.sniff(bytes) {
             do {
                 let (p, media) = try DeckFormat.loadChecked(bytes)
-                return (p, Damage(media: media, slides: []))
+                return (p, Damage(media: media, slides: []), nil)
             } catch {
                 throw EngineError.other(error.description)
             }
         }
+        if let zip = try decryptIfProtected(name, bytes, password: password), let password {
+            guard PPTX.sniff(zip) else { throw EngineError.other("\(name): the protected file doesn't hold a presentation") }
+            let (p, slides) = try openOther(name, zip)
+            return (p, Damage(media: [], slides: slides), DocProtection(password: password))
+        }
         let (p, slides) = try openOther(name, bytes)
-        return (p, Damage(media: [], slides: slides))
+        return (p, Damage(media: [], slides: slides), nil)
+    }
+
+    /// Whether `bytes` is a password-protected file a protected copy can be read from (a compound file holding an
+    /// encrypted OOXML package).
+    public static func isProtected(_ bytes: [UInt8]) -> Bool {
+        (try? OfficeCrypto.protectedPackage(bytes)) != nil || PPTX.isEncrypted(bytes)
+    }
+
+    /// The zip inside a password-protected file, nil for a file that isn't one.
+    private static func decryptIfProtected(_ name: String, _ bytes: [UInt8], password: String?) throws -> [UInt8]? {
+        let package: ProtectedPackage?
+        do { package = try OfficeCrypto.protectedPackage(bytes) } catch { throw EngineError.other("\(name) is \(error)") }
+        guard let package else { return nil }
+        guard let password else { throw EngineError.passwordRequired(name) }
+        do {
+            return try package.decrypt(password: password)
+        } catch .wrongPassword {
+            throw EngineError.wrongPassword(name)
+        } catch {
+            throw EngineError.other("\(name): \(error)")
+        }
     }
 
     private static func openOther(_ name: String, _ bytes: [UInt8]) throws -> (Presentation, [String]) {
@@ -190,7 +233,8 @@ public enum FileCommands {
             return (p, lost)
         }
         if PPTX.isEncrypted(bytes) {
-            throw EngineError.other("\(name) is password-protected. DeckCraft can't open password-protected presentations yet.")
+            // deckcraft's sniffer sees encryption streams that DCCFB couldn't follow: a damaged protected file.
+            throw EngineError.other("\(name) is password-protected, but the file is damaged and can't be opened.")
         }
         let lower = rustASCIILowercase(name)
         let rtf = RTF.sniff(bytes)
@@ -251,12 +295,12 @@ public enum FileCommands {
         return s.addDocument(st)
     }
 
-    /// Read and parse the presentation at `path`.
-    public static func readPresentationFile(_ path: String) throws -> LoadedFile {
+    /// Read and parse the presentation at `path` (with `password` for a password-protected one).
+    public static func readPresentationFile(_ path: String, password: String? = nil) throws -> LoadedFile {
         let bytes = try IO.readFile(path)
-        let (doc, damaged) = try openChecked(path, bytes)
-        let native = DeckFormat.sniff(bytes) || PPTX.sniff(bytes)
-        return LoadedFile(path: path, doc: doc, native: native, damaged: damaged)
+        let (doc, damaged, protection) = try openProtected(path, bytes, password: password)
+        let native = DeckFormat.sniff(bytes) || PPTX.sniff(bytes) || protection != nil
+        return LoadedFile(path: path, doc: doc, native: native, damaged: damaged, protection: protection)
     }
 
     /// Add a loaded presentation as the active document: the shared end of `file.open` and `file.adopt`.
@@ -265,17 +309,21 @@ public enum FileCommands {
     private static func adoptLoaded(_ s: Session, _ f: LoadedFile) throws -> JSON {
         let keepPath = f.native && f.damaged.isEmpty
         let i = addOpened(s, f.path, keepPath ? f.path : nil, f.doc)
+        s.documents.at(i)?.protection = f.protection
         try reportDamage(s, f.damaged)
         let st = try s.doc()
-        return [
+        var out: JSON = [
             "document": .integer(i), "slides": .integer(st.doc.slides.count), "missingFonts": st.missingFonts.toJSON(),
             "damagedMedia": f.damaged.media.toJSON(), "lostSlides": f.damaged.slides.toJSON(),
         ]
+        // Only a protected file's reply says so, so every other reply stays deckcraft's, byte for byte.
+        if f.protection != nil { out.set("protected", true) }
+        return out
     }
 
     @Sendable static func open(_ s: Session, _ p: JSON) throws -> JSON {
         guard let path = Cmd.strParam(p, "path") else { throw Cmd.bad("file.open", "missing `path`") }
-        return try adoptLoaded(s, readPresentationFile(path))
+        return try adoptLoaded(s, readPresentationFile(path, password: Cmd.strParam(p, "password")))
     }
 
     /// `file.adopt {path, token?}`: add the presentation a host read in the background and staged with
@@ -294,8 +342,9 @@ public enum FileCommands {
         guard let data = Cmd.strParam(p, "data").flatMap(Cmd.base64Decode) else {
             throw Cmd.bad("file.openBytes", "missing or invalid base64 `data`")
         }
-        let (doc, damaged) = try openChecked(name, data)
+        let (doc, damaged, protection) = try openProtected(name, data, password: Cmd.strParam(p, "password"))
         let i = addOpened(s, name, nil, doc)
+        s.documents.at(i)?.protection = protection
         try reportDamage(s, damaged)
         return try [
             "document": .integer(i), "missingFonts": s.doc().missingFonts.toJSON(), "damagedMedia": damaged.media.toJSON(),
@@ -456,6 +505,7 @@ public enum FileCommands {
             return ["needsPath": true]
         }
         let format = Cmd.strParam(p, "format") ?? formatForPath(path)
+        try refuseProtected(s.doc())
         let bytes = try saveBytes(s.doc().doc, format)
         try writeFile(path, bytes)
         try markSaved(s, path)
@@ -472,8 +522,16 @@ public enum FileCommands {
 
     @Sendable static func saveBytesCmd(_ s: Session, _ p: JSON) throws -> JSON {
         let format = Cmd.strParam(p, "format") ?? "deckcraft"
+        try refuseProtected(s.doc())
         let bytes = try saveBytes(s.doc().doc, format)
         return ["data": .string(Cmd.base64Encode(bytes)), "bytes": .integer(bytes.count)]
+    }
+
+    /// Until saving with a password arrives (the plan's E3), a password-protected presentation isn't saved: saved
+    /// without its password it would lose its protection silently. Exports (PDF, pictures) are still allowed.
+    public static func refuseProtected(_ st: DocState) throws {
+        guard st.protection != nil else { return }
+        throw EngineError.other("“\(st.title)” is password-protected. DeckCraft can't save password-protected presentations yet, so it doesn't save this one: saved without its password, it would no longer be protected.")
     }
 
     /// `scale` for rendering `doc`'s slides to an image: within 0.01–16, and small enough that the slide

@@ -1161,6 +1161,7 @@
       }
     },
     "Cancel" : {
+      "comment" : "Password prompt: doesn't open it",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2412,6 +2413,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "End size"
+          }
+        }
+      }
+    },
+    "Enter the password to open “%@”." : {
+      "comment" : "Password prompt when opening a password-protected presentation; %@ is the file name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the password to open “%@”."
           }
         }
       }
@@ -4222,7 +4234,7 @@
       }
     },
     "Open" : {
-      "comment" : "Start window sidebar: open a file\nStart window: opens the selected recent presentation",
+      "comment" : "Password prompt: opens the presentation\nStart window sidebar: open a file\nStart window: opens the selected recent presentation",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4362,6 +4374,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paragraph…"
+          }
+        }
+      }
+    },
+    "Password" : {
+      "comment" : "Password prompt: the field's placeholder",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
           }
         }
       }
@@ -6421,6 +6444,17 @@
         }
       }
     },
+    "The password is incorrect. Passwords are case-sensitive." : {
+      "comment" : "Password prompt after a wrong password",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The password is incorrect. Passwords are case-sensitive."
+          }
+        }
+      }
+    },
     "The presentation has no sections. Add one with New Slide ▸ Add Section." : {
       "localizations" : {
         "en" : {
@@ -6490,6 +6524,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thesaurus"
+          }
+        }
+      }
+    },
+    "This presentation is password-protected." : {
+      "comment" : "Password prompt: why it asks",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This presentation is password-protected."
           }
         }
       }

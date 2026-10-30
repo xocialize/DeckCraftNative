@@ -487,6 +487,12 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     every compound file in the fixtures, and PowerPoint's own version 4 files, exactly as olefile does. The files it
     writes open in olefile and POI. It survives the hostile fixtures, deckcraft's 400 CFB inputs and 6,000 seeded
     mutations. Details are in `Packages/DCCFB/PORT-NOTES.md`.
+  - **E2 (2026-10-30): opening protected `.pptx`.**
+    - **DCOffCrypto** decrypts Agile and Standard encryption, which covers every fixture and PowerPoint's own files.
+    - **Opening:** `file.open` and `file.openBytes` take `password`, the app asks for it, `app.open` and dccli
+      (`DCCLI_PASSWORD`) pass it, and the password stays in memory with the document.
+    - **Until E3:** a protected presentation isn't saved, and AutoRecover leaves it out.
+    - Details are in `Packages/DCOffCrypto/PORT-NOTES.md`.
 
 ## Pin moves
 

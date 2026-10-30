@@ -50,9 +50,17 @@ final class AppControlHost: ControlHost {
         do { try Data(bytes).write(to: URL(filePath: path)) } catch { throw AutomationError(error.localizedDescription) }
     }
 
-    func open(_ path: String) throws(AutomationError) {
+    func open(_ path: String, password: String?) throws(AutomationError) {
         guard Thread.isMainThread else { throw Self.offMain }
         let r: String? = MainActor.assumeIsolated {
+            // Nothing the control channel opens waits for a person: the password comes with the request or the
+            // error goes back (PasswordPrompt).
+            PasswordPrompt.supplied = password
+            PasswordPrompt.interactive = false
+            defer {
+                PasswordPrompt.supplied = nil
+                PasswordPrompt.interactive = true
+            }
             let url = URL(filePath: path)
             let controller = NSDocumentController.shared
             if let open = controller.document(for: url) {
@@ -113,7 +121,8 @@ final class AppControlHost: ControlHost {
         o.set("showing", .null)
         o.set("animPreview", .null)
         o.set("documents", .array(m.session.documents.map {
-            ["title": .string($0.title), "dirty": .bool($0.isDirty), "path": $0.path.map(JSON.string) ?? .null]
+            ["title": .string($0.title), "dirty": .bool($0.isDirty), "path": $0.path.map(JSON.string) ?? .null,
+             "protected": .bool($0.protection != nil)]
         }))
         o.set("status", m.status.map(JSON.string) ?? .null)
         o.set("perf", ["frameMs": 0.0, "renderMs": 0.0, "fps": 0.0])

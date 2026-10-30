@@ -36,6 +36,7 @@ let package = Package(
         .library(name: "DCMetafile", targets: ["DCMetafile"]),
         // L1
         .library(name: "DCModel", targets: ["DCModel"]),
+        .library(name: "DCOffCrypto", targets: ["DCOffCrypto"]),
         // L2
         .library(name: "DCText", targets: ["DCText"]),
         .library(name: "DCAnim", targets: ["DCAnim"]),
@@ -102,6 +103,11 @@ let package = Package(
 
         // MARK: DCModel — presentation, masters, layouts, slides, shapes, text, tables, charts,
         // animations, placeholder inheritance (deckcraft-model). Wave 1.
+        // MARK: DCOffCrypto — password-protected OOXML ([MS-OFFCRYPTO]): Agile and Standard encryption, read
+        // (and, from E3, written) through CommonCrypto (Docs/plans/Legacy-PPT-and-Encryption.md, E2).
+        .target(name: "DCOffCrypto", dependencies: ["DCCFB"], path: sources("DCOffCrypto", "DCOffCrypto")),
+        .testTarget(name: "DCOffCryptoTests", dependencies: ["DCOffCrypto", "DCCFB", "DCTestSupport"], path: tests("DCOffCrypto", "DCOffCryptoTests")),
+
         .target(name: "DCModel", dependencies: ["DCCore", "DCGeometry", "DCColor"], path: sources("DCModel", "DCModel")),
         .testTarget(name: "DCModelTests", dependencies: ["DCModel", "DCCore", "DCGeometry", "DCColor", "DCTestSupport"], path: tests("DCModel", "DCModelTests")),
 
@@ -156,7 +162,7 @@ let package = Package(
         // sample deck (deckcraft-engine). Wave 4.
         .target(
             name: "DCEngine",
-            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip"],
+            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCOffCrypto"],
             path: sources("DCEngine", "DCEngine")
         ),
         .testTarget(

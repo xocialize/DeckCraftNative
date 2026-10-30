@@ -22,6 +22,10 @@ public enum EngineError: Error, Sendable, Equatable, CustomStringConvertible {
     case badParams(cmd: String, msg: String)
     case noDocument
     case other(String)
+    /// A password-protected file opened without its password (`file.open {password}`); the host asks for it.
+    case passwordRequired(String)
+    /// A password-protected file opened with a password that isn't its own.
+    case wrongPassword(String)
     /// A failure the command didn't expect (Rust: a caught panic).
     case internalError(String, String)
 
@@ -32,6 +36,8 @@ public enum EngineError: Error, Sendable, Equatable, CustomStringConvertible {
         case .badParams(let cmd, let msg): "invalid parameters for `\(cmd)`: \(msg)"
         case .noDocument: "no active presentation"
         case .other(let s): s
+        case .passwordRequired(let name): "“\(name)” is password-protected: its password is needed to open it"
+        case .wrongPassword(let name): "the password for “\(name)” is incorrect"
         case .internalError(let id, let msg): "internal error in `\(id)` (the presentation was kept as it was): \(msg)"
         }
     }
@@ -323,6 +329,9 @@ public final class DocState {
     /// The list AutoFormat just started from a typed `* ` or `1. `, so Backspace right after can put the
     /// typed text back.
     public var autoList: AutoList?
+    /// The password the file was opened with (Docs/plans/Legacy-PPT-and-Encryption.md §4.3). It lives only here, in
+    /// memory: never in the presentation, a `.deckcraft`, AutoRecover, the journal or a command's reply.
+    public var protection: DocProtection?
 
     public init(_ doc: Presentation, path: String?, title: String) {
         let r = DocRef(doc)
@@ -346,6 +355,7 @@ public final class DocState {
     public func copy() -> DocState {
         let c = DocState(doc, path: path, title: title)
         c.docRef = docRef
+        c.protection = protection
         c.savedDocRef = savedDocRef
         c.selection = selection
         c.history = history
@@ -887,7 +897,13 @@ public final class Session {
             pushUndo(st, HistoryEntry(label: spec.label, doc: old, selection: sel, vertexKind: vertexKind))
         }
         if spec.journal && outer {
-            journal.append((id, params))
+            // A password stays out of the journal.
+            var recorded = params
+            if case .object(var o) = params, o["password"] != nil {
+                o.remove("password")
+                recorded = .object(o)
+            }
+            journal.append((id, recorded))
             if journal.count > 10_000 { journal.removeFirst(1000) }
         }
         return result

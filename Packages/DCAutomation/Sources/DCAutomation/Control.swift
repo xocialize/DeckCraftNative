@@ -102,8 +102,8 @@ public protocol ControlHost: AnyObject {
     var canvasScale: Double { get }
     /// Write a file the way the app writes (`services.write`).
     func write(_ path: String, _ bytes: [UInt8]) throws(AutomationError)
-    /// Open a presentation (`app.open`).
-    func open(_ path: String) throws(AutomationError)
+    /// Open a presentation (`app.open`), with the password of a password-protected one.
+    func open(_ path: String, password: String?) throws(AutomationError)
     /// A key the window takes before the engine (the slide show, the canvas animation preview); nil to let
     /// the engine have it.
     func interceptKey(_ key: String) -> ControlOutcome?
@@ -185,7 +185,7 @@ public enum Control {
         case "app.open":
             guard let path = s("path") else { return err("missing `path`") }
             return wrap { () throws(AutomationError) -> JSON in
-                try host.open(path)
+                try host.open(path, password: s("password"))
                 return .null
             }
         case "app.save":
@@ -263,8 +263,10 @@ public final class HeadlessControlHost: ControlHost {
         do { try IO.writeFile(path, bytes) } catch { throw AutomationError(error.description) }
     }
 
-    public func open(_ path: String) throws(AutomationError) {
-        _ = try run("file.open", ["path": .string(path)])
+    public func open(_ path: String, password: String?) throws(AutomationError) {
+        var p: JSON = ["path": .string(path)]
+        if let password { p.set("password", .string(password)) }
+        _ = try run("file.open", p)
     }
 
     public func interceptKey(_ key: String) -> ControlOutcome? { nil }
