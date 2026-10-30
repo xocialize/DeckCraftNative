@@ -481,7 +481,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   `Docs/plans/Legacy-PPT-and-Encryption.md`: encryption first (E1–E3, its own release), then a `.ppt` reader (P1–P6).
   E0 installed the test tools outside the repo, downloaded [MS-CFB] and [MS-OLEPS], and added `Tools/legacy/`, which
   makes 363 test files from our own decks into the fixtures (every encrypted copy decrypts to its plaintext with two
-  independent tools). PowerPoint's own protected copies and the observations of its password UI are still to do.
+  independent tools). With the operator watching, PowerPoint made 18 protected copies (kept local; Agile AES-256/SHA-512 for `.pptx`,
+  RC4 CryptoAPI for `.ppt`), and its password prompts and File › Passwords… were observed (the plan's §2).
 
 ## Pin moves
 

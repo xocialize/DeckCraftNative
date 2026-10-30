@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 is done apart from its two PowerPoint steps** (§5, E0 notes). · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 is done** (§5, E0 notes); E1 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -39,17 +39,31 @@ Two traps to keep out:
   files LibreOffice made, and to *read* files for comparison.
 - **Working text of the specs.** The spec survey extracted their text into the session scratchpad; it stays there.
 
-## 2. What PowerPoint does (to observe in E0)
+## 2. What PowerPoint does (observed 2026-10-30)
 
-Black-box observations, recorded in our own words in the session notes folder, before E2 and P1 start. Expected,
-from general knowledge, and to be confirmed:
+PowerPoint for Mac 16 on macOS 27, black box, described in our own words. No password was typed into PowerPoint:
+each prompt was opened and cancelled (or answered with Read Only).
 
-- **Opening a protected file**: a sheet names the file and asks for the password, with OK and Cancel. A wrong
-  password says so and lets you try again. A file that also has a *password to modify* asks for that next, with
-  **Read Only** as the way past it.
-- **Setting passwords**: File › Passwords… (and Review › Protect Presentation on the ribbon) opens one sheet with
-  a password to open and a password to modify, each entered twice. Saving then writes the encrypted file.
-- **Opening a `.ppt`**: the window title adds "[Compatibility Mode]" and File › Convert… offers to save as `.pptx`.
+- **Opening a file with a password to open**: before any document window, a small window titled *Password to
+  Open* says the presentation needs a password, names the file, and has one password field with Cancel and Open
+  (Open is disabled while the field is empty). Cancel leaves an empty document window with "can't read" and the
+  file's path, and an OK button.
+- **Opening a file with a password to modify**: *Password to Modify* names the file, has a "Reserved by" line (the
+  author, blank in our files), a password field, and three buttons: **Read Only** on the left, Cancel and Modify
+  (disabled while empty) on the right. Read Only opens the document with "Read-Only" after its name in the title
+  bar and the formatting controls disabled. Not observed: what follows a wrong password, and the order of the two
+  prompts when a file has both.
+- **Setting passwords**: File › Passwords… (between *Always Open Read-Only* and *Restrict Permissions*, disabled in
+  a read-only document) opens a sheet with two sections. *Password to open*: a checkbox "Encrypt this presentation
+  and require a password to open". *Password to modify*: a checkbox "Require a password to modify the
+  presentation". Each has a Change Password… button, enabled once its box is ticked; Cancel and OK close the sheet.
+  The ribbon's Review tab wasn't checked for a Protect command.
+- **What PowerPoint writes** (from the files `powerpoint-protect.sh` made): a password to open gives Agile
+  encryption, AES-256 with SHA-512 and 100,000 rounds, in `.pptx`, and RC4 CryptoAPI in `.ppt` (the summary
+  streams left in the clear). A password to modify alone leaves the `.pptx` unencrypted, with a `modifyVerifier`
+  (SHA-512, 100,000 rounds) in `presentation.xml`; with both passwords the verifier is inside the encrypted package.
+- **Opening a `.ppt`**: the title bar reads "*name* - Compatibility Mode". The File menu has no Convert command;
+  Save keeps the `.ppt`, and Save As… offers other formats. Move… and Rename… are disabled.
 
 ## 3. Adopt, adapt or skip
 
@@ -156,10 +170,14 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
   the app ("Launch Constraint Violation"), so a UNO script can't run. Keynote Creator Studio 15.3 crashed on an
   AppleScript `open` of a `.pptx` (an uncaught exception converting the file argument). Neither is needed: POI,
   msoffcrypto-tool and PowerPoint cover every method.
-- **Still open, both needing the operator**: the PowerPoint-protected set (`Tools/legacy/powerpoint-protect.sh` is
-  written but not run; the first trial timed out on `open`, most likely PowerPoint's sandbox asking for access to a
-  file in `~/Library/Caches`, so the script now works through a fresh temporary folder as `powerpoint-check.sh`
-  does) and the observations of §2. Screen access to PowerPoint was declined, so neither can be checked from here.
+- **PowerPoint steps** (finished 2026-10-30 with the operator watching): `Tools/legacy/powerpoint-protect.sh` made 18
+  protected files from the corpus sample, content and charts decks in `~/Library/Caches/DeckCraftNative/
+  powerpoint-protected/`. PowerPoint is sandboxed: it asks "Grant File Access" for each new folder it saves into,
+  so the script works through one fixed `work/` folder, granted once (a fresh temporary folder per file brought a
+  prompt per file). Every `.pptx` with a password to open decrypts to identical bytes with POI and
+  msoffcrypto-tool; POI and ppt2pptx read every `.ppt` with the same slide count. msoffcrypto-tool 6.0.0 fails on
+  PowerPoint's `.ppt` ("write_stream: data must be the same size"; its `.ppt` support is marked experimental), so
+  POI and ppt2pptx are the `.ppt` references. The observations are in §2.
 
 ## 6. Testing and oracles
 
