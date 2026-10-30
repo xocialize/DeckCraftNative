@@ -471,8 +471,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     five on 2026-10-30 with one build left installed in `/Applications`, including a cold launch. The first test's
     failures (one in five) came from reinstalling the app between tries. Details in DCExtensions/PORT-NOTES.md.
   - Still to do: the Accessibility Inspector audit, held until the operator has time for it.
-- **0.1.6 (2026-10-30, not yet published).** Spotlight and Siri indexing and the fixes above. Notes in
-  `Docs/releases/0.1.6.md`.
+- **Released as [v0.1.6](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.6) (2026-10-30).** Spotlight
+  and Siri indexing and the fixes above. Notes in `Docs/releases/0.1.6.md`.
+  - Built clean from `9bb5b44`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
+    its ticket is stapled.
+  - A build that reports 0.1.5, installed in `/Applications`, finds 0.1.6 through Check for Updates.
 
 ## Pin moves
 
