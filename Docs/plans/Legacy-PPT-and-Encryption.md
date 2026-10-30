@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 1, 2026-10-30. The operator's decisions are recorded (§9). Nothing is built yet. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0 is done apart from its two PowerPoint steps** (§5, E0 notes). · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -27,7 +27,8 @@ This plan adds both, as **a new wave in two parts**: encryption first (smaller, 
 | [MS-OFFCRYPTO] (119 pp), [MS-PPT] (647 pp), [MS-ODRAW] (611 pp), [MS-OSHARED] (199 pp) in `../OfficeFileFormatsProtocols`; [MS-CFB] and [MS-OLEPS], to be downloaded there (approved 2026-10-30) | **The formats.** Open Specifications under Microsoft's Open Specification Promise | Implement from the documents; never copy their text into code or docs (PLAN.md §11). Their examples sections (MS-PPT has 134 pages) become hand-built test inputs, typed from the structure, not pasted |
 | deckcraft `crates/pptx/src/cfb.rs` → `DCPPTX/CFB.swift` (MIT OR Apache-2.0) | The start of the compound-file reader | Already ported. It moves and grows (§4) |
 | rust-cfb (MIT), SheetJS js-cfb (Apache-2.0), OLEKit (Apache-2.0, dormant) | Reference for the compound-file reader and writer | Permissive: may be consulted and ported with attribution in the file header. The spec stays the authority |
-| msoffcrypto-tool (MIT), Apache POI (Apache-2.0), LibreOffice (MPL-2.0), Keynote | **Run, never copied**: they make test files and act as independent readers (§6) | LibreOffice's code is MPL: run only. Their own sample files are excluded (provenance unknown, mostly saved by Office) |
+| msoffcrypto-tool (MIT), Apache POI (Apache-2.0), LibreOffice (MPL-2.0) | **Run, never copied**: they make test files and act as independent readers (§6) | LibreOffice's code is MPL: run only. Their own sample files are excluded (provenance unknown, mostly saved by Office) |
+| [ppt2pptx](https://github.com/HuiTurn/ppt2pptx) (MIT, pure Python, 0.4.2; suggested by the operator 2026-10-30) | **An independent `.ppt` reader** (its reports are in the fixtures' `reference/`), and **a porting reference**: it already handles incremental saves, master selection, RC4 CryptoAPI, PICT, MS Graph charts and tables rebuilt from cell grids | MIT: may be consulted and ported with attribution in the file header; the spec stays the authority. Its own test `.ppt` files were made with PowerPoint (COM) and are excluded |
 | Microsoft PowerPoint for Mac (installed; black-box) | **Behaviour**: the password prompt, File › Passwords, what a `.ppt` looks like once open, slide and shape counts in sweeps. **And password-protected test files** (§6.1, approved 2026-10-30): PowerPoint saves DeckCraft's own decks with a password, as `.pptx` and as `.ppt` | Behaviour described in our own words. The protected files are the one thing PowerPoint saves that is used, and they stay **local-only**, in `~/Library/Caches/DeckCraftNative/powerpoint-protected/`: never in the repo or `../DeckCraftNative-Fixtures`. Nothing else PowerPoint saves, renders or shows is kept |
 | Govdocs1 (US-government files from `.gov` servers) | A **local-only crash corpus** of real `.ppt` files (§6.4, approved 2026-10-30) | Never committed, never in the fixtures repo, never compared for content: only "opens or fails cleanly, in bounded time" |
 
@@ -123,7 +124,7 @@ PORT-STATUS, as before.
 
 | # | Milestone | Size | Done when |
 |---|---|---|---|
-| **E0** | **Setup.** Install LibreOffice, a JDK with Apache POI, and msoffcrypto-tool in a venv (all outside the repo); download [MS-CFB] and [MS-OLEPS]. `Tools/fixtures/` scripts that make every test file (§6.1), writing into `../DeckCraftNative-Fixtures/legacy/`, and the PowerPoint-protected set into its local cache. The PowerPoint observations of §2 | S | `Tools/fixtures/make-all.sh` regenerates the encrypted and `.ppt` sets from DeckCraft's own decks |
+| **E0** | **Setup.** Install LibreOffice, a JDK with Apache POI, and msoffcrypto-tool in a venv (all outside the repo); download [MS-CFB] and [MS-OLEPS]. `Tools/legacy/` scripts that make every test file (§6.1), writing into `../DeckCraftNative-Fixtures/legacy/`, and the PowerPoint-protected set into its local cache. The PowerPoint observations of §2 | S | `Tools/legacy/make-fixtures.sh` regenerates the encrypted and `.ppt` sets from DeckCraft's own decks |
 | **E1** | **DCCFB.** Reader and writer, v3 and v4, mini stream, DIFAT beyond 109 entries, cycle and range guards, fuzzing. CFB.swift moves in; DCPPTX and DeckReader use it | S | Streams read back byte-for-byte against olefile on every fixture; files we write open in olefile and POI; fuzzed input never crashes or hangs |
 | **E2** | **Open protected `.pptx`.** Agile and Standard decryption, password verification, HMAC, the named refusals; `passwordRequired` through the engine, the app's password sheet, MCP/`dccli` `password`; AutoRecover off for protected documents; Quick Look's message unchanged | M | Every encrypted fixture (each producer and cipher, §6.1) opens with its password and matches the plaintext zip byte-for-byte; wrong passwords and tampered files fail cleanly |
 | **E3** | **Save protected `.pptx`.** The Agile writer, File › Passwords… and Review › Protect Presentation, keeping a file's password on Save, password to modify (`modifyVerifier`) with a Read Only choice on open, encrypted AutoRecover | M | msoffcrypto-tool and POI decrypt what we write to our own zip byte-for-byte; PowerPoint opens it with the password (`powerpoint-check.sh` learns to answer the prompt) |
@@ -138,6 +139,28 @@ PORT-STATUS, as before.
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
 
+### E0 notes (2026-10-30)
+
+- **Tools**, all in `~/Library/Caches/DeckCraftNative/legacy-tools/` or installed by Homebrew, none in the repo:
+  LibreOffice 26.8.2 (cask), OpenJDK 27 (the `openjdk` formula; the Temurin cask needs an administrator password),
+  Apache POI 6.0.0's jars from Maven Central (each checked against its SHA-1; POI no longer ships a binary bundle),
+  and a venv with msoffcrypto-tool 6.0.0, olefile 0.47 and ppt2pptx 0.4.2.
+- **Specs**: [MS-CFB] v20210625 (46 pp) and [MS-OLEPS] v20210625 (67 pp) are in `../OfficeFileFormatsProtocols`.
+  [MS-CFB]'s 2024 edition on Microsoft's site is a rights-protected PDF that ordinary readers can't open.
+- **Fixtures**: `Tools/legacy/make-fixtures.sh` (`--quick` for the corpus decks only) makes 363 files in
+  `../DeckCraftNative-Fixtures/legacy/`: 60 `.pptx`, their 60 `.ppt`, 45 encrypted files, 60 hostile copies and
+  138 reference readings. Every encrypted `.pptx` decrypts to its plaintext byte for byte with both
+  msoffcrypto-tool and POI, and both POI and ppt2pptx read every `.ppt`, the RC4 CryptoAPI ones included.
+  `PoiTool.java` (encrypt, decrypt, dump) and `fixtures.py` (describe, mutate, manifest) are its helpers.
+- **Dropped producers**: LibreOffice can't encrypt here, because macOS 27 kills its bundled Python when run outside
+  the app ("Launch Constraint Violation"), so a UNO script can't run. Keynote Creator Studio 15.3 crashed on an
+  AppleScript `open` of a `.pptx` (an uncaught exception converting the file argument). Neither is needed: POI,
+  msoffcrypto-tool and PowerPoint cover every method.
+- **Still open, both needing the operator**: the PowerPoint-protected set (`Tools/legacy/powerpoint-protect.sh` is
+  written but not run; the first trial timed out on `open`, most likely PowerPoint's sandbox asking for access to a
+  file in `~/Library/Caches`, so the script now works through a fresh temporary folder as `powerpoint-check.sh`
+  does) and the observations of §2. Screen access to PowerPoint was declined, so neither can be checked from here.
+
 ## 6. Testing and oracles
 
 ### 6.1 Test files (all made, none PowerPoint-saved)
@@ -146,8 +169,10 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
   (`soffice --headless --convert-to ppt`). Text, shapes, pictures, tables, notes and masters are covered; the
   incremental-save chain isn't (LibreOffice writes one save), so P1 also builds record streams by hand from the
   spec's structures.
-- **Encrypted `.pptx`**: the same decks encrypted by POI (Agile with AES-128/SHA-1, AES-256/SHA-512; Standard),
-  msoffcrypto-tool (Agile), LibreOffice and Keynote (whatever each writes; recorded from their `EncryptionInfo`).
+- **Encrypted `.pptx`**: the corpus decks encrypted by POI (Agile with AES-128/SHA-1 and AES-256/SHA-512, both at
+  100,000 rounds; Standard AES-128) and msoffcrypto-tool (Agile AES-256/SHA-512), with passwords in plain ASCII,
+  with accents, with a character outside the BMP (a UTF-16 surrogate pair) and at Office's 255-character maximum.
+  LibreOffice and Keynote were tried and dropped (E0 notes).
 - **Encrypted `.ppt`**: LibreOffice's `.ppt` files encrypted by POI with RC4 CryptoAPI (LibreOffice can't).
 - **Encrypted by PowerPoint** (local-only, §1): a handful of DeckCraft's decks saved by PowerPoint with a password to
   open, a password to modify, and both, as `.pptx` (Agile, PowerPoint's current default) and as `.ppt` (RC4

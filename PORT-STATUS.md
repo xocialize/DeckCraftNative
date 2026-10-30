@@ -477,6 +477,12 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     its ticket is stapled.
   - A build that reports 0.1.5, installed in `/Applications`, finds 0.1.6 through Check for Updates.
 
+- **Legacy `.ppt` and password protection: planned, E0 done (2026-10-30).** The plan is
+  `Docs/plans/Legacy-PPT-and-Encryption.md`: encryption first (E1–E3, its own release), then a `.ppt` reader (P1–P6).
+  E0 installed the test tools outside the repo, downloaded [MS-CFB] and [MS-OLEPS], and added `Tools/legacy/`, which
+  makes 363 test files from our own decks into the fixtures (every encrypted copy decrypts to its plaintext with two
+  independent tools). PowerPoint's own protected copies and the observations of its password UI are still to do.
+
 ## Pin moves
 
 ### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)
