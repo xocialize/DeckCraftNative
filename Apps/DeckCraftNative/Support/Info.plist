@@ -3,7 +3,8 @@
 <!-- Merged with the generated Info.plist. The document types are deckcraft's
      (packaging/macos/Info.plist.in, MIT OR Apache-2.0): the .deckcraft format is byte-compatible, so both
      apps declare the same UTI. Templates and slide shows open as presentations; they save as .pptx or
-     .deckcraft. -->
+     .deckcraft. Legacy PowerPoint 97–2003 files (.ppt, .pot, .pps; the system's own types) are this app's
+     addition: they're read and converted, and open as untitled copies (Viewer). -->
 <plist version="1.0">
 <dict>
   <key>CFBundleDocumentTypes</key>
@@ -75,6 +76,60 @@
       <array><string>ppsx</string></array>
       <key>CFBundleTypeMIMETypes</key>
       <array><string>application/vnd.openxmlformats-officedocument.presentationml.slideshow</string></array>
+    </dict>
+    <dict>
+      <key>CFBundleTypeName</key>
+      <string>PowerPoint 97–2003 Presentation</string>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>NSDocumentClass</key>
+      <string>DCApp.PresentationDocument</string>
+      <key>LSHandlerRank</key>
+      <string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>com.microsoft.powerpoint.ppt</string>
+      </array>
+      <key>CFBundleTypeExtensions</key>
+      <array><string>ppt</string></array>
+      <key>CFBundleTypeMIMETypes</key>
+      <array><string>application/vnd.ms-powerpoint</string></array>
+    </dict>
+    <dict>
+      <key>CFBundleTypeName</key>
+      <string>PowerPoint 97–2003 Template</string>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>NSDocumentClass</key>
+      <string>DCApp.PresentationDocument</string>
+      <key>LSHandlerRank</key>
+      <string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>com.microsoft.powerpoint.pot</string>
+      </array>
+      <key>CFBundleTypeExtensions</key>
+      <array><string>pot</string></array>
+      <key>CFBundleTypeMIMETypes</key>
+      <array><string>application/vnd.ms-powerpoint</string></array>
+    </dict>
+    <dict>
+      <key>CFBundleTypeName</key>
+      <string>PowerPoint 97–2003 Slide Show</string>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>NSDocumentClass</key>
+      <string>DCApp.PresentationDocument</string>
+      <key>LSHandlerRank</key>
+      <string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>com.microsoft.powerpoint.pps</string>
+      </array>
+      <key>CFBundleTypeExtensions</key>
+      <array><string>pps</string></array>
+      <key>CFBundleTypeMIMETypes</key>
+      <array><string>application/vnd.ms-powerpoint</string></array>
     </dict>
   </array>
 

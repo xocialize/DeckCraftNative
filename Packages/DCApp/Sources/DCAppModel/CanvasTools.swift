@@ -91,7 +91,7 @@ public enum CanvasDrop: Sendable, Equatable {
 
     public static func isPresentation(_ name: String) -> Bool {
         let lower = name.lowercased()
-        return [".deckcraft", ".slidecraft", ".pptx", ".potx", ".ppsx"].contains { lower.hasSuffix($0) }
+        return [".deckcraft", ".slidecraft", ".pptx", ".potx", ".ppsx", ".ppt", ".pot", ".pps"].contains { lower.hasSuffix($0) }
     }
 
     /// nil: DeckCraft can't open this kind of file.

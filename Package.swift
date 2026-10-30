@@ -45,6 +45,7 @@ let package = Package(
         // L3–L4
         .library(name: "DCRender", targets: ["DCRender"]),
         .library(name: "DCPPTX", targets: ["DCPPTX"]),
+        .library(name: "DCPPT", targets: ["DCPPT"]),
         // L5–L6
         .library(name: "DCEngine", targets: ["DCEngine"]),
         .library(name: "DCAutomation", targets: ["DCAutomation"]),
@@ -151,7 +152,12 @@ let package = Package(
         ),
 
         // MARK: DCPPTX — PPTX read and write from ECMA-376 (deckcraft-pptx). Wave 3.
-        .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),
+        // MARK: DCPPT — legacy binary PowerPoint (.ppt, [MS-PPT] and [MS-ODRAW]) read into DCModel (Docs/plans/
+        // Legacy-PPT-and-Encryption.md, P1–P6); its compound file is DCCFB's and its encryption DCOffCrypto's.
+        .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore", "DCCFB", "DCOffCrypto"], path: sources("DCPPT", "DCPPT")),
+        .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCCFB", "DCOffCrypto", "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
+
+                .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),
         .testTarget(
             name: "DCPPTXTests",
             dependencies: ["DCPPTX", "DCModel", "DCFormat", "DCRender", "DCGeometry", "DCColor", "DCZip", "DCCore", "DCTestSupport"],
@@ -162,7 +168,7 @@ let package = Package(
         // sample deck (deckcraft-engine). Wave 4.
         .target(
             name: "DCEngine",
-            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCOffCrypto"],
+            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCOffCrypto", "DCPPT"],
             path: sources("DCEngine", "DCEngine")
         ),
         .testTarget(

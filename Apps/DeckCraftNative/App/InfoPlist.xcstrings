@@ -85,6 +85,42 @@
         }
       }
     },
+    "PowerPoint 97–2003 Presentation" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint 97–2003 Presentation"
+          }
+        }
+      }
+    },
+    "PowerPoint 97–2003 Slide Show" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint 97–2003 Slide Show"
+          }
+        }
+      }
+    },
+    "PowerPoint 97–2003 Template" : {
+      "comment" : "A document type's name, in Finder (Kind) and Get Info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PowerPoint 97–2003 Template"
+          }
+        }
+      }
+    },
     "PowerPoint Presentation" : {
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",

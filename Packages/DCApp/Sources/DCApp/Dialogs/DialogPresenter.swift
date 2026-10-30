@@ -156,7 +156,8 @@ final class DialogPresenter: NSObject, NSWindowDelegate, DialogServices {
         case "audio": ["wav", "mp3", "m4a", "m4b", "aac", "flac", "ogg", "oga", "opus", "aif", "aiff", "aifc", "caf", "wma", "weba", "mka"]
         case "video": ["mp4", "m4v", "mov", "webm", "mkv", "wmv"]
         case "theme": ["thmx", "pptx", "potx", "ppsx"]
-        default: ["deckcraft", "pptx", "potx", "ppsx", "txt", "md"]
+        // The legacy PowerPoint 97–2003 types are this app's addition (Docs/plans/Legacy-PPT-and-Encryption.md, P1).
+        default: ["deckcraft", "pptx", "potx", "ppsx", "ppt", "pot", "pps", "txt", "md"]
         }
     }
 

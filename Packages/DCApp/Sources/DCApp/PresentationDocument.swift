@@ -17,6 +17,10 @@ public enum DocumentTypes {
     public static let pptx = "org.openxmlformats.presentationml.presentation"
     public static let potx = "org.openxmlformats.presentationml.template"
     public static let ppsx = "org.openxmlformats.presentationml.slideshow"
+    /// Legacy PowerPoint 97–2003 files (the system's types): read and converted, never written.
+    public static let ppt = "com.microsoft.powerpoint.ppt"
+    public static let pot = "com.microsoft.powerpoint.pot"
+    public static let pps = "com.microsoft.powerpoint.pps"
 
     /// The engine's format name for a type (`FileCommands.saveBytes`); nil for types it can't write.
     public static func format(_ typeName: String) -> String? {
@@ -34,6 +38,9 @@ public enum DocumentTypes {
         case "pptx": pptx
         case "potx": potx
         case "ppsx": ppsx
+        case "ppt": ppt
+        case "pot": pot
+        case "pps": pps
         default: nil
         }
     }
@@ -43,8 +50,9 @@ public enum DocumentTypes {
 public final class PresentationDocument: NSDocument {
     /// The engine document this one shows (`DocState.uid`); 0 until read or adopted.
     public private(set) var uid: UInt64 = 0
-    /// It was opened read-only (a password to modify wasn't given): an untitled copy, so Save asks where.
-    private(set) var openedReadOnly = false
+    /// It was opened as a copy: read-only (a password to modify wasn't given) or converted (a legacy .ppt). It is
+    /// untitled, so Save asks where.
+    private(set) var openedAsCopy = false
     var model: AppModel? { AppController.shared?.model }
 
     override public init() { super.init() }
@@ -64,7 +72,8 @@ public final class PresentationDocument: NSDocument {
     var engineIndex: Int? { model?.session.documents.firstIndex { $0.uid == uid } }
 
     nonisolated override public class var autosavesInPlace: Bool { false }
-    nonisolated override public class var readableTypes: [String] { [DocumentTypes.deckcraft, DocumentTypes.pptx, DocumentTypes.potx, DocumentTypes.ppsx] }
+    nonisolated override public class var readableTypes: [String] { [DocumentTypes.deckcraft, DocumentTypes.pptx, DocumentTypes.potx, DocumentTypes.ppsx,
+                                                                         DocumentTypes.ppt, DocumentTypes.pot, DocumentTypes.pps] }
     nonisolated override public class var writableTypes: [String] { [DocumentTypes.deckcraft, DocumentTypes.pptx] }
     nonisolated override public class func isNativeType(_ type: String) -> Bool { type == DocumentTypes.deckcraft }
     nonisolated override public func writableTypes(for saveOperation: NSDocument.SaveOperationType) -> [String] { Self.writableTypes }
@@ -105,12 +114,14 @@ public final class PresentationDocument: NSDocument {
                         continue
                     }
                 }
-                let i = FileCommands.addOpened(model.session, name, f.readOnly ? nil : fileURL?.path, f.presentation)
+                let asCopy = f.readOnly || f.converted != nil
+                let i = FileCommands.addOpened(model.session, name, asCopy ? nil : fileURL?.path, f.presentation)
                 if let st = model.session.documents.at(i) {
                     st.protection = f.protection
                     if f.readOnly { st.title = "\(st.title) (Read-Only)" }
                 }
-                openedReadOnly = f.readOnly
+                if let c = f.converted { model.status = FileCommands.convertedMessage(shown, c) }
+                openedAsCopy = asCopy
                 uid = model.session.documents.at(i)?.uid ?? 0
                 return
             } catch let e as EngineError {
@@ -255,8 +266,8 @@ final class DocumentController: NSDocumentController {
         d.fileURL = url
         d.fileType = typeName
         try d.read(from: Data(contentsOf: url), ofType: typeName)
-        // A read-only copy (a password to modify wasn't given) is untitled, so Save can't overwrite the original.
-        if d.openedReadOnly {
+        // A copy (read-only, or a converted .ppt) is untitled, so Save can't overwrite the original.
+        if d.openedAsCopy {
             d.fileURL = nil
             d.displayName = d.state?.title
         }

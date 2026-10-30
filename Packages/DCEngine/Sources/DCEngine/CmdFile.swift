@@ -6,6 +6,7 @@ import DCFormat
 import DCGeometry
 import DCModel
 import DCOffCrypto
+import DCPPT
 import DCPPTX
 import DCRender
 import Foundation
@@ -38,6 +39,8 @@ public struct LoadedFile: Sendable {
     public var protection: DocProtection?
     /// It has a password to modify that wasn't given: it opens as an untitled read-only copy.
     public var readOnly: Bool = false
+    /// A legacy `.ppt`, converted: what the import brought over and left behind.
+    public var converted: PPTReport? = nil
 }
 
 /// What `FileCommands.openFile` read.
@@ -48,6 +51,8 @@ public struct OpenedFile: Sendable {
     public var protection: DocProtection?
     /// It has a password to modify (whether or not it was given).
     public var modifyProtected: Bool
+    /// A legacy `.ppt`, converted (Docs/plans/Legacy-PPT-and-Encryption.md, P1): it opens as an untitled copy.
+    public var converted: PPTReport? = nil
     /// It has a password to modify that wasn't given.
     public var readOnly: Bool { modifyProtected && protection?.modifyPassword == nil }
 }
@@ -202,6 +207,7 @@ public enum FileCommands {
                 throw EngineError.other(error.description)
             }
         }
+        if PPT.sniff(bytes) { return try openPPT(name, bytes, password: password) }
         var zip = bytes
         var protection = DocProtection()
         if let decrypted = try decryptIfProtected(name, bytes, password: password) {
@@ -220,6 +226,24 @@ public enum FileCommands {
         let (p, slides) = try openOther(name, zip)
         return OpenedFile(presentation: p, damage: Damage(media: [], slides: slides), protection: protection.orNil,
                           modifyProtected: modifyProtected)
+    }
+
+    /// A legacy `.ppt`, converted. A password the user typed is kept (Save As .pptx encrypts with it, as PowerPoint
+    /// does); PowerPoint's default password, used when there was none, isn't.
+    static func openPPT(_ name: String, _ bytes: [UInt8], password: String?) throws -> OpenedFile {
+        do {
+            var (p, report) = try PPT.importChecked(bytes, password: password)
+            DeckFormat.repair(&p)
+            let typed = password != nil && password != RC4CryptoAPI.defaultPassword
+            return OpenedFile(presentation: p, damage: Damage(media: [], slides: []),
+                              protection: typed ? DocProtection(password: password) : nil, modifyProtected: false, converted: report)
+        } catch .passwordRequired {
+            throw EngineError.passwordRequired(name)
+        } catch .wrongPassword {
+            throw EngineError.wrongPassword(name)
+        } catch {
+            throw EngineError.other("\(name): \(error)")
+        }
     }
 
     /// Whether `bytes` is a password-protected file a protected copy can be read from (a compound file holding an
@@ -319,8 +343,9 @@ public enum FileCommands {
     public static func readPresentationFile(_ path: String, password: String? = nil, modifyPassword: String? = nil) throws -> LoadedFile {
         let bytes = try IO.readFile(path)
         let f = try openFile(path, bytes, password: password, modifyPassword: modifyPassword)
-        let native = DeckFormat.sniff(bytes) || PPTX.sniff(bytes) || f.protection?.password != nil
-        return LoadedFile(path: path, doc: f.presentation, native: native, damaged: f.damage, protection: f.protection, readOnly: f.readOnly)
+        let native = f.converted == nil && (DeckFormat.sniff(bytes) || PPTX.sniff(bytes) || f.protection?.password != nil)
+        return LoadedFile(path: path, doc: f.presentation, native: native, damaged: f.damage, protection: f.protection, readOnly: f.readOnly,
+                          converted: f.converted)
     }
 
     /// Add a loaded presentation as the active document: the shared end of `file.open` and `file.adopt`.
@@ -331,6 +356,7 @@ public enum FileCommands {
         let i = addOpened(s, f.path, keepPath ? f.path : nil, f.doc)
         s.documents.at(i)?.protection = f.protection
         if f.readOnly, let st = s.documents.at(i) { st.title = "\(st.title) (Read-Only)" }
+        if let c = f.converted { reportConverted(s, RustPath.fileName(f.path) ?? f.path, c) }
         try reportDamage(s, f.damaged)
         let st = try s.doc()
         var out: JSON = [
@@ -340,6 +366,7 @@ public enum FileCommands {
         // Only a protected file's reply says so, so every other reply stays deckcraft's, byte for byte.
         if f.protection != nil { out.set("protected", true) }
         if f.readOnly { out.set("readOnly", true) }
+        if let c = f.converted { out.set("converted", c.toJSON()) }
         return out
     }
 
@@ -369,11 +396,25 @@ public enum FileCommands {
         let (doc, damaged) = (f.presentation, f.damage)
         let i = addOpened(s, name, nil, doc)
         s.documents.at(i)?.protection = f.protection
+        if let c = f.converted { reportConverted(s, name, c) }
         try reportDamage(s, damaged)
         return try [
             "document": .integer(i), "missingFonts": s.doc().missingFonts.toJSON(), "damagedMedia": damaged.media.toJSON(),
             "lostSlides": damaged.slides.toJSON(),
         ]
+    }
+
+    /// Tell the user a `.ppt` was converted, and what didn't come over.
+    static func reportConverted(_ s: Session, _ name: String, _ c: PPTReport) {
+        s.uiRequests.append(.message(text: convertedMessage(name, c)))
+    }
+
+    /// What the status line says about a converted `.ppt`.
+    public static func convertedMessage(_ name: String, _ c: PPTReport) -> String {
+        var text = "“\(name)” is a PowerPoint 97–2003 presentation: it was converted and opened as a copy. "
+        text += "This version brings over its \(c.slides) slide\(c.slides == 1 ? "" : "s") and slide size; its \(c.notImported.joined(separator: ", ")) aren't brought over yet."
+        if !c.unreadSlides.isEmpty { text += " Slide\(c.unreadSlides.count == 1 ? "" : "s") \(c.unreadSlides.map(String.init).joined(separator: ", ")) couldn't be read." }
+        return text
     }
 
     /// Tell the user which pictures, media and slides a damaged file lost, and mark the copy repaired.
@@ -772,5 +813,13 @@ public enum FileCommands {
             for (uid, _) in Recovery.list(dir) { Recovery.discard(dir, uid) }
         }
         return Cmd.ok()
+    }
+}
+
+extension PPTReport {
+    /// The report in a command's reply (`file.open`'s `converted`).
+    func toJSON() -> JSON {
+        ["from": "ppt", "slides": .integer(slides), "unreadSlides": .array(unreadSlides.map { .integer($0) }),
+         "edits": .integer(edits), "encrypted": .bool(encrypted), "notImported": .array(notImported.map { .string($0) })]
     }
 }

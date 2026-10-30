@@ -75,6 +75,11 @@ for f in $out/pptx/corpus-*.pptx(N); do
   done
   o=$out/encrypted/$n.msoffcrypto-agile.pptx
   "$tools/venv/bin/msoffcrypto-tool" -e -p "$p" "$f" "$o" && meta "$o" "{\"kind\":\"encrypted-pptx\",\"plaintext\":\"pptx/${f:t}\",\"producer\":\"msoffcrypto-tool $mocver\",\"password\":$pj,\"passwordKind\":\"$k\",\"describe\":$($py -I $root/Tools/legacy/fixtures.py describe "$o")}"
+  # PowerPoint 2003–2007 SP1's default password, which a reader tries before asking ([MS-OFFCRYPTO] 2.4.2.3).
+  if [[ $n == corpus-sample && -f $out/ppt/$n.ppt ]]; then
+    o=$out/encrypted/$n.poi-rc4cryptoapi-default.ppt
+    poi encrypt-ppt '/01Hannes Ruescher/01' "$out/ppt/$n.ppt" "$o" && meta "$o" "{\"kind\":\"encrypted-ppt\",\"from\":\"ppt/$n.ppt\",\"producer\":\"Apache POI $poiver\",\"method\":\"rc4cryptoapi\",\"password\":\"/01Hannes Ruescher/01\",\"passwordKind\":\"default\"}"
+  fi
   if [[ -f $out/ppt/$n.ppt ]]; then
     o=$out/encrypted/$n.poi-rc4cryptoapi.ppt
     poi encrypt-ppt "$p" "$out/ppt/$n.ppt" "$o" && meta "$o" "{\"kind\":\"encrypted-ppt\",\"from\":\"ppt/$n.ppt\",\"producer\":\"Apache POI $poiver\",\"method\":\"rc4cryptoapi\",\"password\":$pj,\"passwordKind\":\"$k\"}"

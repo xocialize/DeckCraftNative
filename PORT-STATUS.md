@@ -506,6 +506,13 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `b954f3e`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
     its ticket is stapled.
   - The installed 0.1.6 finds 0.1.7 through Check for Updates.
+  - **P1 (2026-10-30): legacy `.ppt`, the container.**
+    - **DCPPT** (new) reads the edit chain and persist directories, decrypts RC4 CryptoAPI (PowerPoint's default
+      password first), and reads the slide size and slide list.
+    - **Opening:** a `.ppt`, `.pot` or `.pps` opens as an untitled converted copy of blank slides, with a status line
+      saying what isn't brought over yet. Content comes in P2–P5.
+    - **The crash corpus:** of 207 real files, 205 open and 2 fail cleanly, with no crashes.
+    - Details are in `Packages/DCPPT/PORT-NOTES.md`; not for a release until the content arrives.
 
 ## Pin moves
 

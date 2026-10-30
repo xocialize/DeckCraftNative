@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** (§5, the milestone notes): encryption is ready for a release; P1 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1 is done** (§5, the milestone notes); P2 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,33 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P1 notes (2026-10-30)
+
+- **DCPPT** (`Packages/DCPPT`, its PORT-NOTES):
+  - The edit chain and the persist directories, the newest edit winning.
+  - RC4 CryptoAPI (in DCOffCrypto), trying PowerPoint's default password before asking.
+  - The DocumentAtom's sizes and the slide list. Each slide becomes a blank slide of the default master, and
+    `PPTReport` says what isn't brought over yet.
+  - 9 tests. They cover every `.ppt` fixture against POI's slide count and size, PowerPoint 16's own 6 encrypted
+    files, and hand-built incremental saves and broken chains. They also cover dual-storage and PowerPoint 95 files,
+    and damage.
+- **The engine and the app:**
+  - A `.ppt` opens as an untitled converted copy, and `file.open`'s reply carries `converted` (only for a `.ppt`).
+  - The status line says what was and wasn't brought over.
+  - A typed password is kept (Save As `.pptx` encrypts with it); the default password isn't.
+  - `.ppt`, `.pot` and `.pps` are declared (Viewer) and accepted by the Open dialog and canvas drops.
+  - The plan's "converted banner" is the status line for now; a banner can come with the content in P2.
+- **The crash corpus:**
+  - 207 `.ppt` files from three Govdocs1 archives (000–002), kept in `~/Library/Caches/DeckCraftNative/govdocs/`,
+    run through `Tools/legacy/crash-run.sh`.
+  - 205 open and 2 fail cleanly. One is a PowerPoint 95 file, now refused by name; the other has a compound file
+    so broken that POI and ppt2pptx fail on it too. **No crash and no time-out**; the run takes under a minute.
+- **Found on the way:**
+  - **Dual storage:** PowerPoint 95's "dual" files keep a PowerPoint 97 copy in a `PP97_DUALSTORAGE` storage, which
+    [MS-PPT] doesn't describe. The corpus had one, and DCPPT reads that copy (48 slides, as POI and ppt2pptx read).
+  - **PowerPoint's own encrypted `.ppt` files** decrypt with RC4 CryptoAPI as the specification says. Their record
+    headers are decrypted with the body, in one RC4 stream per persist object.
 
 ### E3 notes (2026-10-30)
 
