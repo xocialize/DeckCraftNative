@@ -458,7 +458,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built clean from `0c37c9f`, notarized, and accepted by Gatekeeper; the downloaded DMG matches its `.sha256` and
     its ticket is stapled.
   - The 0.1.4 build, run from its export, finds 0.1.5 through Check for Updates.
-- **After 0.1.5 (2026-10-29), on main, unreleased.** Details are in DCApp's PORT-NOTES, under "After 0.1.5".
+- **After 0.1.5 (2026-10-29 to 30).** Details are in DCApp's PORT-NOTES, under "After 0.1.5".
   - The Outline view's rows kept heights measured before a legacy scroller came in, as the navigator's had.
   - `ui.screenshot` returned stale frames while another app's window covered DeckCraft's. It now draws a covered
     window offscreen, and its reply says which capture it used (`source`).
@@ -471,6 +471,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     five on 2026-10-30 with one build left installed in `/Applications`, including a cold launch. The first test's
     failures (one in five) came from reinstalling the app between tries. Details in DCExtensions/PORT-NOTES.md.
   - Still to do: the Accessibility Inspector audit, held until the operator has time for it.
+- **0.1.6 (2026-10-30, not yet published).** Spotlight and Siri indexing and the fixes above. Notes in
+  `Docs/releases/0.1.6.md`.
 
 ## Pin moves
 
