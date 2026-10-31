@@ -390,8 +390,13 @@ public struct SpellDictionary: Sendable {
         return compounded(w, 0)
     }
 
-    /// Is `word` spelt correctly? Capitalised and upper-case forms of a lower-case word pass.
+    /// Is `word` spelt correctly? Capitalised and upper-case forms of a lower-case word pass. Words longer than
+    /// 100 characters are not checked (they pass).
     public func check(_ word: String) -> Bool {
+        // Compound splitting tries every split point, so checking costs O(n²) in the word's length: a
+        // 100,000-character "word" took seconds per check under a compounding dictionary, on every edit
+        // (#1175).
+        if word.charCount > Spell.maxCheckChars { return true }
         if word.unicodeScalars.contains("\u{2019}") {
             return check(String(String.UnicodeScalarView(word.unicodeScalars.map { $0 == "\u{2019}" ? "'" : $0 })))
         }
@@ -420,12 +425,17 @@ public struct SpellDictionary: Sendable {
         if word.charCount > Spell.maxSuggestChars { return [] }
         let first = word.unicodeScalars.first
         let cap = first?.properties.isUppercase ?? false
-        let lower = cap && word.unicodeScalars.dropFirst().allSatisfy({ !$0.properties.isUppercase }) ? rustLowercase(word) : word
+        let upper = word.charCount > 1 && word.unicodeScalars.contains { $0.properties.isUppercase }
+            && !word.unicodeScalars.contains { $0.properties.isLowercase }
+        let lower = upper || (cap && word.unicodeScalars.dropFirst().allSatisfy({ !$0.properties.isUppercase })) ? rustLowercase(word) : word
         let w = Array(lower.unicodeScalars)
         var out: [String] = []
         var seen = Set<[UInt8]>()
         func push(_ s: String) {
-            if !rustEqual(s, lower) && seen.insert(Array(rustLowercase(s).utf8)).inserted
+            if rustEqual(s, lower) { return }
+            // Checked in capitals, so a KEEPCASE entry ("NASA") is offered for an all-caps word.
+            let s = upper ? rustUppercase(s) : s
+            if seen.insert(Array(rustLowercase(s).utf8)).inserted
                 && s.split(separator: " ", omittingEmptySubsequences: false).allSatisfy({ suggestible(String($0)) }) {
                 out.append(s)
             }
@@ -472,7 +482,7 @@ public struct SpellDictionary: Sendable {
             for i in 1 ..< w.count { push("\(Self.str(w[..<i])) \(Self.str(w[i...]))") }
         }
         out = Array(out.prefix(max(n, 0)))
-        if cap { out = out.map(Self.capitalise) }
+        if cap && !upper { out = out.map(Self.capitalise) }
         return out
     }
 
@@ -519,6 +529,9 @@ private func rustASCIIUppercase(_ s: String) -> String {
 public enum Spell {
     /// Longest word `suggest` generates corrections for.
     static let maxSuggestChars = 64
+
+    /// Longest word `Dictionary.check` checks, as Hunspell's word length limit.
+    static let maxCheckChars = 100
 
     /// The checker Review › Spelling uses: deckcraft's Hunspell dictionaries first (installed ones, or ones
     /// `install` put in), then the system's spell checker where there is one. Task-local, so a test can

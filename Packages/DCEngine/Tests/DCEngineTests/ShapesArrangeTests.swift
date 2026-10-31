@@ -34,6 +34,28 @@ func onMainSizedStack<T>(_ body: @escaping @Sendable () throws -> T) throws -> T
 
 @Suite("Shapes: Arrange")
 struct ShapesArrangeTests {
+    /// MM4: moving a group's child through a command refits the group's box to its children, as PowerPoint
+    /// does, and the children stay where they were drawn.
+    // tests.rs moving_a_group_child_refits_the_group
+    @Test func movingAGroupChildRefitsTheGroup() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "blank"}"#)
+        let a = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 100, 50]}"#)).rawValue
+        let b = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [300, 100, 100, 50]}"#)).rawValue
+        let g = answerId(s.run("arrange.group", "{\"ids\": [\(a), \(b)]}"))
+        func gb() -> Xfrm { s.st.shape(g)?.xfrm ?? Xfrm() }
+        #expect([gb().x, gb().w] == [100, 300])
+        s.run("shape.move", "{\"id\": \(b), \"dx\": 100, \"dy\": 60}")
+        var x = gb()
+        #expect([x.x, x.y, x.w, x.h] == [100, 100, 400, 110], "group follows its children: \(x)")
+        // The child is where it was moved to on the slide.
+        let r = s.run("slide.inspect")
+        #expect(r.display.contains("400"), "\(r.display)")
+        s.run("shape.setBounds", "{\"ids\": [\(a)], \"x\": 20, \"y\": 20, \"w\": 100, \"h\": 50}")
+        x = gb()
+        #expect([x.x, x.y, x.w] == [20, 20, 480], "\(x)")
+    }
+
     private func box(_ s: Session, _ id: ShapeId, _ key: String) -> Double {
         s.run("shape.inspect", #"{"id": \#(id.rawValue)}"#).get("box")?.get(key)?.asF64 ?? .nan
     }

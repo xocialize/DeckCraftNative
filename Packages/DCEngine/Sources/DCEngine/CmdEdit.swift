@@ -277,7 +277,7 @@ public enum EditCommands {
                 var shapes = clip.shapes
                 try reid("edit.paste", &doc, &shapes)
                 MediaRefs.VisitMut.shapes(&shapes, remapMedia(media))
-                var taken = Cmd.currentNames(doc, sel)
+                var (taken, count) = Cmd.currentNames(doc, sel)
                 for i in shapes.indices {
                     // Only a name already on the slide is changed (two shapes with one name are what the
                     // issue is about); otherwise it stays, as Morph pairs shapes across slides by name.
@@ -286,10 +286,13 @@ public enum EditCommands {
                         let base = String(decoding: name.utf8[..<sp], as: UTF8.self)
                         let n = name.utf8[name.utf8.index(after: sp)...]
                         if !n.isEmpty && n.allSatisfy({ $0 >= UInt8(ascii: "0") && $0 <= UInt8(ascii: "9") }) {
-                            shapes[i].name = InsertCommands.firstFreeName(base, taken)
+                            shapes[i].name = InsertCommands.firstFreeName(base, taken, count)
                         }
                     }
-                    taken.insert(shapes[i].name)
+                    walk([shapes[i]]) { m, _ in
+                        taken.insert(m.name)
+                        count += 1
+                    }
                     if var x = shapes[i].xfrm {
                         x.x += offset
                         x.y += offset
@@ -453,6 +456,21 @@ public enum EditCommands {
         return try pastePlain(s, t)
     }
 
+    /// Duplicate gives a copy the next automatic name ("Rectangle 4" after "Rectangle 1"), as
+    /// PowerPoint does, and keeps a name the user chose. PowerPoint tells the two apart by comparing
+    /// the number with the shape's id; ids here are numbered across the deck, so any "{kind} {n}"
+    /// counts as automatic.
+    static func renameAutomatic(_ sh: inout Shape, _ taken: inout Set<String>, _ count: Int) {
+        let base = sh.isGroup ? "Group" : InsertCommands.autoNameBase(sh)
+        let name = Array(sh.name.utf8)
+        let b = Array(base.utf8)
+        guard name.count > b.count + 1, name.starts(with: b), name[b.count] == UInt8(ascii: " ") else { return }
+        if name[(b.count + 1)...].allSatisfy({ $0 >= UInt8(ascii: "0") && $0 <= UInt8(ascii: "9") }) {
+            sh.name = InsertCommands.firstFreeName(base, taken, count)
+            taken.insert(sh.name)
+        }
+    }
+
     @Sendable static func duplicate(_ s: Session, _ p: JSON) throws -> JSON {
         let ids = try Cmd.targets(s, p)
         let off = s.prefs.duplicateOffset
@@ -473,6 +491,17 @@ public enum EditCommands {
                 if dd.0.isFinite && dd.1.isFinite { d = dd }
             }
             try reid("edit.duplicate", &doc, &copies)
+            // Every name on the slide, group members included, so a copy never repeats one.
+            var taken: Set<String> = []
+            var count = 0
+            walk(list) { sh, _ in
+                taken.insert(sh.name)
+                count += 1
+            }
+            walkMut(&copies) { c in
+                renameAutomatic(&c, &taken, count)
+                count += 1
+            }
             for i in copies.indices {
                 guard i < boxes.count else { break }
                 var x = boxes[i]
@@ -480,11 +509,6 @@ public enum EditCommands {
                 x.y += d.1
                 copies[i].xfrm = x
                 if sel.target == .slides { copies[i].ph = nil }
-                if !copies[i].name.isEmpty {
-                    var base = copies[i].name
-                    while base.hasSuffix(" copy") { base = String(base.dropLast(5)) }
-                    copies[i].name = "\(base) copy"
-                }
             }
             let newIds = copies.map(\.id)
             try withShapes(&doc, sel, missing: Cmd.bad("edit.duplicate", "no slide")) { $0 += copies }

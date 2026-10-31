@@ -2,8 +2,10 @@
 // journal, preferences and document ids.
 // Ports Session tests of deckcraft crates/engine/src/tests.rs, guard.rs and recovery.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
+import DCColor
 import DCCore
 @testable import DCEngine
+import DCGeometry
 import DCModel
 import Foundation
 import Testing
@@ -219,6 +221,28 @@ struct SessionTests {
         }
     }
 
+    // tests.rs invalid_slide_index_never_falls_back_to_the_selection_in_export_commands
+    @Test func invalidSlideIndexNeverFallsBackToTheSelectionInExportCommands() {
+        let s = session()
+        let dir = scratchDir("badslide")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let path = dir.appending(path: "a.png").path
+        for slide in ["-1", "1.5", "\"two\""] {
+            func refused(_ id: String, _ params: String) {
+                do {
+                    _ = try s.execute(id, j(params))
+                    Issue.record("\(id) slide \(slide) was accepted")
+                } catch let e {
+                    if case .badParams = e {} else { Issue.record("\(id) slide \(slide) gave \(e)") }
+                }
+            }
+            refused("file.export", "{\"path\": \"\(path)\", \"slide\": \(slide), \"scale\": 0.1}")
+            #expect(!FileManager.default.fileExists(atPath: path), "export wrote a file for \(slide)")
+            refused("file.render", "{\"slide\": \(slide), \"scale\": 0.1}")
+            refused("slide.colorAt", "{\"slide\": \(slide), \"x\": 1, \"y\": 1, \"scale\": 0.1}")
+        }
+    }
+
     @Test func invalidIdsAreRefusedBeforeTheSelectionIsUsed() {
         let s = session()
         let title = s.st.currentSlide?.shapes.first?.id ?? .default
@@ -339,5 +363,239 @@ struct SessionTests {
         s.run("edit.undo")
         s.run("edit.undo")
         #expect(s.st.docRef === before)
+    }
+}
+
+// MARK: - Pin move a3fbf029: tests.rs, inspect.rs
+
+@Suite("Pin a3fbf029: commands")
+struct PinA3fbf029Tests {
+    /// In Slide Master / layout view the insert commands edit the master or layout; their answers say so with
+    /// `editing`, and on slides carry no such key.
+    // tests.rs insert_answers_carry_editing_in_master_and_layout_view
+    @Test func insertAnswersCarryEditingInMasterAndLayoutView() {
+        let s = session()
+        let ins = #"{"preset": "rect", "rect": [10.0, 10.0, 100.0, 100.0]}"#
+        s.run("view.slideMaster", #"{"layout": 0}"#)
+        var r = s.run("shape.insert", ins)
+        #expect(r.get("editing")?.get("kind") == "layout", "\(r.display)")
+        #expect(r.get("editing")?.get("name")?.isString == true, "\(r.display)")
+        r = s.run("insert.textBox", #"{"rect": [10.0, 10.0, 100.0, 50.0], "text": "x"}"#)
+        #expect(r.get("editing")?.get("kind") == "layout", "\(r.display)")
+        s.run("view.slideMaster", #"{"master": 0}"#)
+        r = s.run("shape.insert", ins)
+        #expect(r.get("editing")?.get("kind") == "master", "\(r.display)")
+        s.run("view.closeMaster")
+        r = s.run("shape.insert", ins)
+        #expect(r.get("editing") == nil, "\(r.display)")
+    }
+
+    // tests.rs highlight_with_an_invalid_colour_is_rejected_and_keeps_the_highlight
+    @Test func highlightWithAnInvalidColourIsRejectedAndKeepsTheHighlight() {
+        let s = session()
+        let title = s.st.currentSlide?.shapes.first?.id ?? .default
+        s.run("text.edit", "{\"id\": \(title)}")
+        s.run("text.insert", #"{"text": "ARCH"}"#)
+        s.run("text.selectAll")
+        s.run("format.highlight", #"{"color": "yellow"}"#)
+        func hasHighlight() -> Bool { s.st.shape(title)?.text?.paragraphs.flatMap(\.runs).contains { $0.props.highlight != nil } ?? false }
+        #expect(hasHighlight())
+        do {
+            _ = try s.execute("format.highlight", j(#"{"color": "notacolour"}"#))
+            Issue.record("an invalid colour was accepted")
+        } catch let e {
+            if case .badParams = e {} else { Issue.record("\(e)") }
+        }
+        #expect(hasHighlight(), "an invalid colour must not clear the highlight")
+        s.run("format.highlight")
+        #expect(!hasHighlight(), "an absent colour clears the highlight")
+    }
+
+    private func titleOf(_ shapes: [Shape]) -> ShapeId? { shapes.first { $0.ph?.kind.isTitle ?? false }?.id }
+
+    // tests.rs master_layout_placeholder_format_inherits
+    @Test func masterLayoutPlaceholderFormatInherits() throws {
+        let s = Session()
+        try Sample.openSample(s)
+        let existing = try #require(titleOf(s.st.doc.slides[0].shapes))
+        s.run("view.slideMaster", #"{"master": 0, "layout": 0}"#)
+        let layoutTitle = try #require(titleOf(s.st.doc.masters[0].layouts[0].shapes))
+        s.run("edit.select", "{\"ids\": [\(layoutTitle)]}")
+        s.run("format.font", #"{"family": "Montserrat"}"#)
+        s.run("format.align", #"{"align": "right"}"#)
+        var st = s.run("format.state")
+        #expect(st.get("fontRef") == "Montserrat", "layout placeholder: \(st.display)")
+        s.run("view.closeMaster")
+        s.run("slide.new", #"{"layout": "title"}"#)
+        let slide = s.st.selection.slide
+        let fresh = try #require(titleOf(s.st.doc.slides[slide].shapes))
+        for (index, id) in [(slide, fresh), (0, existing)] {
+            s.run("slide.go", "{\"index\": \(index)}")
+            s.run("edit.select", "{\"ids\": [\(id)]}")
+            st = s.run("format.state")
+            #expect(st.get("fontRef") == "Montserrat", "slide placeholder \(id): \(st.display)")
+            #expect(st.get("align") == "r", "slide placeholder \(id): \(st.display)")
+        }
+    }
+
+    // tests.rs master_body_placeholder_format_keeps_per_level_formatting
+    @Test func masterBodyPlaceholderFormatKeepsPerLevelFormatting() throws {
+        let s = Session()
+        try Sample.openSample(s)
+        s.run("view.slideMaster", #"{"master": 0}"#)
+        let bodyIdx = try #require(s.st.doc.masters[0].shapes.firstIndex { $0.ph?.kind == .body })
+        let id = s.st.doc.masters[0].shapes[bodyIdx].id
+        try s.edit { doc, _ in
+            var body = TextBody.fromText("Alpha\nBeta")
+            body.paragraphs[1].level = 1
+            for (l, size) in [(UInt8(0), 32.0), (1, 28.0)] {
+                var lvl = LevelStyle()
+                lvl.run.size = size
+                body.listStyle.set(l, lvl)
+            }
+            doc.masters[0].shapes[bodyIdx].text = body
+        }
+        func level(_ l: UInt8) -> LevelStyle { s.st.doc.masters[0].shapes[bodyIdx].text?.listStyle.level(l) ?? LevelStyle() }
+        // Bolding the level-2 paragraph reaches level 2 only.
+        s.st.selection.shapes = [id]
+        s.st.selection.text = TextSel(shape: id, anchor: TextPoint(1, 0), caret: TextPoint(1, 4), cell: nil, notes: false, lineEnd: nil)
+        s.run("format.bold", #"{"on": true}"#)
+        #expect(level(1).run.bold == true)
+        for l: UInt8 in [0, 2, 3, 8] { #expect(level(l).run.bold == nil, "level \(l + 1)") }
+        // Grow and shrink step each level from its own size.
+        s.st.selection.text = nil
+        // The text itself: a run's explicit size, else its level's effective size.
+        func shown() -> [Double?] {
+            let st = s.st
+            guard let ctx = TextCommands.ctxFor(st.doc, st.selection) else { return [] }
+            let sh = st.doc.masters[0].shapes[bodyIdx]
+            return (sh.text?.paragraphs ?? []).map { p in p.runs.first?.props.size ?? Resolve.levelStyle(ctx, sh, p.level).run.size }
+        }
+        s.run("format.grow")
+        #expect([level(0).run.size, level(1).run.size] == [36.0, 32.0])
+        #expect(shown() == [36.0, 32.0])
+        s.run("format.shrink")
+        s.run("format.shrink")
+        #expect([level(0).run.size, level(1).run.size] == [28.0, 24.0])
+        #expect(shown() == [28.0, 24.0])
+    }
+
+    private func link(_ action: Action) -> Hyperlink {
+        Hyperlink(action: action, tooltip: "", highlightClick: false, stopSound: false)
+    }
+
+    // inspect.rs tests::slide_actions_lists_group_shape_and_text_actions
+    @Test func slideActionsListsGroupShapeAndTextActions() throws {
+        let s = Session.withNew()
+        var child = Shape.default
+        child.id = ShapeId(12)
+        child.name = "Child"
+        child.click = link(.nextSlide)
+        child.hover = link(.url(url: "https://example.com/hover"))
+        var runProps = RunProps()
+        runProps.link = link(.slide(slide: SlideId(7)))
+        var paragraph = Paragraph("linked")
+        paragraph.runs = [Run.with("linked", runProps)]
+        var body = TextBody.default
+        body.paragraphs = [paragraph]
+        child.text = body
+        var group = Shape.default
+        group.id = ShapeId(11)
+        group.name = "Group"
+        group.kind = .group(children: [child], child: Xfrm())
+        let slide = s.st.selection.slide
+        try s.edit { doc, _ in doc.slides[slide].shapes = [group] }
+
+        var v = s.run("slide.actions")
+        let actions = v.get("actions")?.asArray ?? []
+        #expect(actions.count == 3, "\(v.display)")
+        guard actions.count == 3 else { return }
+        #expect(actions[0].get("event") == "click")
+        #expect(actions[0].get("type") == "nextSlide")
+        #expect(actions[0].get("owner")?.get("path")?.at(0)?.get("name") == "Group")
+        #expect(actions[0].get("owner")?.get("path")?.at(1)?.get("id")?.asU64 == 12)
+        #expect(actions[1].get("event") == "hover")
+        #expect(actions[1].get("target") == "https://example.com/hover")
+        #expect(actions[2].get("event") == "textLink")
+        #expect(actions[2].get("owner")?.get("runIndex")?.asU64 == 0)
+        #expect(actions[2].get("target")?.asU64 == 7)
+
+        var cellProps = RunProps()
+        cellProps.hover = link(.url(url: "https://example.com/cell"))
+        var table = Table(rows: 1, cols: 1, width: 100, rowHeight: 40)
+        table.rows[0].cells[0].text.paragraphs = [Paragraph(runs: [Run.with("cell link", cellProps)])]
+        var tableShape = Shape.default
+        tableShape.id = ShapeId(13)
+        tableShape.name = "Table"
+        tableShape.kind = .table(table)
+        try s.edit { doc, _ in doc.slides[slide].shapes.append(tableShape) }
+        v = s.run("slide.actions")
+        let tableAction = try #require(v.get("actions")?.asArray?.last)
+        #expect(tableAction.get("event") == "textHover")
+        #expect(tableAction.get("owner")?.get("tableRowIndex")?.asU64 == 0)
+        #expect(tableAction.get("owner")?.get("tableCellIndex")?.asU64 == 0)
+        #expect(tableAction.get("target") == "https://example.com/cell")
+    }
+
+    // inspect.rs tests::slide_actions_returns_empty_array_for_slide_without_actions
+    @Test func slideActionsReturnsEmptyArrayForSlideWithoutActions() {
+        let s = Session.withNew()
+        #expect(s.run("slide.actions").get("actions") == [])
+    }
+
+    // inspect.rs tests::slide_actions_refuses_a_bad_index_instead_of_using_the_selection
+    @Test func slideActionsRefusesABadIndexInsteadOfUsingTheSelection() {
+        let s = Session.withNew()
+        for index in ["-1", "\"0\"", "1.5"] { #expect(s.fails("slide.actions", "{\"index\": \(index)}"), "\(index)") }
+    }
+
+    private func textShape(_ id: UInt32, _ name: String, _ paragraphs: [Paragraph]) -> Shape {
+        var sh = Shape.default
+        sh.id = ShapeId(id)
+        sh.name = name
+        var body = TextBody.default
+        body.paragraphs = paragraphs
+        sh.text = body
+        return sh
+    }
+
+    private func run(_ text: String, _ color: Rgba) -> Run {
+        var p = RunProps()
+        p.fill = .solid(.rgb(color))
+        return Run.with(text, p)
+    }
+
+    // review.rs accessibility_contrast_tests::contrast_checks_mixed_runs_later_paragraphs_and_group_descendants_once
+    @Test func contrastChecksMixedRunsLaterParagraphsAndGroupDescendantsOnce() throws {
+        let s = Session.withNew()
+        let (black, white) = (Rgba.rgb(0, 0, 0), Rgba.rgb(255, 255, 255))
+        let child = textShape(5, "nested text", [Paragraph(runs: [run("hidden", white)])])
+        var nested = Shape.default
+        nested.id = ShapeId(7)
+        nested.name = "nested group"
+        nested.descr = "nested group of text"
+        nested.kind = .group(children: [child], child: Xfrm())
+        var group = Shape.default
+        group.id = ShapeId(4)
+        group.name = "group"
+        group.descr = "group of text"
+        group.kind = .group(children: [nested], child: Xfrm())
+        var brk = run("\n", white)
+        brk.kind = .break
+        try s.edit { doc, _ in
+            doc.slides[0].shapes = [
+                textShape(2, "mixed", [Paragraph(runs: [run("visible", black), run("hidden", white)])]),
+                textShape(3, "later paragraph", [Paragraph(runs: [run("visible", black)]), Paragraph(runs: [run("hidden", white)])]),
+                group,
+                textShape(6, "black control", [Paragraph(runs: [run("visible", black)])]),
+                textShape(8, "invisible white runs", [Paragraph(runs: [run("visible", black), brk, run("  ", white), run("visible", black)])]),
+            ]
+        }
+        let issues = s.run("review.accessibility")
+        let contrasts = (issues.asArray ?? []).filter { $0.get("issue")?.asStr?.hasPrefix("Hard-to-read text contrast") == true }
+        #expect(contrasts.count == 3, "\(issues.display)")
+        for id: UInt64 in [2, 3, 5] { #expect(contrasts.contains { $0.get("shape")?.asU64 == id }, "missing shape \(id): \(issues.display)") }
+        #expect(!contrasts.contains { $0.get("shape")?.asU64 == 6 }, "black control warned: \(issues.display)")
+        #expect(!contrasts.contains { $0.get("shape")?.asU64 == 8 }, "white break or spaces warned: \(issues.display)")
     }
 }

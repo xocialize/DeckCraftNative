@@ -909,7 +909,28 @@ public final class Session {
             journal.append((id, recorded))
             if journal.count > 10_000 { journal.removeFirst(1000) }
         }
-        return result
+        return outer ? withEditing(id, result) : result
+    }
+
+    /// In Slide Master / layout (or handout / notes master) view the insert commands edit the master or
+    /// layout, not a slide; their answer says so with `editing: {kind, name}`, as `slide.inspect` does.
+    /// Nothing is added on slides, so those answers stay as they were.
+    private func withEditing(_ id: String, _ r: JSON) -> JSON {
+        let inserts = id.hasPrefix("insert.") || ["shape.insert", "shape.freeform", "shape.connect", "slide.new"].contains(id)
+        guard inserts, let st = activeDoc, case .object(var o) = r else { return r }
+        let doc = st.doc
+        let edited: (String, String)?
+        switch st.selection.target {
+        case .master(let master): edited = doc.masters.at(master).map { ("master", $0.name) }
+        case .layout(let master, let layout): edited = doc.masters.at(master)?.layouts.at(layout).map { ("layout", $0.name) }
+        case .handout, .notesMaster:
+            let t = st.selection.target
+            edited = pageMaster(doc, t).map { (t == .handout ? "handout" : "notesMaster", $0.name) }
+        case .slides: edited = nil
+        }
+        guard let (kind, name) = edited, o["editing"] == nil else { return r }
+        o.set("editing", ["kind": .string(kind), "name": .string(name)])
+        return .object(o)
     }
 
     public func commands() -> [CommandInfo] {
@@ -923,6 +944,7 @@ public final class Session {
         var doc = st.doc
         var sel = st.selection
         let r = try f(&doc, &sel)
+        ArrangeCommands.refitGroups(st.doc, &doc)
         Connect.reroute(&doc, sel)
         st.docRef = DocRef(doc)
         st.selection = sel

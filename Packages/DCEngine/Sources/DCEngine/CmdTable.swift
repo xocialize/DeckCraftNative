@@ -89,7 +89,7 @@ public enum TableCommands {
                 "Align Cell Text",
                 ["Table Layout", "Alignment"],
                 nil,
-                "{anchor: top|middle|bottom, cells?, id?}",
+                "{anchor?: top|middle|bottom (vertical; top when neither anchor nor align is given), align?: left|center|right|justify (horizontal, applied to every paragraph of the cells), cells?, id?}",
                 Cmd.hasSelection,
                 cellAlign
             ),
@@ -551,16 +551,42 @@ extension TableCommands {
     }
 
     @Sendable static func cellAlign(_ s: Session, _ p: JSON) throws -> JSON {
-        let a: Anchor
-        switch Cmd.strParam(p, "anchor") ?? "top" {
-        case "middle", "center", "ctr": a = .middle
-        case "bottom", "b": a = .bottom
-        case "top", "t": a = .top
-        case let o: throw Cmd.bad("table.cellAlign", "unknown anchor \(rustDebug(o)); one of top, middle, bottom")
+        // A value that is not a string is refused, not taken as absent.
+        for k in ["align", "anchor"] {
+            if let v = p.get(k), !v.isNull, !v.isString {
+                throw Cmd.bad("table.cellAlign", "`\(k)` is a name such as \(k == "align" ? "left or center" : "top or middle")")
+            }
+        }
+        // Without `align`, the vertical anchor is the whole command (top when not given).
+        let align: Align?
+        switch Cmd.strParam(p, "align") {
+        case nil: align = nil
+        case "left"?, "l"?: align = .left
+        case "center"?, "centre"?, "ctr"?: align = .center
+        case "right"?, "r"?: align = .right
+        case "justify"?, "just"?: align = .justify
+        case let o?: throw Cmd.bad("table.cellAlign", "unknown align \(rustDebug(o)); one of left, center, right, justify")
+        }
+        var anchor: Anchor?
+        let given = Cmd.strParam(p, "anchor")
+        if !(given == nil && align != nil) {
+            switch given ?? "top" {
+            case "middle", "center", "ctr": anchor = .middle
+            case "bottom", "b": anchor = .bottom
+            case "top", "t": anchor = .top
+            case let o: throw Cmd.bad("table.cellAlign", "unknown anchor \(rustDebug(o)); one of top, middle, bottom")
+            }
         }
         let targets = try targetCells(s, p)
         return try withTable(s, p, "table.cellAlign") { t in
-            for (r, c) in targets(t) { t.mutateCell(r, c) { $0.anchor = a } }
+            for (r, c) in targets(t) {
+                t.mutateCell(r, c) { cell in
+                    if let anchor { cell.anchor = anchor }
+                    if let align {
+                        for i in cell.text.paragraphs.indices { cell.text.paragraphs[i].props.align = align }
+                    }
+                }
+            }
         }
     }
 

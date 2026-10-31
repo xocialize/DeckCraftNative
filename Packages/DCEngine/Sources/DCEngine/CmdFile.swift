@@ -512,6 +512,8 @@ public enum FileCommands {
             } else {
                 (a, b) = (part, part)
             }
+            func digits(_ s: String) -> Bool { !s.isEmpty && s.utf8.allSatisfy { $0 >= UInt8(ascii: "0") && $0 <= UInt8(ascii: "9") } }
+            if !digits(a) || !digits(b) { throw invalid }
             guard let x = parseUsize(a), let y = parseUsize(b) else { throw invalid }
             let (lo, hi) = (min(x, y), max(x, y))
             if lo == 0 || hi > count { throw Cmd.bad("file.export", "the presentation has \(count) slides; “\(part)” is outside them") }
@@ -634,7 +636,7 @@ public enum FileCommands {
 
     @Sendable static func render(_ s: Session, _ p: JSON) throws -> JSON {
         let st = try s.doc()
-        let i = Cmd.usizeParam(p, "slide") ?? st.selection.slide
+        let i = try Cmd.optUsizeParam(p, "slide", "file.render") ?? st.selection.slide
         if i >= st.doc.slides.count { throw Cmd.bad("file.render", "no slide \(i)") }
         let (png, w, h) = renderPNGWith(st.doc, i, Cmd.f64Or(p, "scale", 1), Cmd.boolOr(p, "edit", false), Cmd.boolOr(p, "transparentBackground", false))
         return ["png": .string(Cmd.base64Encode(png)), "width": .integer(w), "height": .integer(h)]
@@ -643,7 +645,7 @@ public enum FileCommands {
     /// The colour the slide is drawn with at one point: what the Eyedropper takes.
     @Sendable static func colorAt(_ s: Session, _ p: JSON) throws -> JSON {
         let st = try s.doc()
-        let i = Cmd.usizeParam(p, "slide") ?? st.selection.slide
+        let i = try Cmd.optUsizeParam(p, "slide", "slide.colorAt") ?? st.selection.slide
         if i >= st.doc.slides.count { throw Cmd.bad("slide.colorAt", "no slide \(i)") }
         func coord(_ key: String) throws -> Double {
             guard let v = p.get(key)?.asF64, v.isFinite else { throw Cmd.bad("slide.colorAt", "`\(key)` (a number, in slide units) is required") }
@@ -673,7 +675,7 @@ public enum FileCommands {
         switch format {
         case "png", "jpeg", "jpg":
             let slides: [Int]
-            if let i = Cmd.usizeParam(p, "slide") {
+            if let i = try Cmd.optUsizeParam(p, "slide", "file.export") {
                 slides = [i]
             } else if Cmd.boolOr(p, "all", false) {
                 slides = Array(0 ..< doc.slides.count)

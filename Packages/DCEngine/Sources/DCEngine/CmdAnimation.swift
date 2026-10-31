@@ -12,7 +12,7 @@ public enum AnimationCommands {
                 "Animation Styles",
                 ["Animations", "Animation"],
                 nil,
-                "{effect: fade|fly|zoom|wipe|appear|spin|pulse|fadeOut|lines|… (animation.list), class?: entrance|emphasis|exit|path, option?, ids?} — replaces the shapes' animations",
+                "{effect: fade|fly|zoom|wipe|appear|spin|pulse|fadeOut|lines|… (animation.list), class?: entrance|emphasis|exit|path, option?, path?: [[x,y],…] or OOXML string, closed?: bool, ids?} — replaces the shapes' animations. path (motion paths): points in slide points, as offsets from where the shape sits, or the OOXML path string (slide fractions) animation.get answers",
                 Cmd.hasSelection,
                 set
             ),
@@ -21,7 +21,7 @@ public enum AnimationCommands {
                 "Add Animation",
                 ["Animations", "Advanced Animation"],
                 nil,
-                "{effect, class?, option?, start?: onClick|withPrevious|afterPrevious, duration?: ms, delay?: ms, ids?}",
+                "{effect, class?, option?, path?: [[x,y],…] or OOXML string, closed?: bool, start?: onClick|withPrevious|afterPrevious, duration?: ms, delay?: ms, ids?} → {count, path?}",
                 Cmd.hasSelection,
                 add
             ),
@@ -41,7 +41,7 @@ public enum AnimationCommands {
                 "Effect Options",
                 ["Animations", "Animation"],
                 nil,
-                "{option?, textBuild?: asOne|byParagraph|byWord|byLetter, index?}",
+                "{option?, textBuild?: asOne|byParagraph|byWord|byLetter, path?: [[x,y],…] or OOXML string, closed?: bool, index?}",
                 Cmd.hasSlide,
                 options
             ),
@@ -127,7 +127,7 @@ public enum AnimationCommands {
         "[" + v.map { "\"\($0)\"" }.joined(separator: ", ") + "]"
     }
 
-    static func build(_ p: JSON) throws -> Animation {
+    static func build(_ p: JSON, _ slide: (Double, Double)) throws -> Animation {
         guard let effect = Cmd.strParam(p, "effect") else { throw Cmd.bad("animation", "missing `effect`") }
         let cls = classOf(Cmd.strParam(p, "class"))
         let found: AnimationInfo? = if let c = cls { animationInfo(effect, c) } else { DCModel.animations.first { bytesEqual($0.id, effect) } }
@@ -147,10 +147,102 @@ public enum AnimationCommands {
         a.delayMs = p.get("delay")?.asU64.map { UInt32(min($0, 600_000)) } ?? 0
         a.presetId = info.presetId
         if let st = Cmd.strParam(p, "start") { a.start = startOf(st) }
-        if a.class == .path { a.path = defaultPath(a.effect, a.option) }
+        if a.class == .path {
+            a.path = try pathParam(p, slide) ?? defaultPath(a.effect, a.option)
+        } else if p.get("path") != nil {
+            throw Cmd.bad("animation", "`path` only fits a motion path (class `path`)")
+        }
         if a.effect == "spin" { a.amount = 360.0 }
         if a.effect == "growShrink" { a.amount = 1.5 }
         return a
+    }
+
+    /// Most points of a motion path given as an array, and longest path string given as text.
+    static let maxPathPoints = 1_000
+    static let maxPathText = 16 * 1024
+    /// Largest offset of a point, in slide points; anything beyond is not a place on any slide.
+    static let maxPathOffset = 1.0e6
+
+    /// A number of a path string: slide fractions, rounded to 6 places.
+    static func pathNum(_ v: Double) -> String {
+        var t = Substring(rustFixed(v, places: 6))
+        while t.hasSuffix("0") { t = t.dropLast() }
+        while t.hasSuffix(".") { t = t.dropLast() }
+        return t == "-0" || t.isEmpty ? "0" : String(t)
+    }
+
+    /// Does a raw motion path string draw: only commands and numbers, every number finite, and at least
+    /// two points? (A lone `e`, or `1e999`, would play as an empty or partial path.)
+    static func rawPathDraws(_ text: String) -> Bool {
+        let cs = Array(text.unicodeScalars)
+        func at(_ i: Int) -> Unicode.Scalar? { i < cs.count ? cs[i] : nil }
+        func digit(_ c: Unicode.Scalar?) -> Bool { c.map { $0 >= "0" && $0 <= "9" } ?? false }
+        var i = 0
+        var nums = 0
+        while let c = at(i) {
+            if digit(c) || c == "." || ((c == "-" || c == "+") && (digit(at(i + 1)) || at(i + 1) == ".")) {
+                let start = i
+                i += 1
+                while digit(at(i)) || at(i) == "." { i += 1 }
+                if at(i) == "e" || at(i) == "E" {
+                    let n1 = at(i + 1) ?? " "
+                    if digit(n1) || ((n1 == "-" || n1 == "+") && digit(at(i + 2))) {
+                        i += 2
+                        while digit(at(i)) { i += 1 }
+                    }
+                }
+                let tok = String(String.UnicodeScalarView(cs[start ..< min(i, cs.count)]))
+                guard let v = Double(tok), v.isFinite else { return false }
+                nums += 1
+            } else if " ,MmLlCcQqHhVvZzE".unicodeScalars.contains(c) {
+                i += 1
+            } else {
+                return false
+            }
+        }
+        return nums >= 4
+    }
+
+    /// The motion path `path` asks for, as the OOXML path string animations store: either points
+    /// (`[[x, y], …]`, slide points as offsets from where the shape sits, joined by lines, `closed?` to
+    /// return to the first) or that string itself.
+    static func pathParam(_ p: JSON, _ slide: (Double, Double)) throws -> String? {
+        guard let v = p.get("path") else { return nil }
+        func refuse(_ why: String) -> EngineError { Cmd.bad("animation", "`path` \(why)") }
+        switch v {
+        case .string(let text):
+            let allowed = " .+-eE,MmLlCcQqHhVvZz".unicodeScalars
+            let ok = text.utf8.count <= maxPathText
+                && text.unicodeScalars.contains { $0 >= "0" && $0 <= "9" }
+                && text.unicodeScalars.allSatisfy { ($0 >= "0" && $0 <= "9") || allowed.contains($0) }
+                && rawPathDraws(text)
+            if !ok { throw refuse("string must be an OOXML motion path such as `M 0 0 L 0.25 0 E` (at most 16 KiB)") }
+            return text
+        case .array(let points):
+            if !(2 ... maxPathPoints).contains(points.count) { throw refuse("needs 2 to \(maxPathPoints) points") }
+            if !(slide.0.isFinite && slide.1.isFinite && slide.0 > 0 && slide.1 > 0) {
+                throw refuse("can't be placed: the slide has no size")
+            }
+            var out = ""
+            for (k, pt) in points.enumerated() {
+                guard let a = pt.asArray, a.count == 2, let x = a[0].asF64, let y = a[1].asF64,
+                      Swift.abs(x) <= maxPathOffset, Swift.abs(y) <= maxPathOffset else {
+                    throw refuse("point \(k) must be [x, y], two finite numbers within ±\(maxPathOffset.rustDisplay) points")
+                }
+                out += "\(k == 0 ? "M" : "L") \(pathNum(x / slide.0)) \(pathNum(y / slide.1)) "
+            }
+            if p.get("closed")?.asBool == true { out += "Z " }
+            out += "E"
+            return out
+        default:
+            throw refuse("must be [[x, y], …] or an OOXML path string")
+        }
+    }
+
+    /// The slide's width and height in points.
+    static func slideExtent(_ s: Session) throws -> (Double, Double) {
+        let size = try s.doc().doc.slideSize
+        return (size.width, size.height)
     }
 
     /// Default motion paths, in slide-fraction units relative to the shape's position.
@@ -184,7 +276,7 @@ public enum AnimationCommands {
 
     @Sendable static func set(_ s: Session, _ p: JSON) throws -> JSON {
         let ids = try Cmd.targets(s, p)
-        let a = try build(p)
+        let a = try build(p, slideExtent(s))
         return try s.edit { doc, sel in
             let i = try slideIndex(doc, sel, "animation.set")
             // Replace each shape's animations, keeping their place in the sequence.
@@ -216,7 +308,8 @@ public enum AnimationCommands {
 
     @Sendable static func add(_ s: Session, _ p: JSON) throws -> JSON {
         let ids = try Cmd.targets(s, p)
-        let a = try build(p)
+        let a = try build(p, slideExtent(s))
+        let path = a.path
         return try s.edit { doc, sel in
             let i = try slideIndex(doc, sel, "animation.add")
             for (k, id) in ids.enumerated() {
@@ -225,6 +318,7 @@ public enum AnimationCommands {
                 if k > 0 { x.start = .withPrevious }
                 doc.slides[i].animations.append(x)
             }
+            if let path { return ["count": .integer(doc.slides[i].animations.count), "path": .string(path)] }
             return ["count": .integer(doc.slides[i].animations.count)]
         }
     }
@@ -300,13 +394,15 @@ public enum AnimationCommands {
             default: .asOne
             }
         }
+        let path = try pathParam(p, slideExtent(s))
         return try eachTarget(s, p) { a in
+            if let path, a.class == .path { a.path = path }
             if let o = option {
                 // Each target takes the option in its own effect's terms; one it has no such option for
                 // keeps its own.
                 let allowed = animationInfo(a.effect, a.class)?.options ?? []
                 if let o = resolveOption(allowed, o) {
-                    if a.class == .path { a.path = defaultPath(a.effect, o) }
+                    if a.class == .path && path == nil { a.path = defaultPath(a.effect, o) }
                     a.option = o
                 }
             }
@@ -315,8 +411,7 @@ public enum AnimationCommands {
     }
 
     @Sendable static func clear(_ s: Session, _ p: JSON) throws -> JSON {
-        let current = try s.doc().selection.slide
-        let i = Cmd.usizeParam(p, "index") ?? current
+        let i = try Cmd.optUsizeParam(p, "index", "animation.clear") ?? s.doc().selection.slide
         try s.edit { doc, _ in
             if doc.slides.indices.contains(i) { doc.slides[i].animations.removeAll() }
         }

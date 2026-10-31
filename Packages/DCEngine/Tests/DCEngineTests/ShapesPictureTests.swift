@@ -75,6 +75,25 @@ struct ShapesPictureTests {
         #expect(s.fails("picture.style", #"{"ids": [\#(id.rawValue)], "style": "sparkly"}"#))
     }
 
+    /// HH9: Reset Picture discards the picture's formatting (adjustments, artistic effect, picture style
+    /// effects and outline) but not the frame's shape (Change Shape / Crop to Shape).
+    // tests.rs picture_reset_keeps_the_frame_shape
+    @Test func pictureResetKeepsTheFrameShape() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "blank"}"#)
+        let id = insertPicture(s, pngOf(40, 30) { _, _ in [200, 30, 30, 255] }, "a.png")
+        s.run("shape.change", #"{"preset": "roundRect"}"#)
+        s.run("picture.adjust", #"{"brightness": 0.3}"#)
+        let geom = try #require(shapeNamed(s, id)).geom
+        #expect(geom.presetName != "rect")
+        s.run("picture.reset")
+        #expect(shapeNamed(s, id)?.geom == geom, "the frame shape stays")
+        let fill = try #require(pictureFill(s, id))
+        #expect(fill.adjust == PictureFill.default.adjust)
+        let doc = findCommand("picture.reset")?.params ?? ""
+        #expect(doc.contains("frame shape"), "\(doc)")
+    }
+
     // tests.rs picture_recolor_and_transparent_color
     @Test(.enabled(if: ported("insert.picture")))
     func pictureRecolorAndTransparentColor() throws {

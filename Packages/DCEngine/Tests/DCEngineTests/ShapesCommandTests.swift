@@ -402,6 +402,14 @@ struct ShapeFormatTests {
         s.run("shape.effects", #"{"shadowProps": {"blur": 3}}"#)
         #expect(fx().outerShadow == nil)
         #expect(fx().innerShadow?.blur == 3)
+        // Size scales both axes (PowerPoint's 0–200%); out-of-range values clamp.
+        s.run("shape.effects", #"{"shadow": "inner"}"#)
+        s.run("shape.effects", #"{"shadowProps": {"size": 1.5}}"#)
+        #expect(fx().innerShadow.map { [$0.sx, $0.sy] } == [1.5, 1.5])
+        s.run("shape.effects", #"{"shadowProps": {"size": 9}}"#)
+        #expect(fx().innerShadow?.sx == 2.0)
+        s.run("shape.effects", #"{"shadowProps": {"size": 0}}"#)
+        #expect(fx().innerShadow?.sy == 0.01)
         // Glow: size, colour, transparency; size 0 removes it.
         s.run("shape.effects", #"{"glowProps": {"radius": 12, "transparency": 0.5}}"#)
         let g = try #require(fx().glow)
@@ -715,6 +723,103 @@ struct ShapeFormatTests {
         #expect(m.volume == 1 && m.trimStartMs == 1500 && m.trimEndMs == UInt32.max && m.fadeInMs == 250 && m.fadeOutMs == 0)
         s.run("shape.setDefault")
         #expect(s.defaultLook?.fill == .solid(.scheme(.accent2)))
+    }
+}
+
+// MARK: - cmd/shape.rs: Slide background fill
+
+@Suite("Shapes: Slide background fill")
+struct ShapeBackgroundFillTests {
+    private func fill(_ s: Session, _ id: ShapeId) -> Fill? { s.st.shape(id)?.fill }
+
+    private func colorAt(_ s: Session, _ x: Int, _ y: Int) -> JSON { s.run("slide.colorAt", #"{"x": \#(x), "y": \#(y)}"#).get("color") ?? .null }
+
+    /// How many shapes of a reopened deck have a background fill.
+    private func backgroundFills(_ doc: Presentation) throws -> Int {
+        let back = try PPTX.import(PPTX.export(doc))
+        var filled = 0
+        for slide in back.slides { walk(slide.shapes) { sh, _ in if case .background? = sh.fill { filled += 1 } } }
+        return filled
+    }
+
+    private func picture(_ s: Session, _ png: [UInt8], _ name: String) -> ShapeId {
+        answerId(s.run("insert.picture", #"{"data": "\#(Cmd.base64Encode(png))", "name": "\#(name)", "rect": [400, 100, 100, 100]}"#))
+    }
+
+    // appearance.rs tests::gradient_parameters_keep_flip_mode
+    @Test func gradientParametersKeepFlipMode() throws {
+        let gradient = try #require(ShapeCommands.gradientParam(j(##"{"stops": [[0, "#ff0000"], [1, "#0000ff"]], "flip": "xy"}"##)))
+        #expect(gradient.flip == .xy)
+    }
+
+    // shape.rs tests::background_fill_shows_the_slide_background_and_survives_a_save
+    @Test func backgroundFillShowsTheSlideBackgroundAndSurvivesASave() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "blank"}"#)
+        s.run("design.background", ##"{"color": "#0000c8"}"##)
+        let id = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 200, 100]}"#))
+        #expect(colorAt(s, 200, 150) != "0000C8", "a new shape takes the theme's fill")
+        s.run("shape.fill", #"{"background": true}"#)
+        #expect(fill(s, id) == .background)
+        #expect(colorAt(s, 200, 150) == "0000C8", "the slide background shows through the shape")
+        s.run("edit.undo")
+        #expect(fill(s, id) == nil, "one undo step returns to the theme's fill")
+        s.run("edit.redo")
+        // Transparency changes a solid or picture fill only.
+        s.run("shape.fill", #"{"transparency": 0.5}"#)
+        #expect(fill(s, id) == .background)
+        #expect(try backgroundFills(s.st.doc) == 1, "the shape keeps the background fill after a save and reopen")
+    }
+
+    /// A picture cannot save a slide background fill, so `background` leaves its fill alone.
+    // shape.rs tests::background_fill_skips_pictures
+    @Test func backgroundFillSkipsPictures() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "blank"}"#)
+        let shape = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 200, 100]}"#))
+        let pic = picture(s, pngOf(2, 2) { _, _ in [255, 0, 0, 255] }, "red.png")
+        do {
+            _ = try s.execute("shape.fill", j(#"{"background": true, "ids": [\#(pic.rawValue)]}"#))
+            Issue.record("a picture took the background fill")
+        } catch {
+            #expect("\(error)".contains("shapes and text boxes"), "\(error)")
+        }
+        #expect(fill(s, pic) == nil)
+
+        s.run("edit.select", #"{"ids": [\#(shape.rawValue), \#(pic.rawValue)]}"#)
+        let group = answerId(s.run("arrange.group"))
+        s.run("shape.fill", ##"{"color": "#ff0000"}"##)
+        s.run("shape.fill", #"{"background": true}"#)
+        #expect(fill(s, shape) == .background)
+        if case .solid? = fill(s, pic) {} else { Issue.record("the picture keeps its fill: \(String(describing: fill(s, pic)))") }
+        #expect(fill(s, group) == nil, "the group's own fill is cleared")
+        #expect(try backgroundFills(s.st.doc) == 1, "the shape keeps the background fill after a save and reopen")
+    }
+
+    /// A picture filled with its group's fill keeps that fill behind its transparent pixels when the group's
+    /// shapes take the slide background fill.
+    // shape.rs tests::background_fill_keeps_the_group_fill_a_picture_uses
+    @Test func backgroundFillKeepsTheGroupFillAPictureUses() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "blank"}"#)
+        let shape = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 200, 100]}"#))
+        let pic = picture(s, pngOf(2, 2) { _, _ in [0, 0, 0, 0] }, "clear.png")
+        s.run("edit.select", #"{"ids": [\#(shape.rawValue), \#(pic.rawValue)]}"#)
+        let group = answerId(s.run("arrange.group"))
+        let red = Fill.solid(.rgb(Rgba.rgb(255, 0, 0)))
+        try s.edit { doc, _ in
+            for i in doc.slides.indices {
+                withShape(&doc.slides[i].shapes, group) { $0.fill = red }
+                withShape(&doc.slides[i].shapes, pic) { $0.fill = .group }
+            }
+        }
+        #expect(colorAt(s, 450, 150) == "FF0000", "the group's fill shows through the picture")
+        s.run("edit.select", #"{"ids": [\#(group.rawValue)]}"#)
+        s.run("shape.fill", #"{"background": true}"#)
+        #expect(fill(s, shape) == .background)
+        #expect(fill(s, pic) == .group)
+        #expect(fill(s, group) == red, "the group keeps the fill its picture uses")
+        #expect(colorAt(s, 450, 150) == "FF0000", "the group's fill still shows through the picture")
     }
 }
 

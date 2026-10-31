@@ -24,9 +24,9 @@ public enum ShapeCommands {
             .cmd("shape.adjust", "Adjust Shape", [], nil, "{index, value (file units), ids?}", Cmd.hasSelection, adjust),
             .cmd("shape.change", "Change Shape", ["Shape Format", "Insert Shapes", "Edit Shape"], nil, "{preset, ids?}", Cmd.hasSelection, change),
             .cmd("shape.smoothCorners", "Smooth Corners", ["Shape Format", "Insert Shapes", "Edit Shape"], nil, "{smoothing: 0..100 (%), radius?: pt (default: the rounded rectangle's own), ids?} → rectangle outline with smoothed (squircle) corners", Cmd.hasSelection, smoothCorners),
-            .cmd("shape.fill", "Shape Fill", ["Shape Format", "Shape Styles"], nil, "{color? | none?: true | gradient?: {stops: [[pos, color]], angle?, kind?: linear|radial} | picture?: base64 | pattern?: {preset, fg, bg} | transparency?: 0..1 | reset?: true, ids?}; pictureProps?: {tile?: bool, offsetX?, offsetY?: pt, scaleX?, scaleY?: 0..10, align?: tl|t|tr|l|ctr|r|bl|b|br, mirror?: none|x|y|xy, stretch?: [l, t, r, b] fractions, rotateWithShape?: bool} adjusts a picture fill; a group also formats its members", Cmd.hasSelection, fill),
+            .cmd("shape.fill", "Shape Fill", ["Shape Format", "Shape Styles"], nil, "{color? | none?: true | background?: true (the slide background shows through; shapes and text boxes only) | gradient?: {stops: [[pos, color]], angle?, kind?: linear|radial} | picture?: base64 | pattern?: {preset, fg, bg} | transparency?: 0..1 | reset?: true, ids?}; pictureProps?: {tile?: bool, offsetX?, offsetY?: pt, scaleX?, scaleY?: 0..10, align?: tl|t|tr|l|ctr|r|bl|b|br, mirror?: none|x|y|xy, stretch?: [l, t, r, b] fractions, rotateWithShape?: bool} adjusts a picture fill; a group also formats its members", Cmd.hasSelection, fill),
             .cmd("shape.line", "Shape Outline", ["Shape Format", "Shape Styles"], nil, "{color?, none?, width?: pt, dash?: solid|dot|dash|lgDash|dashDot|sysDot|sysDash, cap?: flat|round|square, join?: round|bevel|miter, compound?: single|double|thickThin|thinThick|triple, head?: none|triangle|stealth|diamond|oval|arrow, tail?, headSize?: sm|med|lg, tailSize?, reset?, ids?}; a group also formats its members", Cmd.hasSelection, line),
-            .cmd("shape.effects", "Shape Effects", ["Shape Format", "Shape Styles"], nil, "{shadow?: none|outer|inner|perspective|{color, blur, dist, dir}, glow?: none|{color, radius}, softEdges?: pt, reflection?: none|tight|half|full, bevel?: none|circle|…, threeD?: {camera?: preset, rotX?, rotY?, rotZ?: deg, z?: pt, bevelTop?, bevelBottom?: none|circle|…, bevelTopW?, bevelTopH?, bevelBottomW?, bevelBottomH?, depth?, contour?: pt, material?, lighting?, reset?: true}, shadowProps?: {color?, transparency?: 0..1, blur?: pt, dist?: pt, dir?: deg}, glowProps?: {color?, transparency?, radius?: pt}, reflectionProps?: {transparency?, size?: 0..1, dist?: pt, blur?: pt}, reset?, ids?} (the *Props keys adjust the current effect, adding a default one when there is none)", Cmd.hasSelection, effects),
+            .cmd("shape.effects", "Shape Effects", ["Shape Format", "Shape Styles"], nil, "{shadow?: none|outer|inner|perspective|{color, blur, dist, dir}, glow?: none|{color, radius}, softEdges?: pt, reflection?: none|tight|half|full, bevel?: none|circle|…, threeD?: {camera?: preset, rotX?, rotY?, rotZ?: deg, z?: pt, bevelTop?, bevelBottom?: none|circle|…, bevelTopW?, bevelTopH?, bevelBottomW?, bevelBottomH?, depth?, contour?: pt, material?, lighting?, reset?: true}, shadowProps?: {color?, transparency?: 0..1, size?: 0.01..2 (1 = 100%), blur?: pt, dist?: pt, dir?: deg}, glowProps?: {color?, transparency?, radius?: pt}, reflectionProps?: {transparency?, size?: 0..1, dist?: pt, blur?: pt}, reset?, ids?} (the *Props keys adjust the current effect, adding a default one when there is none)", Cmd.hasSelection, effects),
             .cmd("shape.quickStyle", "Quick Styles", ["Home", "Drawing"], nil, "{index: 0..41 (theme style row×accent), ids?}", Cmd.hasSelection, quickStyle),
             .cmd("shape.rename", "Rename", ["Selection Pane"], nil, "{name, id?}", Cmd.hasSelection, rename),
             .cmd("shape.altText", "Alt Text", ["Shape Format", "Accessibility"], nil, "{text, decorative?: bool, ids?}", Cmd.hasSelection, altText),
@@ -35,7 +35,11 @@ public enum ShapeCommands {
             .cmd("shape.setDefault", "Set as Default Shape", [], nil, "{}", Cmd.hasSelection, setDefault),
             .cmd("picture.crop", "Crop", ["Picture Format", "Size"], nil, "{left?: fraction 0..1, top?: fraction 0..1, right?: fraction 0..1, bottom?: fraction 0..1, ids?}", Cmd.hasSelection, crop),
             .cmd("picture.adjust", "Corrections", ["Picture Format", "Adjust"], nil, "{brightness?: -1..1, contrast?: -1..1, saturation?: 0..4, grayscale?: bool, transparency?: 0..1, reset?: bool, ids?}", Cmd.hasSelection, pictureAdjust),
-            .cmd("picture.reset", "Reset Picture", ["Picture Format", "Adjust"], nil, "{ids?}", Cmd.hasSelection, pictureReset),
+            .cmd(
+                "picture.reset", "Reset Picture", ["Picture Format", "Adjust"], nil,
+                "{ids?} (discards the picture's formatting: adjustments, artistic effect, crop, transparency, picture-style effects and outline; the frame shape from Change Shape or Crop to Shape, the size and the position stay)",
+                Cmd.hasSelection, pictureReset
+            ),
             .cmd("picture.change", "Change Picture", ["Picture Format", "Adjust"], nil, "{path? | data: base64, name?, ids?}", Cmd.hasSelection, pictureChange),
             .cmd("media.options", "Playback", ["Playback"], nil, "{autoplay?, loop?, rewind?, acrossSlides?, hide?, fullScreen?, volume?: 0..1, trimStart?: ms, trimEnd?: ms, fadeIn?: ms, fadeOut?: ms, ids?}", Cmd.hasSelection, mediaOptions),
         ]
@@ -331,7 +335,10 @@ public enum ShapeCommands {
             let angle = v.get("angle")?.asF64.flatMap { $0.isFinite ? $0 : nil } ?? 90
             shape = .linear(angle: ThreeDCommands.remEuclid(angle, 360), scaled: false)
         }
-        return Gradient(stops: stops, shape: shape, rotateWithShape: v.get("rotateWithShape")?.asBool ?? true, tile: [0, 0, 0, 0])
+        return Gradient(
+            stops: stops, shape: shape, flip: v.get("flip")?.asStr.flatMap { GradientFlip(xml: $0) },
+            rotateWithShape: v.get("rotateWithShape")?.asBool ?? true, tile: [0, 0, 0, 0]
+        )
     }
 
     /// Fill and outline apply to a group's visible members as well as its container. Other edits (notably
@@ -352,6 +359,7 @@ public enum ShapeCommands {
     static func requestedFill(_ s: Session, _ p: JSON) throws -> Fill?? {
         if Cmd.boolOr(p, "reset", false) { return .some(nil) }
         if Cmd.boolOr(p, "none", false) { return .some(.none_) }
+        if Cmd.boolOr(p, "background", false) { return .some(.background) }
         if let c = Cmd.colorParam(p, "color") { return .some(.solid(c)) }
         if let g = p.get("gradient") {
             guard let gradient = gradientParam(g) else {
@@ -427,11 +435,58 @@ public enum ShapeCommands {
         let transparency = Cmd.f64Param(p, "transparency")
         let picProps = p.get("pictureProps").flatMap { $0.isObject ? $0 : nil }
         if newFill == nil && transparency == nil && picProps == nil {
-            throw Cmd.bad("shape.fill", "give `color`, `none`, `gradient`, `pattern`, `picture`, `pictureProps`, `transparency` or `reset`")
+            throw Cmd.bad(
+                "shape.fill",
+                "give `color`, `none`, `background`, `gradient`, `pattern`, `picture`, `pictureProps`, `transparency` or `reset`"
+            )
         }
         // Transparency on an inherited (style) fill needs the effective colour.
         let inherited = try inheritedFills(s, p)
-        return try editGroupAppearance(s, p, "shape.fill") { applyFill(&$0, newFill, picProps, transparency, inherited) }
+        // Only a shape or text box (`p:sp`) saves a slide background fill (`useBgFill`). Pictures,
+        // connectors, tables and charts keep their fill, and a group's own fill is cleared unless one
+        // of them is filled with it (`grpFill`).
+        let background: Bool
+        if case .background?? = newFill { background = true } else { background = false }
+        if background {
+            let st = try s.doc()
+            var any = false
+            for id in try Cmd.targets(s, p) {
+                guard let sh = st.shape(id) else { continue }
+                walk([sh]) { sh, _ in if case .shape = sh.kind { any = true } }
+            }
+            if !any { throw Cmd.bad("shape.fill", "slide background fill applies to shapes and text boxes") }
+        }
+        return try editGroupAppearance(s, p, "shape.fill") { sh in
+            if background {
+                switch sh.kind {
+                case .shape: break
+                case .group:
+                    if !groupFillUsed(sh, 0) { sh.fill = nil }
+                    return
+                default: return
+                }
+            }
+            applyFill(&sh, newFill, picProps, transparency, inherited)
+        }
+    }
+
+    /// Whether a member of the group other than a shape or text box is filled with the group's fill
+    /// (`grpFill`), looking into nested groups that pass the fill on.
+    static func groupFillUsed(_ sh: Shape, _ depth: Int) -> Bool {
+        depth <= 64
+            && sh.children.contains { c in
+                switch c.kind {
+                case .shape: return false
+                case .group:
+                    switch c.fill {
+                    case nil, .group?: return groupFillUsed(c, depth + 1)
+                    default: return false
+                    }
+                default:
+                    if case .group? = c.fill { return true }
+                    return false
+                }
+            }
     }
 
     /// Applies Format Shape ▸ Picture or texture fill options to a picture fill.
@@ -669,6 +724,12 @@ public enum ShapeCommands {
                 if let b = num(v, "blur") { x.blur = b.clamped(0, 100) }
                 if let d = num(v, "dist") { x.dist = d.clamped(0, 200) }
                 if let d = num(v, "dir") { x.dir = ThreeDCommands.remEuclid(d, 360) }
+                // PowerPoint's Size: 0–200%, both axes; a zero scale would collapse the shadow's matrix.
+                if let z = num(v, "size") {
+                    let z = z.clamped(0.01, 2.0)
+                    x.sx = z
+                    x.sy = z
+                }
                 if inner { e.innerShadow = x } else { e.outerShadow = x }
             }
             if let v = glowProps {

@@ -136,7 +136,7 @@ These are declared in the module's file under `// MARK: - Called by the core`. *
 | `TableCommands.selectedCellsText(st)` | `table::selected_cells_text` | ported (text group) |
 | `TableCommands.clearSelectedCells(s)` | `table::clear_selected_cells` | ported (text group) |
 | `TableCommands.extendSelectedCells(s, dr, dc)` | `table::extend_selected_cells` | ported (text group) |
-| `InsertCommands.firstFreeName(base, taken)` | `insert::first_free_name` | ported by the core; keep |
+| `InsertCommands.firstFreeName(base, taken, count)` | `insert::first_free_name` | ported by the core; keep (`count` since a3fbf029) |
 | `ArrangeCommands.unionBounds(xs)` | `arrange::union_bounds` | ported by the core; keep |
 
 ### Helpers the core provides to the modules
@@ -714,3 +714,55 @@ difference a session or test shows:
 - `Tools.swift`: the header comment.
 - DCAutomation: `drivePointer` calls `Session.pointer` (its PORT-NOTES).
 
+
+## Pin move 88c2ceff → a3fbf029
+
+54 upstream commits touch `crates/engine`. All 38 engine scripts give the oracle's answers and decks at the new
+pin, and the registry matches the oracle's command list (331 commands with the new `slide.actions`).
+
+**Ported** (behaviour, command docs and their `#[test]`s, in the test file of the module):
+
+- Index validation that refuses a bad index instead of using the selection (`Cmd.optUsizeParam`):
+  `file.export`, `file.render`, `slide.colorAt` (78c77ad4), `animation.clear` (1bdd63da), `design.ideas` and
+  `design.applyIdea` (35a9b812), the four `transition.*` (443f5034), `slide.actions` (acf05485); `+` in a slide
+  range (cd2e7804); an invalid colour in `format.highlight` (9a716be5).
+- `shape.fill {background: true}`, shapes and text boxes only, a group's fill kept when a picture uses it
+  (71352733, aef36486, 6396c480); `shadowProps.size` (9ad147b3); `picture.reset`'s doc (7b424a46); gradient
+  `flip` in `gradientParam` (ad97533a, 72c86213, 04b0958b).
+- `slide.move {ids}`: several slides as one run, sections and selection following (039395ae, engine side).
+- Duplicate's automatic names, and insert/paste counting group members (8ada6016, fa0a3e9d, ddd7d210,
+  352fec77): `Cmd.currentNames` answers `(names, count)`, `firstFreeName` takes the count.
+- A group's box refitted to its children after any edit (2cad063d): `ArrangeCommands.refitGroups`, called by
+  `Session.edit`. Rust skips the slides and masters the edit didn't touch by `Arc::ptr_eq`; here an equal slide
+  (cheap when its arrays share storage) is skipped, which gives the same result.
+- `review.compare`: `number`/`onlyIn` and the side named in shape details (48535be9); drawn boxes, rotation and
+  flips beside a move, `shape`, `properties` beside the other checks, and accepting an inherited box (cd5ff018).
+- `insert.*` answers carry `editing: {kind, name}` in master and layout views (4c83fb9a: `Session.withEditing`);
+  `insert.dateTime` in the Handout/Notes Master view fills the master's date placeholder (6a1b8f1e).
+- `table.cellAlign {align}` (f58ec399); `format.numbering`'s doc (afe4c324, engine side); bullet follow-text
+  resets in `format.bullets`/`format.numbering` (f5c2aca6).
+- Layout and master placeholder formatting reaching slides through the list style, per level, grow/shrink
+  stepping each level from its own size (446bc528, adaa4e6f): `TextCommands.formatRunLevels`.
+- Clipboard HTML: style on any tag ends at its close, a block tag opens a paragraph, the size cap with a plain
+  fallback and no HTML at all when even that is over (e75a72c0, fd102fb4, 2ac978ce, 4d2c1a3b).
+- Spelling: words over 100 characters pass unchecked; all-caps words get all-caps suggestions, KEEPCASE ones
+  included (7c891de4, d027f9d8, 6fbfea12, 1841ab75). List AutoFormat independent of Replace as you type
+  (6d2fd189).
+- Accessibility contrast over every run, groups included, skipping breaks and blank runs (079ea961,
+  b8cfcf20).
+- `slide.actions` (b082f12f, ee4bdbcd). The Swift walk stops at depth 64 like the model's other walks; Rust's
+  recursion has no bound.
+- Motion paths: `path` (points or an OOXML string, checked by `rawPathDraws`) and `closed` on
+  `animation.add`/`set`/`options`, and `animation.add` answers the stored path (b7482dd3, d2504e5f, 800ffeaa).
+- Hidden macOS system fonts (`.SF NS`) aren't reported missing (fe54c0eb).
+- Pin tests only: re-export overwrites the PNG (0efd6f1b), an action button's fill follows the theme
+  (3356bc07).
+
+**No port needed:** 1a203c4a (strict Clippy refactor: functions split, no spec, message or behaviour change),
+505a6f28 (the engine side is two Clippy-style rewrites in `tools/click.rs`/`pointer.rs`), cccc9064 (a doc
+comment in `guard.rs`), the `Session` test-only change of ee4bdbcd.
+
+**Left to other packages:** d1487e69 (multiple automation roots, `FileAccess.swift`) is the automation port's
+(8aac156 on `sync/automation`). 50b200be's day order is DCText's (`DateFields`): `aLongBritishDatePutsTheDayFirst`
+fails until that lands. e0c64599 and d0f0d14c are deckcraft-cli (`Apps/dccli`). The UI halves of 039395ae,
+71352733, aef36486, 9ad147b3, 72c86213 are the app's.

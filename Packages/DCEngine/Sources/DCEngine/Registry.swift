@@ -575,8 +575,16 @@ public enum Cmd {
     /// The shapes of the edited tree (`current_shapes`).
     public static func currentShapes(_ doc: Presentation, _ sel: Selection) -> [Shape]? { treeShapes(doc, sel) }
 
-    public static func currentNames(_ doc: Presentation, _ sel: Selection) -> Set<String> {
-        Set((currentShapes(doc, sel) ?? []).map(\.name))
+    /// Every name on the slide, group members included, and the number of shapes (which exceeds the
+    /// number of names when two shapes share one).
+    public static func currentNames(_ doc: Presentation, _ sel: Selection) -> (names: Set<String>, count: Int) {
+        var names: Set<String> = []
+        var count = 0
+        walk(currentShapes(doc, sel) ?? []) { sh, _ in
+            names.insert(sh.name)
+            count += 1
+        }
+        return (names, count)
     }
 
     // MARK: Base64

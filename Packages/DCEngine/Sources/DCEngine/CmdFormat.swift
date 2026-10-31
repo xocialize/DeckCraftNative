@@ -136,7 +136,7 @@ public enum FormatCommands {
                 "Numbering",
                 ["Home", "Paragraph"],
                 nil,
-                "{on?: bool, scheme?: arabicPeriod|arabicParenR|romanUcPeriod|romanLcPeriod|alphaUcPeriod|alphaLcParenR|alphaLcPeriod, start?: n, color?, size?: % of text}",
+                "{on?: bool, scheme?: arabicPeriod|arabicParenR|romanUcPeriod|romanLcPeriod|alphaUcPeriod|alphaLcParenR|alphaLcPeriod, start?: n (a numbered paragraph whose start differs from that of the last numbered paragraph at its level begins a new run of numbers at n, as PowerPoint's Start at does), color?, size?: % of text}",
                 Cmd.hasTextOrShapes,
                 numbering
             ),
@@ -350,7 +350,10 @@ extension FormatCommands {
         // Each run steps from its own size, like PowerPoint.
         _ = try s.doc()
         let base = currentRun(s).size ?? 18.0
-        return try TextCommands.formatRun(s) { r in r.size = step(r.size ?? base, up) }
+        // A layout/master level steps from its own effective size, not the first run's.
+        return try TextCommands.formatRunLevels(s, { r in r.size = step(r.size ?? base, up) }) { r, eff in
+            r.size = step(r.size ?? eff.size ?? 18.0, up)
+        }
     }
 
     @Sendable static func color(_ s: Session, _ p: JSON) throws -> JSON {
@@ -510,6 +513,7 @@ extension FormatCommands {
 
     @Sendable static func highlight(_ s: Session, _ p: JSON) throws -> JSON {
         let c = Cmd.colorParam(p, "color")
+        if c == nil, let v = p.get("color"), !v.isNull { throw Cmd.bad("format.highlight", "`color` is not a valid colour") }
         return try TextCommands.formatRun(s) { $0.highlight = c }
     }
 
@@ -851,9 +855,18 @@ extension FormatCommands {
         return try TextCommands.formatPara(s) { para in
             if on {
                 para.props.bullet = .char(char: ch)
-                para.props.bulletFont = explicitChar ? "Arial" : para.props.bulletFont
-                if col != nil { para.props.bulletColor = col }
-                if size != nil { para.props.bulletSize = size }
+                if explicitChar {
+                    para.props.bulletFont = "Arial"
+                    para.props.bulletFontFollowText = nil
+                }
+                if col != nil {
+                    para.props.bulletColor = col
+                    para.props.bulletColorFollowText = nil
+                }
+                if size != nil {
+                    para.props.bulletSize = size
+                    para.props.bulletSizeFollowText = nil
+                }
                 if (para.props.indent.map { $0 >= 0 } ?? true) && (para.props.marginLeft.map { $0 == 0 } ?? true) {
                     para.props.marginLeft = 18.0 + 36.0 * Double(para.level)
                     para.props.indent = -18.0
@@ -876,8 +889,14 @@ extension FormatCommands {
         return try TextCommands.formatPara(s) { para in
             if on {
                 para.props.bullet = .autoNum(scheme: scheme, startAt: start)
-                if col != nil { para.props.bulletColor = col }
-                if size != nil { para.props.bulletSize = size }
+                if col != nil {
+                    para.props.bulletColor = col
+                    para.props.bulletColorFollowText = nil
+                }
+                if size != nil {
+                    para.props.bulletSize = size
+                    para.props.bulletSizeFollowText = nil
+                }
                 para.props.marginLeft = 27.0 + 36.0 * Double(para.level)
                 para.props.indent = -27.0
             } else {

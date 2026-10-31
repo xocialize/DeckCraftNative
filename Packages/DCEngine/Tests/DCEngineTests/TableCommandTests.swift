@@ -449,6 +449,28 @@ struct TableCommandTests {
         }
     }
 
+    /// tests.rs `table_cell_align_sets_the_horizontal_alignment`.
+    @Test func tableCellAlignSetsTheHorizontalAlignment() {
+        let s = session()
+        let id = tableAt(s, [100, 100], [["a", "b"], ["c", "d"]]).rawValue
+        s.run("table.cellAlign", "{\"id\": \(id), \"align\": \"center\", \"cells\": [[0, 0], [1, 0]]}")
+        s.run("table.cellAlign", "{\"id\": \(id), \"align\": \"right\", \"anchor\": \"bottom\", \"cells\": [[0, 1]]}")
+        let t = tableOf(s, ShapeId(id))
+        func al(_ r: Int, _ c: Int) -> [Align?] { t.cell(r, c)?.text.paragraphs.map(\.props.align) ?? [] }
+        #expect(al(0, 0) == [.center])
+        #expect(al(1, 0) == [.center])
+        #expect(al(0, 1) == [.right])
+        #expect(al(1, 1) == [nil], "other cells are untouched")
+        #expect(t.cell(0, 1)?.anchor == .bottom)
+        #expect(t.cell(0, 0)?.anchor == nil, "align alone leaves the vertical anchor")
+        #expect(s.fails("table.cellAlign", "{\"id\": \(id), \"align\": \"diagonal\"}"))
+        // A value that is not a name is refused, not read as absent (which would set the anchor to top).
+        let rev = s.st.revision
+        #expect(s.fails("table.cellAlign", "{\"id\": \(id), \"align\": 1}"))
+        #expect(s.fails("table.cellAlign", "{\"id\": \(id), \"align\": \"left\", \"anchor\": true}"))
+        #expect(s.st.revision == rev)
+    }
+
     /// tests.rs `table_cell_commands_reject_an_invalid_cell_and_name_the_registered_command`.
     @Test func tableCellCommandsRejectAnInvalidCellAndNameTheRegisteredCommand() {
         let s = session()

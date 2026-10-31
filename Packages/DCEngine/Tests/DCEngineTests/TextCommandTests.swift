@@ -587,6 +587,16 @@ struct TextAutoCorrectTests {
         #expect(s.run("text.autocorrect").get("lists") == true)
         s.run("text.autocorrect", #"{"lists": false}"#)
         #expect(list("* x") == ("* x", none))
+        // List AutoFormat is independent of the Replace text as you type setting.
+        s.run("text.autocorrect", #"{"on": false, "lists": true}"#)
+        #expect(list("*") == ("*", none))
+        s.run("text.insert", #"{"text": " "}"#)
+        #expect(para() == ("", ch("•")))
+        s.run("text.delete", #"{"dir": "backward"}"#)
+        #expect(para() == ("* ", none))
+        // Word replacements still run while list formatting is disabled.
+        s.run("text.autocorrect", #"{"on": true, "lists": false}"#)
+        #expect(list("teh ") == ("The ", none))
     }
 }
 

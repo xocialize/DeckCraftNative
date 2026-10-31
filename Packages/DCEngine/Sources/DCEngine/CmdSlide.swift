@@ -19,7 +19,7 @@ public enum SlideCommands {
             ),
             .cmd("slide.duplicate", "Duplicate Slide", ["Insert"], nil, "{index?}", Cmd.hasSlide, duplicate),
             .cmd("slide.delete", "Delete Slide", ["Edit"], nil, "{index?, ids?: [slide id]}", Cmd.hasSlide, delete),
-            .cmd("slide.move", "Move Slide", [], nil, "{from?: index, to: index}", Cmd.hasSlide, moveSlide),
+            .cmd("slide.move", "Move Slide", [], nil, "{from?: index, ids?: [slide id], to: index (counted without the moved slides)}", Cmd.hasSlide, moveSlide),
             .noundo("slide.go", "Go to Slide", [], nil, "{index} | {id}", Cmd.hasSlide, go),
             .noundo("slide.next", "Next Slide", [], "PageDown", "{}", Cmd.hasSlide, next),
             .noundo("slide.previous", "Previous Slide", [], "PageUp", "{}", Cmd.hasSlide, prev),
@@ -260,28 +260,61 @@ public enum SlideCommands {
         }
     }
 
+    /// Moves one slide (`from`, else the current slide) or several (`ids`) to `to`, in one undo step.
+    /// `to` counts in the deck without the moved slides; they land there as one run, in the order
+    /// they had, join the section of the slide before them, and stay selected.
     @Sendable static func moveSlide(_ s: Session, _ p: JSON) throws -> JSON {
-        let from = try Cmd.optUsizeParam(p, "from", "slide.move") ?? s.doc().selection.slide
+        let ids = p.get("ids").flatMap { $0.isNull ? nil : $0 }
+        let from = ids == nil ? try Cmd.optUsizeParam(p, "from", "slide.move") ?? s.doc().selection.slide : 0
         guard let to0 = Cmd.usizeParam(p, "to") else { throw Cmd.bad("slide.move", "missing `to`") }
         return try s.edit { doc, sel in
-            if from >= doc.slides.count { throw Cmd.bad("slide.move", "no slide \(from)") }
-            let sl = doc.slides.remove(at: from)
-            let to = min(to0, doc.slides.count)
-            let id = sl.id
-            doc.slides.insert(sl, at: to)
-            // Keep sections consistent with order: move the id into the section of its new neighbour.
-            if !doc.sections.isEmpty {
-                for i in doc.sections.indices { doc.sections[i].slides.removeAll { $0 == id } }
-                let neighbour = to > 0 ? doc.slides.at(to - 1)?.id : nil
-                let si = neighbour.flatMap { doc.sectionOf($0) } ?? 0
-                if si < doc.sections.count {
-                    doc.sections[si].slides.append(id)
-                    sortByOrder(&doc.sections[si].slides, doc.slides.map(\.id))
-                }
+            let moving: Set<SlideId>
+            if let v = ids {
+                moving = try slideIdsParam(v, doc, "slide.move")
+            } else {
+                guard let id = doc.slides.at(from)?.id else { throw Cmd.bad("slide.move", "no slide \(from)") }
+                moving = [id]
             }
+            let block = doc.slides.filter { moving.contains($0.id) }
+            var rest = doc.slides.filter { !moving.contains($0.id) }
+            let to = min(to0, rest.count)
+            let moved = block.map(\.id)
+            rest.insert(contentsOf: block, at: to)
+            doc.slides = rest
+            reassignSections(&doc, moved, to)
             sel.slide = to
-            sel.slides = [id]
-            return ["index": .integer(to)]
+            sel.slides = moved
+            sel.shapes.removeAll()
+            sel.text = nil
+            return ["index": .integer(to), "moved": .integer(moving.count)]
+        }
+    }
+
+    /// The slides an `ids` param names: a non-empty list of ids of slides in `doc` (repeats fold).
+    /// The first id that is not a slide of `doc` is an error, so the set never outgrows the deck.
+    static func slideIdsParam(_ v: JSON, _ doc: Presentation, _ cmd: String) throws -> Set<SlideId> {
+        guard let a = v.asArray else { throw Cmd.bad(cmd, "`ids` must be a list of slide ids") }
+        let known = Set(doc.slides.map(\.id))
+        var out: Set<SlideId> = []
+        for x in a {
+            guard let n = x.asU32, known.contains(SlideId(n)) else { throw Cmd.bad(cmd, "no slide with id \(x.display)") }
+            out.insert(SlideId(n))
+        }
+        if out.isEmpty { throw Cmd.bad(cmd, "`ids` is empty") }
+        return out
+    }
+
+    /// Keeps sections in step after `moved` landed as a run at `at`: the run joins the section of
+    /// the slide just before it (the first section when it opens the deck), in document order.
+    static func reassignSections(_ doc: inout Presentation, _ moved: [SlideId], _ at: Int) {
+        if doc.sections.isEmpty { return }
+        let moving = Set(moved)
+        for i in doc.sections.indices { doc.sections[i].slides.removeAll { moving.contains($0) } }
+        let neighbour = at > 0 ? doc.slides.at(at - 1)?.id : nil
+        let si = neighbour.flatMap { doc.sectionOf($0) } ?? 0
+        if si < doc.sections.count {
+            doc.sections[si].slides.append(contentsOf: moved)
+            sortByOrder(&doc.sections[si].slides, doc.slides.map(\.id))
         }
     }
 

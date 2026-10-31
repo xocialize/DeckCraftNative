@@ -103,6 +103,29 @@ struct InsertDateTimeTests {
         #expect(undos(s) == before + 1)
     }
 
+    // tests.rs action_button_fill_follows_the_theme
+    @Test func actionButtonFillFollowsTheTheme() throws {
+        let s = session()
+        let id = s.run("insert.actionButton", #"{"kind": "next"}"#).get("id")
+        func fill() -> JSON? { s.run("slide.inspect").get("shapes")?.asArray?.first { $0.get("id") == id }?.get("fill") }
+        let before = fill()
+        #expect(before?.asStr?.hasPrefix("#") == true, "\(before?.display ?? "nil")")
+        s.run("design.theme", #"{"name": "Ember"}"#)
+        #expect(before != fill(), "the button takes the new theme's accent1")
+        let sh = try #require(s.st.doc.slides[0].shapes.first { $0.fill == nil && $0.style != nil })
+        #expect(sh.fill == nil, "no explicit fill: the style binds it to accent1")
+    }
+
+    // insert.rs::a_long_british_date_puts_the_day_first
+    @Test func aLongBritishDatePutsTheDayFirst() {
+        let s = session()
+        editTitle(s)
+        let text = s.run("insert.dateTime", #"{"format": "datetime4", "update": false, "language": "en-GB"}"#).get("text")?.asStr ?? ""
+        #expect(text.first?.isASCII == true && text.first?.isNumber == true && !text.contains(","), "\(text)")
+        let v = s.run("insert.dateTime", #"{"format": "datetime4", "update": false, "language": "en-US"}"#)
+        #expect(v.get("text")?.asStr?.contains(",") == true, "\(v.display)")
+    }
+
     // insert.rs::a_named_format_in_french_and_a_bad_value_change_nothing
     @Test(.enabled(if: ported("text.edit", "text.insert"))) func aNamedFormatInFrenchAndABadValueChangeNothing() throws {
         let s = session()
@@ -130,6 +153,45 @@ struct InsertDateTimeTests {
     }
 
     // insert.rs::without_a_caret_the_date_lands_on_this_slide_only
+    /// ZZ1: in the handout and notes master views the date goes into the master's date placeholder (not the
+    /// current slide), so the exported handout and notes pages show it.
+    // insert.rs::on_a_page_master_the_date_fills_its_date_placeholder
+    @Test func onAPageMasterTheDateFillsItsDatePlaceholder() throws {
+        for view in ["view.handoutMaster", "view.notesMaster"] {
+            let s = session()
+            s.run(view)
+            func master() -> Master? { pageMaster(s.st.doc, s.st.selection.target) }
+            let id = try #require(master()?.shapes.first { $0.phType == .date }?.id)
+            func dateShape() -> Shape? { master()?.shapes.first { $0.id == id } }
+            #expect(dateShape()?.text.map { $0.text.isEmpty } ?? true)
+            s.run("edit.select", "{\"ids\": [\(id)]}")
+            let v = s.run("insert.dateTime", #"{"format": "datetime10", "update": true}"#)
+            #expect(v.get("where") == "master", "\(view): \(v.display)")
+            #expect(dateRun(s) == nil, "the slide keeps no date")
+            let run = try #require(dateShape()?.text?.paragraphs.first?.runs.first)
+            if case .field(let field) = run.kind { #expect(field == "datetime10", "\(view)") } else { Issue.record("\(view): \(run)") }
+            let m = try #require(master())
+            let placed = placeMasterTexts(s.st.doc, m, 1)
+            #expect(placed.contains { $0.body.text == run.text } && run.text.contains(":"), "\(view): the page shows the date")
+            s.run("edit.undo")
+            #expect(dateShape()?.text.map { $0.text.isEmpty } ?? true, "one undo")
+            // A fixed date in a placeholder whose run is en-GB reads day first, and the answer reports the text
+            // that was written, not the en-US sample.
+            s.run("insert.dateTime", #"{"format": "datetime1", "update": false, "language": "en-GB"}"#)
+            let w = s.run("insert.dateTime", #"{"format": "datetime1", "update": false}"#)
+            let fixed = try #require(dateShape()?.text?.paragraphs.first?.runs.first)
+            #expect(fixed.props.lang == "en-GB", "\(view): \(fixed)")
+            #expect(w.get("text")?.asStr == fixed.text, "\(view): the answer reports the written text: \(w.display)")
+            let now = try #require(DCText.DateTime.nowLocal())
+            #expect(fixed.text == DateFields.fieldText("datetime1", "en-GB", now), "\(view): the date in en-GB order (dd/mm/yyyy)")
+            // No date placeholder: refused, nothing changed.
+            s.run(view == "view.handoutMaster" ? "handout.placeholders" : "notes.placeholders", #"{"date": false}"#)
+            let rev = s.st.revision
+            #expect(s.fails("insert.dateTime", #"{"format": "datetime1"}"#))
+            #expect(s.st.revision == rev)
+        }
+    }
+
     @Test(.enabled(if: ported("design.headerFooter", "edit.undo"))) func withoutACaretTheDateLandsOnThisSlideOnly() throws {
         let s = session()
         s.run("slide.new", #"{"layout": "blank"}"#)

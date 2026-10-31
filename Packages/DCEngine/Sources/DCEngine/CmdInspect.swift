@@ -11,6 +11,7 @@ public enum InspectCommands {
         [
             .query("document.inspect", "Inspect Presentation", [], nil, "{} → slides with titles, layouts, shape counts; selection; size; theme", Cmd.hasDoc, document),
             .query("slide.inspect", "Inspect Slide", [], nil, "{index?} → the slide's shapes with ids, kinds, boxes, text, fills, animations, transition, notes (text, and notesBody with its formatting)", Cmd.hasDoc, slide),
+            .query("slide.actions", "Inspect Slide Actions", [], nil, "{index?} → {index, slideId, actions: [{owner, event, type, target, hyperlink}]}; lists shape click/hover actions and text-run links/hover actions (including table cells) without executing them", Cmd.hasDoc, actions),
             .query("shape.inspect", "Inspect Shape", [], nil, "{id} → full shape JSON plus its effective box", Cmd.hasDoc, shape),
             .query("commands.list", "List Commands", [], nil, "{filter?: substring} → [{id, label, params, enabled}]", Cmd.always, commands),
         ]
@@ -97,6 +98,63 @@ public enum InspectCommands {
     }
 
     private static func round(_ v: Double) -> Double { (v * 100).rounded(.toNearestOrAwayFromZero) / 100 }
+
+    /// `slide.actions`: every click and hover action of a slide, on shapes (groups included) and on text
+    /// runs (table cells included), without running any.
+    @Sendable static func actions(_ s: Session, _ p: JSON) throws -> JSON {
+        let st = try s.doc()
+        let i = try Cmd.optUsizeParam(p, "index", "slide.actions") ?? st.selection.slide
+        guard let sl = st.doc.slides.at(i) else { throw Cmd.bad("slide.actions", "no slide \(i)") }
+        var found: [JSON] = []
+        var path: [JSON] = []
+        for sh in sl.shapes { collectActions(sh, &path, &found, 0) }
+        return ["index": .integer(i), "slideId": sl.id.toJSON(), "actions": .array(found)]
+    }
+
+    private static func collectActions(_ sh: Shape, _ path: inout [JSON], _ found: inout [JSON], _ depth: Int) {
+        path.append(["id": sh.id.toJSON(), "name": .string(sh.name)])
+        defer { path.removeLast() }
+        let owner: JSON = ["shapeId": sh.id.toJSON(), "shapeName": .string(sh.name), "path": .array(path)]
+        if let link = sh.click { found.append(actionEntry(owner, "click", link)) }
+        if let link = sh.hover { found.append(actionEntry(owner, "hover", link)) }
+        if let text = sh.text { collectTextActions(text, owner, &found) }
+        if case .table(let table) = sh.kind {
+            for (r, row) in table.rows.enumerated() {
+                for (c, cell) in row.cells.enumerated() {
+                    collectTextActions(cell.text, withKeys(owner, ["tableRowIndex": .integer(r), "tableCellIndex": .integer(c)]), &found)
+                }
+            }
+        }
+        // Rust recurses without a bound; the model's nesting is bounded at 64 everywhere else.
+        if case .group(let children, _) = sh.kind, depth < 64 {
+            for child in children { collectActions(child, &path, &found, depth + 1) }
+        }
+    }
+
+    private static func collectTextActions(_ text: TextBody, _ owner: JSON, _ found: inout [JSON]) {
+        for (pi, paragraph) in text.paragraphs.enumerated() {
+            for (ri, run) in paragraph.runs.enumerated() {
+                for (event, link) in [("textLink", run.props.link), ("textHover", run.props.hover)] {
+                    guard let link else { continue }
+                    let o = withKeys(owner, ["paragraphIndex": .integer(pi), "runIndex": .integer(ri), "text": .string(run.content)])
+                    found.append(actionEntry(o, event, link))
+                }
+            }
+        }
+    }
+
+    /// `owner["key"] = value` for each pair.
+    private static func withKeys(_ owner: JSON, _ pairs: KeyValuePairs<String, JSON>) -> JSON {
+        guard case .object(var o) = owner else { return owner }
+        for (k, v) in pairs { o.set(k, v) }
+        return .object(o)
+    }
+
+    private static func actionEntry(_ owner: JSON, _ event: String, _ link: Hyperlink) -> JSON {
+        let action = link.action.toJSON()
+        let target = ["url", "slide", "name", "path"].lazy.compactMap { action.get($0) }.first ?? .null
+        return ["owner": owner, "event": .string(event), "type": kindTag(action), "target": target, "hyperlink": link.toJSON()]
+    }
 
     @Sendable static func slide(_ s: Session, _ p: JSON) throws -> JSON {
         let st = try s.doc()

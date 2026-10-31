@@ -48,6 +48,105 @@ struct SlideTests {
         }
     }
 
+    // MARK: slide.rs: moving several slides
+
+    private func ids(_ s: Session) -> [UInt32] { s.st.doc.slides.map(\.id.rawValue) }
+
+    private func selected(_ s: Session) -> (Int, [UInt32]) { (s.st.selection.slide, s.st.selection.slides.map(\.rawValue)) }
+
+    private func list(_ xs: [UInt32]) -> String { "[" + xs.map(String.init).joined(separator: ", ") + "]" }
+
+    // slide.rs tests::move_from_to_moves_one_slide
+    @Test func moveFromToMovesOneSlide() {
+        let s = deckOf(4)
+        let id = ids(s)
+        s.run("slide.move", #"{"from": 3, "to": 0}"#)
+        #expect(ids(s) == [id[3], id[0], id[1], id[2]])
+        #expect(selected(s) == (0, [id[3]]))
+    }
+
+    // slide.rs tests::move_ids_lands_them_as_one_run_in_deck_order
+    @Test func moveIdsLandsThemAsOneRunInDeckOrder() {
+        // Listed backwards: they still land in the order they had.
+        var s = deckOf(6)
+        var id = ids(s)
+        s.run("slide.move", #"{"ids": \#(list([id[4], id[1]])), "to": 0}"#)
+        #expect(ids(s) == [id[1], id[4], id[0], id[2], id[3], id[5]])
+        #expect(selected(s) == (0, [id[1], id[4]]), "the moved slides stay selected")
+
+        s = deckOf(6)
+        id = ids(s)
+        s.run("slide.move", #"{"ids": \#(list([id[0], id[2]])), "to": 2}"#)
+        #expect(ids(s) == [id[1], id[3], id[0], id[2], id[4], id[5]])
+        #expect(selected(s) == (2, [id[0], id[2]]))
+
+        s = deckOf(6)
+        id = ids(s)
+        s.run("slide.move", #"{"ids": \#(list([id[1], id[3]])), "to": 1000}"#)
+        #expect(ids(s) == [id[0], id[2], id[4], id[5], id[1], id[3]])
+        #expect(selected(s) == (4, [id[1], id[3]]))
+    }
+
+    // slide.rs tests::moving_several_slides_is_one_undo_step
+    @Test func movingSeveralSlidesIsOneUndoStep() {
+        let s = deckOf(5)
+        let id = ids(s)
+        s.run("slide.selectSlides", #"{"ids": \#(list([id[0], id[3]]))}"#)
+        let before = selected(s)
+        s.run("slide.move", #"{"ids": \#(list([id[0], id[3]])), "to": 3}"#)
+        let after = ids(s)
+        #expect(after == [id[1], id[2], id[4], id[0], id[3]])
+        s.run("edit.undo")
+        #expect(ids(s) == id)
+        #expect(selected(s) == before)
+        s.run("edit.redo")
+        #expect(ids(s) == after)
+    }
+
+    // slide.rs tests::moved_slides_join_the_section_before_them
+    @Test func movedSlidesJoinTheSectionBeforeThem() {
+        let s = deckOf(5)
+        let id = ids(s)
+        s.run("section.add", #"{"name": "A", "at": 0}"#)
+        s.run("section.add", #"{"name": "B", "at": 3}"#)
+        func sections() -> [[UInt32]] { s.st.doc.sections.map { $0.slides.map(\.rawValue) } }
+        // A = 0,1,2; B = 3,4. Move 0 and 1 to the end: B gets them, A keeps only slide 2.
+        s.run("slide.move", #"{"ids": \#(list([id[0], id[1]])), "to": 3}"#)
+        #expect(sections() == [[id[2]], [id[3], id[4], id[0], id[1]]])
+        // Move the whole of A away: A stays, empty; the run at the front joins the first section.
+        s.run("slide.move", #"{"ids": \#(list([id[2]])), "to": 4}"#)
+        #expect(sections() == [[], [id[3], id[4], id[0], id[1], id[2]]])
+        s.run("slide.move", #"{"ids": \#(list([id[0], id[1]])), "to": 0}"#)
+        #expect(sections() == [[id[0], id[1]], [id[3], id[4], id[2]]])
+        #expect(sections().flatMap { $0 } == ids(s), "sections follow slide order")
+    }
+
+    // slide.rs tests::bad_ids_are_rejected_and_change_nothing
+    @Test func badIdsAreRejectedAndChangeNothing() {
+        let s = deckOf(3)
+        let id = ids(s)
+        let lotsOfUnknown = "[" + (1_000_000 ..< 1_100_000).map(String.init).joined(separator: ",") + "]"
+        for p in [
+            #"{"ids": [], "to": 0}"#,
+            #"{"ids": [\#(id[0]), 999999], "to": 0}"#,
+            #"{"ids": [-1], "to": 0}"#,
+            #"{"ids": ["1"], "to": 0}"#,
+            #"{"ids": [1.5], "to": 0}"#,
+            #"{"ids": [18446744073709551615], "to": 0}"#,
+            #"{"ids": \#(id[0]), "to": 0}"#,
+            #"{"ids": \#(lotsOfUnknown), "to": 0}"#,
+            #"{"ids": [\#(id[1])]}"#,
+        ] {
+            #expect(s.fails("slide.move", p), "slide.move must reject \(p.prefix(80))")
+            #expect(ids(s) == id, "\(p.prefix(80))")
+        }
+        // Repeats fold into one.
+        let repeated = list(Array(repeating: id[2], count: 100_000))
+        s.run("slide.move", #"{"ids": \#(repeated), "to": 0}"#)
+        #expect(ids(s) == [id[2], id[0], id[1]])
+        #expect(selected(s) == (0, [id[2]]))
+    }
+
     @Test func duplicateKeepsSectionOrderInStepWithSlides() {
         let s = deckOf(3)
         s.run("section.add", #"{"at": 0}"#)

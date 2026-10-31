@@ -4,6 +4,7 @@
 // contributors). The data types were declared by the core (`DocState` holds a `Compare`); the diff,
 // `ChangeKey.of`, accept and reject follow them (the text agent, Wave 4).
 import DCCore
+import DCGeometry
 import DCModel
 
 /// The revised presentation a document is being compared with.
@@ -65,21 +66,36 @@ public struct Change: Sendable, Equatable {
     public var kind: ChangeKind
     /// Index in the open deck (for inserted: where it would go).
     public var slide: Int
+    /// The editor's number of that slide (`slide` + 1).
+    public var number: Int
+    /// Which side has it alone: `deck` (the open presentation; accepting deletes it) or `file` (the
+    /// compared file; accepting adds it). Absent when both have it and differ.
+    public var onlyIn: String?
     /// Index in the revised deck (none for deleted).
     public var revised: Int?
     /// What differs, readable: `Title 1: text`, `Picture 3 inserted`, `notes`…
     public var details: [String]
 
-    public init(kind: ChangeKind, slide: Int, revised: Int?, details: [String]) {
+    public init(kind: ChangeKind, slide: Int, number: Int, onlyIn: String?, revised: Int?, details: [String]) {
         self.kind = kind
         self.slide = slide
+        self.number = number
+        self.onlyIn = onlyIn
         self.revised = revised
         self.details = details
     }
 
-    /// serde's `Change` (camelCase).
+    /// serde's `Change` (camelCase; `onlyIn` left out when absent).
     public func toJSON() -> JSON {
-        ["kind": .string(kind.rawValue), "slide": .integer(slide), "revised": revised.map { JSON.integer($0) } ?? .null, "details": .array(details.map(JSON.string))]
+        var o: JSON = [
+            "kind": .string(kind.rawValue), "slide": .integer(slide), "number": .integer(number),
+            "revised": revised.map { JSON.integer($0) } ?? .null, "details": .array(details.map(JSON.string)),
+        ]
+        if let onlyIn, case .object(var obj) = o {
+            obj.set("onlyIn", .string(onlyIn))
+            o = .object(obj)
+        }
+        return o
     }
 }
 
@@ -131,15 +147,15 @@ public enum Comparing {
         for (i, j) in pairs {
             guard let a = cur.slides.at(i), let b = rev.slides.at(j) else { continue }
             let details = slideDetails(cur, a, rev, b)
-            if !details.isEmpty { out.append(Change(kind: .changed, slide: i, revised: j, details: details)) }
+            if !details.isEmpty { out.append(Change(kind: .changed, slide: i, number: i &+ 1, onlyIn: nil, revised: j, details: details)) }
         }
         for (i, s) in cur.slides.enumerated() where !curMatched.contains(i) {
-            out.append(Change(kind: .deleted, slide: i, revised: nil, details: [slideTitle(s)]))
+            out.append(Change(kind: .deleted, slide: i, number: i &+ 1, onlyIn: "deck", revised: nil, details: [slideTitle(s)]))
         }
         for (j, s) in rev.slides.enumerated() where !revMatched.contains(j) {
             // After the open slide that matches the revised slide before it.
             let at = (0 ..< j).reversed().lazy.compactMap { k in pairs.first { $0.1 == k }.map { $0.0 + 1 } }.first ?? 0
-            out.append(Change(kind: .inserted, slide: at, revised: j, details: [slideTitle(s)]))
+            out.append(Change(kind: .inserted, slide: at, number: at &+ 1, onlyIn: "file", revised: j, details: [slideTitle(s)]))
         }
         // A stable sort, as Rust's `sort_by_key`.
         return out.enumerated().sorted { x, y in
@@ -170,7 +186,18 @@ public enum Comparing {
         return c
     }
 
-    static func shapeDetails(_ cp: Presentation, _ a: Shape, _ rp: Presentation, _ b: Shape, _ out: inout [String]) {
+    /// The box a shape is drawn with: its own, else the one it inherits from its layout or master
+    /// placeholder (`ctx`).
+    static func drawnBox(_ ctx: Resolve.Ctx?, _ s: Shape) -> Xfrm? {
+        s.xfrm ?? ctx.map { Resolve.xfrm($0, s) }
+    }
+
+    /// The rotation and flips a shape is drawn with (none without a box).
+    static func turn(_ ctx: Resolve.Ctx?, _ s: Shape) -> (rot: Double, flipH: Bool, flipV: Bool) {
+        drawnBox(ctx, s).map { ($0.rot, $0.flipH, $0.flipV) } ?? (0, false, false)
+    }
+
+    static func shapeDetails(_ cp: Presentation, _ ca: Resolve.Ctx?, _ a: Shape, _ rp: Presentation, _ cb: Resolve.Ctx?, _ b: Shape, _ out: inout [String]) {
         let label = shapeLabel(b)
         func text(_ s: Shape) -> String { s.text?.text ?? "" }
         var what: [String] = []
@@ -179,47 +206,64 @@ public enum Comparing {
         } else if a.text != b.text {
             what.append("text formatting")
         }
-        if let x = a.xfrm, let y = b.xfrm, (x.x != y.x || x.y != y.y) && (x.w == y.w && x.h == y.h) {
-            what.append("moved")
-        } else if let x = a.xfrm, let y = b.xfrm, x.w != y.w || x.h != y.h {
-            what.append("resized")
-        } else if a.xfrm?.rot != b.xfrm?.rot {
-            what.append("rotated")
+        // Boxes as drawn: a stored box equal to the inherited one is no change.
+        if let x = drawnBox(ca, a), let y = drawnBox(cb, b) {
+            if (x.x != y.x || x.y != y.y) && (x.w == y.w && x.h == y.h) {
+                what.append("moved")
+            } else if x.w != y.w || x.h != y.h {
+                what.append("resized")
+            }
         }
+        // Rotation and flips are reported alongside a move or resize, not hidden behind it. No stored
+        // box means the inherited one (the layout's or master's), as the shape is drawn.
+        let (ta, tb) = (turn(ca, a), turn(cb, b))
+        if ta.rot != tb.rot { what.append("rotated") }
+        if ta.flipH != tb.flipH || ta.flipV != tb.flipV { what.append("flipped") }
+        if a.geom != b.geom { what.append("shape") }
         if a.fill != b.fill || a.line != b.line || a.style != b.style || a.effects != b.effects { what.append("formatting") }
         func pic(_ p: Presentation, _ s: Shape) -> [UInt8]? {
             if case .picture(let fill) = s.kind { return p.media(fill.media)?.data }
             return nil
         }
         if pic(cp, a) != pic(rp, b) { what.append("picture") }
-        if what.isEmpty {
-            var (x, y) = (plainShape(a), plainShape(b))
-            x.text = nil
-            y.text = nil
-            if case .picture = x.kind, case .picture = y.kind {
-                x.kind = .shape
-                y.kind = .shape
-            }
-            if x != y { what.append("properties") }
+        // Anything the checks above do not cover (alt text, hidden, a link…) is reported too, also beside
+        // them: the fields they compared are left out of this comparison.
+        var (x, y) = (plainShape(a), plainShape(b))
+        func strip(_ z: inout Shape) {
+            z.text = nil
+            z.xfrm = nil
+            z.geom = .default
+            z.fill = nil
+            z.line = nil
+            z.style = nil
+            z.effects = nil
         }
+        strip(&x)
+        strip(&y)
+        if case .picture = x.kind, case .picture = y.kind {
+            x.kind = .shape
+            y.kind = .shape
+        }
+        if x != y { what.append("properties") }
         if !what.isEmpty { out.append("\(label): \(what.joined(separator: ", "))") }
     }
 
     static func slideDetails(_ cp: Presentation, _ a: Slide, _ rp: Presentation, _ b: Slide) -> [String] {
         var out: [String] = []
         var used = Set<Int>()
+        let (ca, cb) = (Resolve.Ctx.forSlide(cp, a), Resolve.Ctx.forSlide(rp, b))
         for sa in a.shapes {
             let k = b.shapes.firstIndex { $0.id == sa.id }
                 ?? b.shapes.indices.first { !used.contains($0) && b.shapes[$0].name == sa.name && !b.shapes[$0].name.isEmpty }
             if let k, !used.contains(k) {
                 used.insert(k)
-                if let sb = b.shapes.at(k) { shapeDetails(cp, sa, rp, sb, &out) }
+                if let sb = b.shapes.at(k) { shapeDetails(cp, ca, sa, rp, cb, sb, &out) }
             } else {
-                out.append("\(shapeLabel(sa)) deleted")
+                out.append("\(shapeLabel(sa)) deleted (only in the deck)")
             }
         }
         for (k, sb) in b.shapes.enumerated() where !used.contains(k) {
-            out.append("\(shapeLabel(sb)) inserted")
+            out.append("\(shapeLabel(sb)) inserted (only in the file)")
         }
         func order(_ s: Slide) -> [String] { s.shapes.map(\.name) }
         if out.isEmpty && order(a) != order(b) { out.append("order of objects") }
@@ -298,6 +342,16 @@ public enum Comparing {
             let name = rev.layout(slide.layout)?.layout.name
             let byName = name.flatMap { n in doc.masters.lazy.flatMap(\.layouts).first { $0.name == n }?.id }
             sl.layout = byName ?? doc.masters.first?.layouts.first?.id ?? LayoutId(0)
+        }
+        // A placeholder without a box of its own is drawn with its layout's; where this deck's layout
+        // draws it otherwise (placed or turned differently), the file's box is stored on it, so the
+        // accepted slide looks as the file does and compares equal to it.
+        if let file = Resolve.Ctx.forSlide(rev, slide), let here = Resolve.Ctx.forSlide(doc, sl) {
+            let boxes: [Xfrm?] = zip(slide.shapes, sl.shapes).map { f, h in
+                let want = Resolve.xfrm(file, f)
+                return h.xfrm == nil && Resolve.xfrm(here, h) != want ? want : nil
+            }
+            for (i, b) in zip(sl.shapes.indices, boxes) where b != nil { sl.shapes[i].xfrm = b }
         }
         if let id = replacing {
             sl.id = id

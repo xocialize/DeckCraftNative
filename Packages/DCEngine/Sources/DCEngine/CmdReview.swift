@@ -67,9 +67,21 @@ public enum ReviewCommands {
                 thesaurus
             ),
             .cmd("review.replaceWord", "Insert Synonym", [], nil, "{with}: replace the selected word (or the word at the caret) while editing text", Cmd.hasText, insertSynonym),
-            .noundo("review.compare", "Compare", ["Review", "Compare"], nil, "{path} | {name, data: base64} — compare with a revised copy → {name, changes}", Cmd.hasDoc, compare),
-            .query("review.revisions", "Revisions", [], nil, "{} → {name, changes: [{kind: inserted|deleted|changed, slide, revised, details}]}", Cmd.hasDoc, revisions),
-            .cmd("review.accept", "Accept Revision", ["Review", "Compare"], nil, "{index} | {all: true}", comparing, accept),
+            .noundo(
+                "review.compare", "Compare", ["Review", "Compare"], nil,
+                "{path} | {name, data: base64} — compare the open deck with another file → {name, changes: [{kind, slide, number, onlyIn?, revised, details}]}; each change is described from the open deck: `onlyIn: \"deck\"` is in the deck and not in the file, `onlyIn: \"file\"` is in the file and not in the deck, `changed` is in both and differs; `slide` is 0-based, `number` the editor's slide number; review.accept takes the FILE's side, so it deletes what is only in the deck (Accept All keeps the deck's last remaining slide rather than deleting it)",
+                Cmd.hasDoc, compare
+            ),
+            .query(
+                "review.revisions", "Revisions", [], nil,
+                "{} → {name, changes: [{kind: inserted|deleted|changed, slide (0-based), number (editor's), onlyIn?: deck|file, revised, details}]}; `onlyIn: deck` = only in the open deck, `file` = only in the compared file; accepting takes the file's side",
+                Cmd.hasDoc, revisions
+            ),
+            .cmd(
+                "review.accept", "Accept Revision", ["Review", "Compare"], nil,
+                "{index} | {all: true} — accept the compared file's side of a change (or all): what is only in the file is added, what is only in the open deck is deleted (all: true leaves the deck's last remaining slide in place), a changed slide becomes the file's",
+                comparing, accept
+            ),
             .noundo(
                 "review.reject",
                 "Reject Revision",
@@ -233,15 +245,27 @@ extension ReviewCommands {
             let (bgFill, ph) = Resolve.background(ctx, sl)
             guard case .solid(let color) = bgFill else { continue }
             let bg = ctx.color(color, ph)
-            for sh in sl.shapes {
-                guard let t = sh.text, let para = t.paragraphs.first(where: { !$0.isEmpty }) else { continue }
-                let rp = Resolve.run(ctx, sh, para, para.runs.first?.props ?? RunProps())
-                if let f = Resolve.fill(ctx, sh).fill, !f.isNone { continue }
-                let fg = Resolve.textColor(ctx, rp)
-                if fg.contrast(bg) < 3.0 {
+            walk(sl.shapes) { sh, _ in
+                guard let t = sh.text else { return }
+                if let f = Resolve.fill(ctx, sh).fill, !f.isNone { return }
+                var low: Double?
+                search: for para in t.paragraphs {
+                    for run in para.runs {
+                        // A line break or blank run shows no glyphs, so its colour can't be hard to read.
+                        if case .break = run.kind { continue }
+                        if rustTrim(run.text).isEmpty { continue }
+                        let rp = Resolve.run(ctx, sh, para, run.props)
+                        let contrast = Resolve.textColor(ctx, rp).contrast(bg)
+                        if contrast < 3.0 {
+                            low = contrast
+                            break search
+                        }
+                    }
+                }
+                if let contrast = low {
                     out.append([
                         "slide": .integer(i), "shape": sh.id.toJSON(), "name": .string(sh.name),
-                        "issue": .string("Hard-to-read text contrast (\(rustFixed(fg.contrast(bg), places: 1)):1)"),
+                        "issue": .string("Hard-to-read text contrast (\(rustFixed(contrast, places: 1)):1)"),
                     ])
                 }
             }
