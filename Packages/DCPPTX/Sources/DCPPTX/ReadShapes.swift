@@ -285,6 +285,8 @@ extension PPTXRead {
     static func pic(_ imp: Imp, _ part: Part, _ ctx: IdCtx, _ e: XMLEl) -> Shape {
         var s = base(imp, part, ctx, e.child("nvPicPr"))
         if let pr = e.child("spPr") { spPr(imp, part, &s, pr) }
+        // A picture in a picture placeholder is cut into the layout's shape (a circle, say).
+        markInheritedGeometry(&s, e.child("spPr"))
         s.style = e.child("style").map(style)
         let pf = e.child("blipFill").flatMap { blipFill(imp, part, $0) }
         let nvpr = e.path(["nvPicPr", "nvPr"])

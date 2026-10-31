@@ -217,15 +217,25 @@ enum CustGeom {
                 token = ""
             }
         }
-        for ch in d.unicodeScalars {
+        let cs = Array(d.unicodeScalars)
+        for (i, ch) in cs.enumerated() {
             switch ch {
+            // An 'E' inside a number followed by a digit (or a sign and a digit) is an exponent,
+            // not the end command.
+            case "E" where !token.isEmpty && {
+                let n1: Unicode.Scalar = i + 1 < cs.count ? cs[i + 1] : " "
+                let n2: Unicode.Scalar = i + 2 < cs.count ? cs[i + 2] : " "
+                let digits: ClosedRange<Unicode.Scalar> = "0" ... "9"
+                return digits.contains(n1) || ((n1 == "-" || n1 == "+") && digits.contains(n2))
+            }():
+                token.unicodeScalars.append(ch)
             case "M", "L", "C", "Q", "Z", "m", "l", "c", "q", "z", "E":
                 pushTok()
                 flush()
                 cmd = Character(ch.properties.isLowercase && ch.isASCII ? Unicode.Scalar(ch.value - 32) ?? ch : ch)
             case " ", ",", "\t", "\n":
                 pushTok()
-            case "-" where !token.isEmpty && !hasByteSuffix(token, "e"):
+            case "-" where !token.isEmpty && !hasByteSuffix(token, "e") && !hasByteSuffix(token, "E"):
                 pushTok()
                 token.unicodeScalars.append(ch)
             default:

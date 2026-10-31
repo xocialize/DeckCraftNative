@@ -50,6 +50,18 @@ import Testing
         #expect(Maps.effectForPreset(.entrance, 2) == "fly")
         #expect(Maps.effectForPreset(.emphasis, 8) == "spin")
     }
+
+    /// PowerPoint's own ids: Darken is 24 and Desaturate 25 (read back from its saved file).
+    @Test func darkenAndDesaturateUsePowerpointsIds() {
+        #expect(Maps.effectForPreset(.emphasis, 24) == "darken")
+        #expect(Maps.effectForPreset(.emphasis, 25) == "desaturate")
+        for (effect, id) in [("darken", UInt32(24)), ("desaturate", 25)] {
+            var a = Animation.default
+            a.`class` = .emphasis
+            a.effect = effect
+            #expect(Maps.presetFor(a) == id, "\(effect)")
+        }
+    }
 }
 
 @Suite struct CustGeomTests {
@@ -112,6 +124,17 @@ import Testing
         // Scaled by 1000 (100 → 100000).
         #expect(back[0].w == 100_000.0)
         #expect(back[0].d == "M 0 0 L 100000 0 C 100000 10000 90000 50000 50000 50000 Q 0 50000 0 0 Z")
+    }
+
+    @Test func parsePathUppercaseExponent() {
+        func eq(_ a: [(Character, [Double])], _ b: [(Character, [Double])]) -> Bool {
+            a.count == b.count && zip(a, b).allSatisfy { $0.0 == $1.0 && $0.1 == $1.1 }
+        }
+        #expect(eq(CustGeom.parsePath("M 1E-5 2 L 3 4"), [("M", [1e-5, 2.0]), ("L", [3.0, 4.0])]))
+        #expect(eq(CustGeom.parsePath("M 1.5E3 2"), [("M", [1500.0, 2.0])]))
+        #expect(eq(CustGeom.parsePath("M 1e-5 2"), [("M", [1e-5, 2.0])]))
+        // An 'E' right after a number with no exponent digits is the end command.
+        #expect(eq(CustGeom.parsePath("M 0 0E"), [("M", [0.0, 0.0]), ("E", [])]))
     }
 
     @Test func parsePathTokens() {

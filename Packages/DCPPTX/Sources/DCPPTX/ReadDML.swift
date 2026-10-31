@@ -134,7 +134,13 @@ extension PPTXRead {
         let tile = f.child("tileRect").map { r in
             [pct(r, "l"), pct(r, "t"), pct(r, "r"), pct(r, "b")].map { ($0 ?? 0.0).clamped(-10.0, 10.0) }
         }
-        return Gradient(stops: stops, shape: shape, rotateWithShape: f.bool("rotWithShape") ?? true, tile: tile ?? [0, 0, 0, 0])
+        return Gradient(
+            stops: stops,
+            shape: shape,
+            flip: f.attr("flip").flatMap { GradientFlip(xml: $0) },
+            rotateWithShape: f.bool("rotWithShape") ?? true,
+            tile: tile ?? [0, 0, 0, 0]
+        )
     }
 
     /// `blipFill` (either `a:` or `p:`) → picture fill, registering the image as media.
@@ -219,6 +225,7 @@ extension PPTXRead {
             }
         }
         l.compound = ln.attr("cmpd").map(Compound.fromXML)
+        l.align = ln.attr("algn").flatMap { LineAlign(xml: $0) }
         l.fill = fillOf(imp, part, ln)
         for e in ln.elements {
             switch e.local {
@@ -229,13 +236,26 @@ extension PPTXRead {
                 l.dash = .custom(pattern: pattern)
             case "round": l.join = .round
             case "bevel": l.join = .bevel
-            case "miter": l.join = .miter
+            case "miter":
+                l.join = .miter
+                l.miterLimit = e.attr("lim").flatMap(parseMiterLimit)
             case "headEnd": l.head = lineEnd(e)
             case "tailEnd": l.tail = lineEnd(e)
             default: break
             }
         }
         return l
+    }
+
+    static func parseMiterLimit(_ value: String) -> UInt32? {
+        let max = UInt32(Int32.max)
+        let value = rustTrim(value)
+        if let percent = stripByteSuffix(value, "%") {
+            guard let p = rustParseF64(rustTrim(String(percent))) else { return nil }
+            let units = p * 1000.0
+            return units.isFinite && units >= 0.0 && units <= Double(max) ? UInt32(units.rounded()) : nil
+        }
+        return rustParseUnsigned(value, as: UInt32.self).flatMap { $0 <= max ? $0 : nil }
     }
 
     static func lineEnd(_ e: XMLEl) -> LineEnd? {
@@ -423,8 +443,11 @@ extension PPTXRead {
             case "buBlip":
                 if let m = e.child("blip").flatMap({ mediaRef(imp, part, $0) }) { pp.bullet = .picture(media: m) }
             case "buFont": pp.bulletFont = e.attr("typeface")
+            case "buFontTx": pp.bulletFontFollowText = true
             case "buClr": pp.bulletColor = color(e)
+            case "buClrTx": pp.bulletColorFollowText = true
             case "buSzPct": pp.bulletSize = pct(e, "val").map { $0.clamped(0.25, 4.0) }
+            case "buSzTx": pp.bulletSizeFollowText = true
             case "tabLst":
                 pp.tabs = e.childrenNamed("tab").prefix(64).map { t in TabStop(pos: pt(t, "pos") ?? 0.0, align: t.attr("algn") ?? "l") }
             case "defRPr": def = rpr(imp, part, e)

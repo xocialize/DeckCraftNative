@@ -198,6 +198,7 @@ extension PPTXWrite {
                     case .flat: "flat"
                     }
                 })
+                .o("algn", l.align.map(\.xml))
                 .o("cmpd", l.compound.map(\.xml))
             w.open(tag, a)
             if let f = l.fill {
@@ -222,7 +223,9 @@ extension PPTXWrite {
             switch l.join {
             case .round?: w.empty0("a:round")
             case .bevel?: w.empty0("a:bevel")
-            case .miter?: w.empty0("a:miter")
+            case .miter?:
+                let limit = l.miterLimit.flatMap { $0 <= UInt32(Int32.max) ? $0 : nil }
+                w.empty("a:miter", A.new().o("lim", limit))
             case nil: break
             }
             for (t, e) in [("a:headEnd", l.head), ("a:tailEnd", l.tail)] {
@@ -259,7 +262,7 @@ extension PPTXWrite {
         }
 
         static func gradient(_ w: inout W, _ g: Gradient) {
-            w.open("a:gradFill", A.new().a("rotWithShape", g.rotateWithShape ? "1" : "0"))
+            w.open("a:gradFill", A.new().o("flip", g.flip.map(\.xml)).a("rotWithShape", g.rotateWithShape ? "1" : "0"))
             // No stops: no `a:gsLst`, so the gradient keeps taking them from its style's fill.
             var stops = g.stops
             if stops.count == 1 {
@@ -508,8 +511,11 @@ extension PPTXWrite {
                 || p.spaceAfter != nil
                 || p.bullet != nil
                 || p.bulletFont != nil
+                || p.bulletFontFollowText != nil
                 || p.bulletColor != nil
+                || p.bulletColorFollowText != nil
                 || p.bulletSize != nil
+                || p.bulletSizeFollowText != nil
                 || p.tabs != nil
                 || def != nil
             if !hasKids {
@@ -526,15 +532,21 @@ extension PPTXWrite {
             if let s = p.spaceAfter {
                 spacing(&w, "a:spcAft", s)
             }
-            if let c = p.bulletColor {
+            if p.bulletColor == nil && p.bulletColorFollowText == true {
+                w.empty0("a:buClrTx")
+            } else if let c = p.bulletColor {
                 w.open0("a:buClr")
                 color(&w, c)
                 w.close("a:buClr")
             }
-            if let s = p.bulletSize {
+            if p.bulletSize == nil && p.bulletSizeFollowText == true {
+                w.empty0("a:buSzTx")
+            } else if let s = p.bulletSize {
                 w.val("a:buSzPct", pct(s.clamped(0.25, 4.0)))
             }
-            if let f = p.bulletFont {
+            if p.bulletFont == nil && p.bulletFontFollowText == true {
+                w.empty0("a:buFontTx")
+            } else if let f = p.bulletFont {
                 w.empty("a:buFont", A.new().a("typeface", f))
             }
             switch p.bullet {

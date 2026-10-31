@@ -322,8 +322,14 @@ extension PPTXRead {
             if let n, !attrIs(n.attr("sourceLinked"), "1") { return n.attr("formatCode") }
             return sourceFormat(a) ?? n?.attr("formatCode")
         }
+        // `c:tickLblPos val="none"` hides the labels just as `c:delete` does.
         func deleted(_ a: XMLEl) -> Bool {
-            a.child("delete")?.bool("val") == true
+            a.child("delete")?.bool("val") == true || attrIs(a.childVal("tickLblPos"), "none")
+        }
+        // A gridline whose `c:spPr/a:ln` has `a:noFill` is not drawn, though the element is there.
+        func grid(_ a: XMLEl, _ k: String) -> Bool {
+            guard let g = a.child(k) else { return false }
+            return g.child("spPr")?.child("ln")?.child("noFill") == nil
         }
         if c.kind == .combo && c.series.contains(where: \.secondaryAxis) {
             let primaryId = valAx?.childVal("axId")
@@ -339,8 +345,8 @@ extension PPTXRead {
         }
         let catAx = pa.child("catAx") ?? pa.child("dateAx") ?? valAxes.first { !isVertical($0) }
         if let v = valAx {
-            c.gridlines = v.child("majorGridlines") != nil
-            c.minorGridlines = v.child("minorGridlines") != nil
+            c.gridlines = grid(v, "majorGridlines")
+            c.minorGridlines = grid(v, "minorGridlines")
             let sc = v.child("scaling")
             c.yMin = sc?.childVal("min").flatMap { rustParseF64($0) }.flatMap { $0.isFinite ? $0 : nil }
             c.yMax = sc?.childVal("max").flatMap { rustParseF64($0) }.flatMap { $0.isFinite ? $0 : nil }

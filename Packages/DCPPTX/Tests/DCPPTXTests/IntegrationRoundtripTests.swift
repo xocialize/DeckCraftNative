@@ -109,6 +109,7 @@ private func rtWithSlide1(_ bytes: [UInt8], _ xml: String) throws -> [UInt8] {
                 GradientStop(pos: 1.0, color: ColorRef.scheme(.accent2).with(.lumMod(75000))),
             ],
             shape: .linear(angle: 45.0, scaled: false),
+            flip: .xy,
             rotateWithShape: true,
             tile: [0, 0, 0, 0]
         ))
@@ -416,6 +417,90 @@ private func rtWithSlide1(_ bytes: [UInt8], _ xml: String) throws -> [UInt8] {
         #expect(c.line == (try rtByName(p.slides[1], "Connector")).line)
         // Ids are kept.
         #expect(try rtByName(q.slides[1], "Group").id == rtByName(p.slides[1], "Group").id)
+    }
+
+    // Rust: it/roundtrip.rs::line_miter_limit_survives_two_pptx_round_trips
+    @Test func lineMiterLimitSurvivesTwoPptxRoundTrips() throws {
+        var p = Presentation.default
+        var limited = IT.shape(&p, "Limited miter", 20.0, 20.0, 100.0, 100.0)
+        limited.line = Line(join: .miter, miterLimit: 200_000)
+        var defaulted = IT.shape(&p, "Default miter", 140.0, 20.0, 100.0, 100.0)
+        defaulted.line = Line(join: .miter)
+        var large = IT.shape(&p, "Large miter", 260.0, 20.0, 100.0, 100.0)
+        large.line = Line(join: .miter, miterLimit: 1_000_001)
+        p.slides[0].shapes.append(contentsOf: [limited, defaulted, large])
+
+        let q = try IT.round(IT.round(p))
+        #expect(try rtByName(q.slides[0], "Limited miter").line?.miterLimit == 200_000)
+        #expect(try rtByName(q.slides[0], "Default miter").line?.miterLimit == nil)
+        #expect(try rtByName(q.slides[0], "Large miter").line?.miterLimit == 1_000_001)
+    }
+
+    // Rust: it/roundtrip.rs::bullet_follow_text_resets_survive_two_pptx_round_trips
+    @Test func bulletFollowTextResetsSurviveTwoPptxRoundTrips() throws {
+        var p = Presentation.default
+        var textbox = IT.shape(&p, "Follow text bullets", 20.0, 20.0, 400.0, 100.0)
+        var follow = Paragraph.default
+        follow.props = ParaProps(bullet: .char(char: "•"), bulletFontFollowText: true, bulletColorFollowText: true, bulletSizeFollowText: true)
+        follow.runs = [Run.with("Bullet text", RunProps.default)]
+        var body = TextBody.default
+        body.paragraphs = [follow]
+        textbox.text = body
+        p.slides[0].shapes.append(textbox)
+        var conflicting = IT.shape(&p, "Explicit bullet values", 20.0, 140.0, 400.0, 100.0)
+        var explicit = Paragraph.default
+        explicit.props = ParaProps(
+            bullet: .char(char: "•"),
+            bulletFont: "Inter",
+            bulletFontFollowText: true,
+            bulletColor: ColorRef.rgb(Rgba.rgb(255, 0, 0)),
+            bulletColorFollowText: true,
+            bulletSize: 1.5,
+            bulletSizeFollowText: true
+        )
+        explicit.runs = [Run.with("Explicit bullet text", RunProps.default)]
+        body.paragraphs = [explicit]
+        conflicting.text = body
+        p.slides[0].shapes.append(conflicting)
+
+        let q = try IT.round(IT.round(p))
+        let props = try #require(rtByName(q.slides[0], "Follow text bullets").text?.paragraphs.first).props
+        #expect(props.bulletColorFollowText == true)
+        #expect(props.bulletSizeFollowText == true)
+        #expect(props.bulletFontFollowText == true)
+        let kept = try #require(rtByName(q.slides[0], "Explicit bullet values").text?.paragraphs.first).props
+        #expect(kept.bulletColorFollowText == nil)
+        #expect(kept.bulletSizeFollowText == nil)
+        #expect(kept.bulletFontFollowText == nil)
+        #expect(kept.bulletSize == 1.5)
+        #expect(kept.bulletFont == "Inter")
+        #expect(kept.bulletColor == ColorRef.rgb(Rgba.rgb(255, 0, 0)))
+    }
+
+    // Rust: it/roundtrip.rs::line_alignment_survives_two_pptx_round_trips
+    @Test func lineAlignmentSurvivesTwoPptxRoundTrips() throws {
+        var p = Presentation.default
+        var inside = IT.shape(&p, "Inset line", 20.0, 20.0, 100.0, 100.0)
+        inside.line = Line(align: .inside)
+        var centered = IT.shape(&p, "Centered line", 140.0, 20.0, 100.0, 100.0)
+        centered.line = Line(align: .center)
+        p.slides[0].shapes.append(contentsOf: [inside, centered])
+
+        let q = try IT.round(IT.round(p))
+        #expect(try rtByName(q.slides[0], "Inset line").line?.align == .inside)
+        #expect(try rtByName(q.slides[0], "Centered line").line?.align == .center)
+        #expect(LineAlign(xml: "out") == nil)
+    }
+
+    // Rust: it/roundtrip.rs::gradient_flip_mode_survives_two_pptx_round_trips
+    @Test func gradientFlipModeSurvivesTwoPptxRoundTrips() throws {
+        let p = Self.richDeck()
+        let q = try IT.round(IT.round(p))
+        guard case .gradient(let g)? = try rtByName(q.slides[1], "Gradient Star").fill else {
+            Issue.record("not a gradient")
+            return
+        }
+        #expect(g.flip == .xy)
     }
 
     // Rust: it/roundtrip.rs::pictures_media_and_ink_round_trip
@@ -1602,5 +1687,40 @@ extension IntegrationRoundtripTests {
         #expect(keptXML.has("<p:pic>") && !keptXML.has("spid"), "\(keptXML)")
         #expect(preview != nil, "the preview picture is kept")
         #expect(kept.contains { $0.b.hasSuffix("/oleObject") }, "the embedding is kept: \(kept)")
+    }
+
+    // Rust: it/roundtrip.rs::darken_and_desaturate_write_powerpoints_hsl_shift
+    @Test func darkenAndDesaturateWritePowerpointsHslShift() throws {
+        for (effect, preset, shift) in [("darken", 24, #"s="0" l="-25098""#), ("desaturate", 25, #"s="-70588" l="0""#)] {
+            var p = newPresentation(nil)
+            let sh = IT.shape(&p, "Target", 100.0, 100.0, 100.0, 100.0)
+            try #require(!p.slides.isEmpty)
+            p.slides[0].shapes.append(sh)
+            var a = Animation.default
+            a.shape = sh.id
+            a.class = .emphasis
+            a.effect = effect
+            a.durationMs = 500
+            p.slides[0].animations.append(a)
+            let bytes = try PPTX.export(p)
+            let xml = String(decoding: try #require(IT.part(bytes, "ppt/slides/slide1.xml"), "slide"), as: UTF8.self)
+            #expect(xml.has(#"presetID="\#(preset)""#), "\(effect)")
+            #expect(xml.has(#"clrSpc="hsl""#) && xml.has(shift), "\(effect): \(xml)")
+            #expect(try IT.round(p).slides.first?.animations.first?.effect == effect)
+        }
+    }
+
+    /// PowerPoint's default durations (COM `AddEffect`), which differ from the 0.5 s most effects get.
+    // Rust: it/roundtrip.rs::default_durations_match_powerpoint
+    @Test func defaultDurationsMatchPowerpoint() throws {
+        let want: [(String, UInt32)] = [
+            ("grow", 1000), ("shrinkTurn", 1000), ("box", 2000), ("circle", 2000), ("diamond", 2000), ("boxOut", 2000),
+            ("diamondOut", 2000), ("expand", 1000), ("contract", 1000), ("spinner", 500), ("spinnerOut", 500),
+            ("colorPulse", 250), ("objectColor", 500), ("boldFlash", 2000),
+        ]
+        for (effect, ms) in want {
+            let a = try #require(animations.first { $0.id == effect }, "\(effect)")
+            #expect(a.defaultDurationMs == ms, "\(effect)")
+        }
     }
 }

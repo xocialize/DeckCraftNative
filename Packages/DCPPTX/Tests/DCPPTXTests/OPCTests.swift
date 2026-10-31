@@ -37,6 +37,13 @@ import Testing
         #expect(q.get("e") != nil)
     }
 
+    @Test func backslashZipEntryNamesAreFound() throws {
+        let z = try Self.zipOf([("PPT\\Slides\\Slide1.xml", 3)])
+        let p = try Package.open(z)
+        #expect(p.get("ppt/slides/slide1.xml") != nil)
+        #expect(p.originalName("ppt/slides/slide1.xml") == "PPT/Slides/Slide1.xml")
+    }
+
     @Test func xmlBytesAppliesTheXMLLimit() throws {
         let z = try Self.zipOf([("small.xml", 10)])
         let p = try Package.open(z)
