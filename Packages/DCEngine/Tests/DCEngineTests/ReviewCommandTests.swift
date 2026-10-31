@@ -362,6 +362,139 @@ struct CompareTests {
         #expect(s.st.doc.slides.count == n, "comparing alone changes nothing")
     }
 
+    // compare.rs tests::each_change_says_which_side_it_is_on
+    @Test(.enabled(if: ported(Sample.commands) || Fixtures.oracleCorpus != nil, "needs the sample deck")) func eachChangeSaysWhichSideItIsOn() throws {
+        let (s, rev, _) = try decks()
+        let v = s.run("review.compare", compareParams(rev))
+        for c in v.get("changes")?.asArray ?? [] {
+            #expect(c.get("number")?.asU64 == (c.get("slide")?.asU64).map { $0 + 1 }, "\(c.display)")
+            switch c.get("kind")?.asStr {
+            case "deleted": #expect(c.get("onlyIn") == "deck", "\(c.display)")
+            case "inserted": #expect(c.get("onlyIn") == "file", "\(c.display)")
+            default: #expect(c.get("onlyIn") == nil, "\(c.display)")
+            }
+        }
+        // A shape only in the open deck reads as only in the deck.
+        s.run("shape.insert", #"{"preset": "ellipse", "rect": [10.0, 10.0, 40.0, 40.0]}"#)
+        let r = s.run("review.revisions")
+        #expect(r.display.contains("deleted (only in the deck)"), "\(r.display)")
+    }
+
+    private func saved(_ s: Session) throws -> String { try #require(s.run("file.saveBytes").get("data")?.asStr) }
+
+    private func compareWith(_ s: Session, _ data: String, _ name: String = "before.deckcraft") -> JSON {
+        s.run("review.compare", JSON.object(JSONObject(["name": .string(name), "data": .string(data)])).display)
+    }
+
+    private func isTitle(_ sh: Shape) -> Bool { sh.ph.map { $0.kind == .title } ?? false }
+
+    /// Turns the title placeholder of the layout of slide `slide` by `rot` degrees; returns its box as it was.
+    private func turnLayoutTitle(_ s: Session, _ slide: Int, _ rot: Double) throws -> Xfrm {
+        try s.edit { doc, _ in
+            let layout = doc.slides[slide].layout
+            for m in doc.masters.indices {
+                for l in doc.masters[m].layouts.indices where doc.masters[m].layouts[l].id == layout {
+                    for k in doc.masters[m].layouts[l].shapes.indices where isTitle(doc.masters[m].layouts[l].shapes[k]) {
+                        guard var x = doc.masters[m].layouts[l].shapes[k].xfrm else { continue }
+                        x.rot = rot
+                        doc.masters[m].layouts[l].shapes[k].xfrm = x
+                        return x
+                    }
+                }
+            }
+            throw Cmd.bad("test", "no layout title")
+        }
+    }
+
+    /// NN6: a slide reset drops the placeholders' stored boxes; comparing it with the copy from before the
+    /// reset must not call that a rotation (no stored box is rotation 0).
+    // compare.rs tests::a_reset_slide_is_not_rotated_against_its_earlier_copy
+    @Test func aResetSlideIsNotRotatedAgainstItsEarlierCopy() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "titleAndContent", "title": "T", "body": "b"}"#)
+        for id in s.st.doc.slides[1].shapes.map(\.id.rawValue) {
+            s.run("shape.move", "{\"ids\": [\(id)], \"dx\": 10, \"dy\": 0}")
+            s.run("shape.move", "{\"ids\": [\(id)], \"dx\": -10, \"dy\": 0}")
+        }
+        let before = try saved(s)
+        s.run("slide.reset", #"{"index": 1}"#)
+        let v = compareWith(s, before)
+        #expect(!v.display.contains("rotated"), "\(v.display)")
+    }
+
+    /// A shape both moved and rotated reports both, not only the move.
+    // compare.rs tests::a_moved_and_rotated_shape_reports_both
+    @Test func aMovedAndRotatedShapeReportsBoth() throws {
+        let s = session()
+        let id = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 100, 50]}"#)).rawValue
+        let before = try saved(s)
+        s.run("shape.move", "{\"ids\": [\(id)], \"dx\": 40, \"dy\": 0}")
+        s.run("shape.rotate", "{\"ids\": [\(id)], \"deg\": 30}")
+        let v = compareWith(s, before).display
+        #expect(v.contains("moved") && v.contains("rotated"), "\(v)")
+    }
+
+    /// A property no other check covers (here the alt text) is reported beside a flip.
+    // compare.rs tests::a_flipped_shape_with_new_alt_text_reports_both
+    @Test func aFlippedShapeWithNewAltTextReportsBoth() throws {
+        let s = session()
+        let id = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 100, 50]}"#))
+        let before = try saved(s)
+        s.run("shape.flip", "{\"ids\": [\(id.rawValue)]}")
+        try s.edit { doc, _ in withShape(&doc.slides[0].shapes, id) { $0.descr = "A red box" } }
+        let v = compareWith(s, before).display
+        #expect(v.contains("flipped") && v.contains("properties"), "\(v)")
+    }
+
+    /// A flip and a change of shape (rectangle to ellipse) are both reported.
+    // compare.rs tests::a_flipped_shape_that_changed_shape_reports_both
+    @Test func aFlippedShapeThatChangedShapeReportsBoth() throws {
+        let s = session()
+        let id = answerId(s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 100, 50]}"#)).rawValue
+        let before = try saved(s)
+        s.run("shape.flip", "{\"ids\": [\(id)]}")
+        s.run("shape.change", "{\"ids\": [\(id)], \"preset\": \"ellipse\"}")
+        let v = compareWith(s, before).display
+        #expect(v.contains("flipped") && v.contains("shape\""), "\(v)")
+    }
+
+    /// A placeholder with no box of its own is drawn with its layout's rotation; setting it to 0 on the slide
+    /// is a rotation change, and compare says so.
+    // compare.rs tests::an_inherited_rotation_counts_when_compared
+    @Test func anInheritedRotationCountsWhenCompared() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "titleOnly", "title": "T"}"#)
+        s.run("slide.reset", #"{"index": 1}"#)
+        var x = try turnLayoutTitle(s, 1, 30)
+        #expect(s.st.doc.slides[1].shapes.first(where: isTitle)?.xfrm == nil, "the title inherits its box")
+        let before = try saved(s)
+        x.rot = 0
+        try s.edit { doc, _ in
+            if let k = doc.slides[1].shapes.firstIndex(where: isTitle) { doc.slides[1].shapes[k].xfrm = x }
+        }
+        let v = compareWith(s, before)
+        #expect(v.display.contains("rotated"), "\(v.display)")
+    }
+
+    /// The file's placeholder inherits an unturned box from its layout while this deck's layout turns it:
+    /// accepting stores the file's box on the placeholder, so the slide is drawn as in the file and nothing
+    /// is left to accept.
+    // compare.rs tests::accepting_an_inherited_box_takes_the_files_box
+    @Test func acceptingAnInheritedBoxTakesTheFilesBox() throws {
+        let s = session()
+        s.run("slide.new", #"{"layout": "titleOnly", "title": "T"}"#)
+        s.run("slide.reset", #"{"index": 1}"#)
+        let file = try saved(s)
+        _ = try turnLayoutTitle(s, 1, 30)
+        let v = compareWith(s, file, "file.deckcraft")
+        #expect(v.display.contains("rotated"), "\(v.display)")
+        s.run("review.accept", #"{"all": true}"#)
+        let t = try #require(s.st.doc.slides[1].shapes.first(where: isTitle))
+        #expect(t.xfrm?.rot == 0, "the file's box is stored: \(String(describing: t.xfrm))")
+        let w = compareWith(s, file, "file.deckcraft")
+        #expect(w.get("changes")?.asArray?.isEmpty == true, "nothing left to accept: \(w.display)")
+    }
+
     /// A deck with one slide: a table whose cell has a picture fill, a picture background and a transition
     /// sound. `tag` starts the bytes of each (compare.rs tests `media_deck`).
     private func mediaDeck(_ tag: String) -> Presentation {
@@ -573,6 +706,27 @@ struct SpellTests {
         #expect(d.suggest("foto", 5).contains("photo"))
         #expect(d.suggest("Slidse", 5).contains("Slides"))
         #expect(d.suggest("workingslides", 5).contains("working slides"))
+    }
+
+    /// spell.rs `all_caps_words_get_uppercase_suggestions`.
+    @Test func allCapsWordsGetUppercaseSuggestions() {
+        let d = dict(spellTestAFF, spellTestDIC)
+        #expect(d.suggest("SLDE", 5).contains("SLIDE"))
+        #expect(d.suggest("FOTO", 5).contains("PHOTO"))
+        #expect(d.suggest("NSSA", 5).contains("NASA"))
+    }
+
+    /// #1175: compound splitting is quadratic in the word's length, so a word longer than the check limit is
+    /// not checked; shorter ones still are (spell.rs `a_word_longer_than_the_check_limit_is_not_checked`).
+    @Test func aWordLongerThanTheCheckLimitIsNotChecked() {
+        let d = dict("COMPOUNDFLAG X\nCOMPOUNDMIN 3\n", "2\nfoot/X\nball/X\n")
+        #expect(d.check("footballfoot"), "a compound is checked")
+        let under = String(repeating: "footb", count: Spell.maxCheckChars / 5)
+        #expect(under.unicodeScalars.count == Spell.maxCheckChars)
+        #expect(!d.check(under), "a word at the limit is still checked")
+        // Unchecked, not seconds of compound splitting.
+        #expect(d.check(String(repeating: "footb", count: 20_000)))
+        #expect(d.check(under + "x"))
     }
 
     /// spell.rs `compounds_join_flagged_parts`.

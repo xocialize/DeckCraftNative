@@ -15,22 +15,64 @@ enum RichClip {
     static let maxParas = 2_000
     static let maxRuns = 10_000
 
-    /// HTML for `body`: one `<p>` per paragraph, `<b>`, `<i>` and `<u>` for the formatting.
+    /// HTML for `body`: one `<p>` per paragraph, `<b>`, `<i>` and `<u>` for the formatting. When it would
+    /// pass the cap, the text without formatting (`plainHTML`).
     static func bodyToHTML(_ body: TextBody) -> String {
-        var out = ""
+        var out: [UInt8] = []
         for (i, p) in body.paragraphs.enumerated() {
-            if i > 0 { out += "<br>" }
-            out += "<p>"
+            if !pushIfFits(&out, i > 0 ? "<br><p>" : "<p>", 4) { return plainHTML(body) }
             for r in p.runs {
                 let (open, close) = tags(r.props)
-                out += open
-                if case .break = r.kind { out += "<br>" } else { pushEscaped(&out, r.text) }
-                out += close
-                if out.utf8.count > maxHTML { break }
+                let reserve = close.utf8.count + 4
+                if !pushIfFits(&out, open, reserve) { return plainHTML(body) }
+                if case .break = r.kind {
+                    if !pushIfFits(&out, "<br>", reserve) { return plainHTML(body) }
+                } else if !pushEscapedBounded(&out, r.text, reserve) {
+                    return plainHTML(body)
+                }
+                out += close.utf8
             }
-            out += "</p>"
+            out += "</p>".utf8
         }
-        return out
+        return String(decoding: out, as: UTF8.self)
+    }
+
+    /// The text without formatting, or "" (no HTML on the clipboard) when even that is too big: a cut-off
+    /// prefix would paste as if it were the whole text.
+    static func plainHTML(_ body: TextBody) -> String {
+        var out: [UInt8] = []
+        for (i, p) in body.paragraphs.enumerated() {
+            if !pushIfFits(&out, i > 0 ? "<br><p>" : "<p>", 4) { return "" }
+            for r in p.runs {
+                let fits: Bool
+                if case .break = r.kind { fits = pushIfFits(&out, "<br>", 4) } else { fits = pushEscapedBounded(&out, r.text, 4) }
+                if !fits { return "" }
+            }
+            out += "</p>".utf8
+        }
+        return String(decoding: out, as: UTF8.self)
+    }
+
+    /// Appends `value` when it and `reserve` more bytes stay within the cap.
+    private static func pushIfFits(_ out: inout [UInt8], _ value: String, _ reserve: Int) -> Bool {
+        let (n, o1) = out.count.addingReportingOverflow(value.utf8.count)
+        let (m, o2) = n.addingReportingOverflow(reserve)
+        if o1 || o2 || m > maxHTML { return false }
+        out += value.utf8
+        return true
+    }
+
+    /// Appends `text` escaped, character by character, while it and `reserve` more bytes stay within the cap.
+    private static func pushEscapedBounded(_ out: inout [UInt8], _ text: String, _ reserve: Int) -> Bool {
+        for c in text.unicodeScalars {
+            switch c {
+            case "&": if !pushIfFits(&out, "&amp;", reserve) { return false }
+            case "<": if !pushIfFits(&out, "&lt;", reserve) { return false }
+            case ">": if !pushIfFits(&out, "&gt;", reserve) { return false }
+            default: if !pushIfFits(&out, String(c), reserve) { return false }
+            }
+        }
+        return true
     }
 
     private static func tags(_ props: RunProps) -> (String, String) {
@@ -49,17 +91,6 @@ enum RichClip {
             close = "</u>" + close
         }
         return (open, close)
-    }
-
-    private static func pushEscaped(_ out: inout String, _ text: String) {
-        for c in text.unicodeScalars {
-            switch c {
-            case "&": out += "&amp;"
-            case "<": out += "&lt;"
-            case ">": out += "&gt;"
-            default: out.unicodeScalars.append(c)
-            }
-        }
     }
 
     private static func str(_ b: ArraySlice<UInt8>) -> String { String(decoding: b, as: UTF8.self) }
@@ -105,20 +136,21 @@ enum RichClip {
                 }
                 if skip > 0 { continue }
                 if closing {
-                    let kind = tagKind(name)
-                    if !kind.isEmpty {
-                        let searchStart = max(stack.count - 64, 0)
-                        if let pos = stack[searchStart...].lastIndex(where: { $0.0 == kind }) {
-                            let (_, db, di, du) = stack[pos]
-                            bold -= db
-                            italic -= di
-                            underline -= du
-                            stack.removeSubrange(pos...)
-                        }
+                    // Any other tag that styled its text (`<a style=…>`) closes under its own name.
+                    let k = tagKind(name)
+                    let kind = k.isEmpty ? name : k
+                    let searchStart = max(stack.count - 64, 0)
+                    if let pos = stack[searchStart...].lastIndex(where: { $0.0 == kind }) {
+                        let (_, db, di, du) = stack[pos]
+                        bold -= db
+                        italic -= di
+                        underline -= du
+                        stack.removeSubrange(pos...)
                     }
                     if isBlock(name) { newPara(&paragraphs) }
                     continue
                 }
+                if isBlock(name) { newPara(&paragraphs) }
                 if isBreak(name) {
                     newPara(&paragraphs)
                     continue
@@ -129,7 +161,8 @@ enum RichClip {
                     italic += di
                     underline += du
                     if token.utf8.last != UInt8(ascii: "/") && stack.count < 128 {
-                        stack.append((tagKind(name), db, di, du))
+                        let k = tagKind(name)
+                        stack.append((k.isEmpty ? name : k, db, di, du))
                     } else {
                         bold -= db
                         italic -= di

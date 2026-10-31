@@ -41,9 +41,9 @@ public enum TransitionCommands {
         ]
     }
 
-    static func slideIndices(_ s: Session, _ p: JSON) throws -> [Int] {
+    static func slideIndices(_ s: Session, _ p: JSON, _ cmd: String) throws -> [Int] {
         let st = try s.doc()
-        if let i = Cmd.usizeParam(p, "index") { return [i] }
+        if let i = try Cmd.optUsizeParam(p, "index", cmd) { return [i] }
         let v = st.selection.slides.compactMap { st.doc.slideIndex($0) }
         return v.isEmpty ? [st.selection.slide] : v
     }
@@ -55,7 +55,7 @@ public enum TransitionCommands {
         }
         let option = Cmd.strParam(p, "option") ?? info.options.first ?? ""
         let duration = p.get("duration")?.asU64.map { UInt32(min($0, 59_000)) }
-        let list = try slideIndices(s, p)
+        let list = try slideIndices(s, p, "transition.set")
         try s.edit { doc, _ in
             for i in list where doc.slides.indices.contains(i) {
                 var t = doc.slides[i].transition ?? .default
@@ -72,7 +72,7 @@ public enum TransitionCommands {
 
     @Sendable static func options(_ s: Session, _ p: JSON) throws -> JSON {
         guard let option = Cmd.strParam(p, "option") else { throw Cmd.bad("transition.options", "missing `option`") }
-        let list = try slideIndices(s, p)
+        let list = try slideIndices(s, p, "transition.options")
         try s.edit { doc, _ in
             for i in list where doc.slides.indices.contains(i) && doc.slides[i].transition != nil {
                 doc.slides[i].transition?.option = option
@@ -82,7 +82,7 @@ public enum TransitionCommands {
     }
 
     @Sendable static func timing(_ s: Session, _ p: JSON) throws -> JSON {
-        let list = try slideIndices(s, p)
+        let list = try slideIndices(s, p, "transition.timing")
         try s.edit { doc, _ in
             for i in list where doc.slides.indices.contains(i) {
                 var t = doc.slides[i].transition ?? .default
@@ -102,7 +102,7 @@ public enum TransitionCommands {
 
     /// Transitions › Sound: embed an audio file as the slides' transition sound, or `none` to remove it.
     @Sendable static func sound(_ s: Session, _ p: JSON) throws -> JSON {
-        let list = try slideIndices(s, p)
+        let list = try slideIndices(s, p, "transition.sound")
         let looping = Cmd.boolParam(p, "loop")
         func editAll(_ f: (inout Transition) -> Void) throws {
             try s.edit { doc, _ in

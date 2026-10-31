@@ -354,15 +354,45 @@ extension TextCommands {
     /// shapes). A caret without a range formats the word it's in (PowerPoint behaviour) (`format_run`).
     @discardableResult
     public static func formatRun(_ s: Session, _ f: (inout RunProps) -> Void) throws -> JSON {
+        try formatRunLevels(s, f) { r, _ in f(&r) }
+    }
+
+    /// Like `formatRun`, with a separate change for the list-style levels of a layout or master
+    /// placeholder: `lf` gets the level's own run props and the level's effective ones (what a run at that
+    /// level resolves to), so a relative change (grow/shrink) steps each level from its own value
+    /// (`format_run_levels`).
+    @discardableResult
+    public static func formatRunLevels(_ s: Session, _ f: (inout RunProps) -> Void, _ lf: (inout RunProps, RunProps) -> Void) throws -> JSON {
         let st = try s.doc()
         if let t = st.selection.text {
             let (a, b) = formatRange(st, t)
-            try editText(s) { body, _ in TextEdit.format(&body, a, b, f) }
+            // Only the levels of the paragraphs the selected range touches.
+            let levels = a == b ? [] : masterLevels(st, t, (t.ordered.0.tuple, t.ordered.1.tuple))
+            try editText(s) { body, _ in
+                if levels.isEmpty {
+                    TextEdit.format(&body, a, b, f)
+                } else {
+                    formatByLevel(&body, a, b, lf, levels)
+                }
+                for (l, eff) in levels {
+                    var lvl = body.listStyle.level(l) ?? LevelStyle()
+                    lf(&lvl.run, eff)
+                    body.listStyle.set(l, lvl)
+                }
+            }
             return Cmd.ok()
         }
         let ids = st.selection.shapes
         if ids.isEmpty { throw Cmd.bad("format", Cmd.selectTextOrShape) }
         let cells = st.selection.cells
+        // Effective run props of every level of the selected placeholders, resolved before editing.
+        var effective: [ShapeId: [RunProps]] = [:]
+        if editingMaster(st), let ctx = ctxFor(st.doc, st.selection) {
+            for id in ids {
+                guard let sh = st.shape(id), sh.ph != nil else { continue }
+                effective[id] = (0 ..< listLevels).map { Resolve.levelStyle(ctx, sh, $0).run }
+            }
+        }
         _ = try Cmd.editShapes(s, ["ids": ids.toJSON()], "format") { sh in
             let id = sh.id
             if case .table(var t) = sh.kind {
@@ -376,12 +406,79 @@ extension TextCommands {
                 sh.kind = .table(t)
             } else {
                 var body = sh.text ?? TextBody()
-                TextEdit.formatAll(&body, f)
+                if let eff = effective[id] {
+                    let levels = Array(zip(0 ..< listLevels, eff))
+                    formatByLevel(&body, (0, 0), (Int.max, Int.max), lf, levels)
+                    // The whole shape is selected: every level of its list style.
+                    for (l, e) in levels {
+                        var lvl = body.listStyle.level(l) ?? LevelStyle()
+                        lf(&lvl.run, e)
+                        body.listStyle.set(l, lvl)
+                    }
+                } else {
+                    TextEdit.formatAll(&body, f)
+                }
                 sh.text = body
             }
         }
         for id in ids { try fitTextBox(s, id) }
         return Cmd.ok()
+    }
+
+    /// Format the runs of [a, b) paragraph by paragraph, each with its own level's effective props, so a
+    /// relative change (grow/shrink) steps every paragraph from its own size instead of one shared value.
+    /// `a`/`b` are clamped to the body (`format_by_level`).
+    static func formatByLevel(_ body: inout TextBody, _ a: TextPos, _ b: TextPos, _ lf: (inout RunProps, RunProps) -> Void, _ levels: [(UInt8, RunProps)]) {
+        guard !body.paragraphs.isEmpty else { return }
+        let last = body.paragraphs.count - 1
+        let (first, end) = (min(a.0, last), min(b.0, last))
+        guard first <= end else { return }
+        for pi in first ... end {
+            let p = body.paragraphs[pi]
+            let from = pi == first ? min(a.1, p.charLen) : 0
+            let to = pi == end ? min(b.1, p.charLen) : p.charLen
+            if from == to && p.charLen > 0 { continue }
+            let lvl = min(p.level, listLevels - 1)
+            guard let eff = levels.first(where: { $0.0 == lvl })?.1 else { continue }
+            TextEdit.format(&body, (pi, from), (pi, to)) { lf(&$0, eff) }
+        }
+    }
+
+    /// List-style levels (`lvl1pPr`–`lvl9pPr`) a placeholder passes on to the slides that use it.
+    static let listLevels: UInt8 = 9
+
+    /// Formatting a placeholder on a layout or master (Slide Master view) also sets its list style, which is
+    /// what the placeholders on slides inherit; its own runs may be few or none.
+    static func editingMaster(_ st: DocState) -> Bool {
+        switch st.selection.target {
+        case .layout, .master: true
+        default: false
+        }
+    }
+
+    /// The distinct list-style levels of the paragraphs `range` touches in a layout or master placeholder,
+    /// with each level's effective run props. Empty anywhere else (`master_levels`).
+    static func masterLevels(_ st: DocState, _ t: TextSel, _ range: (TextPos, TextPos)) -> [(UInt8, RunProps)] {
+        if !editingMaster(st) || t.notes || t.cell != nil { return [] }
+        guard let sh = st.shape(t.shape), sh.ph != nil, let body = bodyOf(st, t), let ctx = ctxFor(st.doc, st.selection) else { return [] }
+        var levels: [UInt8] = body.paragraphs.enumerated().filter { range.0.0 <= $0.offset && $0.offset <= range.1.0 }.map { min($0.element.level, listLevels - 1) }
+        if body.paragraphs.isEmpty { levels.append(0) }
+        levels = Array(Set(levels)).sorted()
+        return levels.map { ($0, Resolve.levelStyle(ctx, sh, $0).run) }
+    }
+
+    /// Apply a paragraph change to one level of a body's list style (`format_list_level`).
+    static func formatListLevel(_ body: inout TextBody, _ l: UInt8, _ f: (inout Paragraph) -> Void) {
+        var lvl = body.listStyle.level(l) ?? LevelStyle()
+        var p = Paragraph()
+        p.level = l
+        p.props = lvl.para
+        f(&p)
+        // A level change (indent/outdent) means nothing for a list-style level.
+        if p.level == l {
+            lvl.para = p.props
+            body.listStyle.set(l, lvl)
+        }
     }
 
     /// What `formatRun` formats while editing: the selection, or for a bare caret the word it's in
@@ -429,6 +526,8 @@ extension TextCommands {
         let st = try s.doc()
         if let t = st.selection.text {
             let (a, b) = t.ordered
+            // Only the list-style levels of the paragraphs touched, on a layout or master placeholder.
+            let levels = masterLevels(st, t, (a.tuple, b.tuple)).map(\.0)
             try editText(s) { body, _ in
                 if body.paragraphs.isEmpty { body.paragraphs.append(Paragraph()) }
                 let last = max(body.paragraphs.count - 1, 0)
@@ -437,14 +536,17 @@ extension TextCommands {
                         f(&body.paragraphs[pi])
                     }
                 }
+                for l in levels { formatListLevel(&body, l, f) }
             }
             return Cmd.ok()
         }
         let ids = st.selection.shapes
         if ids.isEmpty { throw Cmd.bad("format", Cmd.selectTextOrShape) }
         let cells = st.selection.cells
+        let onMaster = editingMaster(st)
         _ = try Cmd.editShapes(s, ["ids": ids.toJSON()], "format") { sh in
             let id = sh.id
+            let inherited = onMaster && sh.ph != nil
             if case .table(var t) = sh.kind {
                 let range = TableCommands.selectedRange(cells, id, t)
                 for r in t.rows.indices {
@@ -457,6 +559,10 @@ extension TextCommands {
                 var body = sh.text ?? TextBody()
                 if body.paragraphs.isEmpty { body.paragraphs.append(Paragraph()) }
                 for k in body.paragraphs.indices { f(&body.paragraphs[k]) }
+                // The whole shape is selected: every level of its list style.
+                if inherited {
+                    for l in 0 ..< listLevels { formatListLevel(&body, l, f) }
+                }
                 sh.text = body
             }
         }
@@ -985,7 +1091,7 @@ extension TextCommands {
 
     /// After a space or punctuation, correct the word just typed.
     private static func autocorrect(_ s: Session, _ typing: Bool) throws {
-        if !s.prefs.autocorrect { return }
+        if !s.prefs.autocorrect && !(typing && s.prefs.acLists) { return }
         let st = try s.doc()
         guard let t = st.selection.text, let body = bodyOf(st, t) else { return }
         let line = Array((body.paragraphs.at(t.caret.para)?.text ?? "").unicodeScalars)
@@ -998,6 +1104,7 @@ extension TextCommands {
             if autoListStyle(lead) != nil { return }
             if try startAutoList(s, t, line, end) { return }
         }
+        if !s.prefs.autocorrect { return }
         var wordEnd = end - 1
         var start = wordEnd
         while start > 0, let c = line.at(start - 1), !c.properties.isWhitespace { start -= 1 }

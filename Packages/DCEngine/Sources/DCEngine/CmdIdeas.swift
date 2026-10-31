@@ -216,13 +216,13 @@ public enum IdeasCommands {
 
     @Sendable static func ideasCmd(_ s: Session, _ p: JSON) throws -> JSON {
         let st = try s.doc()
-        let i = Cmd.usizeParam(p, "slide") ?? st.selection.slide
+        let i = try Cmd.optUsizeParam(p, "slide", "design.ideas") ?? st.selection.slide
         return .array(ideasFor(st.doc, i).map { ["id": .string($0.id), "label": .string($0.label)] })
     }
 
     @Sendable static func applyCmd(_ s: Session, _ p: JSON) throws -> JSON {
         guard let id = Cmd.strParam(p, "id") else { throw Cmd.bad("design.applyIdea", "missing `id`") }
-        let slide = Cmd.usizeParam(p, "slide")
+        let slide = try Cmd.optUsizeParam(p, "slide", "design.applyIdea")
         return try s.edit { doc, sel in
             let i = slide ?? sel.slide
             try applyIdea(&doc, sel, i, id)

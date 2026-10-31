@@ -307,9 +307,10 @@ struct EditTests {
         s.st.selection.shapes = [title]
         let r = s.run("edit.duplicate")
         let copy = id(r.get("ids")?.at(0))
-        #expect(s.st.shape(copy)?.name == "Title 1 copy")
+        // "Title 1" is not an automatic name of a rectangle, so the copy keeps it, as in PowerPoint (deckcraft 8ada6016).
+        #expect(s.st.shape(copy)?.name == "Title 1")
         s.run("edit.duplicate")
-        #expect(s.st.selectedShapes.first?.name == "Title 1 copy", "a copy of a copy is not `copy copy`")
+        #expect(s.st.selectedShapes.first?.name == "Title 1", "a copy of a copy keeps the name too")
         #expect(s.run("edit.delete") == ["deleted": 1])
         #expect(s.run("edit.delete", "{\"ids\": [\(copy)]}") == ["deleted": 1])
         #expect(s.st.shape(copy) == nil)
@@ -434,6 +435,115 @@ struct EditTests {
         s.run("edit.copy")
         s.run("edit.paste")
         #expect(names().last == "Hero")
+    }
+
+    /// PowerPoint 16.0 (Windows): on "Rectangle 1, Oval 2, TextBox 3, Hero" Duplicate gives "Rectangle 5" and
+    /// then "Rectangle 6", "TextBox 7"; the copy of "Hero" (and of its copy) is "Hero". Never "Hero copy".
+    // tests.rs duplicate_gives_the_next_automatic_name_and_keeps_a_chosen_one
+    @Test func duplicateGivesTheNextAutomaticNameAndKeepsAChosenOne() throws {
+        let s = session()
+        func names() -> [String] { s.st.currentSlide?.shapes.map(\.name) ?? [] }
+        func add(_ p: String) -> UInt32 {
+            s.run("shape.insert", p)
+            return s.st.selection.shapes.first?.rawValue ?? 0
+        }
+        let rect = add(#"{"preset": "rect", "rect": [10, 10, 50, 50]}"#)
+        let tb = add(#"{"preset": "rect", "rect": [100, 10, 50, 50]}"#)
+        s.run("shape.rename", "{\"id\": \(tb), \"name\": \"Hero\"}")
+        let n = names().count
+        let auto = names()[n - 2]
+        let base = String(auto[..<(auto.lastIndex(of: " ") ?? auto.endIndex)])
+
+        s.run("edit.duplicate", "{\"ids\": [\(rect)]}")
+        s.run("edit.duplicate", "{\"ids\": [\(rect)]}")
+        var all = names()
+        #expect(all[n] == "\(base) \(n + 1)", "\(all)")
+        #expect(all[n + 1] == "\(base) \(n + 2)", "\(all)")
+
+        s.run("edit.duplicate", "{\"ids\": [\(tb)]}")
+        let copy = try #require(s.st.selection.shapes.first)
+        s.run("edit.duplicate", "{\"ids\": [\(copy)]}")
+        all = names()
+        #expect(Array(all[(n + 2)...]) == ["Hero", "Hero"], "\(all)")
+    }
+
+    /// Two shapes sharing a chosen name are still two shapes: the next number follows the count.
+    // tests.rs duplicate_numbers_from_the_shape_count_when_names_repeat
+    @Test func duplicateNumbersFromTheShapeCountWhenNamesRepeat() throws {
+        let s = session()
+        s.run("shape.insert", #"{"preset": "rect", "rect": [10, 10, 50, 50]}"#)
+        let rect = try #require(s.st.selection.shapes.first)
+        s.run("shape.insert", #"{"preset": "rect", "rect": [100, 10, 50, 50]}"#)
+        let hero = try #require(s.st.selection.shapes.first)
+        s.run("shape.rename", "{\"id\": \(hero), \"name\": \"Hero\"}")
+        s.run("edit.duplicate", "{\"ids\": [\(hero)]}")
+        let before = s.st.currentSlide?.shapes.count ?? 0
+        s.run("edit.duplicate", "{\"ids\": [\(rect)]}")
+        let shapes = s.st.currentSlide?.shapes ?? []
+        let source = try #require(shapes.first { $0.id == rect })
+        let base = String(source.name[..<(source.name.lastIndex(of: " ") ?? source.name.endIndex)])
+        #expect(shapes.at(before)?.name == "\(base) \(before + 1)", "\(shapes.map(\.name))")
+    }
+
+    /// Every name on the current slide, group members included.
+    private func allNames(_ s: Session) -> [String] {
+        var all: [String] = []
+        walk(s.st.currentSlide?.shapes ?? []) { sh, _ in all.append(sh.name) }
+        return all
+    }
+
+    private func insertRects(_ s: Session, _ xs: [Int]) -> [ShapeId] {
+        xs.compactMap { x in
+            s.run("shape.insert", "{\"preset\": \"rect\", \"rect\": [\(x), 10, 50, 50]}")
+            return s.st.selection.shapes.first
+        }
+    }
+
+    /// The next automatic name looks at the names inside groups too.
+    // tests.rs duplicating_a_group_does_not_repeat_the_names_of_its_members
+    @Test func duplicatingAGroupDoesNotRepeatTheNamesOfItsMembers() throws {
+        let s = session()
+        let ids = insertRects(s, [10, 70, 130, 190])
+        s.run("arrange.group", "{\"ids\": [\(ids[2]), \(ids[3])]}")
+        let group = try #require(s.st.selection.shapes.first)
+        // Fewer top-level shapes than names in use: the next number is one a member already has.
+        s.run("edit.delete", "{\"ids\": [\(ids[0]), \(ids[1])]}")
+        s.run("edit.duplicate", "{\"ids\": [\(group)]}")
+        let all = allNames(s)
+        #expect(Set(all).count == all.count, "\(all)")
+    }
+
+    /// A shape inserted or pasted after a group was duplicated takes none of its members' names.
+    // tests.rs inserting_after_duplicating_a_group_does_not_repeat_a_member_name
+    @Test func insertingAfterDuplicatingAGroupDoesNotRepeatAMemberName() throws {
+        let s = session()
+        let ids = insertRects(s, [10, 70])
+        s.run("arrange.group", "{\"ids\": [\(ids[0]), \(ids[1])]}")
+        let group = try #require(s.st.selection.shapes.first)
+        s.run("edit.duplicate", "{\"ids\": [\(group)]}")
+        // Fewer top-level shapes than shapes: counting only the top level reaches a member's number.
+        _ = insertRects(s, [130, 190, 250])
+        s.run("edit.copy")
+        s.run("edit.paste")
+        let all = allNames(s)
+        #expect(Set(all).count == all.count, "\(all)")
+    }
+
+    /// Group members are renamed like any other copied shape.
+    // tests.rs duplicating_a_group_renames_its_automatic_children
+    @Test func duplicatingAGroupRenamesItsAutomaticChildren() throws {
+        let s = session()
+        let ids = insertRects(s, [10, 100])
+        s.run("arrange.group", "{\"ids\": [\(ids[0]), \(ids[1])]}")
+        let group = try #require(s.st.selection.shapes.first)
+        s.run("edit.duplicate", "{\"ids\": [\(group)]}")
+        let shapes = s.st.currentSlide?.shapes ?? []
+        let (orig, copy) = (shapes[shapes.count - 2], shapes[shapes.count - 1])
+        #expect(orig.isGroup && copy.isGroup)
+        #expect(orig.name != copy.name)
+        #expect(copy.name.hasPrefix("Group "), "\(copy.name)")
+        let all = (orig.children + copy.children).map(\.name)
+        #expect(Set(all).count == all.count, "\(all)")
     }
 
     @Test(.enabled(if: ported("shape.insert")))
@@ -597,6 +707,42 @@ struct EditTests {
 
 @Suite("Rich clipboard")
 struct RichClipTests {
+    // richclip.rs tests::style_on_other_tags_ends_at_their_close
+    @Test func styleOnOtherTagsEndsAtTheirClose() throws {
+        let cases: [(String, String, (RunProps) -> Bool)] = [
+            ("a", "font-weight:bold", { $0.bold == true }),
+            ("td", "font-style:italic", { $0.italic == true }),
+            ("mark", "text-decoration:underline", { $0.underline != nil }),
+        ]
+        for (tag, style, prop) in cases {
+            let body = try #require(RichClip.htmlToBody("<p><\(tag) style=\"\(style)\">link</\(tag)> plain</p>"))
+            let runs = body.paragraphs[0].runs
+            #expect(runs.count == 2, "\(tag)")
+            guard runs.count == 2 else { continue }
+            #expect(prop(runs[0].props), "\(tag)")
+            #expect(runs[0].text == "link")
+            #expect(runs[1].text == " plain")
+            #expect(runs[1].props.bold == nil && runs[1].props.italic == nil && runs[1].props.underline == nil, "\(tag)")
+        }
+    }
+
+    // richclip.rs tests::text_before_opening_block_tag_is_separate_paragraph
+    @Test func textBeforeOpeningBlockTagIsSeparateParagraph() throws {
+        for tag in ["div", "p", "li", "h1"] {
+            let body = try #require(RichClip.htmlToBody("Hello<\(tag)>world</\(tag)>"))
+            #expect(body.paragraphs.map { $0.runs.map(\.text).joined() } == ["Hello", "world"], "\(tag)")
+        }
+    }
+
+    // richclip.rs tests::oversized_escaped_rich_text_puts_no_html_on_the_clipboard
+    @Test func oversizedEscapedRichTextPutsNoHTMLOnTheClipboard() {
+        var body = TextBody.fromText(String(repeating: "&<🦀", count: 100_000))
+        body.paragraphs[0].runs[0].props.bold = true
+        body.paragraphs.append(Paragraph("later paragraph"))
+        // Neither the formatted nor the plain HTML fits, and a truncated prefix would lose text.
+        #expect(RichClip.bodyToHTML(body).isEmpty)
+    }
+
     @Test func multibyteAfterAmpersandIsKept() {
         let text = String(repeating: "é", count: 20)
         #expect(RichClip.decodeText("R&D \(text)") == "R&D \(text)")

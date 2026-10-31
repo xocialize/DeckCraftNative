@@ -82,7 +82,7 @@ public enum InsertCommands {
                 "Date & Time",
                 ["Insert", "Text"],
                 nil,
-                "{format?: datetime1..datetime13, update?: bool, language?: en-US|en-GB|fr-FR|ja-JP|sv-SE} — no keys opens the dialog",
+                "{format?: datetime1..datetime13, update?: bool, language?: en-US|en-GB|fr-FR|ja-JP|sv-SE} — no keys opens the dialog; in the Handout or Notes Master view it fills the selected date placeholder (else the master's own) and answers where: \"master\"",
                 Cmd.hasSlide,
                 dateTime
             ),
@@ -178,8 +178,8 @@ public enum InsertCommands {
             shape.id = ShapeId(raw)
             if shape.name.isEmpty {
                 let base = autoNameBase(shape)
-                let taken = Cmd.currentNames(doc, sel)
-                shape.name = firstFreeName(base, taken)
+                let (taken, count) = Cmd.currentNames(doc, sel)
+                shape.name = firstFreeName(base, taken, count)
             }
             let id = shape.id
             let added = shape
@@ -1419,11 +1419,50 @@ public enum InsertCommands {
             }
             return dateAnswer("caret", o)
         }
+        // Handout or Notes Master view: the master's date placeholder (the selected one, else the master's
+        // own), which every handout or notes page then shows.
+        if try s.doc().selection.target.isPageMaster { return try writeMasterDate(s, o) }
         // Not editing: the slide's date placeholder (this slide only). A layout with no date placeholder
         // gets a text box instead, so the chosen format is still inserted.
         _ = try s.execute("design.headerFooter", ["date": true, "all": false])
         if !(try writeDatePlaceholder(s, o)) { return try insertDateBox(s, o) }
         return dateAnswer("footer", o)
+    }
+
+    /// Put the date in the date placeholder of the handout or notes master being edited.
+    static func writeMasterDate(_ s: Session, _ o: DateOpts) throws -> JSON {
+        let hasDate = try {
+            let st = try s.doc()
+            return pageMaster(st.doc, st.selection.target)?.shapes.contains { $0.phType == .date } ?? false
+        }()
+        if !hasDate {
+            throw Cmd.bad("insert.dateTime", "this master has no date placeholder; show it with handout.placeholders or notes.placeholders {date: true}")
+        }
+        // The text the master holds afterwards, which the answer reports (it can differ from the caller's
+        // sample when the placeholder's own language formats a fixed date).
+        var written = o.sample
+        try s.edit { doc, sel in
+            _ = mutatePageMaster(&doc, sel.target) { m in
+                func isDate(_ x: Shape) -> Bool { x.phType == .date }
+                let shapes = m.shapes
+                let chosen = sel.shapes.lazy.compactMap { id in shapes.firstIndex { $0.id == id && isDate($0) } }.first
+                guard let i = chosen ?? m.shapes.firstIndex(where: isDate) else { return }
+                let sh = m.shapes[i]
+                var props = sh.text?.paragraphs.first?.runs.first?.props ?? RunProps.default
+                // A fixed date reads in the placeholder's own language when the caller named none.
+                var text = o.sample
+                if o.lang == nil, let l = props.lang, !o.update { text = (try? dateSample(o.format, l)) ?? o.sample }
+                if let lang = o.lang { props.lang = lang }
+                let kind: RunKind = o.update ? .field(field: o.format) : .text
+                var body = sh.text ?? TextBody.default
+                var para = body.paragraphs.first ?? Paragraph.default
+                written = text
+                para.runs = [Run(text: text, props: props, kind: kind)]
+                body.paragraphs = [para]
+                m.shapes[i].text = body
+            }
+        }
+        return ["where": "master", "format": .string(o.format), "update": .bool(o.update), "text": .string(written)]
     }
 
     /// Point the current slide's date placeholder at this format (a field, or the sample as plain text).
@@ -1725,9 +1764,10 @@ public enum InsertCommands {
 extension InsertCommands {
     /// "{base} n" with the first `n` from the shape count + 1 that no shape on the slide already uses, so
     /// a gap left by a deleted shape never makes a second shape with the same name (`first_free_name`).
+    /// `count` is the number of shapes, which exceeds the number of names when two shapes share one.
     /// Ported by the core.
-    static func firstFreeName(_ base: String, _ taken: Set<String>) -> String {
-        var n = taken.count + 1
+    static func firstFreeName(_ base: String, _ taken: Set<String>, _ count: Int) -> String {
+        var n = count + 1
         while true {
             let c = "\(base) \(n)"
             if !taken.contains(c) { return c }

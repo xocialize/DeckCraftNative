@@ -177,6 +177,82 @@ public enum ArrangeCommands {
         }
     }
 
+    /// After an edit: refit every group whose children's geometry changed to the union of its children
+    /// (PowerPoint keeps a group's box on its children, so moving one child grows or shrinks the group). The
+    /// children keep their place on the slide: the group's box and its child space change together. `old` is
+    /// the presentation before the edit; only slides the edit touched are looked at, and a group whose own box
+    /// changed (it was moved or resized) is left to that edit (`refit_groups`).
+    static func refitGroups(_ old: Presentation, _ new: inout Presentation) {
+        // Each slide, master and layout is compared with its own earlier state, found by id: a move,
+        // insertion or deletion shifts the indices, and shape ids repeat across slides. Rust skips the ones
+        // the edit didn't touch by pointer; an equal slide (cheap when its arrays share storage) has nothing
+        // to refit either.
+        var oldSlides: [SlideId: Int] = [:]
+        for (i, s) in old.slides.enumerated() where oldSlides[s.id] == nil { oldSlides[s.id] = i }
+        for i in new.slides.indices {
+            guard let j = oldSlides[new.slides[i].id] else { continue }
+            let before = old.slides[j]
+            if before == new.slides[i] { continue }
+            refitList(before.shapes, &new.slides[i].shapes, 0)
+        }
+        // A child edited in Slide Master, layout, notes or handout view refits its group there too.
+        for i in new.masters.indices {
+            if let before = old.masters.first(where: { $0.id == new.masters[i].id }), before != new.masters[i] {
+                refitMaster(before, &new.masters[i])
+            }
+        }
+        if let before = old.notesMaster, var after = new.notesMaster, before != after {
+            refitMaster(before, &after)
+            new.notesMaster = after
+        }
+        if let before = old.handoutMaster, var after = new.handoutMaster, before != after {
+            refitMaster(before, &after)
+            new.handoutMaster = after
+        }
+    }
+
+    static func refitMaster(_ old: Master, _ new: inout Master) {
+        refitList(old.shapes, &new.shapes, 0)
+        for i in new.layouts.indices {
+            refitList(old.layouts.first { $0.id == new.layouts[i].id }?.shapes, &new.layouts[i].shapes, 0)
+        }
+    }
+
+    static func refitList(_ old: [Shape]?, _ list: inout [Shape], _ depth: Int) {
+        // Most edits touch a slide without groups: nothing to refit, and no per-shape lookup. Nesting is
+        // bounded like the model's other walks.
+        if depth > 64 || !list.contains(where: \.isGroup) { return }
+        var byId: [ShapeId: Shape] = [:]
+        for x in old ?? [] where byId[x.id] == nil { byId[x.id] = x }
+        for i in list.indices {
+            let before = byId[list[i].id]
+            var oldChildren: [Shape]?
+            var oldChild: Xfrm?
+            if case .group(let children, let child)? = before?.kind {
+                oldChildren = children
+                oldChild = child
+            }
+            let smart = list[i].diagram != nil
+            guard case .group(var children, var child) = list[i].kind else { continue }
+            refitList(oldChildren, &children, depth + 1)
+            defer { list[i].kind = .group(children: children, child: child) }
+            // A SmartArt graphic's box is its own; its shapes are regenerated inside it.
+            if smart { continue }
+            guard let oldChildren, let before else { continue }
+            if before.xfrm != list[i].xfrm || oldChild != child || children.isEmpty { continue }
+            let same = oldChildren.count == children.count && zip(oldChildren, children).allSatisfy { $0.id == $1.id && $0.xfrm == $1.xfrm }
+            if same { continue }
+            guard let group = list[i].xfrm else { continue }
+            guard let u = unionBounds(children.compactMap(\.xfrm)), u.isFinite else { continue }
+            let union = Xfrm(u.x0, u.y0, u.width, u.height)
+            let placed = childToParent(group, child, union)
+            var x = group
+            (x.x, x.y, x.w, x.h) = (placed.x, placed.y, placed.w, placed.h)
+            list[i].xfrm = x
+            child = union
+        }
+    }
+
     /// A child's xfrm in slide space, given its group.
     public static func childToParent(_ group: Xfrm, _ ch: Xfrm, _ c: Xfrm) -> Xfrm {
         let sx = Swift.abs(ch.w) > 1e-9 ? group.w / ch.w : 1

@@ -308,6 +308,19 @@ struct DesignIdeasTests {
             }
         }
     }
+
+    // Rust: cmd/ideas.rs::an_invalid_slide_index_is_refused_not_replaced_by_the_selection
+    @Test func anInvalidSlideIndexIsRefusedNotReplacedByTheSelection() {
+        let s = ideasDeck(false)
+        let before = s.st.doc
+        for bad in ["-1", "1.5", "\"0\""] {
+            #expect(s.fails("design.applyIdea", "{\"id\": \"centred\", \"slide\": \(bad)}"), "\(bad)")
+            #expect(s.fails("design.ideas", "{\"slide\": \(bad)}"), "\(bad)")
+        }
+        #expect(s.st.doc == before)
+        #expect(!s.fails("design.applyIdea", #"{"id": "centred", "slide": 0}"#))
+        #expect(!s.fails("design.ideas"))
+    }
 }
 
 // MARK: - Animations
@@ -458,6 +471,65 @@ struct AnimationCommandTests {
             #expect(s.run("animation.get").asArray?.count == 1)
         }
     }
+
+    // Rust: cmd/animation.rs::clear_rejects_invalid_index
+    @Test func clearRejectsInvalidIndex() {
+        let s = Session.withNew()
+        let id = s.run("shape.insert", #"{"preset": "rect", "rect": [10.0, 10.0, 100.0, 100.0]}"#).get("id")?.asU64 ?? 0
+        s.run("animation.add", "{\"effect\": \"fade\", \"class\": \"entrance\", \"ids\": [\(id)]}")
+        for bad in ["-1", "1.5"] {
+            #expect(s.fails("animation.clear", "{\"index\": \(bad)}"))
+            #expect(s.run("animation.get").asArray?.count == 1)
+        }
+    }
+
+    private func pathOf(_ s: Session) -> String? { s.run("animation.get").asArray?.last?.get("path")?.asStr }
+
+    private func ellipse(_ s: Session) -> UInt64 {
+        s.run("shape.insert", #"{"preset": "ellipse", "rect": [100.0, 400.0, 20.0, 20.0]}"#).get("id")?.asU64 ?? 0
+    }
+
+    /// #1576: points in slide points, as offsets from the shape, become the slide-fraction path.
+    // Rust: cmd/animation.rs::a_custom_path_takes_its_points
+    @Test func aCustomPathTakesItsPoints() {
+        let s = Session.withNew()
+        let id = ellipse(s)
+        let (w, h) = (s.st.doc.slideSize.width, s.st.doc.slideSize.height)
+        let r = s.run("animation.add", "{\"effect\": \"customPath\", \"class\": \"path\", \"path\": [[0, 0], [\(w / 2), \(-h / 4)], [\(w), \(-h / 2)]], \"ids\": [\(id)]}")
+        #expect(r.get("path") == "M 0 0 L 0.5 -0.25 L 1 -0.5 E")
+        #expect(pathOf(s) == "M 0 0 L 0.5 -0.25 L 1 -0.5 E")
+        // closed shapes end back at the start; set replaces; no path keeps the default
+        s.run("animation.set", "{\"effect\": \"customPath\", \"path\": [[0, 0], [\(w / 4), 0], [\(w / 4), \(h / 4)]], \"closed\": true, \"ids\": [\(id)]}")
+        #expect(pathOf(s) == "M 0 0 L 0.25 0 L 0.25 0.25 Z E")
+        s.run("animation.set", "{\"effect\": \"customPath\", \"ids\": [\(id)]}")
+        #expect(pathOf(s) == "M 0 0 L 0 0.25 E")
+    }
+
+    // Rust: cmd/animation.rs::a_raw_path_string_is_kept_and_options_edits_it
+    @Test func aRawPathStringIsKeptAndOptionsEditsIt() {
+        let s = Session.withNew()
+        let id = ellipse(s)
+        s.run("animation.add", "{\"effect\": \"customPath\", \"path\": \"M 0 0 C 0.1 0 0.2 0.1 0.3 0.1 E\", \"ids\": [\(id)]}")
+        #expect(pathOf(s) == "M 0 0 C 0.1 0 0.2 0.1 0.3 0.1 E")
+        s.run("animation.options", #"{"index": 0, "path": [[0, 0], [96, 54]]}"#)
+        #expect(pathOf(s) == "M 0 0 L 0.1 0.1 E")
+    }
+
+    // Rust: cmd/animation.rs::a_bad_path_is_refused_and_changes_nothing
+    @Test func aBadPathIsRefusedAndChangesNothing() {
+        let s = Session.withNew()
+        let id = ellipse(s)
+        let many = "[" + (0 ..< 2_000).map { "[\($0), \($0)]" }.joined(separator: ",") + "]"
+        let long = JSON.string(String(repeating: "M 0 0 L 0.1 0.1 ", count: 10_000)).display
+        for bad in [
+            "[[0, 0]]", "[]", "[[0, 0], [1]]", #"[[0, 0], ["a", 1]]"#, "[[0, 0], [1e300, 1]]", "[[0, 0], [null, 1]]",
+            #""M 0 0 L <script> E""#, #""not a path""#, #""eeee1""#, #""M 0 0 L 1e999 0 E""#, "5", many, long,
+        ] {
+            #expect(s.fails("animation.add", "{\"effect\": \"customPath\", \"path\": \(bad), \"ids\": [\(id)]}"), "\(bad.prefix(60))")
+        }
+        #expect(s.fails("animation.add", "{\"effect\": \"fade\", \"path\": [[0, 0], [1, 1]], \"ids\": [\(id)]}"), "path only fits a motion path")
+        #expect(s.run("animation.get").asArray?.isEmpty == true, "a refused add left an animation behind")
+    }
 }
 
 // MARK: - Transitions
@@ -529,6 +601,23 @@ struct TransitionCommandTests {
         let after = try #require(s.st.doc.slides[0].transition)
         #expect(after.sound != nil && !after.soundLoop)
         #expect(throws: (any Error).self) { try s.execute("transition.sound", ["builtin": "foghorn"]) }
+    }
+
+    // Rust: cmd/transition.rs::invalid_index_params_are_rejected_not_defaulted_to_selection
+    @Test func invalidIndexParamsAreRejectedNotDefaultedToSelection() {
+        let s = Session.withNew()
+        while s.st.doc.slides.count < 3 { s.run("slide.new") }
+        for bad in ["-1", "1.5"] {
+            for (cmd, p) in [
+                ("transition.set", "{\"kind\": \"fade\", \"index\": \(bad)}"),
+                ("transition.options", "{\"option\": \"x\", \"index\": \(bad)}"),
+                ("transition.timing", "{\"duration\": 500, \"index\": \(bad)}"),
+                ("transition.sound", "{\"none\": true, \"index\": \(bad)}"),
+            ] {
+                #expect(s.fails(cmd, p), "\(cmd) must reject \(p)")
+                #expect(s.st.doc.slides.allSatisfy { $0.transition == nil }, "\(cmd) \(p)")
+            }
+        }
     }
 }
 

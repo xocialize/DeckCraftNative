@@ -417,6 +417,15 @@ struct FormatTextTests {
     @Test(.enabled(if: ported("insert.textBox"))) func numberingTakesColorAndSize() {
         let s = session()
         s.run("insert.textBox", #"{"rect": [10, 10, 300, 100], "text": "One\nTwo"}"#)
+        if let id = s.st.selection.shapes.first {
+            _ = try? s.edit { doc, _ in
+                withShape(&doc.slides[0].shapes, id) { sh in
+                    sh.text?.paragraphs[0].props.bulletFontFollowText = true
+                    sh.text?.paragraphs[0].props.bulletColorFollowText = true
+                    sh.text?.paragraphs[0].props.bulletSizeFollowText = true
+                }
+            }
+        }
         s.run("format.numbering", #"{"on": true, "scheme": "romanUcPeriod", "start": 3, "color": "accent2", "size": 150}"#)
         func pp() -> ParaProps {
             let st = s.st
@@ -425,9 +434,13 @@ struct FormatTextTests {
         let p = pp()
         #expect(p.bullet == .autoNum(scheme: "romanUcPeriod", startAt: 3))
         #expect(p.bulletSize == 1.5)
+        #expect(p.bulletFontFollowText == true)
+        #expect(p.bulletColorFollowText == nil)
+        #expect(p.bulletSizeFollowText == nil)
         #expect(p.bulletColor == ColorRef.scheme(.accent2))
         s.run("format.bullets", #"{"on": true, "char": "★", "size": 9000}"#)
         #expect(pp().bulletSize == 4.0)
+        #expect(pp().bulletFontFollowText == nil)
     }
 
     // tests.rs format_language_marks_the_selected_text

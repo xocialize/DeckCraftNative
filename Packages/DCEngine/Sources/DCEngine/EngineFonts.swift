@@ -22,12 +22,14 @@ public enum EngineFonts {
     }
 
     /// The font families the slides' text is drawn in (theme fonts resolved, bullet fonts included) that
-    /// aren't installed or bundled, sorted, without duplicates (case-insensitive).
+    /// aren't installed or bundled, sorted, without duplicates (case-insensitive). Names that start with a
+    /// dot are macOS hidden system fonts (`.SF NS`); they never appear in a font list and can't be
+    /// installed, so they aren't reported.
     public static func missingFonts(_ p: Presentation) -> [String] {
         let db = FontDB.shared
         var out: [String] = []
         for family in usedFonts(p) {
-            if !db.hasFamily(family) && !out.contains(where: { eqIgnoreASCIICase($0, family) }) { out.append(family) }
+            if !family.hasPrefix(".") && !db.hasFamily(family) && !out.contains(where: { eqIgnoreASCIICase($0, family) }) { out.append(family) }
         }
         // `sort_by_key(to_lowercase)`: stable, by the lowercased name's bytes.
         return out.enumerated().sorted { a, b in

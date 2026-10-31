@@ -128,6 +128,10 @@ struct FileTests {
         #expect(throws: EngineError.self) { try r("a-b", 6) }
         #expect(throws: EngineError.self) { try r(" , ", 6) }
         #expect(throws: EngineError.self, "hostile numbers are refused") { try r("1-99999999999999999999999", 6) }
+        // file.rs tests::slide_range_rejects_plus_sign
+        #expect(throws: EngineError.self) { try r("+2", 3) }
+        #expect(throws: EngineError.self) { try r("+1-+3", 3) }
+        #expect(try r("1-3", 3) == [0, 1, 2])
         // file.export takes the same text for a PDF.
         let s = session()
         s.run("slide.new")
@@ -233,6 +237,32 @@ struct FileTests {
         r = s.run("file.openBytes", "{\"name\": \"b.pptx\", \"data\": \"\(try deckInFont(have))\"}")
         #expect(r.get("missingFonts") == [])
         s.run("file.new")
+        #expect(s.st.missingFonts.isEmpty)
+    }
+
+    /// HH12: exporting the same slide twice to one PNG path after an edit overwrites the file with the new
+    /// picture (not a bug: the second file differs).
+    // tests.rs exporting_a_slide_again_overwrites_the_png_with_the_edit
+    @Test func exportingASlideAgainOverwritesThePNGWithTheEdit() throws {
+        let dir = scratchDir("hh12")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let png = dir.appending(path: "slide.png")
+        let s = session()
+        let params = JSON.object(JSONObject(["path": .string(png.path), "format": "png", "slide": 0, "scale": 0.5])).display
+        s.run("file.export", params)
+        let first = try Data(contentsOf: png)
+        s.run("shape.insert", #"{"preset": "rect", "rect": [100, 100, 400, 300]}"#)
+        s.run("shape.fill", ##"{"color": "#FF0000"}"##)
+        s.run("file.export", params)
+        let second = try Data(contentsOf: png)
+        #expect(first != second, "the second export replaced the file with the edited slide")
+    }
+
+    // tests.rs a_macos_hidden_system_font_is_not_reported_missing
+    @Test func aMacOSHiddenSystemFontIsNotReportedMissing() throws {
+        let s = Session.withNew()
+        let r = s.run("file.openBytes", "{\"name\": \"a.pptx\", \"data\": \"\(try deckInFont(".SF NS"))\"}")
+        #expect(r.get("missingFonts") == [])
         #expect(s.st.missingFonts.isEmpty)
     }
 
