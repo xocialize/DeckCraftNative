@@ -65,6 +65,10 @@ EOF
     rm -f "$plain"
   elif [[ $fmt == ppt ]]; then
     "$py" -I "$root/Tools/legacy/fixtures.py" olefile-list "$dst" > "$dst.olefile.json"
+    # POI's readings, for DCPPT's tests (as make-fixtures.sh makes them for LibreOffice's files).
+    local poi=(/opt/homebrew/opt/openjdk/bin/java -cp "${py:h:h:h}/poi-6.0.0/*" "$root/Tools/legacy/PoiTool.java")
+    "${poi[@]}" dump-ppt "$dst" $open_pw > "$dst.poi.json" 2>/dev/null
+    "${poi[@]}" format-ppt "$dst" $open_pw > "$dst.poi-format.json" 2>/dev/null
   fi
   print -r -- "{\"kind\":\"powerpoint-protected\",\"from\":\"${src#$fix/}\",\"producer\":\"Microsoft PowerPoint $ver\",\"format\":\"$fmt\",\"password\":$pj,\"modifyPassword\":$mj,\"describe\":$($py -I $root/Tools/legacy/fixtures.py describe "$dst")}" > "$dst.meta.json"
 }

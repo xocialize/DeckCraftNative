@@ -1,7 +1,8 @@
 // DCPPT — a drawing's shapes as DCModel shapes (P3): autoshapes with their preset or freeform geometry, fill, line,
 // shadow and text frame; groups, kept as groups; connectors joined to the shapes their rules name; tables (a group
 // flagged as one, its cells rectangles and its borders lines); and WordArt (a text-effect shape's string, drawn with
-// the shape's fill and line). Pictures and OLE objects come in P4.
+// the shape's fill and line). P4 adds pictures (a picture shape's picture with its crop and corrections), OLE objects
+// (their preview, as an `opaque` shape) and movies and sounds (their file, with the shape's picture as the poster).
 import DCColor
 import DCCore
 import DCGeometry
@@ -19,6 +20,10 @@ struct ShapeBuilder {
     let masterShapes: [UInt32: [UInt16: UInt32]]
     /// Scheme colours stay theme colours (the slide uses its master's).
     let linked: Bool
+    /// The pictures' media and the pattern bitmaps' presets.
+    var pictures = PictureRefs()
+    /// The document's OLE objects, movies and sounds, with the media of those already added.
+    var objects = ExObjects()
     /// Each drawn shape's id (its spid) as a DCModel id, given before any shape is built so connectors can name shapes
     /// that come after them.
     var ids: [UInt32: ShapeId] = [:]
@@ -40,16 +45,23 @@ struct ShapeBuilder {
     }
 
     func props(_ d: DrawnShape) -> ShapeProps {
-        ShapeProps(b, d, defaults: defaults, master: d.props[0x0301].flatMap { masterShapes[$0] }, scheme: ctx.scheme, linked: linked)
+        ShapeProps(b, d, defaults: defaults, master: d.props[0x0301].flatMap { masterShapes[$0] }, scheme: ctx.scheme, linked: linked,
+                   pictures: pictures)
     }
 
-    /// Whether a drawn shape comes in P4 instead (a picture or an OLE object).
+    /// Whether a drawn shape is a picture: a picture frame, an OLE object, or a shape with a picture of its own and no
+    /// outline of its own (a text box's picture is its fill's).
     static func isPicture(_ d: DrawnShape) -> Bool {
         d.type == 75 || d.isOLE || (d.props[0x0104] != nil && d.props[0x0145] == nil && !d.isGroup && d.type != 202)
     }
 
+    /// The external object (OLE object, movie or sound) a shape shows, by its ExObjRefAtom.
+    func exObject(_ d: DrawnShape) -> UInt32? {
+        d.clientData.first { $0.type == RT.exObjRefAtom && $0.body.count >= 4 }.map { le32(b, $0.body.lowerBound) }
+    }
+
     func shape(_ d: DrawnShape) -> Shape? {
-        guard !Self.isPicture(d), let id = ids[d.id], let box = d.rect else { return nil }
+        guard let id = ids[d.id], let box = d.rect else { return nil }
         let pr = props(d)
         var s = Shape.default
         s.id = id
@@ -74,6 +86,8 @@ struct ShapeBuilder {
             s.name = pr.string(0x0380) ?? "Group \(id.rawValue)"
             return s
         }
+
+        if Self.isPicture(d) { return picture(d, pr, s, w: w, h: h) }
 
         s.geom = geometry(d, pr, w: w, h: h)
         let lineLike: Bool = if case .preset(let name, _) = s.geom { Preset.isLineLike(name) } else { false }
@@ -121,6 +135,47 @@ struct ShapeBuilder {
             body.body = pr.frame(body.body)
             s.text = body
         }
+        return s
+    }
+
+    /// A picture shape: a picture, an OLE object's preview, or a movie or sound with its picture as the poster. A picture
+    /// whose picture couldn't be read keeps its place as an empty frame.
+    func picture(_ d: DrawnShape, _ pr: ShapeProps, _ shape: Shape, w: Double, h: Double) -> Shape {
+        var s = shape
+        s.geom = d.type == 75 ? .preset("rect") : geometry(d, pr, w: w, h: h)
+        // A picture is drawn without a fill unless it sets one, and with the outline it sets.
+        s.fill = pr.sets(0x01BF, 0x0180, 0x0181) ? pr.fill : nil
+        s.line = pr.sets(0x01FF, 0x01C0, 0x01CB) ? pr.line : nil
+        s.effects = pr.effects
+        let fill = pr.picture
+        let n = s.id.rawValue
+        if let ref = exObject(d), let o = objects.objects[ref] {
+            switch o.kind {
+            case .ole(let label):
+                s.kind = .opaque(xml: "", preview: fill?.media, label: label, parts: [])
+                s.name = "Object \(n)"
+            case .video, .audio, .embeddedSound:
+                if let m = objects.media[ref] {
+                    var video = false
+                    if case .video = o.kind { video = true }
+                    s.kind = .media(MediaClip(media: m, video: video, poster: fill?.media, volume: 1, loopPlay: o.loop, rewind: o.rewind))
+                    s.name = "\(video ? "Movie" : "Sound") \(n)"
+                } else if let fill {
+                    s.kind = .picture(fill: fill)
+                    s.name = "Picture \(n)"
+                }
+            }
+        } else if d.isOLE {
+            s.kind = .opaque(xml: "", preview: fill?.media, label: "Object", parts: [])
+            s.name = "Object \(n)"
+        } else if let fill {
+            s.kind = .picture(fill: fill)
+            s.name = "Picture \(n)"
+        } else {
+            s.name = "Picture \(n)"
+            s.fill = s.fill ?? Fill.none_
+        }
+        if let name = pr.string(0x0380) { s.name = name }
         return s
     }
 

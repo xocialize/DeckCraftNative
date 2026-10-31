@@ -58,6 +58,14 @@ done
   --save "$out/pptx/presets.pptx" >/dev/null 2>&1 \
   && meta "$out/pptx/presets.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/preset-deck.py\",\"producer\":\"dccli\"}" \
   || print -u2 "export failed: presets"
+# Pictures cropped, corrected and recoloured; picture, tiled and pattern fills and backgrounds; comments (P4's
+# pictures test; picture-deck.py). Its JPEG is made by sips from the script's own PNG.
+pics=$(mktemp -d -t dc-pictures)
+$py -I $root/Tools/legacy/picture-deck.py --png "$pics/photo.png" && sips -s format jpeg -s formatOptions 80 "$pics/photo.png" --out "$pics/photo.jpg" >/dev/null
+"$dccli" run "${(@f)$($py -I $root/Tools/legacy/picture-deck.py "$pics/photo.jpg")}" --save "$out/pptx/pictures.pptx" >/dev/null 2>&1 \
+  && meta "$out/pptx/pictures.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/picture-deck.py\",\"producer\":\"dccli\"}" \
+  || print -u2 "export failed: pictures"
+rm -rf "$pics"
 "$soffice" --headless --norestore "-env:UserInstallation=file://$lo_profile" --convert-to ppt --outdir "$out/ppt" $out/pptx/*.pptx >/dev/null 2>&1
 rm -rf "$lo_profile"
 for p in $out/ppt/*.ppt(N); do

@@ -232,7 +232,7 @@ public enum FileCommands {
     /// does); PowerPoint's default password, used when there was none, isn't.
     static func openPPT(_ name: String, _ bytes: [UInt8], password: String?) throws -> OpenedFile {
         do {
-            var (p, report) = try PPT.importChecked(bytes, password: password)
+            var (p, report) = try PPT.importChecked(bytes, password: password, hooks: LegacyPictures.hooks)
             DeckFormat.repair(&p)
             let typed = password != nil && password != RC4CryptoAPI.defaultPassword
             return OpenedFile(presentation: p, damage: Damage(media: [], slides: []),
@@ -412,7 +412,12 @@ public enum FileCommands {
     /// What the status line says about a converted `.ppt`.
     public static func convertedMessage(_ name: String, _ c: PPTReport) -> String {
         var text = "“\(name)” is a PowerPoint 97–2003 presentation: it was converted and opened as a copy. "
-        text += "This version brings over its \(c.slides) slide\(c.slides == 1 ? "" : "s") and slide size; its \(c.notImported.joined(separator: ", ")) aren't brought over yet."
+        text += "Its \(c.notImported.joined(separator: ", ")) aren't brought over yet."
+        if !c.asPictures.isEmpty {
+            let n = c.asPictures.count
+            text += " \(n) embedded object\(n == 1 ? " was" : "s were") brought over as \(n == 1 ? "a picture" : "pictures")."
+        }
+        if c.lostPictures > 0 { text += " \(c.lostPictures) picture\(c.lostPictures == 1 ? "" : "s") couldn't be read." }
         if !c.unreadSlides.isEmpty { text += " Slide\(c.unreadSlides.count == 1 ? "" : "s") \(c.unreadSlides.map(String.init).joined(separator: ", ")) couldn't be read." }
         return text
     }
@@ -820,6 +825,8 @@ extension PPTReport {
     /// The report in a command's reply (`file.open`'s `converted`).
     func toJSON() -> JSON {
         ["from": "ppt", "slides": .integer(slides), "unreadSlides": .array(unreadSlides.map { .integer($0) }),
-         "edits": .integer(edits), "encrypted": .bool(encrypted), "notImported": .array(notImported.map { .string($0) })]
+         "edits": .integer(edits), "encrypted": .bool(encrypted), "notImported": .array(notImported.map { .string($0) }),
+         "asPictures": .array(asPictures.map { .string($0) }), "lostPictures": .integer(lostPictures),
+         "convertedPictures": .integer(convertedPictures)]
     }
 }

@@ -93,7 +93,7 @@ check ".pptx reads back" $?
 shot 2-pptx
 quit
 
-echo "== 2b. Open a .ppt: a converted copy with its shapes, saved as .pptx (legacy plan P3)"
+echo "== 2b. Open a .ppt: a converted copy with its shapes and pictures, saved as .pptx (legacy plan P3–P4)"
 launch "$FIX/legacy/ppt/corpus-shapes.ppt"
 N=$(app document.inspect | jq_ "['slides'][1]['shapes']")
 check "the .ppt opens with its shapes" $([ "${N:-0}" -ge 6 ]; echo $?)
@@ -101,6 +101,16 @@ shot 2b-ppt
 app file.save "{\"path\":\"$OUT/converted.pptx\",\"format\":\"pptx\"}" >/dev/null
 "$BIN/dccli" render "$OUT/converted.pptx" --slide 1 --scale 0.5 "$OUT/2b-converted.png" >/dev/null 2>&1
 check "the converted .pptx saves and renders" $([ -s "$OUT/2b-converted.png" ]; echo $?)
+quit
+# Its pictures (legacy plan P4): the pictures deck's first content slide holds eight, which save and render.
+launch "$FIX/legacy/ppt/pictures.ppt"
+N=$(app document.inspect | jq_ "['slides'][1]['shapes']")
+M=$(app document.inspect | jq_ "['media'].__len__()" )
+check "the .ppt opens with its pictures" $([ "${N:-0}" -ge 8 ] && [ "${M:-0}" -ge 3 ]; echo $?)
+app file.save "{\"path\":\"$OUT/pictures.pptx\",\"format\":\"pptx\"}" >/dev/null
+"$BIN/dccli" render "$OUT/pictures.pptx" --slide 1 --scale 0.5 "$OUT/2b-pictures.png" >/dev/null 2>&1
+check "its pictures save and render" $([ -s "$OUT/2b-pictures.png" ]; echo $?)
+shot 2b-pictures
 quit
 
 echo "== 3. Present: show, transitions, presenter view"

@@ -146,13 +146,16 @@ struct Masters {
         return atom.flatMap { scheme(master: $0.masterId) } ?? main.flatMap { Self.scheme($0.bytes, $0.record) }
     }
 
-    /// A drawing's background shape's fill as DCModel (solid colours; a gradient by its first colour; a picture not
-    /// yet), nil when it has none.
-    static func background(_ b: [UInt8], _ c: Record, scheme: [Rgba]) -> Background? {
+    /// A drawing's background shape's fill as DCModel, its colours resolved: solid, shaded, pattern, picture or
+    /// texture (P4); nil when it has none.
+    static func background(_ b: [UInt8], _ c: Record, scheme: [Rgba], pictures: PictureRefs = PictureRefs()) -> Background? {
         guard let bg = Drawing.background(b, c) else { return nil }
         let type = bg.props[0x0180] ?? 0
-        guard [0, 4, 5, 6, 7].contains(type), let color = bg.props[0x0181] else { return nil }
-        return Self.color(color, scheme).map { .fill(fill: .solid(color: .rgb($0))) }
+        // A solid or shaded background with no colour of its own, or "the background", says nothing.
+        if type == 9 || ([0, 4, 5, 6, 7, 8].contains(type) && bg.props[0x0181] == nil) { return nil }
+        let pr = ShapeProps(b, bg, defaults: [:], scheme: scheme, linked: false, pictures: pictures)
+        guard let fill = pr.fill, fill != .none_ else { return nil }
+        return .fill(fill: fill)
     }
 
     /// An OfficeArtCOLORREF ([MS-ODRAW] 2.2.2): red, green, blue and flags; with fSchemeIndex (0x08) the red byte is a

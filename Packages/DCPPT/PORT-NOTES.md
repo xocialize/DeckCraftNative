@@ -78,6 +78,67 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
 - **Checked:** POI's reading of every fixture and of PowerPoint's own files, slide by slide and shape by shape:
   text, boxes and notes all match.
 
+## P4: pictures and objects (2026-10-30)
+
+- **`Pictures`:** the drawing group's BLIP store and the `Pictures` stream.
+  - Each entry holds its blip or points into the stream. A blip becomes a complete file:
+    - JPEG, PNG and TIFF as stored;
+    - a DIB with the BITMAPFILEHEADER that makes it a `.bmp`;
+    - EMF inflated;
+    - WMF inflated, with the placeable header, its bounds from the blip's header;
+    - PICT with the 512-byte header a PICT file starts with.
+  - The WMF and PICT headers are the ones Apache POI adds, so the bytes can be compared with POI's.
+  - Inflating stops at 256 MB.
+  - **Encrypted files:** each field of a blip is encrypted on its own, as block 0. The fields are the header, each
+    16-byte id, a metafile's 34-byte header or a bitmap's tag byte, and then the picture. This is how POI reads
+    them, and PowerPoint's own encrypted files read correctly this way. Treating the blip as one RC4 stream doesn't.
+  - **PICT:** macOS can't draw PICT any more, so it is converted.
+    - A PICT holding a JPEG becomes that JPEG. PowerPoint for Mac stored photos this way, using QuickTime's opcode
+      0x8200, and AppKit draws those as a single colour.
+    - Any other PICT is drawn by AppKit's `NSPICTImageRep` and kept as PNG. This goes through
+      `PPTHooks.pict`, supplied by DCEngine's `LegacyPictures`, so DCPPT itself doesn't use AppKit.
+    - The crash corpus has PICT pictures in about 6% of its files.
+  - **Patterns:** a pattern fill's bitmap is matched against DCRender's preset tiles, dark pixels as the foreground.
+    This goes through `PPTHooks.pattern`. All six patterns in PowerPoint's save of the pictures deck come back as
+    their presets.
+- **`PictureMedia`:** a picture is added to the presentation only when a shape, a fill or a background uses it, and
+  only once.
+- **`ShapeProps`:**
+  - **Picture fills:** a texture (type 2) is tiled at its own size; a picture (type 3) is stretched.
+  - **A picture's own properties:** the crop, as fractions; the transparent colour; contrast (0x10000 leaves it
+    unchanged); brightness (±0x8000); greyscale; and black and white.
+  - **Placeholders:** a placeholder now takes fill and line from its master's placeholder (hspMaster) too. This
+    fixes a P3 bug: in PowerPoint's own files, title placeholders drew an outline their master turns off.
+- **Backgrounds:** a background's fill now goes through `ShapeProps`, so it can be a gradient, a pattern, a picture
+  or a texture as well as a solid colour.
+- **`ExObjects`:** the document's ExObjList.
+  - **OLE objects** (embedded, linked or ActiveX) become `opaque` shapes showing their preview, labelled with
+    their program id or menu name. Saved as `.pptx` they are that picture; their data isn't carried over.
+  - **Movies** (MCI, AVI) become a linked video. The path is turned into a `file:` URL, and the shape's picture is
+    the poster.
+  - **Sounds:** a WAV from the SoundCollection is embedded; a linked WAV or MIDI file is linked.
+- **Comments:** each slide's Comment10Containers, found in its PowerPoint 2002 binary tag. A comment keeps its
+  author, initials, text, date and position. PowerPoint 16 leaves comments out when it saves `.ppt`; LibreOffice
+  keeps them.
+- **The report:**
+  - `asPictures` names each OLE object brought over as a picture.
+  - `lostPictures` counts the pictures that couldn't be read, and `convertedPictures` the PICTs that were converted.
+  - The status line says how many objects became pictures.
+  - Picture bullets (PowerPoint 2000's BlipCollection9) aren't read. Neither the fixtures nor the crash corpus has
+    any.
+- **Checked:**
+  - **Against POI:** every picture in every fixture's BLIP store has POI's bytes. So does every picture shape's
+    picture, OLE preview, picture fill and picture background, and each crop matches. The report lists each of
+    POI's OLE objects, and each slide's comments match POI's.
+  - **PowerPoint's own pictures deck** (`Tools/legacy/picture-deck.py`, saved as a protected `.ppt`, local only)
+    comes back as the original, picture by picture: the bytes, crop, brightness, contrast, greyscale, black and
+    white, transparent colour, picture and tiled fills, pattern presets, and backgrounds.
+  - **Hostile blips, objects and comments** are refused without trapping.
+  - **An engine test:** a `.ppt` whose OLE charts become pictures, and which saves as `.pptx` with them.
+  - **The crash corpus** with every slide rendered: 205 files open and render and 2 fail cleanly, with no crashes or
+    time-outs. Across it, 83 PICT pictures were converted and no picture was lost.
+  - **The alpha gate:** step 2b also opens and saves the pictures deck, in both layouts.
+
 ## P3: shapes (2026-10-30)
 
 - **`Drawing`:**
@@ -99,7 +160,7 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
   - ShapeIds are given to every drawn shape first, so a connector can name a shape drawn after it.
   - It builds groups, connectors, tables (`TableBuilder`) and WordArt, and runs the text through P2's readers with
     the shape's frame over it.
-  - Pictures and OLE objects are left for P4.
+  - Pictures and OLE objects came in P4.
 - **`Freeform`:** pVertices (2- or 4-byte coordinates) walked by pSegmentInfo.
   - Handled: lines, curves, moves, closes and ends; noFill and noLine; elliptical quadrants; quadratic Béziers.
   - Arcs and angle ellipses are drawn straight.

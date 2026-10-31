@@ -5,8 +5,9 @@
 // (P2a: their text, paragraphs and character formatting), with its notes page's text as its notes. P2b adds the first
 // main master's text styles, colour scheme and background to the default master, each slide's own scheme and
 // background, headers and footers, and hyperlinks. P3 brings every shape (Shapes.swift): geometry, fill, line, shadow,
-// groups, connectors, tables and WordArt. Pictures and the slide show come in P4–P5; the import report lists what
-// isn't brought over.
+// groups, connectors, tables and WordArt. P4 brings the pictures (Pictures.swift: shapes, picture and pattern fills,
+// backgrounds), OLE objects as their pictures, movies and sounds (Objects.swift), and comments. The slide show comes in
+// P5; the import report lists what isn't brought over, and each object that became a picture.
 import DCCFB
 import DCColor
 import DCGeometry
@@ -23,6 +24,12 @@ public struct PPTReport: Sendable, Equatable {
     public var encrypted: Bool
     /// What this version doesn't bring over yet.
     public var notImported: [String]
+    /// The objects that came over as their picture, one per object: "slide 3: MSGraph.Chart.8".
+    public var asPictures: [String] = []
+    /// Pictures that couldn't be read (damaged, or a PICT that couldn't be drawn).
+    public var lostPictures = 0
+    /// PICT pictures converted to JPEG or PNG.
+    public var convertedPictures = 0
 }
 
 public enum PPT {
@@ -35,7 +42,9 @@ public enum PPT {
     static let sizeRange = 72.0 ... 4032.0
 
     /// The presentation in a `.ppt`, and what the import couldn't bring over.
-    public static func importChecked(_ bytes: [UInt8], password: String? = nil) throws(PPTError) -> (Presentation, PPTReport) {
+    public static func importChecked(_ bytes: [UInt8], password: String? = nil, hooks: PPTHooks = PPTHooks()) throws(PPTError)
+        -> (Presentation, PPTReport)
+    {
         let file = try PPTFile(bytes, password: password)
         guard let doc = file.object(file.documentRef), let root = Record(doc, at: 0), root.type == RT.document, root.isContainer else {
             throw .damaged("the DocumentContainer can't be read")
@@ -82,15 +91,23 @@ public enum PPT {
         let hyperlinks = Document.hyperlinks(doc, children)
         let shapeDefaults = Drawing.defaults(doc, children)
         let masterShapes = masters.shapeProps()
+        var pictures = PictureMedia(pictures: Pictures.read(file, doc, children), hooks: hooks)
+        var objects = ExObjects.read(doc, children)
+        var asPictures: [String] = []
 
         var p = blankPresentation(size, .default, false)
         p.notesSize = notes
+        /// A drawing's background, its pictures added first.
+        func background(_ b: [UInt8], _ r: Record, _ scheme: [Rgba]) -> Background? {
+            if let bg = Drawing.background(b, r) { pictures.add([bg], &p, master: [:]) }
+            return Masters.background(b, r, scheme: scheme, pictures: pictures.refs)
+        }
+        if let main = masters.main, !p.masters.isEmpty, let bg = background(main.bytes, main.record, masterScheme) { p.masters[0].background = bg }
         if var m = p.masters.first {
             m.titleStyle = styles.listStyle(0, base)
             m.bodyStyle = styles.listStyle(1, base)
             m.otherStyle = styles.listStyle(4, base)
             m.theme.colors = Masters.themeColors(masterScheme, m.theme.colors)
-            if let main = masters.main, let bg = Masters.background(main.bytes, main.record, scheme: masterScheme) { m.background = bg }
             p.masters[0] = m
         }
         p.defaultTextStyle = styles.listStyle(4, base)
@@ -108,13 +125,21 @@ public enum PPT {
                 var builder = ShapeBuilder(b: o, outline: entry.outline, ctx: ctx, hyperlinks: hyperlinks, defaults: shapeDefaults,
                                            masterShapes: masterShapes, linked: scheme == masterScheme)
                 let (drawn, rules) = Drawing.tree(o, r)
+                pictures.add(drawn, &p, master: masterShapes)
+                for ref in Self.exObjects(o, drawn) {
+                    _ = objects.media(ref, &p)
+                    if case .ole(let label)? = objects.objects[ref]?.kind { asPictures.append("slide \(i + 1): \(label)") }
+                }
+                builder.pictures = pictures.refs
+                builder.objects = objects
                 slide.shapes = builder.build(&p, drawn, rules: rules)
+                slide.comments = Document.comments(o, r)
                 let atom = Masters.slideAtom(o, r)
-                if let atom, atom.flags & 0x4 == 0, let bg = Masters.background(o, r, scheme: scheme) {
+                if let atom, atom.flags & 0x4 == 0, let bg = background(o, r, scheme) {
                     // Its own background.
                     slide.background = bg
                 } else if scheme != masterScheme, let atom, let (mb, mr) = masters.byId[atom.masterId],
-                          let bg = Masters.background(mb, mr, scheme: scheme) {
+                          let bg = background(mb, mr, scheme) {
                     // A master other than the one DCModel has, or other colours: that master's background, resolved.
                     slide.background = bg
                 }
@@ -124,10 +149,21 @@ public enum PPT {
             if let n = notesBodies[entry.slideId] { slide.notes = n }
             p.slides.append(slide)
         }
-        let report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["pictures and OLE objects", "the master's own shapes", "picture backgrounds",
-                                             "transitions and animations"])
+        var report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
+                               notImported: ["the master's own shapes", "picture bullets", "transitions and animations"])
+        report.asPictures = asPictures
+        report.lostPictures = pictures.lost.count
+        report.convertedPictures = pictures.converted
         return (p, report)
+    }
+
+    /// The external objects (ExObjRefAtom ids) a drawing's shapes show, in z-order, groups' members included.
+    static func exObjects(_ b: [UInt8], _ drawn: [DrawnShape], depth: Int = 0) -> [UInt32] {
+        guard depth < Drawing.maxDepth else { return [] }
+        return drawn.flatMap { d -> [UInt32] in
+            let own = d.clientData.first { $0.type == RT.exObjRefAtom && $0.body.count >= 4 }.map { [le32(b, $0.body.lowerBound)] } ?? []
+            return own + exObjects(b, d.children, depth: depth + 1)
+        }
     }
 
     /// PowerPoint's default colour scheme (white background, black text), for a file without one.

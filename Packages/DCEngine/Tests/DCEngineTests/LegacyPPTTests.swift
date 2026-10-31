@@ -1,6 +1,7 @@
 // DCEngineTests — opening a legacy `.ppt` (Docs/plans/Legacy-PPT-and-Encryption.md, P1): it is converted and opens as
 // an untitled copy with the file's slides and slide size; the reply and the status line say what was converted and
-// what isn't brought over yet. An encrypted one needs its password, unless it used PowerPoint's default.
+// what isn't brought over yet. An encrypted one needs its password, unless it used PowerPoint's default. Its OLE
+// objects come over as their pictures (P4), the reply naming each, and save to `.pptx` as pictures.
 import DCCore
 @testable import DCEngine
 import DCTestSupport
@@ -49,5 +50,23 @@ import Testing
         guard FileManager.default.fileExists(atPath: def) else { return }
         _ = try s.execute("file.open", ["path": .string(def)])
         #expect(try s.doc().protection == nil)
+    }
+
+    @Test func objectsComeOverAsPicturesAndSave() throws {
+        let path = Self.legacy.appending(path: "ppt/corpus-content.ppt").path
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let s = Session()
+        let r = try s.execute("file.open", ["path": .string(path)])
+        let objects = r.get("converted")?.get("asPictures")?.asArray ?? []
+        #expect(objects.count == 2)
+        #expect(r.get("converted")?.get("lostPictures")?.asI64 == 0)
+        #expect(s.uiRequests.contains { if case let .message(t) = $0 { t.contains("2 embedded objects were brought over as pictures") } else { false } })
+        let out = FileManager.default.temporaryDirectory.appending(path: "dc-ppt-\(UUID().uuidString).pptx").path
+        defer { try? FileManager.default.removeItem(atPath: out) }
+        s.run("file.save", #"{"path": "\#(out)"}"#)
+        let saved = try FileCommands.readPresentationFile(out).doc
+        let pictures = saved.slides.flatMap(\.shapes).filter { if case .picture = $0.kind { true } else { false } }
+        #expect(pictures.count == 2)
+        #expect(pictures.allSatisfy { if case .picture(let f) = $0.kind { saved.media(f.media)?.data.isEmpty == false } else { false } })
     }
 }

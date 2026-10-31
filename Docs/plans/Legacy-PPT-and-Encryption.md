@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P3 are done** (§5, the milestone notes); P4 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P4 are done** (§5, the milestone notes); P5 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,55 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P4 notes (2026-10-30)
+
+- **Pictures** (`Pictures.swift`):
+  - The drawing group's BLIP store lists the pictures. Each entry holds its blip or points into the `Pictures`
+    stream, and each blip becomes a complete file.
+  - A DIB becomes a `.bmp`, a WMF gets its placeable header, and a PICT gets its 512-byte header, the same headers
+    POI adds, so the bytes compare.
+  - A picture is added to the deck only when a shape, a fill or a background uses it.
+- **Encrypted pictures:** a blip's fields are encrypted one by one, each as block 0. Those fields are the header,
+  each id, a metafile's header or a bitmap's tag, and then the picture. The plan's §7 worry was right: [MS-OFFCRYPTO]
+  is unclear here. POI's reader and PowerPoint's own files settled it.
+- **PICT (§8 decided):**
+  - A PICT holding a JPEG (QuickTime's opcode, as PowerPoint for Mac stored photos) becomes that JPEG.
+  - Any other PICT is drawn by AppKit and kept as PNG, through a hook the engine supplies; DCPPT has no AppKit.
+  - The crash corpus has 89 PICT pictures, in 13 of its 207 files.
+  - No QuickDraw subset is needed: AppKit still reads PICT on macOS 27. It fails only on the QuickTime JPEGs, and
+    those are extracted.
+- **Picture shapes** keep their crop, transparent colour, brightness, contrast, greyscale, and black and white.
+  Their outline is the one they set. They have no fill unless they set one.
+- **Fills and backgrounds:**
+  - A texture fill is tiled; a picture fill is stretched.
+  - A pattern's bitmap is matched to its DrawingML preset by DCRender's tiles.
+  - Backgrounds now take any fill: solid, gradient, pattern, picture or texture.
+- **OLE objects and charts** (MS Graph included) become `opaque` shapes showing their preview, labelled with their
+  program id. The import report lists each one (`asPictures`). Saved as `.pptx`, they are their picture.
+- **Movies and sounds:**
+  - Movies become linked videos; their path becomes a `file:` URL.
+  - Embedded WAV sounds are embedded; linked WAV and MIDI files are linked.
+  - The shape's picture is the poster.
+- **Comments:**
+  - Read from each slide's PowerPoint 2002 binary tag, with author, initials, text, date and position.
+  - PowerPoint 16 drops comments when it saves `.ppt`, so they are checked on LibreOffice's files, against POI.
+- **Not brought over:**
+  - Picture bullets (BlipCollection9): none in the fixtures or the crash corpus.
+  - OLE objects' data: the object is kept only as its picture.
+- **A P3 fix:** placeholders take fill and line from their master's placeholder (hspMaster), not just their own
+  properties. PowerPoint's title placeholders had drawn an outline their master turns off.
+- **Checked:**
+  - **Against POI:** `PictureTests` and `ShapeTests` check every picture in every fixture against POI's bytes,
+    along with each picture shape, OLE preview, picture fill, background and crop, the report's objects and the
+    comments.
+  - **PowerPoint's pictures deck** (§6.1) comes back as the original.
+  - **An engine test** opens a `.ppt` whose charts become pictures and saves it as `.pptx`.
+  - **The crash corpus** with rendering: 205 files open and render and 2 fail cleanly, with no crashes or time-outs
+    (9 min 20 s in Debug, up from 4 min now that pictures render). Across it, 83 PICT pictures were converted, no
+    picture was lost, and 725 OLE objects came over as pictures.
+  - **The alpha gate:** step 2b also opens LibreOffice's pictures deck, saves it as `.pptx` and renders it. It
+    passes in both layouts.
 
 ### P3 notes (2026-10-30)
 
@@ -447,6 +496,14 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
 - **Every gallery preset** (P3): `Tools/legacy/preset-deck.py` writes the `dccli` commands for a deck of the 180
   presets, each wide, tall and with its adjusts moved. It is converted like the others, and PowerPoint also saves it
   (below; `powerpoint-protect.sh --ppt`).
+- **Pictures** (P4): `Tools/legacy/picture-deck.py` writes the `dccli` commands for a deck of pictures:
+  - pictures cropped, corrected, recoloured, with a transparent colour, and a JPEG;
+  - shapes with picture, tiled and pattern fills;
+  - picture, tiled and pattern backgrounds;
+  - comments.
+
+  Its PNGs are generated by the script, and its JPEG is made from one of them by `sips`. LibreOffice converts it,
+  and PowerPoint saves it (`powerpoint-protect.sh --ppt`).
 - **Encrypted `.pptx`**: the corpus decks encrypted by POI (Agile with AES-128/SHA-1 and AES-256/SHA-512, both at
   100,000 rounds; Standard AES-128) and msoffcrypto-tool (Agile AES-256/SHA-512), with passwords in plain ASCII,
   with accents, with a character outside the BMP (a UTF-16 surrogate pair) and at Office's 255-character maximum.
@@ -472,6 +529,11 @@ They live in `../DeckCraftNative-Fixtures/legacy/` (local, never pushed), with a
   it through the master styles.
   Since P3, the shape dump also gives each shape's DrawingML type, rotation, flips, fill, line, shadow and text frame,
   and whether it sets its own fill and line, names a master shape, or has vertices.
+  Since P4, it also gives:
+  - each picture's type, size and SHA-256, as POI's `getData` gives it;
+  - each picture shape's crop;
+  - each fill's and background's picture;
+  - each slide's comments.
 - **PowerPoint**: the sweep's AppleScript counts slides and shapes in each `.ppt` fixture, as it does for `.pptx`
   today (black box: counts only, nothing saved).
 
@@ -493,7 +555,7 @@ every slide, at quarter scale.
 
 | Risk | Mitigation |
 |---|---|
-| **PICT pictures**: modern macOS has no PICT renderer; DCMetafile handles EMF and WMF only | P4 decides between a QuickDraw subset (bitmaps and simple vectors) and the shape's grey placeholder with a report entry (§8) |
+| **PICT pictures**: modern macOS has no PICT renderer; DCMetafile handles EMF and WMF only | Decided in P4: AppKit's `NSPICTImageRep` still reads them, so they are converted to PNG; the QuickTime JPEGs it can't draw are extracted |
 | **Incremental saves** aren't in any generated file | Hand-built record streams in P1, and the crash corpus exercises them in the wild |
 | LibreOffice's `.ppt` files are simpler than PowerPoint's (fewer PP9/PP10 tags) | Hand-built streams for the tag extensions; the crash corpus; PowerPoint's counts in the sweep |
 | LibreOffice writes adjust values in DrawingML's meaning, not the legacy one (P3) | Shapes are checked against PowerPoint's own save of every preset; LibreOffice's files are checked by type and box only |
@@ -505,7 +567,8 @@ every slide, at quarter scale.
 
 ## 8. Later decisions
 
-- **PICT**: QuickDraw subset or placeholder (decide in P4, with counts from the crash corpus).
+- **PICT**: decided in P4. A PICT is converted on import: one holding a JPEG becomes that JPEG, and any other is
+  drawn by AppKit and kept as PNG. The crash corpus has 89 PICT pictures, in 13 of its 207 files.
 - **Encrypted `.deckcraft`**: possible later; for now saving a protected presentation as `.deckcraft` warns.
 - **Charts from MS Graph** as real charts ([MS-OGRAPH] over [MS-XLS]) rather than their preview: only if the import
   report shows they're common.

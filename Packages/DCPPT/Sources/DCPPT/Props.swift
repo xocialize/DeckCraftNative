@@ -1,7 +1,7 @@
 // DCPPT — a shape's OfficeArt properties ([MS-ODRAW] 2.3) as DCModel: its fill, line, shadow and text frame. A
 // property the shape doesn't set comes from the drawing's defaults (the OfficeArtDggContainer's options, where
 // PowerPoint puts the default shape's fill and line) and then from the specification's default. A placeholder takes
-// only what it sets itself: the rest comes from its layout, as in DrawingML.
+// only what it or its master's placeholder (hspMaster) sets: the rest comes from its layout, as in DrawingML.
 import DCColor
 import Darwin
 import DCModel
@@ -15,14 +15,17 @@ struct ShapeProps {
     let scheme: [Rgba]
     /// Scheme colours stay theme colours when the slide uses its master's colours; otherwise they are resolved.
     let linked: Bool
+    /// The pictures' media and the patterns' presets.
+    let pictures: PictureRefs
 
     init(_ b: [UInt8], _ shape: DrawnShape, defaults: [UInt16: UInt32], master: [UInt16: UInt32]? = nil, scheme: [Rgba],
-         linked: Bool) {
+         linked: Bool, pictures: PictureRefs = PictureRefs()) {
         self.b = b
         self.shape = shape
-        self.defaults = shape.placeholder == nil ? [master ?? [:], defaults] : []
+        self.defaults = shape.placeholder == nil ? [master ?? [:], defaults] : [master ?? [:]]
         self.scheme = scheme
         self.linked = linked
+        self.pictures = pictures
     }
 
     func value(_ id: UInt16) -> UInt32? { shape.props[id] ?? defaults.lazy.compactMap { $0[id] }.first }
@@ -33,6 +36,8 @@ struct ShapeProps {
     func points(_ id: UInt16) -> Double? { int(id).map { Double($0) / 12700 } }
     /// Whether the shape itself sets any of these properties.
     func sets(_ ids: UInt16...) -> Bool { ids.contains { shape.props[$0] != nil } }
+    /// Whether the shape or one it inherits from sets any of these (for a placeholder, its master's placeholder).
+    func given(_ ids: UInt16...) -> Bool { ids.contains { value($0) != nil } }
 
     /// A boolean property's flag ([MS-ODRAW] 2.3, "… Boolean Properties"): the shape's when its fUse bit (16 above
     /// the flag) says it sets it, else the defaults', else `fallback`.
@@ -131,16 +136,49 @@ struct ShapeProps {
 
     /// The fill ([MS-ODRAW] 2.3.7), or nil for a placeholder that doesn't set one.
     var fill: Fill? {
-        if shape.placeholder != nil, !sets(0x01BF, 0x0180, 0x0181) { return nil }
+        if shape.placeholder != nil, !given(0x01BF, 0x0180, 0x0181) { return nil }
         guard flag(0x01BF, 4, true) else { return .none_ }
         let fore = color(0x0181, 0xFFFFFF, opacity: 0x0182) ?? .rgb(.rgb(255, 255, 255))
         let back = color(0x0183, 0xFFFFFF, opacity: 0x0184) ?? .rgb(.rgb(255, 255, 255))
         switch value(0x0180) ?? 0 {
-        case 1: return .pattern(PatternFill(preset: "pct50", fg: fore, bg: back))
+        case 1:
+            // A pattern: its bitmap (fillBlip) is one of the preset tiles, fillColor its dark pixels.
+            let preset = value(0x0186).flatMap { pictures.patterns[$0] } ?? "pct50"
+            return .pattern(PatternFill(preset: preset, fg: fore, bg: back))
+        case 2, 3:
+            // A texture (the picture tiled at its own size) or a picture stretched over the shape.
+            guard let pib = value(0x0186), let media = pictures.media[pib] else { return .solid(color: fore) }
+            var f = PictureFill(media: media)
+            if value(0x0180) == 2 { f.mode = .tile(tx: 0, ty: 0, sx: 1, sy: 1, flip: "none", align: "tl") }
+            if let o = fixed(0x0182), o < 1 { f.alpha = max(0, o) }
+            f.upright = !flag(0x01BF, 5, true)
+            return .picture(f)
         case 4, 5, 6, 7, 8: return gradient(fore, back)
         case 9: return .background
-        default: return .solid(color: fore)   // solid; texture and picture fills come in P4
+        default: return .solid(color: fore)
         }
+    }
+
+    // MARK: Picture
+
+    /// A picture shape's picture ([MS-ODRAW] 2.3.23 Blip properties): its crop, transparent colour, brightness,
+    /// contrast, and greyscale or black-and-white; nil when its picture isn't there.
+    var picture: PictureFill? {
+        guard let pib = value(0x0104), let media = pictures.media[pib] else { return nil }
+        var f = PictureFill(media: media)
+        // cropFromLeft, …Top, …Right, …Bottom: 16.16 fractions of the picture, negative to pad.
+        f.crop = [0x0102, 0x0100, 0x0103, 0x0101].map { id in fixed(id).map { min(max($0, -10), 1) } ?? 0 }
+        if let t = value(0x0107), t >> 24 != 0xFF, let c = rgb(t) { f.adjust.clearColor = c }
+        // pictureContrast: 0x10000 leaves it; less lowers it to 0, more raises it toward 1 (as 1 - 0x10000/v).
+        if let c = value(0x0108), c != 0x10000 {
+            let v = Double(c)
+            f.adjust.contrast = v <= 65536 ? v / 65536 - 1 : 1 - 65536 / v
+        }
+        // pictureBrightness: -0x8000 (black) to 0x8000 (white).
+        if let v = int(0x0109), v != 0 { f.adjust.brightness = min(max(Double(v) / 32768, -1), 1) }
+        // The blip booleans: fPictureBiLevel (bit 1), fPictureGray (bit 2).
+        if flag(0x013F, 1, false) { f.adjust.bilevel = 0.5 } else if flag(0x013F, 2, false) { f.adjust.grayscale = true }
+        return f
     }
 
     /// A shaded fill. The first colour (fillColor, or fillShadeColors' first) runs to the last (fillBackColor);
@@ -182,7 +220,7 @@ struct ShapeProps {
 
     /// The line ([MS-ODRAW] 2.3.8), or nil for a placeholder that doesn't set one.
     var line: Line? {
-        if shape.placeholder != nil, !sets(0x01FF, 0x01C0, 0x01CB) { return nil }
+        if shape.placeholder != nil, !given(0x01FF, 0x01C0, 0x01CB) { return nil }
         guard flag(0x01FF, 3, true) else { return Line(fill: Fill.none_) }
         var l = Line(fill: .solid(color: color(0x01C0, 0, opacity: 0x01C1) ?? .rgb(.rgb(0, 0, 0))))
         l.width = points(0x01CB) ?? 0.75

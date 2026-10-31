@@ -16,6 +16,9 @@ import DCOffCrypto
 public struct PPTFile: Sendable {
     /// The `PowerPoint Document` stream (still encrypted, for an encrypted file: `object` decrypts).
     let stream: [UInt8]
+    /// The `Pictures` stream, where the BLIP store's entries point (still encrypted: `blip` decrypts); empty when
+    /// the file has none.
+    let pictures: [UInt8]
     /// Persist object id → offset in the stream, newest edit winning.
     public let directory: [UInt32: Int]
     /// The persist id of the DocumentContainer.
@@ -44,12 +47,12 @@ public struct PPTFile: Sendable {
     static let dualStorage = "PP97_DUALSTORAGE"
 
     /// The `Current User` and `PowerPoint Document` streams of the PowerPoint 97 document in `cfb`.
-    static func streams(_ cfb: CompoundFile) throws(PPTError) -> (user: [UInt8], document: [UInt8]) {
+    static func streams(_ cfb: CompoundFile) throws(PPTError) -> (user: [UInt8], document: [UInt8], pictures: [UInt8]) {
         for prefix in ["", dualStorage + "/"] {
             guard let user = try? cfb.stream(prefix + "Current User"), let doc = try? cfb.stream(prefix + "PowerPoint Document"),
                   let r = Record(user, at: 0), r.type == RT.currentUserAtom
             else { continue }
-            return (user, doc)
+            return (user, doc, (try? cfb.stream(prefix + "Pictures")) ?? [])
         }
         if cfb.contains("Header") || cfb.contains("PersistentStorage Directory") {
             throw .unsupported("PowerPoint 95 and earlier presentations")
@@ -62,8 +65,9 @@ public struct PPTFile: Sendable {
         let cfb: CompoundFile
         do { cfb = try CompoundFile(bytes) } catch { throw .notPPT }
         guard cfb.contains("Current User") || cfb.contains(Self.dualStorage + "/Current User") else { throw .notPPT }
-        let (user, stream) = try Self.streams(cfb)
+        let (user, stream, pictures) = try Self.streams(cfb)
         self.stream = stream
+        self.pictures = pictures
 
         // CurrentUserAtom: where the newest edit is.
         guard user.count >= 20 else { throw .damaged("the CurrentUserAtom is too short") }
@@ -141,6 +145,35 @@ public struct PPTFile: Sendable {
         let length = Int(le32(header, 4))
         guard length <= stream.count - at - 8 else { return nil }
         return header + rc4.process(stream[at + 8 ..< at + 8 + length])
+    }
+
+    /// The blip record at `offset` in the `Pictures` stream, its header and data, decrypted; nil when it runs past the
+    /// stream. In an encrypted file each of a blip's fields is encrypted on its own as block 0: the header, each id,
+    /// a metafile's header or a bitmap's tag, then the picture ([MS-OFFCRYPTO] 2.3.7.4; Apache POI reads
+    /// them the same way).
+    func blip(at offset: Int) -> [UInt8]? {
+        guard offset >= 0, offset + 8 <= pictures.count else { return nil }
+        func part(_ r: Range<Int>) -> [UInt8] {
+            guard let key else { return Array(pictures[r]) }
+            return key.cipher(block: 0).process(pictures[r])
+        }
+        let header = part(offset ..< offset + 8)
+        let length = Int(le32(header, 4))
+        guard length <= pictures.count - offset - 8 else { return nil }
+        guard key != nil else { return Array(pictures[offset ..< offset + 8 + length]) }
+        let type = le16(header, 2), instance = le16(header, 0) >> 4
+        guard (RT.blipEMF ... RT.blipJPEGCMYK).contains(type) else { return nil }
+        var out = header, p = offset + 8
+        let end = p + length
+        var fields = [Int](repeating: 16, count: instance & 1 == 1 ? 2 : 1)
+        fields.append([RT.blipEMF, RT.blipWMF, RT.blipPICT].contains(type) ? 34 : 1)
+        for n in fields {
+            guard p + n <= end else { break }
+            out += part(p ..< p + n)
+            p += n
+        }
+        if p < end { out += part(p ..< end) }
+        return out
     }
 }
 
@@ -235,6 +268,40 @@ enum RT {
     static let tertiaryFopt: UInt16 = 0xF122
     static let drawingGroup: UInt16 = 0x040B
     static let dggContainer: UInt16 = 0xF000
+    static let bstoreContainer: UInt16 = 0xF001
+    static let fbse: UInt16 = 0xF007
+    static let blipEMF: UInt16 = 0xF01A
+    static let blipWMF: UInt16 = 0xF01B
+    static let blipPICT: UInt16 = 0xF01C
+    static let blipJPEG: UInt16 = 0xF01D
+    static let blipPNG: UInt16 = 0xF01E
+    static let blipDIB: UInt16 = 0xF01F
+    static let blipTIFF: UInt16 = 0xF029
+    static let blipJPEGCMYK: UInt16 = 0xF02A
+    // External objects ([MS-PPT] 2.10): OLE objects, movies and sounds, which shapes name by ExObjRefAtom.
+    static let exObjRefAtom: UInt16 = 0x0BC1
+    static let exOleObjAtom: UInt16 = 0x0FC3
+    static let exOleEmbed: UInt16 = 0x0FCC
+    static let exOleLink: UInt16 = 0x0FCE
+    static let exControl: UInt16 = 0x0FEE
+    static let exMediaAtom: UInt16 = 0x1004
+    static let exAviMovie: UInt16 = 0x1006
+    static let exMciMovie: UInt16 = 0x1007
+    static let exMidiAudio: UInt16 = 0x100D
+    static let exCdAudio: UInt16 = 0x100E
+    static let exWavAudioEmbedded: UInt16 = 0x100F
+    static let exWavAudioLink: UInt16 = 0x1010
+    static let exWavAudioEmbeddedAtom: UInt16 = 0x1013
+    static let exVideo: UInt16 = 0x1005
+    static let soundCollection: UInt16 = 0x07E4
+    static let sound: UInt16 = 0x07E6
+    static let soundDataBlob: UInt16 = 0x07E7
+    // Comments ([MS-PPT] 2.5.15), in a slide's PowerPoint 2002 binary tag.
+    static let progTags: UInt16 = 0x1388
+    static let progBinaryTag: UInt16 = 0x138A
+    static let binaryTagDataBlob: UInt16 = 0x138B
+    static let comment10: UInt16 = 0x2EE0
+    static let comment10Atom: UInt16 = 0x2EE1
 }
 
 /// A record header ([MS-PPT] 2.3.1) and where its data is.

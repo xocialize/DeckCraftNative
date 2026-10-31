@@ -543,6 +543,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
       - The alpha gate opens a `.ppt` in the app.
       - The crash corpus, with every slide rendered, is clean.
     - **Still to come:** pictures and OLE objects (P4) and the slide show (P5). `.ppt` support isn't released yet.
+  - **P4 (2026-10-30): `.ppt` pictures and objects.**
+    - **What comes over:**
+      - pictures (JPEG, PNG, DIB, TIFF, EMF and WMF), with their crop and corrections;
+      - picture, texture and pattern fills;
+      - picture backgrounds;
+      - OLE objects and charts, as their preview picture;
+      - linked movies, and embedded or linked sounds;
+      - comments.
+    - **PICT:** macOS can't draw it any more, so a PICT becomes the JPEG inside it, or a PNG drawn by AppKit.
+    - **The report:** the import report names each object that became a picture.
+    - **Encrypted files:** pictures are decrypted field by field, as PowerPoint writes them.
+    - **A P3 fix:** placeholders in PowerPoint's own files no longer draw an outline.
+    - **Checked:**
+      - every picture's bytes match POI's;
+      - PowerPoint's own save of a pictures deck imports as the original;
+      - the crash corpus, with every slide rendered.
+    - **Still to come:** the slide show (P5) and hardening (P6). `.ppt` support isn't released yet.
 
 ## Pin moves
 

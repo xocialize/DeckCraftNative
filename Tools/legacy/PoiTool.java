@@ -8,7 +8,7 @@
 //       wrap IN's exact bytes as an encrypted OOXML package ([MS-OFFCRYPTO] Agile or Standard)
 //   decrypt-ooxml PASSWORD IN OUT.pptx    write the decrypted package; exit 2 on a wrong password
 //   encrypt-ppt PASSWORD IN.ppt OUT.ppt   re-save a .ppt encrypted with RC4 CryptoAPI
-//   dump-ppt IN.ppt [PASSWORD]            slides, shapes and text as JSON on stdout
+//   dump-ppt IN.ppt [PASSWORD]            slides, shapes, text, pictures and comments as JSON on stdout
 //   format-ppt IN.ppt [PASSWORD]          each text shape's paragraphs and runs with the formatting POI resolves
 //                                         through the master styles (alignment, margins, bullets, spacing, font,
 //                                         size, bold, italic, underline, colour), as JSON on stdout
@@ -121,14 +121,48 @@ public class PoiTool {
         for (int i = 0; i < slides.size(); i++) {
             HSLFSlide s = slides.get(i);
             if (i > 0) b.append(',');
-            b.append("{\"index\":").append(i + 1).append(",\"hidden\":").append(s.isHidden()).append(",\"shapes\":");
+            b.append("{\"index\":").append(i + 1).append(",\"hidden\":").append(s.isHidden());
+            HSLFBackground bg = s.getBackground();
+            b.append(",\"background\":").append(bg == null ? "null" : picture(bg.getFill().getPictureData()));
+            b.append(",\"comments\":[");
+            List<HSLFComment> comments = s.getComments();
+            for (int j = 0; j < comments.size(); j++) {
+                HSLFComment c = comments.get(j);
+                b.append(j > 0 ? "," : "").append("{\"author\":").append(str(c.getAuthor())).append(",\"initials\":").append(str(c.getAuthorInitials()))
+                 .append(",\"text\":").append(str(c.getText()))
+                 .append(String.format(Locale.ROOT, ",\"x\":%.3f,\"y\":%.3f}", c.getOffset().getX(), c.getOffset().getY()));
+            }
+            b.append(']');
+            b.append(",\"shapes\":");
             shapes(b, s.getShapes());
             HSLFNotes n = s.getNotes();
             StringBuilder notes = new StringBuilder();
             if (n != null) for (List<HSLFTextParagraph> paras : n.getTextParagraphs()) notes.append(HSLFTextParagraph.getText(paras)).append('\n');
             b.append(",\"notes\":").append(str(notes.toString().strip())).append('}');
         }
+        b.append("],\"pictures\":[");
+        List<HSLFPictureData> pics = ss.getPictureData();
+        for (int i = 0; i < pics.size(); i++) b.append(i > 0 ? "," : "").append(picture(pics.get(i)));
         return b.append("]}").toString();
+    }
+
+    /// A picture's type, size and SHA-256, as POI's getData gives it (with the header a WMF, PICT or DIB needs).
+    static String picture(HSLFPictureData d) {
+        if (d == null) return "null";
+        try {
+            byte[] data = d.getData();
+            StringBuilder h = new StringBuilder();
+            for (byte x : java.security.MessageDigest.getInstance("SHA-256").digest(data)) h.append(String.format("%02x", x));
+            return "{\"type\":" + str(d.getType().name()) + ",\"size\":" + data.length + ",\"sha256\":\"" + h + "\"}";
+        } catch (Exception e) {
+            return "{\"error\":" + str(e.toString()) + "}";
+        }
+    }
+
+    /// A 16.16 property as a fraction, null when the shape doesn't set it.
+    static String fix(org.apache.poi.ddf.AbstractEscherOptRecord opt, int id) {
+        if (opt == null || !(opt.lookup(id) instanceof org.apache.poi.ddf.EscherSimpleProperty p)) return "null";
+        return String.format(Locale.ROOT, "%.4f", p.getPropertyValue() / 65536.0);
     }
 
     static void shapes(StringBuilder b, List<HSLFShape> list) {
@@ -160,6 +194,7 @@ public class PoiTool {
             if (sh instanceof HSLFSimpleShape s) {
                 HSLFFill f = s.getFill();
                 b.append(",\"fillType\":").append(f.getFillType())
+                 .append(",\"fillPicture\":").append(picture(f.getPictureData()))
                  .append(",\"fill\":").append(hex(s.getFillColor()))
                  .append(",\"line\":").append(hex(s.getLineColor()))
                  .append(String.format(Locale.ROOT, ",\"lineWidth\":%.2f", s.getLineWidth()))
@@ -174,6 +209,12 @@ public class PoiTool {
                  .append(",\"vAlign\":").append(str(t.getVerticalAlignment() == null ? null : t.getVerticalAlignment().name()))
                  .append(",\"wrap\":").append(t.getWordWrap());
             }
+            // Since P4: a picture's (or OLE object's preview's) bytes as POI gives them, and its crop.
+            if (sh instanceof HSLFPictureShape ps) {
+                b.append(",\"picture\":").append(picture(ps.getPictureData()));
+                b.append(String.format(Locale.ROOT, ",\"crop\":[%s,%s,%s,%s]", fix(opt, 0x102), fix(opt, 0x100), fix(opt, 0x103), fix(opt, 0x101)));
+            }
+            if (sh instanceof HSLFObjectShape os) b.append(",\"progId\":").append(str(os.getProgId()));
             if (sh instanceof HSLFTable tb) b.append(",\"rows\":").append(tb.getNumberOfRows()).append(",\"cols\":").append(tb.getNumberOfColumns());
             if (sh instanceof HSLFGroupShape g) { b.append(",\"children\":"); shapes(b, g.getShapes()); }
             b.append('}');

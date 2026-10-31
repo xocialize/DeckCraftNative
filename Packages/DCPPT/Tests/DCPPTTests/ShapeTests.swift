@@ -1,7 +1,9 @@
 // DCPPT — the shapes (P3): every shape of every slide is where POI puts it, of the type POI names, with POI's fill
 // and line colours, and every table has POI's rows and columns and cells; PowerPoint's own save of every gallery
 // preset (Tools/legacy/preset-deck.py, local only) imports as the original deck's preset with its adjust values; and
-// hostile property data never traps.
+// hostile property data never traps. Since P4 every picture, OLE object's preview, picture fill and picture background
+// has POI's bytes and crop.
+import CryptoKit
 import DCColor
 import DCGeometry
 import DCModel
@@ -52,9 +54,19 @@ import Testing
             /// Whether the shape sets any fill or line property itself, names a master shape, or has vertices.
             let ownFill: Bool?, ownLine: Bool?, master: Bool?, vertices: Bool?
             let children: [Shape]?
+            /// A picture's (or OLE object's preview's) bytes, a fill's picture, and the crop (left, top, right,
+            /// bottom; null where the shape doesn't set it).
+            let picture: Picture?, fillPicture: Picture?
+            let crop: [Double?]?
         }
-        struct Slide: Decodable { let shapes: [Shape] }
+        struct Picture: Decodable { let type: String?; let size: Int?; let sha256: String? }
+        struct Slide: Decodable { let shapes: [Shape]; let background: Picture? }
         let slides: [Slide]
+        let pictures: [Picture]?
+    }
+
+    static func sha256(_ p: Presentation, _ m: MediaId) -> String? {
+        p.media(m).map { SHA256.hash(data: Data($0.data)).map { String(format: "%02x", $0) }.joined() }
     }
 
     /// The fixtures, and PowerPoint 16's own `.ppt` files when the local set is here.
@@ -96,7 +108,7 @@ import Testing
         return x.count == y.count && zip(x, y).allSatisfy { abs($0 - $1) <= 1 }
     }
 
-    /// POI's pictures and OLE objects come in P4.
+    /// POI's pictures and OLE objects.
     static func isPicture(_ s: Dump.Shape) -> Bool { s.kind == "HSLFPictureShape" || s.kind == "HSLFObjectShape" }
 
     @Test func everyShapeIsPOIs() throws {
@@ -114,8 +126,14 @@ import Testing
             let (p, _) = try PPT.importChecked(Array(try Data(contentsOf: c.file)), password: c.password)
             let theme = p.masters.first?.theme.colors ?? ColorScheme(name: "", colors: [])
             for (i, (slide, theirs)) in zip(p.slides, ref.slides).enumerated() {
+                // POI gives a pattern background's bitmap as its picture; that's a pattern here.
+                let pattern = if case .fill(.pattern)? = slide.background { true } else { false }
+                if let bg = theirs.background, bg.type != "PICT", !pattern {
+                    var ours: String?
+                    if case .fill(.picture(let f))? = slide.background { ours = Self.sha256(p, f.media) }
+                    check("background", ours == bg.sha256, "\(c.name) slide \(i + 1): POI's background \(bg.type ?? ""), ours \(String(describing: slide.background))")
+                }
                 func walk(_ ours: [Shape], _ poi: [Dump.Shape], _ at: String) {
-                    let poi = poi.filter { !Self.isPicture($0) }
                     guard ours.count == poi.count else {
                         check("count", false, "\(at): POI \(poi.count) (\(poi.map(\.type))), ours \(ours.count)")
                         return
@@ -135,8 +153,32 @@ import Testing
                                 $0.text.paragraphs.map { $0.runs.map(\.text).joined() }.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
                             }
                             check("cells", cells.sorted() == mine.sorted(), "\(here): POI \(cells), ours \(mine)")
+                        case .picture(let f):
+                            check("kind", Self.isPicture(t), "\(here): POI \(t.kind), ours a picture")
+                            if let pic = t.picture, pic.type != "PICT" {
+                                check("picture", Self.sha256(p, f.media) == pic.sha256, "\(here): POI's \(pic.type ?? "") of \(pic.size ?? -1) bytes, ours differs")
+                            }
+                            let crop = (t.crop ?? []).map { $0 ?? 0 }
+                            check("crop", crop.isEmpty || zip(crop, f.crop).allSatisfy { abs($0 - $1) < 0.001 }, "\(here): POI \(crop), ours \(f.crop)")
+                        case .opaque(_, let preview, _, _):
+                            check("kind", t.kind == "HSLFObjectShape", "\(here): POI \(t.kind), ours an object")
+                            if let pic = t.picture, pic.type != "PICT" {
+                                check("picture", preview.flatMap { Self.sha256(p, $0) } == pic.sha256, "\(here): POI's preview \(pic.type ?? ""), ours differs")
+                            }
+                        case .media(let clip):
+                            check("kind", Self.isPicture(t), "\(here): POI \(t.kind), ours media")
+                            if let pic = t.picture, pic.type != "PICT" {
+                                check("picture", clip.poster.flatMap { Self.sha256(p, $0) } == pic.sha256, "\(here): POI's poster, ours differs")
+                            }
                         default:
-                            check("kind", !["HSLFGroupShape", "HSLFTable"].contains(t.kind), "\(here): POI \(t.kind), ours a shape")
+                            // A picture whose picture can't be read keeps its place as an empty frame.
+                            check("kind", !["HSLFGroupShape", "HSLFTable"].contains(t.kind) && (!Self.isPicture(t) || t.picture == nil),
+                                  "\(here): POI \(t.kind), ours a shape")
+                            if let pic = t.fillPicture, [2, 3].contains(t.fillType ?? 0), pic.type != "PICT" {
+                                var ours: String?
+                                if case .picture(let f)? = s.fill { ours = Self.sha256(p, f.media) }
+                                check("fillPicture", ours == pic.sha256, "\(here): POI's fill \(pic.type ?? ""), ours \(String(describing: s.fill))")
+                            }
                             // The type: the same preset, or a freeform where POI reads a freeform.
                             // A shape with vertices is a freeform whatever its type (PowerPoint gives presets it has no
                             // legacy type for the nearest type and their outline); a type with no DrawingML name maps
@@ -167,7 +209,9 @@ import Testing
                         guard s.ph == nil, s.text?.body.warp == nil, t.master != true else { continue }
                         if case .table = s.kind { continue }
                         if case .group = s.kind { continue }
-                        if t.ownFill == true, t.fillType == 0 || t.fill == nil {
+                        // A picture's fill is behind its picture: POI reads the picture fill PowerPoint stores there.
+                        let pictured = switch s.kind { case .picture, .opaque, .media: true; default: false }
+                        if !pictured, t.ownFill == true, t.fillType == 0 || t.fill == nil {
                             switch s.fill {
                             case .solid(let col)?:
                                 let ours = Self.hex(col.resolve(theme, nil))
