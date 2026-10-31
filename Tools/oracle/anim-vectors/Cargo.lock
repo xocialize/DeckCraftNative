@@ -187,7 +187,7 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
 name = "deckcraft-anim"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-geom",
  "deckcraft-model",
@@ -196,14 +196,14 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-color"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "deckcraft-fonts"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "epaint_default_fonts",
  "harfrust",
@@ -215,7 +215,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-format"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-model",
  "serde",
@@ -226,7 +226,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-geom"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "kurbo",
  "serde",
@@ -234,7 +234,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-metafile"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "image",
  "kurbo",
@@ -243,7 +243,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-model"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-color",
  "deckcraft-geom",
@@ -255,7 +255,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-render"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-anim",
  "deckcraft-color",
@@ -274,7 +274,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-text"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "chrono",
  "deckcraft-color",

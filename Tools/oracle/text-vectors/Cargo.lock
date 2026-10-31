@@ -108,14 +108,14 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-color"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "deckcraft-fonts"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "epaint_default_fonts",
  "harfrust",
@@ -127,7 +127,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-format"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-model",
  "serde",
@@ -138,7 +138,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-geom"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "kurbo",
  "serde",
@@ -146,7 +146,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-model"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-color",
  "deckcraft-geom",
@@ -158,7 +158,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-text"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "chrono",
  "deckcraft-color",

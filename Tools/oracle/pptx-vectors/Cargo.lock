@@ -46,14 +46,14 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-color"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "deckcraft-geom"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "kurbo",
  "serde",
@@ -61,7 +61,7 @@ dependencies = [
 
 [[package]]
 name = "deckcraft-model"
-version = "0.11.1"
+version = "0.13.1"
 dependencies = [
  "deckcraft-color",
  "deckcraft-geom",
