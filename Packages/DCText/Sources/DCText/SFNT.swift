@@ -283,6 +283,17 @@ func styleItalic(_ style: String) -> Bool {
     return s.contains("italic") || s.contains("oblique") || s == "it"
 }
 
+/// The Windows family and style a variable font's named instance answers to (deckcraft `instance_legacy_names`).
+/// Windows lists each instance other than Regular, Italic, Bold and Bold Italic as a family of its own, as the
+/// family's static files name themselves: "Montserrat ExtraBold" / "Regular" for the ExtraBold instance,
+/// "Montserrat ExtraBold" / "Italic" for ExtraBold Italic.
+func instanceLegacyNames(_ family: String, _ style: String) -> (String, String)? {
+    if style.contains("{") { return nil }
+    let weight = style.split(whereSeparator: \.isWhitespace).filter { !["italic", "oblique"].contains(normStyle(String($0))) }.joined(separator: " ")
+    if ["", "regular", "bold"].contains(normStyle(weight)) { return nil }
+    return ("\(family) \(weight)", styleItalic(style) ? "Italic" : "Regular")
+}
+
 /// Letters and digits only, lower case (deckcraft `norm`).
 func normStyle(_ s: String) -> String {
     String(String.UnicodeScalarView(s.unicodeScalars.filter { $0.properties.isAlphabetic || $0.properties.numericType != nil }

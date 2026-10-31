@@ -88,10 +88,19 @@ public enum DateFields {
         let short = shortDate(lang, now)
         func two(_ v: some BinaryInteger) -> String { v < 10 ? "0\(v)" : "\(v)" }
         func named(_ text: String) -> String? { english ? text : nil }
+        // British-style English writes the day before the month ("9 October 2026"). The punctuation follows
+        // PowerPoint on Windows per locale: Irish English has no comma after the weekday, British and Australian
+        // English put one after the month in `datetime3`, and South African English writes the weekday form day
+        // first too.
+        let dayFirst = ["en-gb", "en-au", "en-nz", "en-ie", "en-in"].contains(lang)
         switch kind {
         case "datetime", "datetimeFigureOut", "datetime1": return short
+        case "datetime2" where lang == "en-ie": return named("\(day) \(d) \(month) \(y)")
+        case "datetime2" where dayFirst || lang == "en-za": return named("\(day), \(d) \(month) \(y)")
         case "datetime2": return named("\(day), \(month) \(d), \(y)")
+        case "datetime3" where lang == "en-gb" || lang == "en-au": return named("\(d) \(month), \(y)")
         case "datetime3": return named("\(d) \(month) \(y)")
+        case "datetime4" where dayFirst: return named("\(d) \(month) \(y)")
         case "datetime4": return named("\(month) \(d), \(y)")
         case "datetime5": return named("\(d)-\(mon)-\(two(yy))")
         case "datetime6": return named("\(month) \(two(yy))")

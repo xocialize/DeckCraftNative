@@ -114,7 +114,44 @@ public final class FontDB: Sendable {
     /// Every face in a font file or collection; a variable font gives one face per named instance.
     static func facesOf(data: Data, bundled: Bool) -> [FontFace] {
         guard let descs = CTFontManagerCreateFontDescriptorsFromData(data as CFData) as? [CTFontDescriptor] else { return [] }
-        return descs.flatMap { facesOf(descriptor: $0, bundled: bundled) }
+        return collectionFaces(descs, data).flatMap { facesOf(descriptor: $0, bundled: bundled) }
+    }
+
+    /// Most faces enumerated from one font collection (deckcraft `MAX_COLLECTION_FACES`).
+    static let maxCollectionFaces = 256
+    /// Most collection entries inspected while looking for distinct table directories.
+    static let maxCollectionEntriesScanned = 16_384
+    /// Most named instances read from one face.
+    static let maxNamedInstancesPerFace = 1024
+
+    /// The first entry of each distinct table-directory offset, among the first `maxCollectionEntriesScanned`
+    /// (index, offset) entries, at most `maxCollectionFaces` of them: entries sharing a face don't use up the cap.
+    static func distinctFaceIndices(_ entries: [(index: Int, offset: UInt32)]) -> [Int] {
+        var offsets: Set<UInt32> = []
+        var indices: [Int] = []
+        for (index, offset) in entries.prefix(maxCollectionEntriesScanned) where offsets.insert(offset).inserted {
+            indices.append(index)
+            if indices.count == maxCollectionFaces { break }
+        }
+        return indices
+    }
+
+    static func cappedNamedInstanceCount(_ count: Int) -> Int { Swift.min(count, maxNamedInstancesPerFace) }
+
+    /// The faces of a collection (`ttcf`) that deckcraft enumerates (`distinctFaceIndices`); a single font's as they
+    /// are. CoreText gives one descriptor per entry, or already one per distinct offset (it drops entries sharing an
+    /// offset, in order), so the picked entries are found either way.
+    static func collectionFaces(_ descs: [CTFontDescriptor], _ data: Data) -> [CTFontDescriptor] {
+        func u32(_ o: Int) -> UInt32? {
+            guard o >= 0, o + 4 <= data.count else { return nil }
+            let b = data.startIndex + o
+            return UInt32(data[b]) << 24 | UInt32(data[b + 1]) << 16 | UInt32(data[b + 2]) << 8 | UInt32(data[b + 3])
+        }
+        guard u32(0) == 0x7474_6366, let count = u32(8) else { return descs }
+        let n = Int(Swift.min(count, UInt32(maxCollectionEntriesScanned)))
+        let picked = distinctFaceIndices((0 ..< n).compactMap { i in u32(12 + i * 4).map { (i, $0) } })
+        if descs.count == Int(count) { return picked.compactMap { descs.at($0) } }
+        return Array(descs.prefix(picked.count))
     }
 
     static func facesOf(descriptor: CTFontDescriptor, bundled: Bool) -> [FontFace] {
@@ -146,7 +183,7 @@ public final class FontDB: Sendable {
         let recs = SFNT.names(font)
         let base = Int(axesOff) + Int(axisCount) * Int(axisSize)
         var out: [(String, [(String, Double)])] = []
-        for i in 0 ..< Int(instCount) {
+        for i in 0 ..< cappedNamedInstanceCount(Int(instCount)) {
             let r = base + i * Int(instSize)
             guard let nameID = t.u16(r) else { break }
             var coords: [(String, Double)] = []

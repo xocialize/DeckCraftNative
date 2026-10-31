@@ -1,6 +1,6 @@
 # DCText port notes
 
-DCText is deckcraft's `crates/fonts` and `crates/text` (pin `27009cd9`, `Tools/oracle/pin.env`) on
+DCText is deckcraft's `crates/fonts` and `crates/text` (pin `a3fbf029`, `Tools/oracle/pin.env`) on
 CoreText. deckcraft's layout engine is ported line for line: run styles through `Resolve`, font slots and
 the cascade, bidi, items, line breaking, bullets and numbering, indents, tabs, spacing, alignment with
 kashida, columns, anchoring, vertical text, autofit, decorations, fields and the caret model. CoreText
@@ -146,6 +146,45 @@ machine that runs the tests.
       Hebrew, Arabic, Thai and Devanagari in a missing family fall back quickly (14 s in a debug build before, 0.1 s
       after).
 
+## Pin move 88c2ceff → a3fbf029
+
+Ported:
+- **Bullets in Unicode symbol fonts** (65826295, 9d32bc4d, 31efc67f, b54edd61). `mapSymbolBullet` maps by code
+  only for Wingdings and a font named exactly Symbol, and maps private-use codes only when no bullet font is
+  named, so "Noto Sans Symbols" bullets keep ❑ ❖. A bullet the bullet's face can't draw takes a face by the
+  usual cascade (`bulletFace`), no longer Inter; one the cascaded face still lacks is drawn as "•" rather
+  than .notdef. Test `bulletInAnUnavailableUnicodeSymbolFontKeepsItsCharacter`, with b54edd61's exact-glyph check.
+- **A space after a symbol-font character** (0865152e, moved by c66fee15) no longer stays in the symbol
+  font's face: neutrals keep the previous face only when it isn't a symbol font. Test
+  `aSpaceAfterASymbolFontCharacterKeepsTheRunsFont` (runs here: Office's DFonts hold Wingdings).
+- **"Start at" begins a new run of numbers** (afe4c324, the text part): a paragraph whose `startAt` differs
+  from the run its level is in restarts the count, and an empty one previews 1 of that run. Test
+  `aParagraphWithItsOwnStartAtRestartsTheCountThere`.
+- **Long English dates per locale** (50b200be, the `datetime.rs` part): day-first `datetime2` / `datetime4` for
+  en-GB, AU, NZ, IE, IN (and en-ZA's weekday form), no weekday comma in en-IE, a comma after the month in
+  en-GB and en-AU `datetime3`. `languageOrdersNumericDatesAndKeepsNamesEnglishOnly` takes deckcraft's new
+  en-GB answer; `longEnglishDatesFollowEachLocale` is new.
+- **Variable-font instances answer to their Windows names** (20553865): a named instance other than Regular,
+  Italic, Bold and Bold Italic gets `legacy` = ("<family> <weight>", Regular or Italic), so "Montserrat
+  ExtraBold" finds the bundled variable Montserrat. Test `variableFontInstancesAnswerToTheirWindowsNames`.
+- **Collection bounds** (35208630, 6d699b48, cfd30ce4): at most 256 faces from one collection, the first entry
+  of each distinct table-directory offset among the first 16 384 (`distinctFaceIndices`), and at most 1024
+  named instances per face. CoreText makes the descriptors (`CTFontManagerCreateFontDescriptorsFromData`); it
+  already drops entries sharing an offset, so `collectionFaces` takes the picked entries by index when CoreText
+  gave one descriptor per entry, else the first as many as were picked. Tests
+  `duplicateCollectionOffsetsDoNotConsumeFaceCap`, `namedInstanceLimitIsBoundedPerFace`, and (not in deckcraft)
+  `aCollectionsSharedEntriesGiveOneFace` on a system collection with every other entry doubled. The Office
+  folder index still reads every face of Office's own files. A collection with an unreadable entry is rejected
+  whole by CoreText, where skrifa skips the entry: a divergence from before the move, unchanged.
+
+No port needed: 4de3a4dc (Clippy refactor: `bidi.rs` split into helpers, `BreakParams`, explicit imports), and
+the merges (b5257f94, 5187e018, 234329a8, c66fee15, 3dc66ac1 and the PR merges), which add nothing past the
+commits above.
+
+Not here: fe54c0eb (names starting with "." aren't reported missing) changes the engine's `missing_fonts`
+(DCEngine `EngineFonts.missingFonts`); `FontDB.hasFamily` answers as before. 50b200be's insert-dialog part is the
+engine's too.
+
 ## Port bugs found by the ported tests
 
 - **Bidi_Class table.** The first generated table missed every range rustfmt had wrapped across two
@@ -159,10 +198,10 @@ machine that runs the tests.
 
 ## Tests
 
-110 tests in `Tests/DCTextTests`:
-- `LayoutTests` (38) and `BidiAndStyleTests` (38), ported from text `tests.rs`. deckcraft's tests that
+122 tests in `Tests/DCTextTests`:
+- `LayoutTests` (40) and `BidiAndStyleTests` (39), ported from text `tests.rs`. deckcraft's tests that
   need a font this machine lacks return early here too.
-- `FontTests` (32): the fonts crate's tests, bidi, script, shaping and date fields.
+- `FontTests` (41): the fonts crate's tests, bidi, script, shaping and date fields.
 - `OracleParityTests` (2).
 
 Adaptations:
