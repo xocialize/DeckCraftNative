@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1 and P2 are done** (§5, the milestone notes); P3 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P3 are done** (§5, the milestone notes); P4 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,72 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P3 notes (2026-10-30)
+
+- **The drawing** (`Drawing.swift`): each slide's OfficeArt tree with groups kept as groups, each child's box in its
+  group's coordinate space. Every OfficeArtFOPT and OfficeArtTertiaryFOPT property is kept, with its complex data,
+  and the solver container's connector rules.
+- **Properties** (`Props.swift`). Each property comes from the first of these that sets it:
+  - the shape itself;
+  - the master shape it names (hspMaster);
+  - the drawing group's defaults, where PowerPoint puts its default fill and line;
+  - the specification's default.
+
+  A placeholder takes only what it sets; the rest comes from its layout.
+  - **Colours:** RGB; scheme colours, kept as theme colours while the slide uses its master's scheme; and the
+    references to the shape's own fill, line and shadow colours, darkened or lightened.
+  - **Fills:** solid, pattern (as 50%, until P4 reads its bitmap), and shaded. A shaded fill becomes a linear or
+    path gradient. Its angle turns counterclockwise from "bottom to top". The fill colour is the first stop, and
+    fillFocus places the last colour: 0 at the vector's start, 100 at its end, mirrored in between. The background
+    fill is also read.
+  - **Lines:** colour, opacity, width, dash, compound, join, cap and arrowheads.
+  - **Shadows:** a hard offset shadow.
+  - **Text frames:** insets, anchoring, wrapping, direction and fit-to-text.
+- **Geometry** (`Presets.swift`, `Shapes.swift`):
+  - **Freeforms:** a shape with vertices is a freeform whatever its type, its path walked from pSegmentInfo.
+    PowerPoint saves presets that have no legacy type as the nearest type plus their outline.
+  - **The legacy shape types:** each maps to its DrawingML preset with its adjust values rescaled. Legacy adjusts
+    are positions in a 21,600-unit square stretched over the box, so a conversion depends on the box's width,
+    height and shorter side.
+  - **Where the conversions come from:** `Tools/legacy/preset-deck.py` makes a deck of every gallery preset (wide,
+    tall, and with its adjusts moved). PowerPoint saved it as a protected `.ppt`, which is local only (§1). Each
+    conversion is the inverse of what PowerPoint wrote. An adjust a shape leaves out takes its type's default, which
+    the same file shows.
+  - **Types PowerPoint never writes:** they map to the nearest preset at its defaults.
+  - **The legacy trapezoid:** it is wide at the top, so it becomes a freeform rather than a flipped preset, which
+    would turn its text upside down.
+- **Boxes:** a shape turned 45° to 135° (or 225° to 315°) is stored with its box turned too, so width and height
+  swap about its centre. With one flip, the stored rotation runs the other way.
+- **Kinds:**
+  - **Groups** become DCModel groups.
+  - **Connectors** are joined to the shapes and connection sites their rules name.
+  - **Tables** are groups flagged with tableProperties. The grid comes from the cells' edges, merged cells span
+    what they cover, cells keep their text, fill, margins and anchoring, and border lines go onto the cells either
+    side of them.
+  - **WordArt:** the string (gtextUNICODE) in its font and size, filled and outlined as the shape is, with the
+    type's text warp.
+  - **Shapes** also keep their name, description, hidden flag, and click and hover hyperlinks.
+- **LibreOffice's `.ppt` files differ from PowerPoint's in three ways:**
+  - **Adjust values:** it writes DrawingML's values scaled to 21,600 (a right arrow's 50,000 as 10,800), not legacy
+    positions. They are read with PowerPoint's meaning, as PowerPoint reads them, so its arrows come out thin.
+  - **Array lengths:** its IMsoArray lengths leave out their 6-byte header. They are recognised and corrected,
+    because otherwise every complex property after one is misread.
+  - **Freeform coordinates:** its freeforms have no coordinate space, so the vertices' extent is used.
+- **Checked:**
+  - **Against POI:** `ShapeTests.everyShapeIsPOIs` checks 17,259 properties against POI's dump of every fixture and
+    of PowerPoint's own files. It compares each shape's kind, type, box, flips, fill and line colour and line width,
+    and each table's size and cells. Colours are compared where the shape sets them itself, because POI follows
+    neither hspMaster nor the drawing group's defaults.
+  - **PowerPoint's preset deck:** it comes back as the original deck's presets with their adjust values, 363 of
+    them, plus 177 freeforms where PowerPoint wrote freeforms. The one value lost is the rounded callout's corner,
+    which the legacy shape can't hold.
+  - **LibreOffice's preset deck:** it comes back by name, 399 presets.
+  - **Renders:** they match the original deck's shape for shape.
+  - **The alpha gate:** a new step 2b opens a `.ppt` in the app with its shapes, saves it as `.pptx` and renders
+    that. It passes in both layouts.
+  - **The crash corpus:** with every slide rendered, 205 files open and render and 2 fail cleanly, with no crashes
+    or time-outs.
 
 ### P2b notes (2026-10-30)
 
@@ -378,6 +444,9 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
   (`soffice --headless --convert-to ppt`). Text, shapes, pictures, tables, notes and masters are covered; the
   incremental-save chain isn't (LibreOffice writes one save), so P1 also builds record streams by hand from the
   spec's structures.
+- **Every gallery preset** (P3): `Tools/legacy/preset-deck.py` writes the `dccli` commands for a deck of the 180
+  presets, each wide, tall and with its adjusts moved. It is converted like the others, and PowerPoint also saves it
+  (below; `powerpoint-protect.sh --ppt`).
 - **Encrypted `.pptx`**: the corpus decks encrypted by POI (Agile with AES-128/SHA-1 and AES-256/SHA-512, both at
   100,000 rounds; Standard AES-128) and msoffcrypto-tool (Agile AES-256/SHA-512), with passwords in plain ASCII,
   with accents, with a character outside the BMP (a UTF-16 surrogate pair) and at Office's 255-character maximum.
@@ -401,6 +470,8 @@ They live in `../DeckCraftNative-Fixtures/legacy/` (local, never pushed), with a
   `dccli info`. macOS's `Office.mdimporter` gives text per file as a second opinion. Since P2b, a second POI dump
   (`format-ppt`, kept as `reference/*.poi-format.json`) gives each paragraph's and run's formatting as POI resolves
   it through the master styles.
+  Since P3, the shape dump also gives each shape's DrawingML type, rotation, flips, fill, line, shadow and text frame,
+  and whether it sets its own fill and line, names a master shape, or has vertices.
 - **PowerPoint**: the sweep's AppleScript counts slides and shapes in each `.ppt` fixture, as it does for `.pptx`
   today (black box: counts only, nothing saved).
 
@@ -425,6 +496,7 @@ every slide, at quarter scale.
 | **PICT pictures**: modern macOS has no PICT renderer; DCMetafile handles EMF and WMF only | P4 decides between a QuickDraw subset (bitmaps and simple vectors) and the shape's grey placeholder with a report entry (§8) |
 | **Incremental saves** aren't in any generated file | Hand-built record streams in P1, and the crash corpus exercises them in the wild |
 | LibreOffice's `.ppt` files are simpler than PowerPoint's (fewer PP9/PP10 tags) | Hand-built streams for the tag extensions; the crash corpus; PowerPoint's counts in the sweep |
+| LibreOffice writes adjust values in DrawingML's meaning, not the legacy one (P3) | Shapes are checked against PowerPoint's own save of every preset; LibreOffice's files are checked by type and box only |
 | [MS-OFFCRYPTO]'s wording on decrypting the `.ppt` Pictures stream is unusual | Cross-check with POI and msoffcrypto-tool on E0's RC4 CryptoAPI files, and with PowerPoint's own encrypted `.ppt`, before trusting it |
 | Animation is big and in two generations | P5 starts with the embedded OOXML timing, which DCPPTX already reads; the rest maps to the nearest effect |
 | Password handling | Passwords never logged, never in DCModel, `.deckcraft`, MCP replies or the clipboard; key buffers cleared after use where Swift allows; AutoRecover off or encrypted |

@@ -104,6 +104,20 @@ struct Masters {
         return m
     }
 
+    /// Every master shape's properties by its shape id: what a slide shape naming it in hspMaster ([MS-ODRAW]
+    /// 2.3.2.1) takes for the properties it doesn't set.
+    func shapeProps() -> [UInt32: [UInt16: UInt32]] {
+        var out: [UInt32: [UInt16: UInt32]] = [:]
+        func add(_ list: [DrawnShape]) {
+            for d in list {
+                out[d.id] = d.props
+                add(d.children)
+            }
+        }
+        for (b, r) in byId.values { add(Drawing.tree(b, r).shapes) }
+        return out
+    }
+
     /// A slide's (or title master's) SlideAtom: its master id and SlideFlags.
     static func slideAtom(_ b: [UInt8], _ c: Record) -> (masterId: UInt32, flags: UInt16)? {
         guard let a = c.children(b).first(where: { $0.type == RT.slideAtom }), a.body.count >= 22 else { return nil }

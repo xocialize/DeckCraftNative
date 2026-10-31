@@ -526,6 +526,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
       Rendering the crash corpus had found text-heavy files taking over 30 s; they now take under a second.
     - **Checked:** all 17,980 paragraph and run properties compared match POI's resolved formatting. The crash
       corpus, with every slide rendered, is clean.
+  - **P3 (2026-10-30): `.ppt` shapes.**
+    - **What comes over:** every shape. That covers:
+      - the 203 legacy shape types as DrawingML presets, their adjust values rescaled the way PowerPoint writes them;
+      - freeforms;
+      - groups;
+      - connectors joined to their shapes;
+      - tables;
+      - WordArt;
+      - fill (solid, pattern, gradient), line, arrowheads and shadow;
+      - the text frame;
+      - names, alt text, hidden shapes and click actions.
+    - **Checked:**
+      - 17,259 shape properties match POI's dump.
+      - PowerPoint's own `.ppt` of every gallery preset imports as the original presets with their adjust values.
+      - The alpha gate opens a `.ppt` in the app.
+      - The crash corpus, with every slide rendered, is clean.
+    - **Still to come:** pictures and OLE objects (P4) and the slide show (P5). `.ppt` support isn't released yet.
 
 ## Pin moves
 

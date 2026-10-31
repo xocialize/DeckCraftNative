@@ -141,7 +141,39 @@ public class PoiTool {
              .append(",\"type\":").append(str(sh.getShapeType() == null ? "" : sh.getShapeType().name()))
              .append(",\"name\":").append(str(sh.getShapeName()))
              .append(String.format(Locale.ROOT, ",\"x\":%.2f,\"y\":%.2f,\"w\":%.2f,\"h\":%.2f", r.getX(), r.getY(), r.getWidth(), r.getHeight()));
-            if (sh instanceof HSLFTextShape t) b.append(",\"text\":").append(str(t.getText()));
+            // Since P3: the shape type's DrawingML name, rotation and flips; fill, line and shadow as POI resolves them.
+            b.append(",\"ooxml\":").append(str(sh.getShapeType() == null ? null : sh.getShapeType().getOoxmlName()))
+             .append(",\"id\":").append(sh.getShapeId())
+             .append(String.format(Locale.ROOT, ",\"rot\":%.2f", sh.getRotation()))
+             .append(",\"flipH\":").append(sh.getFlipHorizontal()).append(",\"flipV\":").append(sh.getFlipVertical());
+            // Which properties the shape sets itself: any fill or line property, a master shape (hspMaster), vertices.
+            org.apache.poi.ddf.AbstractEscherOptRecord opt = sh.getEscherOptRecord();
+            boolean ownFill = false, ownLine = false;
+            if (opt != null) for (org.apache.poi.ddf.EscherProperty p : opt.getEscherProperties()) {
+                int id = p.getPropertyNumber();
+                if (id >= 0x180 && id <= 0x1BF) ownFill = true;
+                if (id >= 0x1C0 && id <= 0x1FF) ownLine = true;
+            }
+            b.append(",\"ownFill\":").append(ownFill).append(",\"ownLine\":").append(ownLine)
+             .append(",\"master\":").append(opt != null && opt.lookup(0x301) != null)
+             .append(",\"vertices\":").append(opt != null && opt.lookup(0x145) != null);
+            if (sh instanceof HSLFSimpleShape s) {
+                HSLFFill f = s.getFill();
+                b.append(",\"fillType\":").append(f.getFillType())
+                 .append(",\"fill\":").append(hex(s.getFillColor()))
+                 .append(",\"line\":").append(hex(s.getLineColor()))
+                 .append(String.format(Locale.ROOT, ",\"lineWidth\":%.2f", s.getLineWidth()))
+                 .append(",\"dash\":").append(str(s.getLineDash() == null ? null : s.getLineDash().name()))
+                 .append(",\"head\":").append(str(s.getLineHeadDecoration() == null ? null : s.getLineHeadDecoration().name()))
+                 .append(",\"tail\":").append(str(s.getLineTailDecoration() == null ? null : s.getLineTailDecoration().name()))
+                 .append(",\"shadow\":").append(s.getShadow() != null);
+            }
+            if (sh instanceof HSLFTextShape t) {
+                b.append(",\"text\":").append(str(t.getText()))
+                 .append(String.format(Locale.ROOT, ",\"insets\":[%.2f,%.2f,%.2f,%.2f]", t.getLeftInset(), t.getTopInset(), t.getRightInset(), t.getBottomInset()))
+                 .append(",\"vAlign\":").append(str(t.getVerticalAlignment() == null ? null : t.getVerticalAlignment().name()))
+                 .append(",\"wrap\":").append(t.getWordWrap());
+            }
             if (sh instanceof HSLFTable tb) b.append(",\"rows\":").append(tb.getNumberOfRows()).append(",\"cols\":").append(tb.getNumberOfColumns());
             if (sh instanceof HSLFGroupShape g) { b.append(",\"children\":"); shapes(b, g.getShapes()); }
             b.append('}');
@@ -205,12 +237,18 @@ public class PoiTool {
         return b.append("]}").toString();
     }
 
-    /// The text shapes of a shape list in z-order, groups flattened.
+    /// The text shapes of a shape list in z-order, groups flattened; tables' cells left out (since P3 the import
+    /// keeps a table as one, and its cells are checked by ShapeTests).
     static void textShapes(List<HSLFShape> list, List<HSLFTextShape> out) {
         for (HSLFShape sh : list) {
+            if (sh instanceof HSLFTable) continue;
             if (sh instanceof HSLFGroupShape g) textShapes(g.getShapes(), out);
             else if (sh instanceof HSLFTextShape t) out.add(t);
         }
+    }
+
+    static String hex(java.awt.Color c) {
+        return c == null ? "null" : String.format("\"%02X%02X%02X%s\"", c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha() == 255 ? "" : String.format("%02X", c.getAlpha()));
     }
 
     static String num(Double d) { return d == null ? "null" : String.format(Locale.ROOT, "%.3f", d); }

@@ -51,14 +51,19 @@ import Testing
     @Test func everySlidesTextIsWhatPOIReads() throws {
         struct Dump: Decodable {
             struct Shape: Decodable {
+                let kind: String
                 let text: String?
                 let x: Double, y: Double, w: Double, h: Double
+                let rot: Double?
                 let children: [Shape]?
             }
             struct Slide: Decodable { let shapes: [Shape]; let notes: String }
             let slides: [Slide]
         }
-        func flat(_ shapes: [Dump.Shape]) -> [Dump.Shape] { shapes.flatMap { s in s.children.map(flat) ?? [s] } }
+        // Groups opened up on both sides; tables, which the import keeps as tables, are ShapeTests'.
+        func flat(_ shapes: [Dump.Shape]) -> [Dump.Shape] {
+            shapes.flatMap { s in s.kind == "HSLFTable" ? [] : s.children.map(flat) ?? [s] }
+        }
         func norm(_ t: String) -> String {
             t.replacingOccurrences(of: "\r", with: "\n").replacingOccurrences(of: "\u{0B}", with: "\n")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -90,7 +95,8 @@ import Testing
             let (p, _) = try PPT.importChecked(Array(try Data(contentsOf: c.file)), password: c.password)
             for (i, (slide, theirs)) in zip(p.slides, ref.slides).enumerated() {
                 let want = flat(theirs.shapes).filter { !norm($0.text ?? "").isEmpty }
-                let got = slide.shapes.filter { !ours($0.text).isEmpty }
+                // WordArt's string is a shape property POI doesn't read.
+                let got = ShapeTests.leaves(slide.shapes).filter { !ours($0.text).isEmpty && $0.text?.body.warp == nil }
                 let wt = want.map { norm($0.text ?? "") }, gt = got.map { ours($0.text) }
                 if wt != gt {
                     mismatches += 1
@@ -99,8 +105,14 @@ import Testing
                 }
                 for (w, g) in zip(want, got) {
                     guard let x = g.xfrm else { continue }
-                    let close = abs(x.x - w.x) < 0.6 && abs(x.y - w.y) < 0.6 && abs(x.w - w.w) < 0.6 && abs(x.h - w.h) < 0.6
-                    if !close { Issue.record("\(name) slide \(i + 1) “\(w.text?.prefix(20) ?? "")”: POI \(w.x),\(w.y) \(w.w)×\(w.h), ours \(x.x),\(x.y) \(x.w)×\(x.h)") }
+                    // POI's anchor is the stored box, which a shape turned 45° to 135° (or 225° to 315°) turns with it.
+                    var rot = (w.rot ?? 0).truncatingRemainder(dividingBy: 360)
+                    if rot < 0 { rot += 360 }
+                    let swap = (45 ..< 135).contains(rot) || (225 ..< 315).contains(rot)
+                    let ww = swap ? w.h : w.w, wh = swap ? w.w : w.h
+                    let wx = w.x + (w.w - ww) / 2, wy = w.y + (w.h - wh) / 2
+                    let close = abs(x.x - wx) < 0.6 && abs(x.y - wy) < 0.6 && abs(x.w - ww) < 0.6 && abs(x.h - wh) < 0.6
+                    if !close { Issue.record("\(name) slide \(i + 1) “\(w.text?.prefix(20) ?? "")”: POI \(wx),\(wy) \(ww)×\(wh), ours \(x.x),\(x.y) \(x.w)×\(x.h)") }
                 }
                 #expect(ours(slide.notes) == norm(theirs.notes), "\(name) slide \(i + 1) notes")
             }
@@ -132,7 +144,7 @@ import Testing
         let names = (try? FileManager.default.contentsOfDirectory(atPath: dir.path))?.filter { $0.hasSuffix(".ppt") } ?? []
         guard !names.isEmpty else { return }
         struct Meta: Decodable { let password: String; let from: String }
-        let counts = ["corpus-sample": 8, "corpus-content": 5, "corpus-charts": 6]
+        let counts = ["corpus-sample": 8, "corpus-content": 5, "corpus-charts": 6, "presets": 31]
         for n in names {
             let meta = try JSONDecoder().decode(Meta.self, from: Data(contentsOf: dir.appending(path: "\(n).meta.json")))
             let bytes = Array(try Data(contentsOf: dir.appending(path: n)))

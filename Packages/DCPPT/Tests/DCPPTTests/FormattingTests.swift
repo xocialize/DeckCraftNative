@@ -74,7 +74,8 @@ import Testing
             let (p, _) = try PPT.importChecked(Array(try Data(contentsOf: c.file)), password: c.password)
             for (i, (slide, theirs)) in zip(p.slides, ref.slides).enumerated() {
                 guard let ctx = Resolve.Ctx.forSlide(p, slide) else { continue }
-                let shapes = slide.shapes.filter { s in
+                // WordArt's string is a shape property POI doesn't read.
+                let shapes = ShapeTests.leaves(slide.shapes).filter { $0.text?.body.warp == nil }.filter { s in
                     !(s.text?.paragraphs ?? []).allSatisfy { $0.runs.allSatisfy { $0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } }
                 }
                 guard shapes.count == theirs.shapes.count else {

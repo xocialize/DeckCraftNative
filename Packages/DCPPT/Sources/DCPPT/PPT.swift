@@ -2,10 +2,11 @@
 // slide and notes size from the DocumentAtom ([MS-PPT] 2.4.2, in master units of 1/576 inch) and the slides from
 // the slide list (the SlideListWithTextContainer of instance 0, 2.4.14.3: one SlidePersistAtom per slide, in order).
 // Each slide is a slide of the default master's blank layout holding the file's text-bearing shapes and placeholders
-// (P2a: their text, paragraphs and character formatting, flattened out of groups), with its notes page's text as its
-// notes. P2b adds the first main master's text styles, colour scheme and background to the default master, each
-// slide's own scheme and background, headers and footers, and hyperlinks. Shapes, pictures and the slide show come in
-// P3–P5; the import report lists what isn't brought over.
+// (P2a: their text, paragraphs and character formatting), with its notes page's text as its notes. P2b adds the first
+// main master's text styles, colour scheme and background to the default master, each slide's own scheme and
+// background, headers and footers, and hyperlinks. P3 brings every shape (Shapes.swift): geometry, fill, line, shadow,
+// groups, connectors, tables and WordArt. Pictures and the slide show come in P4–P5; the import report lists what
+// isn't brought over.
 import DCCFB
 import DCColor
 import DCGeometry
@@ -79,6 +80,8 @@ public enum PPT {
         let masterScheme = masters.main.flatMap { Masters.scheme($0.bytes, $0.record) } ?? Self.defaultScheme
         let base = TextContext(fonts: fonts, scheme: masterScheme, styles: styles)
         let hyperlinks = Document.hyperlinks(doc, children)
+        let shapeDefaults = Drawing.defaults(doc, children)
+        let masterShapes = masters.shapeProps()
 
         var p = blankPresentation(size, .default, false)
         p.notesSize = notes
@@ -102,9 +105,10 @@ public enum PPT {
             if let o = file.object(entry.ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {
                 let scheme = masters.scheme(slide: o, r) ?? masterScheme
                 let ctx = TextContext(fonts: fonts, scheme: scheme, styles: styles)
-                for drawn in Drawing.shapes(o, r) {
-                    if let shape = textShape(&p, o, drawn, outline: entry.outline, ctx, hyperlinks) { slide.shapes.append(shape) }
-                }
+                var builder = ShapeBuilder(b: o, outline: entry.outline, ctx: ctx, hyperlinks: hyperlinks, defaults: shapeDefaults,
+                                           masterShapes: masterShapes, linked: scheme == masterScheme)
+                let (drawn, rules) = Drawing.tree(o, r)
+                slide.shapes = builder.build(&p, drawn, rules: rules)
                 let atom = Masters.slideAtom(o, r)
                 if let atom, atom.flags & 0x4 == 0, let bg = Masters.background(o, r, scheme: scheme) {
                     // Its own background.
@@ -121,7 +125,7 @@ public enum PPT {
             p.slides.append(slide)
         }
         let report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["shapes without text", "pictures", "the master's own shapes", "picture backgrounds",
+                               notImported: ["pictures and OLE objects", "the master's own shapes", "picture backgrounds",
                                              "transitions and animations"])
         return (p, report)
     }
@@ -169,36 +173,6 @@ public enum PPT {
             }
         }
         return out
-    }
-
-    /// A slide shape for a drawn shape with text, or a placeholder: its box, placeholder and text. Other shapes come
-    /// in P3.
-    static func textShape(_ p: inout Presentation, _ b: [UInt8], _ d: DrawnShape, outline: [PPTText], _ ctx: TextContext,
-                          _ hyperlinks: [UInt32: Hyperlink]) -> Shape? {
-        var text = PPTText.bodies(b, d.textbox).first
-        if text == nil, let ref = d.textbox.first(where: { $0.type == RT.outlineTextRefAtom }), ref.body.count >= 4 {
-            let i = Int(i32(b, ref.body.lowerBound))
-            if outline.indices.contains(i) { text = outline[i] }
-        }
-        let kind = d.placeholder.flatMap { placeholderKind($0.type) }
-        guard let rect = d.rect, text.map({ !$0.chars.isEmpty }) == true || kind != nil, let raw = p.allocId() else { return nil }
-        var s = Shape.default
-        s.id = ShapeId(raw)
-        s.xfrm = Xfrm(x: rect.x * pointsPerMasterUnit, y: rect.y * pointsPerMasterUnit, w: max(0, rect.w) * pointsPerMasterUnit,
-                      h: max(0, rect.h) * pointsPerMasterUnit, flipH: d.flipH, flipV: d.flipV)
-        s.geom = .preset(name: "rect", adj: [])
-        if let kind, let ph = d.placeholder {
-            s.ph = Placeholder(kind: kind.type, idx: ph.position > 0 ? UInt32(ph.position) : 0, vertical: kind.vertical)
-            s.name = "\(kind.type.rawValue.prefix(1).uppercased())\(kind.type.rawValue.dropFirst()) Placeholder \(raw)"
-        } else {
-            s.name = d.type == 202 ? "TextBox \(raw)" : "Shape \(raw)"
-            s.textBox = d.type == 202
-        }
-        var body = text?.body(ctx, hyperlinks: hyperlinks) ?? TextBody()
-        // Center title, center body, half and quarter body: their differences from title and body, on the shape.
-        if let t = text?.type, MasterStyles.baseType(t) != nil { body.listStyle = ctx.styles.listStyle(t, own: true, ctx) }
-        s.text = body
-        return s
     }
 
     /// The DCModel placeholder for a PlaceholderEnum ([MS-PPT] 2.13.25).

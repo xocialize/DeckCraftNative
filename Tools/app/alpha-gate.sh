@@ -93,6 +93,16 @@ check ".pptx reads back" $?
 shot 2-pptx
 quit
 
+echo "== 2b. Open a .ppt: a converted copy with its shapes, saved as .pptx (legacy plan P3)"
+launch "$FIX/legacy/ppt/corpus-shapes.ppt"
+N=$(app document.inspect | jq_ "['slides'][1]['shapes']")
+check "the .ppt opens with its shapes" $([ "${N:-0}" -ge 6 ]; echo $?)
+shot 2b-ppt
+app file.save "{\"path\":\"$OUT/converted.pptx\",\"format\":\"pptx\"}" >/dev/null
+"$BIN/dccli" render "$OUT/converted.pptx" --slide 1 --scale 0.5 "$OUT/2b-converted.png" >/dev/null 2>&1
+check "the converted .pptx saves and renders" $([ -s "$OUT/2b-converted.png" ]; echo $?)
+quit
+
 echo "== 3. Present: show, transitions, presenter view"
 launch "$CORPUS/motion.deckcraft"
 method show.start '{"from":0}' >/dev/null

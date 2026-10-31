@@ -53,6 +53,11 @@ for d in $corpus $others; do
   "$dccli" convert "$d" "$out/pptx/$name.pptx" >/dev/null 2>&1 || { print -u2 "export failed: $name"; continue }
   meta "$out/pptx/$name.pptx" "{\"kind\":\"pptx\",\"deck\":\"${d#$fix/}\",\"producer\":\"dccli\"}"
 done
+# Every gallery preset, at its default adjusts and with them moved (P3's shapes test; preset-deck.py).
+"$dccli" run "${(@f)$($py -I $root/Tools/legacy/preset-deck.py $root/Packages/DCFoundation/Sources/DCGeometry/Preset.swift)}" \
+  --save "$out/pptx/presets.pptx" >/dev/null 2>&1 \
+  && meta "$out/pptx/presets.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/preset-deck.py\",\"producer\":\"dccli\"}" \
+  || print -u2 "export failed: presets"
 "$soffice" --headless --norestore "-env:UserInstallation=file://$lo_profile" --convert-to ppt --outdir "$out/ppt" $out/pptx/*.pptx >/dev/null 2>&1
 rm -rf "$lo_profile"
 for p in $out/ppt/*.ppt(N); do
@@ -100,7 +105,9 @@ done
 # 4. What the independent readers say about every .ppt.
 for p in $out/ppt/*.ppt(N) $out/encrypted/*.ppt(N); do
   pass=()
-  [[ -f $p.meta.json ]] && pass=($($py -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("password",""))' "$p.meta.json"))
+  # One word, spaces and all (PowerPoint's default password has one).
+  [[ -f $p.meta.json ]] && pass=("${(@f)$($py -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("password",""))' "$p.meta.json")}")
+  [[ $pass == "" ]] && pass=()
   poi dump-ppt "$p" $pass > "$out/reference/${p:t}.poi.json" || print -u2 "POI couldn't read ${p:t}"
   poi format-ppt "$p" $pass > "$out/reference/${p:t}.poi-format.json" || print -u2 "POI couldn't format ${p:t}"
   t=$(mktemp -d)

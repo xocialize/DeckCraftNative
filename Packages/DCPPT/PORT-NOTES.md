@@ -78,6 +78,36 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
 - **Checked:** POI's reading of every fixture and of PowerPoint's own files, slide by slide and shape by shape:
   text, boxes and notes all match.
 
+## P3: shapes (2026-10-30)
+
+- **`Drawing`:**
+  - `tree` keeps groups as groups, each child's box in its group's space; `shapes` still flattens, for notes pages.
+  - Every FOPT and tertiary FOPT property is kept, with the complex data after the entries. An IMsoArray whose
+    length leaves out its 6-byte header, as LibreOffice writes it, is corrected.
+  - It also reads the OfficeArtClientData's records, the solver container's connector rules, and the drawing
+    group's default properties.
+- **`ShapeProps`:**
+  - A property's value comes from the shape, then the master shape it names (hspMaster), then the drawing group's
+    defaults. Boolean properties are read flag by flag through their fUse bits.
+  - It gives the shape's colours, fill, line, shadow and text frame as DCModel.
+- **`LegacyShapes`:** the 203 MSOSPT types as DrawingML presets.
+  - Every conversion PowerPoint uses was derived from PowerPoint's own save of the preset deck, wide, tall and
+    moved: the inverse of what it wrote.
+  - The legacy defaults are the values PowerPoint leaves out.
+  - `warp` maps the WordArt types.
+- **`ShapeBuilder`:**
+  - ShapeIds are given to every drawn shape first, so a connector can name a shape drawn after it.
+  - It builds groups, connectors, tables (`TableBuilder`) and WordArt, and runs the text through P2's readers with
+    the shape's frame over it.
+  - Pictures and OLE objects are left for P4.
+- **`Freeform`:** pVertices (2- or 4-byte coordinates) walked by pSegmentInfo.
+  - Handled: lines, curves, moves, closes and ends; noFill and noLine; elliptical quadrants; quadratic Béziers.
+  - Arcs and angle ellipses are drawn straight.
+  - A path is capped at 100,000 commands.
+- **Checked:** `ShapeTests` (against POI's dump, PowerPoint's preset save and LibreOffice's, and hostile property
+  data), the text and formatting tests on the flattened shapes, the alpha gate's new `.ppt` step, and the crash
+  corpus with rendering.
+
 ## P2b: masters, styles and the rest of the text (2026-10-30)
 
 - **`MasterStyles`:** the TextMasterStyleAtoms of the Environment, with the main master's over them, by text type and
@@ -93,7 +123,7 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
   - `themeColors` maps the eight PowerPoint colours onto the theme's twelve.
 - **`Document`:** headers and footers (HeadersFootersContainer, instance 3), and hyperlinks (each ExHyperlink's
   target and location).
-- **`Drawing`:** keeps each shape's simple FOPT properties, and finds the background shape.
+- **`Drawing`:** keeps each shape's simple FOPT properties, and finds the background shape (P3 keeps them all).
 - **`PF` and `CF`** are shared by the text runs and the master styles.
   - `PF` now reads every TextPFException field: bullet flags, character, font, size and colour; alignment; line
     spacing and spacing before and after; margin and indent; and the default tab.

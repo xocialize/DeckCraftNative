@@ -230,6 +230,11 @@ enum RT {
     static let childAnchor: UInt16 = 0xF00F
     static let clientAnchor: UInt16 = 0xF010
     static let clientData: UInt16 = 0xF011
+    static let solverContainer: UInt16 = 0xF005
+    static let connectorRule: UInt16 = 0xF012
+    static let tertiaryFopt: UInt16 = 0xF122
+    static let drawingGroup: UInt16 = 0x040B
+    static let dggContainer: UInt16 = 0xF000
 }
 
 /// A record header ([MS-PPT] 2.3.1) and where its data is.

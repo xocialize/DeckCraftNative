@@ -10,8 +10,11 @@
 # it hasn't been given asks "Grant File Access" for that folder, so every file goes through one fixed folder, `work/`,
 # which is granted once (the first run shows the prompt; choose Grant Access).
 #
-#   Tools/legacy/powerpoint-protect.sh [DECK.pptx …]   default: the legacy fixtures' corpus sample, content, charts
+#   Tools/legacy/powerpoint-protect.sh [--ppt] [DECK.pptx …]   default: the legacy fixtures' corpus sample, content,
+#                                                              charts; --ppt: only the .ppt with a password to open
+#                                                              (the shapes oracle, P3: legacy/pptx/presets.pptx)
 set -uo pipefail
+ppt_only=0; [[ ${1:-} == --ppt ]] && { ppt_only=1; shift }
 root=${0:A:h:h:h}
 fix=${DECKCRAFT_FIXTURES:-$root/../DeckCraftNative-Fixtures}
 out=$HOME/Library/Caches/DeckCraftNative/powerpoint-protected
@@ -69,6 +72,7 @@ EOF
 fails=0
 for d in $decks; do
   n=${d:t:r}
+  if (( ppt_only )); then save "$d" "$out/$n.open.ppt" ppt 'Password1' '' || fails=$((fails + 1)); continue; fi
   save "$d" "$out/$n.open.pptx" pptx 'Password1' '' || fails=$((fails + 1))
   save "$d" "$out/$n.open-accents.pptx" pptx 'Tëst-pässwörd' '' || fails=$((fails + 1))
   save "$d" "$out/$n.open-modify.pptx" pptx 'Password1' 'Modify2' || fails=$((fails + 1))
