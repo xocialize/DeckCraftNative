@@ -1,7 +1,7 @@
 # Port status
 
 Crate by crate: what deckcraft has, what the native port does with it, and where it stands. Rust line
-counts include in-file tests, measured at `27009cd9` (2026-10-26). The pin is now `88c2ceff` (see Pin
+counts include in-file tests, measured at `27009cd9` (2026-10-26). The pin is now `a3fbf029` (see Pin
 moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
 
 ## Wave 0: scaffold and oracle (done 2026-10-26)
@@ -595,6 +595,51 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     `/Applications`.
 
 ## Pin moves
+
+### 88c2ceff → a3fbf029 (2026-10-31, after 0.1.8)
+
+- **What changed upstream, in 277 commits** (149 touch crates; deckcraft is now 0.13.1, craft-libs `c5a1cbfb`,
+  craft-fonts unchanged).
+  - **Refactors for strict Clippy** (`cognitive_complexity`, `too_many_arguments`, `wildcard_imports` now deny):
+    functions split and arguments packed, in geom, model, text, metafile, render, pptx, engine and the CLI. Audited
+    hunk by hunk; none changes behaviour, so none is ported.
+  - **Behaviour, ported** (each package's PORT-NOTES has the commit-by-commit list under "Pin move 88c2ceff →
+    a3fbf029"):
+    - **Model:** gradient flip, line miter limit and alignment, bullet font/colour/size follow-text resets and
+      their inheritance, histogram values on a bin edge, CRLF in `replaceText`, Darken/Desaturate preset ids and
+      PowerPoint's default durations for 14 effects.
+    - **Text:** Unicode symbol-font bullets through the fallback chain (a dot, never .notdef), a space after a
+      symbol-font character keeps the run's font, "Start at" restarts numbering, long English dates per locale,
+      variable-font instances under their Windows family names, bounded font collections.
+    - **Render, metafile, anim:** shapes with non-finite or huge outlines are skipped, no labels for missing bar
+      values, animation state never reaches layout or master shapes, bounded EMF+ region paths, the show
+      remembers a slide was reached going back.
+    - **PPTX:** the new model fields read and written, Auto-reverse from behaviour nodes, media settings from the
+      timing tree, the Darken/Desaturate HSL shift, custom-geometry exponents, backslash zip names, picture
+      placeholders take their layout's shape, `tickLblPos none` and unfilled gridlines.
+    - **Engine:** bad indexes refused instead of falling back to the selection (seven commands), Slide background
+      fill, Duplicate and paste naming, group boxes follow their children, review.compare sides and boxes,
+      layout and master formatting reaching slides, clipboard HTML caps and paste fixes, spelling of all-caps
+      words, accessibility contrast across runs, motion paths from points, insert in master views, hidden
+      system fonts, and the new `slide.actions` (331 commands).
+    - **Automation and media:** MCP `insert_chart` box, bounded MCP frames (replacing our session-ending
+      256 MiB limit), repeated automation roots, `run --cmd-file`, output finished after stdout closes, whole-deck
+      bench statistics, Ogg damage recovery within its budget.
+    - **App** (not a port of the egui UI; user-visible changes only): effect presets that remember their choice,
+      Scale Height/Width and Position From, gradient flip kept when editing a fill, show clicks on animated
+      shapes, Keep mouse cursor visible, presenter answers and the Next preview off the main thread, dragging several
+      selected slides at once, Fill ▸ Slide background fill, a shadow Size slider, and going back in a show playing
+      the left slide's transition in reverse.
+  - **Doesn't apply:** the codec crates (replaced by VideoToolbox and libvpx), deckcraft's raster PDF backdrop fix
+    (our PDF is vector; a related dark-fringe risk on transparent rasters is noted in DCRender's PORT-NOTES), the
+    egui print preview, updater and media bar.
+- **The oracle at the new pin.** `deckcraft-cli` 0.13.1 built from `a3fbf029`; the corpus and every vector set
+  regenerated (fixtures `3426eba`, local). The 88c2ceff corpus is kept beside it until this move is released.
+- **Tests.** The full suite passes, apart from two cases. `aDenseShapeGradientRendersPromptly` timed out under the
+  load of the full run and passes alone, as before. `outlineRowsFollowTheScrollerStyle` fails: the outline's rows keep
+  their estimated heights, not the ones measured. It fails the same way on `main` (`86df54c`), so it isn't from this
+  move. It passed on 2026-10-29, so something on the test Mac has changed since then. The alpha gate passes in both
+  layouts (24/24 each).
 
 ### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)
 
