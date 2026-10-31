@@ -22,7 +22,8 @@ func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
 
 @Suite struct FontDBTests {
     /// A family macOS downloads on demand but hasn't (Osaka, from the legacy crash corpus) is missing, at once:
-    /// asking CoreText about it would start the download and block on a prompt a window-less process never shows.
+    /// asking CoreText about it would put up macOS's download prompt and block until someone answers it. (Where
+    /// Osaka is installed the lookup is simply quick; this Mac had it on demand until 2026-10-31.)
     /// The lookup runs on its own thread, so a regression fails here rather than hanging the run.
     @Test func aFontMacOSWouldDownloadIsMissingAtOnce() {
         let fresh = FontDB(craftFontsDir: nil, systemFonts: true)

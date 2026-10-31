@@ -72,15 +72,38 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
     slides. Before: 4,751 opened, 2,849 failed cleanly. After: 4,806 opened, 2,894 failed cleanly. Neither run had
     a crash or time-out (8 min, 8 jobs).
 - **The crash corpus at full size.** The whole of Govdocs1's `.ppt` set (its four by-type zips, 103 GiB, approved
-  by the operator 2026-10-31), filtered by signature and stream to 49,7xx files, is kept in
+  by the operator 2026-10-31), filtered by signature and stream to 49,485 files, is kept in
   `~/Library/Caches/DeckCraftNative/govdocs/ppt-all`. `crash-run.sh` now runs files in parallel (`CRASH_RUN_JOBS`)
   and can use a Release dccli (`CRASH_RUN_CONFIG=release`) to render it.
+  - **Opened in Debug** (7 jobs, 49 min): 49,175 open and 310 fail cleanly, with no crash or time-out. The
+    failures are 211 PowerPoint 95 files (refused by name), 98 that aren't presentations DeckCraft can read
+    (compound files without a usable PowerPoint document) and one with no CurrentUserAtom.
+  - **Opened and rendered, every slide at quarter scale, in Release** (7 jobs, 1 h 50 min): 49,170 open and render
+    and the same 310 fail cleanly, with no crash. Five decks passed the 30 s limit. Alone, each finishes, in 36 to
+    101 s, so they are slow, not hung, and the cost is in DCRender, which a `.pptx` with the same content shares:
+    - four in `MetafileRender.rasterize`: WMF/EMF pictures whose many clip regions each make a canvas-sized clip
+      layer (each pop copies the bitmap), or one very costly stroked path;
+    - one in text layout: `FontDB.find` scanning every loaded face once per text cell, for a long run of text in
+      missing fonts falling back through the substitutes.
+
+    Left for a follow-up (DCRender performance), outside P6.
   - **It found a hang, outside DCPPT.** Four files in the first part timed out with almost no CPU. FontDB asked
     CoreText for "Osaka", a font macOS downloads on demand but hadn't. Every CoreText lookup of such a font starts
-    the download and blocks until a person answers a prompt, which dccli and the extensions never show.
+    the download and puts up macOS's download prompt, then blocks until someone answers it. Unattended, as dccli
+    and the extensions are, that is a hang. The crash run put those prompts on the operator's screen, one per file,
+    until the operator allowed a download (Osaka is installed on this Mac since).
     `kCTFontDownloadableAttribute` doesn't stop it. FontDB now asks CoreText only about installed names: families,
     PostScript names and full names, read once in 26 ms. The Notes view's `NSFont(name:)` does the same. All four
     files open in under a second; `FontTests.aFontMacOSWouldDownloadIsMissingAtOnce` is the regression test.
+  - **And the same hang inside ImageIO.** Eight files in the next two parts timed out the same way, inside
+    `NSPICTImageRep.draw`. ImageIO's PICT decoder draws a text opcode in the font the PICT names, and CoreGraphics
+    starts the download. No name check of ours reaches in there, so `LegacyPictures.pictToPNG` now draws on a
+    thread of its own with a 5 s deadline. A PICT that misses it is left out (counted as a picture that couldn't be
+    read). While one is stuck, no other conversion starts, since the next would likely wait the same way. If the stuck
+    one ever finishes, conversions resume. The eight files open in about 5.5 s.
+    `LegacyPPTTests.aPICTWaitingOnAFontDownloadGivesUp` builds such a PICT (text in Osaka). It hit the deadline
+    (5.01 s) before Osaka was installed here; with Osaka installed, both regression tests just pass quickly, so on
+    this Mac they no longer exercise the download.
 
 ## P1: the container (2026-10-30)
 

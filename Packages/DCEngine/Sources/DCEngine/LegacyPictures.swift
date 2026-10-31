@@ -7,6 +7,7 @@ import DCPPT
 import DCRender
 import Foundation
 import ImageIO
+import Synchronization
 import UniformTypeIdentifiers
 
 public enum LegacyPictures {
@@ -15,9 +16,49 @@ public enum LegacyPictures {
     /// Longest side a PICT is drawn at.
     static let maxSide = 4096.0
 
+    /// How long a PICT may take to draw.
+    static let pictDeadline = DispatchTimeInterval.seconds(5)
+    /// PICT conversions that missed the deadline and haven't finished.
+    final class Stalls: Sendable { let count = Atomic<Int>(0) }
+    static let stalls = Stalls()
+
+    /// One PICT conversion: running (0), finished (1) or given up on (2), and its result.
+    final class PICTJob: Sendable {
+        let state = Atomic<Int>(0)
+        let result = Mutex<[UInt8]?>(nil)
+        let done = DispatchSemaphore(value: 0)
+    }
+
+    /// `drawPICT` on a thread of its own, with a deadline. ImageIO draws a PICT's text in the font it names, and
+    /// asked for a font macOS downloads on demand but hasn't (Osaka, found by the legacy crash corpus) CoreGraphics
+    /// puts up macOS's download prompt and blocks until someone answers it: unattended (dccli, the extensions) that is
+    /// a hang.
+    /// Such a picture is left out, and while one is stuck no other starts: the next would likely wait the same way.
+    static func pictToPNG(_ pict: [UInt8], stalls: Stalls = stalls) -> [UInt8]? {
+        guard stalls.count.load(ordering: .acquiring) == 0 else { return nil }
+        let job = PICTJob()
+        Thread {
+            let png = drawPICT(pict)
+            job.result.withLock { $0 = png }
+            // Given up on: it was counted as stalled, and isn't any more.
+            if !job.state.compareExchange(expected: 0, desired: 1, ordering: .acquiringAndReleasing).exchanged {
+                stalls.count.subtract(1, ordering: .releasing)
+            }
+            job.done.signal()
+        }.start()
+        if job.done.wait(timeout: .now() + pictDeadline) == .success { return job.result.withLock { $0 } }
+        stalls.count.add(1, ordering: .releasing)
+        guard job.state.compareExchange(expected: 0, desired: 2, ordering: .acquiringAndReleasing).exchanged else {
+            // It finished just now.
+            stalls.count.subtract(1, ordering: .releasing)
+            return job.result.withLock { $0 }
+        }
+        return nil
+    }
+
     /// A PICT file (its 512-byte header included) drawn by AppKit, as PNG at its own size (at most `maxSide`); nil
     /// when AppKit can't read it.
-    static func pictToPNG(_ pict: [UInt8]) -> [UInt8]? {
+    static func drawPICT(_ pict: [UInt8]) -> [UInt8]? {
         guard let rep = NSPICTImageRep(data: Data(pict)) else { return nil }
         let size = rep.boundingBox.size
         guard size.width.isFinite, size.height.isFinite, size.width >= 1, size.height >= 1 else { return nil }

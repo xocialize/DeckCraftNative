@@ -33,6 +33,29 @@ import Testing
         #expect(try FileCommands.readPresentationFile(out).doc.slides.count == 8)
     }
 
+    /// A PICT whose text is in a font macOS downloads on demand (Osaka) makes ImageIO wait on a download prompt no
+    /// window shows: its conversion gives up at the deadline instead of hanging the open (found by the crash corpus).
+    @Test func aPICTWaitingOnAFontDownloadGivesUp() {
+        func be16(_ v: Int) -> [UInt8] { [UInt8(truncatingIfNeeded: v >> 8), UInt8(truncatingIfNeeded: v)] }
+        let frame = be16(0) + be16(0) + be16(40) + be16(200)
+        let name = Array("Osaka".utf8)
+        var ops = be16(0x0011) + be16(0x02FF)
+        ops += be16(0x0C00) + be16(-2) + be16(0) + be16(72) + be16(0) + be16(72) + be16(0) + frame + be16(0) + be16(0)
+        ops += be16(0x0001) + be16(10) + frame
+        // FontName (id 16384 is "Osaka"), TxFont, TxSize, then LongText at (20, 30).
+        ops += be16(0x002C) + be16(3 + name.count) + be16(16384) + [UInt8(name.count)] + name
+        ops += be16(0x0003) + be16(16384) + be16(0x000D) + be16(18)
+        let text = Array("テキスト Text".utf8)
+        ops += be16(0x0028) + be16(30) + be16(20) + [UInt8(text.count)] + text
+        if ops.count % 2 == 1 { ops.append(0) }
+        ops += be16(0x00FF)
+        let pict = [UInt8](repeating: 0, count: 512) + be16(0) + frame + ops
+        let start = Date()
+        // Its own count of stalled conversions, so one left stuck here doesn't stop other tests' pictures.
+        _ = LegacyPictures.pictToPNG(pict, stalls: LegacyPictures.Stalls())
+        #expect(Date().timeIntervalSince(start) < 15, "the PICT conversion waited \(Date().timeIntervalSince(start)) s")
+    }
+
     /// A hostile file's report stays short: ten unread slide numbers at most, and slides past the cap are counted.
     @Test func theStatusLineStaysShort() {
         var report = PPTReport(slides: 10_500, unreadSlides: Array(2 ... 400), edits: 2, encrypted: false, notImported: ["picture bullets"])

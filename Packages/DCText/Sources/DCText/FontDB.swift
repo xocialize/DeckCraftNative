@@ -255,7 +255,8 @@ public final class FontDB: Sendable {
     /// The fonts installed on this Mac by every name CoreText finds them by (family, PostScript and full names, ASCII
     /// lower case), read once. CoreText is asked about a name only when it is one of these: asked about a font macOS
     /// can download on demand but hasn't (Osaka, found by the legacy crash corpus), it starts the download and blocks
-    /// until a person answers a prompt that a process without windows (dccli, the extensions) never shows.
+    /// until someone answers macOS's download prompt: a hang for dccli and the extensions, and a prompt nobody asked
+    /// for in the app (the crash corpus put one up per file).
     static let installedNames: Set<String> = {
         var names = Set<String>()
         for n in (CTFontManagerCopyAvailableFontFamilyNames() as? [String]) ?? [] { names.insert(rustASCIILowercase(n)) }

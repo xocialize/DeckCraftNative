@@ -581,8 +581,12 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     - **Fuzzing:** structure-aware damage to every record reader, the Pictures stream, encryption headers and PICT.
       77,000 damaged files with no trap, and 7,700 of them through dccli's open and render with no crash or time-out.
     - **The crash corpus at full size**, all of Govdocs1's `.ppt`. Its first part (11,551 files) found a hang in
-      FontDB, outside DCPPT: a font macOS downloads on demand (Osaka) blocked CoreText on a prompt no window shows.
-      FontDB now asks CoreText only about installed fonts, and the four files open in under a second.
+      FontDB, outside DCPPT: a font macOS downloads on demand (Osaka) blocked CoreText until someone answered macOS's download prompt.
+      FontDB now asks CoreText only about installed fonts, and the four files open in under a second. Eight more
+      waited the same way inside ImageIO's PICT decoder; a PICT now gets a 5 s deadline.
+    - **The whole corpus:** 49,485 files. In Debug, 49,175 open and 310 fail cleanly (211 PowerPoint 95, 98 not
+      presentations, one damaged). Rendering every slide in Release, 49,170 render. No crash and no hang. Five
+      decks take 36–101 s to render, in DCRender's metafile rasterizer and font fallback, which `.pptx` shares.
     - **Release:** notes drafted in `Docs/releases/0.1.8.md`; EVALUATION lists `.ppt` as done. Releasing awaits the
       operator.
 

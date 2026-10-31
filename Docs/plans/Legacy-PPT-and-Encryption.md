@@ -174,8 +174,12 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
   - Damaged PICTs through AppKit.
 - **The crash corpus at full size:** all of Govdocs1's `.ppt` (about 49,700 files), in parallel.
   - It found a hang outside DCPPT: CoreText downloading a font macOS offers on demand (Osaka) and waiting on a
-    prompt no window shows. FontDB now asks CoreText only about installed fonts.
-  - Results are in PORT-STATUS.
+    download prompt that someone had to answer. FontDB now asks CoreText only about installed fonts, and a PICT,
+    which ImageIO draws, gets a deadline.
+  - It also found the same hang inside ImageIO's PICT decoder (eight files): a PICT now gets a 5 s deadline.
+  - **Results:** 49,485 files. In Debug, 49,175 open and 310 fail cleanly. Rendering every slide in Release, 49,170
+    render and the same 310 fail cleanly. No crash and no hang. Five decks render slowly (36–101 s alone), in DCRender's
+    metafile rasterizer and its font fallback; that is left for a follow-up.
 - Details are in `Packages/DCPPT/PORT-NOTES.md`.
 
 ### P5 notes (2026-10-30)
