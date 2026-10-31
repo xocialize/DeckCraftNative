@@ -212,3 +212,18 @@ local so concurrent tests never see it) playing upstream's VP9 and VP8 clips and
 New: container sniffing, error messages, ASF fields, MP3 measurement, `Pcm` bounds, an undecodable voice, the
 AVAudioEngine output, AudioToolbox and AVAssetWriter media through the decoders, and the three oracle comparisons.
 The upstream fixtures are read from `../deckcraft/crates/media/tests/fixtures`; those tests skip without it.
+
+## Pin move 88c2ceff → a3fbf029
+
+- **Ported: ogg damage-recovery bounds** (ede7a7ea, 6a34f138). A page read only to find its CRC wrong is now
+  charged to the 32 MiB recovery budget, like the scan's 64 KiB windows, and the walk stops once fewer than 4
+  bytes of budget are left (`spent`): a file of dense fake capture patterns can no longer make `Ogg.open` CRC
+  gigabytes. The warnings list (capped at 256, then "further warnings omitted", the budget warning last) isn't
+  ported: `Ogg.open` keeps no warnings, as nothing in deckcraft-media reads them. Tests `OggRecoveryTests` (the good
+  pages are kept, a stream past the spent budget isn't found while one after a little damage is, 2,000 good pages
+  are all read); `a_budget_too_small_to_search_is_spent` tests the scanner's internals, which are a closure here.
+- **Doesn't apply: the codec crates.** h264/hevc (3c068df6, 7190c858, ddd39249, 2c11865b `hvcC` SEI arrays,
+  8c2560f3 configuration NAL types, 63b18117 picture-setup panics) change deckcraft's own decoders, which
+  VideoToolbox replaces here; damaged codec configurations were already a recorded divergence (above). av1, h264,
+  hevc, vp9 and opus (3f853db3, d9749fbc, 0e7cd013, 9c529505, c58f19f1) are strict-Clippy refactors. `crates/media`
+  itself didn't change. The regenerated media vectors still pass `OracleParityTests` unchanged.

@@ -88,14 +88,18 @@ enum Ogg {
         var partial: [UInt32: Partial] = [:]
         var pos: UInt64 = 0
         var foundAny = false
+        // Source bytes damage recovery may read: the windows the scan for the next capture pattern fills and
+        // the pages read only to find their CRC wrong (craft's `RECOVERY_BUDGET`). Spent once fewer bytes are
+        // left than a capture pattern needs.
         var scanBudget = 32 * 1024 * 1024
+        var spent: Bool { scanBudget < 4 }
         var scanned: (start: UInt64, end: UInt64) = (0, 0)
         func capture(_ p: UInt64) -> Bool {
             let i = Int(p)
             return src[i] == 0x4F && src[i + 1] == 0x67 && src[i + 2] == 0x67 && src[i + 3] == 0x53
         }
         /// craft's `CaptureScanner::find`: the next `OggS` at or after `from`, reading in 64 KiB windows
-        /// against a 32 MiB budget.
+        /// against the recovery budget.
         func find(_ from: UInt64) -> UInt64? {
             var at = from
             while at + 4 <= len {
@@ -108,7 +112,7 @@ enum Ogg {
                     at = scanned.end >= 3 ? scanned.end - 3 : 0
                     continue
                 }
-                if scanBudget == 0 { return nil }
+                if spent { return nil }
                 let n = min(min(Int(len - at), 64 * 1024), scanBudget)
                 if n < 4 { break }
                 scanned = (at, at + UInt64(n))
@@ -139,6 +143,9 @@ enum Ogg {
             let stored = UInt32(page[22]) | UInt32(page[23]) << 8 | UInt32(page[24]) << 16 | UInt32(page[25]) << 24
             for i in 22..<26 { page[i] = 0 }
             if crc32(page[...]) != stored {
+                // A page read only to find it damaged is recovery work, charged like the scan's windows.
+                scanBudget = max(0, scanBudget - Int(pageLen))
+                if spent { break }
                 pos += 1
                 continue
             }
