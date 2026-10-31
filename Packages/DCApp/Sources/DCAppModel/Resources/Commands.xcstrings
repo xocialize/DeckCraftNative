@@ -4645,6 +4645,18 @@
         }
       }
     },
+    "help.slide.actions" : {
+      "comment" : "What command slide.actions does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List the slide's click and hover actions and links, without running them."
+          }
+        }
+      }
+    },
     "help.slide.delete" : {
       "comment" : "What command slide.delete does, in one line: the second line of its tooltip and its VoiceOver hint",
       "extractionState" : "manual",
@@ -8169,6 +8181,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slide Show"
+          }
+        }
+      }
+    },
+    "slide.actions" : {
+      "comment" : "The label of command slide.actions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspect Slide Actions"
           }
         }
       }

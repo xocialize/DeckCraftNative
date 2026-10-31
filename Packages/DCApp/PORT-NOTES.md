@@ -1588,6 +1588,9 @@ Tests in `ViewsModelTests`, `InspectorFillTests`, `InspectorEffectsAndSizeTests`
   target's), and `ShowTransition.reverse` makes `ShowTransition.layers` run the frames from the end with old and
   new swapped (the Metal stage draws those); Morph is not reversed.
 
+**b082f12f (`slide.actions`, engine only)** reached the app as a new registry command: it gains its Commands
+catalog entry and a palette description (`CommandHelp`).
+
 **Left: the operator's call.** 9ad147b3's drawn preset tiles (a card with each shadow, glow or soft edge drawn on
 it). The pickers give the same choices; drawn tiles, as in PowerPoint's Presets galleries, are a medium SwiftUI
 piece (about 150 lines) for the inspector and the ribbon's effect menus together.

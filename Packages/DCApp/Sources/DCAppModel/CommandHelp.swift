@@ -27,6 +27,7 @@ public enum CommandHelp {
         "slide.reset": "Put the slide's placeholders back where its layout has them.",
         "section.add": "Start a section at the selected slide to organise the deck.",
         "slide.hide": "Leave the slide out of the slide show without deleting it.",
+        "slide.actions": "List the slide's click and hover actions and links, without running them.",
         // Font
         "format.font": "Choose the typeface for the selected text.",
         "format.size": "Set the size of the selected text in points.",
