@@ -94,6 +94,9 @@ struct MCPProcessTests {
             toolCall(31, "run_command", #"{"command": "shape.inspect", "params": {"id": 1.5}}"#),
             toolCall(32, "new_presentation", #"{"blank": true}"#),
             toolCall(33, "inspect_slide"),
+            toolCall(34, "insert_chart", #"{"type": "pie", "categories": ["A", "B"], "series": [{"name": "S", "values": [3, 5]}], "x": 50, "y": 60, "w": 300, "h": 200}"#),
+            toolCall(35, "insert_chart", #"{"type": "bar", "categories": ["A"], "series": [{"values": [1]}], "x": -1e300, "y": 1e300, "w": -5, "h": 0}"#),
+            toolCall(36, "inspect_slide"),
         ]
     }
 
@@ -232,7 +235,7 @@ struct MCPProcessTests {
         ]
         let (r, out) = try session(.ours, ["--automation-read-root", read.path, "--automation-write-root", write.path], lines)
         #expect(r.code == 0)
-        #expect(r.stderr.hasPrefix("deckcraft-cli: files confined: read root "), "\(r.stderr)")
+        #expect(r.stderr.hasPrefix("deckcraft-cli: files confined: read roots "), "\(r.stderr)")
         #expect(!isToolError(out[1]) && FileManager.default.fileExists(atPath: write.appending(path: "ok.deckcraft").path))
         #expect(isToolError(out[2]) && toolText(out[2]).asStr?.contains("outside the write root") == true, "\(out[2])")
         #expect(isToolError(out[3]), "the write root grants no read access: \(out[3])")
@@ -241,6 +244,36 @@ struct MCPProcessTests {
             let (b, theirs) = try session(.oracle, ["--automation-read-root", read.path, "--automation-write-root", write.path], lines)
             #expect(r.stderr == b.stderr)
             #expect(Array(out.dropFirst(2)) == Array(theirs.dropFirst(2)), "the refusals are the oracle's")
+        }
+    }
+
+    @Test("Repeated roots each grant their access")
+    func multipleRoots() throws {
+        let dir = scratch("mcp-multiple-roots")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (read1, read2) = (dir.appending(path: "read1"), dir.appending(path: "read2"))
+        let (write1, write2) = (dir.appending(path: "write1"), dir.appending(path: "write2"))
+        for d in [read1, read2, write1, write2] { try FileManager.default.createDirectory(at: d, withIntermediateDirectories: true) }
+        try Data("one".utf8).write(to: read1.appending(path: "one.txt"))
+        try Data("two".utf8).write(to: read2.appending(path: "two.txt"))
+        let args = ["--automation-read-root", read1.path, "--automation-read-root=\(read2.path)", "--automation-write-root", write1.path, "--automation-write-root=\(write2.path)"]
+        let lines = [
+            toolCall(1, "open_presentation", #"{"path": "\#(read1.path)/one.txt"}"#),
+            toolCall(2, "open_presentation", #"{"path": "\#(read2.path)/two.txt"}"#),
+            toolCall(3, "save_presentation", #"{"path": "\#(write1.path)/one.deckcraft"}"#),
+            toolCall(4, "save_presentation", #"{"path": "\#(write2.path)/two.deckcraft"}"#),
+            toolCall(5, "open_presentation", #"{"path": "\#(dir.path)/outside.txt"}"#),
+        ]
+        let (r, out) = try session(.ours, args, lines)
+        #expect(r.code == 0, "\(r.stderr)")
+        for line in out.prefix(4) { #expect(!isToolError(line), "\(line)") }
+        #expect(FileManager.default.fileExists(atPath: write1.appending(path: "one.deckcraft").path))
+        #expect(FileManager.default.fileExists(atPath: write2.appending(path: "two.deckcraft").path))
+        #expect(out.count == 5 && isToolError(out[4]) && toolText(out[4]).asStr?.contains("outside the read roots ") == true, "\(out.last ?? "")")
+        if Binaries.haveOracle {
+            let (b, theirs) = try session(.oracle, args, lines)
+            #expect(r.stderr == b.stderr)
+            #expect(Array(out.prefix(2)) == Array(theirs.prefix(2)) && out.last == theirs.last, "the answers are the oracle's")
         }
     }
 

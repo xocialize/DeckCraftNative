@@ -10,6 +10,15 @@ import Testing
 
 @Suite("deckcraft-cli main.rs")
 struct CLITests {
+    @Test func timingSummaryKeepsMedianAndMaxFromOnePopulation() {
+        let slideMedians = [8.99, 16.565]
+        let wholeDeck = CLI.summarizeMs([17.0, 18.0, 16.0])
+        #expect(wholeDeck == (17.0, 18.0))
+        #expect(wholeDeck.1 >= wholeDeck.0)
+        #expect(slideMedians.reduce(0, +) > wholeDeck.1, "the fixture must expose summing independent slide medians")
+        #expect(CLI.summarizeMs([]) == (0.0, 0.0))
+    }
+
     @Test func renderHelpPrintsUsageAndWritesNothing() {
         #expect((try? CLI.render(["--help"])) != nil)
         #expect((try? CLI.render(["-h"])) != nil)
@@ -137,17 +146,16 @@ struct CLITests {
 
 @Suite("deckcraft-cli automation_args.rs")
 struct AutomationArgsTests {
-    @Test func rootsAreTakenOnceAndOtherArgumentsAreLeft() throws {
+    @Test func rootsAreRepeatedAndOtherArgumentsAreLeft() throws {
         var roots = AutomationArgs()
         var args = ArgStream(["a folder", "deck.pptx"])
         #expect(try roots.consume("--automation-read-root", &args))
+        #expect(try roots.consume("--automation-read-root=other", &args))
         #expect(try roots.consume("--automation-write-root=out", &args))
         #expect(try !roots.consume("--sample", &args))
-        #expect(roots.readRoot == "a folder")
-        #expect(roots.writeRoot == "out")
+        #expect(roots.readRoots == ["a folder", "other"])
+        #expect(roots.writeRoots == ["out"])
         #expect(args.next() == "deck.pptx")
-        #expect(throws: CLIFailure.self) { try roots.consume("--automation-read-root=other", &args) }
-        #expect(roots.readRoot == "a folder")
     }
 
     @Test func invalidOperandsLeaveRootsUnchanged() {
@@ -156,8 +164,8 @@ struct AutomationArgsTests {
                 var roots = AutomationArgs(readRoot: "read", writeRoot: "write")
                 var args = ArgStream(operand.map { [$0] } ?? [])
                 #expect(throws: CLIFailure.self, "\(flag) \(operand ?? "nil")") { try roots.consume(flag, &args) }
-                #expect(roots.readRoot == "read")
-                #expect(roots.writeRoot == "write")
+                #expect(roots.readRoots == ["read"])
+                #expect(roots.writeRoots == ["write"])
             }
             var roots = AutomationArgs()
             var none = ArgStream([])
@@ -171,8 +179,8 @@ struct AutomationArgsTests {
         #expect(try roots.consume("--automation-read-root=-folder", &none))
         var one = ArgStream(["./-folder"])
         #expect(try roots.consume("--automation-write-root", &one))
-        #expect(roots.readRoot == "-folder")
-        #expect(roots.writeRoot == "./-folder")
+        #expect(roots.readRoots == ["-folder"])
+        #expect(roots.writeRoots == ["./-folder"])
     }
 }
 

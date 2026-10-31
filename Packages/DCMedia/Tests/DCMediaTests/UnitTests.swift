@@ -129,3 +129,42 @@ import Testing
         #expect(c.trimStart == 1.5 && c.trimEnd == 0.25 && c.fadeOut == 1 && c.volume == 1)
     }
 }
+
+/// deckcraft crates/ogg/src/tests.rs's damage-recovery tests. Its warnings aren't kept here (nothing in
+/// deckcraft-media reads them), so the warning cap has nothing to test; the budget's effect on what is found is
+/// tested instead of the bytes read.
+@Suite struct OggRecoveryTests {
+    /// A valid file followed by `len` bytes of 0xFF with a capture pattern every 64 bytes. Each one claims 255
+    /// full lacing values, so it reads as a page of about 64 KiB that fails its CRC.
+    static func denseFakePages(_ len: Int) -> [UInt8] {
+        var f = TestMedia.oggOpus(packets: 6)
+        let start = f.count
+        f += [UInt8](repeating: 0xFF, count: len)
+        for at in stride(from: start, to: start + len - 64, by: 64) {
+            f.replaceSubrange(at ..< at + 5, with: Array("OggS".utf8) + [0])
+            f[at + 26] = 255
+        }
+        return f
+    }
+
+    /// Good pages of another stream, longer than a fake page claims to be (so none of those runs past the end).
+    static func laterStream() -> [UInt8] {
+        var f = TestMedia.oggPage(serial: 0x7777, seq: 0, granule: 0, packets: [TestMedia.opusHead(channels: 1, preSkip: 312)], bos: true)
+        for k in 1 ... 3 { f += TestMedia.oggPage(serial: 0x7777, seq: UInt32(k), granule: Int64(k * 960), packets: [[UInt8](repeating: 0, count: 50_000)]) }
+        return f
+    }
+
+    @Test func recoveryReadsABoundedAmountOfADamagedFile() throws {
+        let o = try #require(Ogg.open(Self.denseFakePages(1 << 20) + Self.laterStream()))
+        #expect(o.streams.first?.packets.count == 6, "the good pages are kept")
+        // Past the budget the rest isn't searched: the later stream isn't found.
+        #expect(o.streams.count == 1)
+        // After a little damage it is.
+        #expect(Ogg.open(Self.denseFakePages(4 << 10) + Self.laterStream())?.streams.count == 2)
+    }
+
+    @Test func aFileOfGoodPagesIsNotChargedForRecovery() throws {
+        let o = try #require(Ogg.open(TestMedia.oggOpus(packets: 2000)))
+        #expect(o.streams.first?.packets.count == 2000)
+    }
+}

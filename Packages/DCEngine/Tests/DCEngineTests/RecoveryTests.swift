@@ -139,7 +139,7 @@ private func folders(_ name: String) throws -> (URL, AutomationRoots) {
     }
     try Data("x".utf8).write(to: base.appending(path: "in/a.deckcraft"))
     try Data("x".utf8).write(to: base.appending(path: "outside/secret.deckcraft"))
-    let roots = try #require(try AutomationRoots.make(read: base.appending(path: "in").path, write: base.appending(path: "out").path))
+    let roots = try #require(try AutomationRoots.make(read: [base.appending(path: "in").path], write: [base.appending(path: "out").path]))
     return (base, roots)
 }
 
@@ -167,6 +167,19 @@ struct FileAccessTests {
         // Read and write access are separate.
         #expect(err(roots, base.appending(path: "in/a.deckcraft").path, .write).contains("outside the write root"))
         #expect(err(roots, base.appending(path: "out/x.png").path, .read).contains("outside the read root"))
+    }
+
+    @Test func anyConfiguredRootGrantsAccess() throws {
+        let (base, _) = try folders("multiple")
+        defer { try? FileManager.default.removeItem(at: base) }
+        let roots = try #require(try AutomationRoots.make(
+            read: [base.appending(path: "in").path, base.appending(path: "in2").path],
+            write: [base.appending(path: "out").path, base.appending(path: "outside").path]
+        ))
+        #expect(ok(roots, base.appending(path: "in/a.deckcraft").path, .read))
+        #expect(ok(roots, base.appending(path: "in2/b.deckcraft").path, .read))
+        #expect(ok(roots, base.appending(path: "out/new.deckcraft").path, .write))
+        #expect(ok(roots, base.appending(path: "outside/new.deckcraft").path, .write))
     }
 
     @Test func aSiblingWithTheSamePrefixIsOutside() throws {
@@ -198,20 +211,20 @@ struct FileAccessTests {
         let (base, _) = try folders("missing")
         defer { try? FileManager.default.removeItem(at: base) }
         do {
-            _ = try AutomationRoots.make(read: base.appending(path: "nope").path, write: nil)
+            _ = try AutomationRoots.make(read: [base.appending(path: "nope").path], write: [])
             Issue.record("a missing root opened")
         } catch { #expect(error.message.hasPrefix("cannot open the automation read root"), "\(error)") }
         do {
-            _ = try AutomationRoots.make(read: nil, write: base.appending(path: "in/a.deckcraft").path)
+            _ = try AutomationRoots.make(read: [], write: [base.appending(path: "in/a.deckcraft").path])
             Issue.record("a file root opened")
         } catch { #expect(error.message.hasPrefix("cannot open the automation write root") && error.message.hasSuffix("not a directory"), "\(error)") }
         do {
-            _ = try AutomationRoots.make(read: "", write: nil)
+            _ = try AutomationRoots.make(read: [""], write: [])
             Issue.record("an empty root opened")
         } catch { #expect(error.message.hasPrefix("cannot open the automation read root ``"), "\(error)") }
-        #expect(try AutomationRoots.make(read: nil, write: nil) == nil)
+        #expect(try AutomationRoots.make(read: [], write: []) == nil)
         // One root alone grants only its own access.
-        let readOnly = try #require(try AutomationRoots.make(read: base.appending(path: "in").path, write: nil))
+        let readOnly = try #require(try AutomationRoots.make(read: [base.appending(path: "in").path], write: []))
         #expect(err(readOnly, base.appending(path: "in/x.deckcraft").path, .write).contains("write authority is absent"))
     }
 
@@ -230,7 +243,7 @@ struct FileAccessTests {
         #expect(ok(roots, base.appending(path: "in/alias/x.deckcraft").path, .read))
         // A root given through a link is the folder it leads to.
         try fm.createSymbolicLink(at: base.appending(path: "in-link"), withDestinationURL: base.appending(path: "in"))
-        let linked = try #require(try AutomationRoots.make(read: base.appending(path: "in-link").path, write: nil))
+        let linked = try #require(try AutomationRoots.make(read: [base.appending(path: "in-link").path], write: []))
         #expect(ok(linked, base.appending(path: "in/a.deckcraft").path, .read))
     }
 

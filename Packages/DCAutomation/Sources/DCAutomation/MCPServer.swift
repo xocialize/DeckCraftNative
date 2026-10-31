@@ -49,7 +49,7 @@ public enum MCPProtocol {
     public static let version = "2025-06-18"
     static let supportedVersions = [version, "2025-03-26", "2024-11-05"]
     /// The version deckcraft-cli reports (`serverInfo.version`): the deckcraft this port follows.
-    public static let serverVersion = "0.11.1"
+    public static let serverVersion = "0.13.1"
 
     /// Resource URIs.
     public static let documentURI = "deckcraft://document"

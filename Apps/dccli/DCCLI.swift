@@ -105,7 +105,7 @@ struct DCCLI: ParsableCommand {
     )
 
     static func main() {
-        // A closed stdout is an error to handle (deckcraft exits 0), not a signal that kills the process.
+        // A closed stdout is an error to handle (deckcraft carries on without it), not a signal that kills the process.
         signal(SIGPIPE, SIG_IGN)
         // VP9 and VP8 through libvpx, as the app has them (video posters on insert, renders of video frames).
         Media.register(externalDecoder: VpxVideoDecoder())

@@ -1,6 +1,6 @@
 // DCAutomationTests — JSON-RPC framing, the MCP lifecycle and resources, as deckcraft's server answers
 // them (crates/mcp/src/server.rs, MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The
-// expected lines are deckcraft-cli 0.11.1's own replies to the same lines, byte for byte.
+// expected lines are deckcraft-cli 0.13.1's own replies to the same lines, byte for byte.
 import DCCore
 @testable import DCAutomation
 import DCEngine
@@ -56,7 +56,7 @@ struct FramingTests {
         let result = r.get("result") ?? .null
         #expect(result.get("protocolVersion") == "2025-06-18")
         #expect(result.get("capabilities") == j(#"{"resources": {}, "tools": {}}"#))
-        #expect(result.get("serverInfo") == j(#"{"name": "deckcraft", "title": "DeckCraft", "version": "0.11.1", "websiteUrl": "https://getartcraft.com/apps/deckcraft"}"#))
+        #expect(result.get("serverInfo") == j(#"{"name": "deckcraft", "title": "DeckCraft", "version": "0.13.1", "websiteUrl": "https://getartcraft.com/apps/deckcraft"}"#))
         let instructions = result.get("instructions")?.asStr ?? ""
         #expect(instructions.contains("Backend: headless (in-process engine; no window)."))
         #expect(instructions.hasSuffix("The `app.links` command returns these links."))
@@ -89,17 +89,57 @@ struct FramingTests {
         #expect(j(#"{"b": [1, {"c": []}], "a": {"x": 1.0}}"#).pretty == "{\n  \"a\": {\n    \"x\": 1.0\n  },\n  \"b\": [\n    1,\n    {\n      \"c\": []\n    }\n  ]\n}")
     }
 
-    @Test func linesAreReadAsRustReadsThem() throws {
+    @Test func framesAreReadAsDeckcraftReadsThem() throws {
         let r = LineReader(bytes: Array("a\r\nb\n\nlast".utf8), chunk: 2)
-        #expect(try r.readLine(maximum: 100) == "a")
-        #expect(try r.readLine(maximum: 100) == "b")
-        #expect(try r.readLine(maximum: 100) == "")
-        #expect(try r.readLine(maximum: 100) == "last")
-        #expect(try r.readLine(maximum: 100) == nil)
+        #expect(try r.readFrame(maximum: 100) == .complete(Array("a\r\n".utf8)))
+        #expect(try r.readFrame(maximum: 100) == .complete(Array("b\n".utf8)))
+        #expect(try r.readFrame(maximum: 100) == .complete([0x0A]))
+        #expect(try r.readFrame(maximum: 100) == .complete(Array("last".utf8)))
+        #expect(try r.readFrame(maximum: 100) == nil)
+        // Bytes are bytes here; UTF-8 is the server's question.
         let bad = LineReader(bytes: [0x61, 0xFF, 0x0A])
-        #expect(throws: IOFailure("stream did not contain valid UTF-8")) { try bad.readLine(maximum: 100) }
-        let long = LineReader(bytes: Array(repeating: 0x61, count: 50) + [0x0A])
-        #expect(throws: IOFailure.self) { try long.readLine(maximum: 10) }
+        #expect(try bad.readFrame(maximum: 100) == .complete([0x61, 0xFF, 0x0A]))
+        // The limit counts the newline; a longer frame is drained to its newline and the next one read.
+        let long = LineReader(bytes: Array(repeating: 0x61, count: 50) + [0x0A] + Array("ok\n".utf8), chunk: 7)
+        #expect(try long.readFrame(maximum: 10) == .tooLarge)
+        #expect(try long.readFrame(maximum: 10) == .complete(Array("ok\n".utf8)))
+        #expect(try long.readFrame(maximum: 10) == nil)
+        let exact = LineReader(bytes: Array(repeating: 0x61, count: 9) + [0x0A] + Array(repeating: 0x61, count: 10) + [0x0A])
+        #expect(try exact.readFrame(maximum: 10) == .complete(Array(repeating: 0x61, count: 9) + [0x0A]))
+        #expect(try exact.readFrame(maximum: 10) == .tooLarge)
+        let unended = LineReader(bytes: Array(repeating: 0x61, count: 11))
+        #expect(try unended.readFrame(maximum: 10) == .tooLarge)
+        #expect(try unended.readFrame(maximum: 10) == nil)
+    }
+
+    @Test func oversizedStdioFrameIsDrainedBeforeTheNextRequest() async throws {
+        let s = headless()
+        var input = [UInt8](repeating: 0x78, count: 16 * 1024 * 1024 + 1)
+        input += Array("\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\"}\n".utf8)
+        let out = Collected()
+        try await s.serve(LineReader(bytes: input)) { (bytes: [UInt8]) throws(IOFailure) in out.append(bytes) }
+        let replies = out.text.split(separator: "\n").map { (try? JSONParser.parse(String($0))) ?? .null }
+        #expect(replies.count == 2)
+        #expect(replies.first?.get("error")?.get("code")?.asI64 == -32600)
+        #expect(replies.first?.get("error")?.get("message")?.asStr?.contains("16 MiB") == true)
+        #expect(replies.last?.get("id")?.asU64 == 1)
+        #expect(replies.last?.get("result")?.get("serverInfo")?.get("name") == "deckcraft")
+        #expect(out.text.hasPrefix(#"{"error":{"code":-32600,"message":"request frame exceeds 16 MiB"},"id":null,"jsonrpc":"2.0"}"# + "\n"))
+        await s.stop()
+    }
+
+    @Test func invalidUTF8StdioFrameGetsAParseErrorAndDoesNotStopServing() async throws {
+        let s = headless()
+        let input: [UInt8] = [0xFF, 0x0A] + Array("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\"}\n".utf8)
+        let out = Collected()
+        try await s.serve(LineReader(bytes: input)) { (bytes: [UInt8]) throws(IOFailure) in out.append(bytes) }
+        let replies = out.text.split(separator: "\n").map { (try? JSONParser.parse(String($0))) ?? .null }
+        #expect(replies.count == 2)
+        #expect(replies.first?.get("error")?.get("code")?.asI64 == -32700)
+        #expect(replies.first?.get("error")?.get("message")?.asStr?.contains("UTF-8") == true)
+        #expect(replies.last?.get("result")?.get("serverInfo")?.get("name") == "deckcraft")
+        #expect(out.text.hasPrefix(#"{"error":{"code":-32700,"message":"request frame is not valid UTF-8"},"id":null,"jsonrpc":"2.0"}"# + "\n"))
+        await s.stop()
     }
 
     @Test func serveAnswersEachLineInOrder() async throws {

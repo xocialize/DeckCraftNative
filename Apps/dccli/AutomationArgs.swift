@@ -4,19 +4,16 @@
 // contributors).
 
 struct AutomationArgs {
-    var readRoot: String?
-    var writeRoot: String?
-    private var readGiven = false
-    private var writeGiven = false
+    var readRoots: [String]
+    var writeRoots: [String]
 
     init(readRoot: String? = nil, writeRoot: String? = nil) {
-        self.readRoot = readRoot
-        self.writeRoot = writeRoot
+        readRoots = readRoot.map { [$0] } ?? []
+        writeRoots = writeRoot.map { [$0] } ?? []
     }
 
-    /// Whether `arg` is a root flag (taking its value from `args` when it isn't inline). A second
-    /// occurrence of a flag is an error, including when the two spellings (`--flag DIR`, `--flag=DIR`) are
-    /// mixed.
+    /// Whether `arg` is a root flag (taking its value from `args` when it isn't inline). Both spellings
+    /// (`--flag DIR` and `--flag=DIR`) may be repeated.
     mutating func consume(_ arg: String, _ args: inout ArgStream) throws(CLIFailure) -> Bool {
         let flag: String
         let inline: String?
@@ -33,7 +30,6 @@ struct AutomationArgs {
         case "--automation-write-root": read = false
         default: return false
         }
-        if read ? readGiven : writeGiven { throw CLIFailure("\(flag) given twice") }
         let value: String
         if let inline {
             value = inline
@@ -43,13 +39,7 @@ struct AutomationArgs {
             value = v
         }
         if value.isEmpty { throw CLIFailure("\(flag) needs a non-empty folder") }
-        if read {
-            readRoot = value
-            readGiven = true
-        } else {
-            writeRoot = value
-            writeGiven = true
-        }
+        if read { readRoots.append(value) } else { writeRoots.append(value) }
         return true
     }
 }

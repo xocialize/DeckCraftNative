@@ -20,13 +20,21 @@ struct CLIFailure: Error, Equatable, CustomStringConvertible {
 
 /// Where the CLI writes (stdout; stderr for diagnostics).
 enum Out {
-    /// `outln!`: a line on stdout. A closed pipe ends the process quietly (exit 0), any other failure
-    /// with exit 1.
+    /// Set once a reader has closed stdout: later lines are dropped and the work goes on.
+    nonisolated(unsafe) private static var stdoutClosed = false
+
+    /// `outln!`: a line on stdout. Once the pipe is closed the lines are dropped and the work goes on (its
+    /// files are still written, its failures still reported); any other failure ends the process with
+    /// exit 1.
     static func line(_ s: String) {
+        if stdoutClosed { return }
         do {
             try write(STDOUT_FILENO, s + "\n")
         } catch {
-            if error.code == EPIPE { exit(0) }
+            if error.code == EPIPE {
+                stdoutClosed = true
+                return
+            }
             err("deckcraft-cli: can't write to stdout: \(error)")
             exit(1)
         }
@@ -53,6 +61,48 @@ enum Out {
             }
         }
         if let failure { throw failure }
+    }
+}
+
+/// Reads a command file's lines (`run --cmd-file`) from a file descriptor, as deckcraft's
+/// `read_command_file_line` does: split at `\n`, the last line kept without one, a line longer than
+/// allowed refused before it is kept.
+final class CommandFileReader {
+    private let fd: Int32
+    private var buffer = [UInt8](repeating: 0, count: 64 << 10)
+    private var start = 0
+    private var end = 0
+
+    init(fd: Int32) { self.fd = fd }
+
+    /// Bytes still buffered, refilled when empty; none at the end of the file.
+    private func fill() throws(IOFailure) -> Bool {
+        if start < end { return true }
+        while true {
+            let n = buffer.withUnsafeMutableBytes { Darwin.read(fd, $0.baseAddress, $0.count) }
+            if n < 0 {
+                if errno == EINTR { continue }
+                throw .current
+            }
+            (start, end) = (0, n)
+            return n > 0
+        }
+    }
+
+    /// The next line without its `\n`; nil at the end. A line over `maximum` bytes is an error.
+    func next(maximum: Int) throws(IOFailure) -> [UInt8]? {
+        var line: [UInt8] = []
+        while try fill() {
+            let newline = buffer[start ..< end].firstIndex(of: 0x0A)
+            let stop = newline ?? end
+            if line.count + (stop - start) > maximum {
+                throw IOFailure("command line exceeds \(maximum) byte limit")
+            }
+            line.append(contentsOf: buffer[start ..< stop])
+            start = newline.map { $0 + 1 } ?? end
+            if newline != nil { return line }
+        }
+        return line.isEmpty ? nil : line
     }
 }
 
@@ -276,7 +326,13 @@ enum CLI {
             try f()
             ms.append(Double(DispatchTime.now().uptimeNanoseconds - t) / 1e6)
         }
-        ms.sort { $0 < $1 }
+        return summarizeMs(ms)
+    }
+
+    /// The median and maximum of one population of measurements; each maximum must come from that
+    /// population.
+    static func summarizeMs(_ ms: [Double]) -> (Double, Double) {
+        let ms = ms.sorted { $0 < $1 }
         return (ms.isEmpty ? 0 : ms[ms.count / 2], ms.last ?? 0)
     }
 
@@ -332,9 +388,10 @@ enum CLI {
             ("open .pptx", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.openPresentation("bench.pptx", pptx) } }),
             ("export .pdf", try timeMs(runs) { () throws(CLIFailure) in _ = try engine { try FileCommands.saveBytes(doc, "pdf") } }),
         ]
-        let renderTotal = perSlide.reduce(0) { $0 + $1.0 }
-        let renderMax = perSlide.reduce(0.0) { Swift.max($0, $1.1) }
-        steps.insert(("render all slides (1×)", (renderTotal, renderMax)), at: 1)
+        let renderAll = try timeMs(runs) { () throws(CLIFailure) in
+            for i in 0 ..< slides { _ = renderSlide(doc, i, opts) }
+        }
+        steps.insert(("render all slides (1×)", renderAll), at: 1)
         let peak = peakRssMiB()
         if asJSON {
             let v: JSON = [
@@ -570,10 +627,88 @@ enum CLI {
 
     // MARK: run
 
+    /// Where `run`'s commands come from, in the order the options are given.
+    enum CommandSource {
+        case inline(String)
+        case file(String)
+    }
+
+    /// The longest line a command file may hold, its newline not counted.
+    static let maxCommandFileLineBytes = 16 * 1024 * 1024
+
+    /// The same command syntax and execution path for `--cmd` and each command-file line.
+    static func runCommand(_ s: Session, _ command: String, _ print: Bool) throws(CLIFailure) {
+        let id: String
+        let p: JSON
+        if let (head, json) = splitOnce(command, "=") {
+            id = head
+            do { p = try parseJSON(json) } catch { throw CLIFailure("\(id): bad JSON: \(error)") }
+        } else {
+            id = command
+            p = .emptyObject
+        }
+        let r = try execute(s, id, p)
+        if print { Out.line("\(id) → \(r.display)") }
+    }
+
+    /// `--cmd-file`: one command per line, run as each line is read. Blank lines and `#` comments are
+    /// skipped, surrounding whitespace (a `\r` too) and a BOM at the start of the file are dropped.
+    static func runCommandFile(_ s: Session, _ path: String, _ print: Bool) throws(CLIFailure) {
+        let fd = Darwin.open(path, O_RDONLY | O_CLOEXEC)
+        guard fd >= 0 else { throw CLIFailure("\(path): \(IOFailure.current)") }
+        defer { close(fd) }
+        let reader = CommandFileReader(fd: fd)
+        var lineNumber = 0
+        while true {
+            lineNumber += 1
+            let bytes: [UInt8]
+            do {
+                guard let b = try reader.next(maximum: maxCommandFileLineBytes) else { break }
+                bytes = b
+            } catch { throw CLIFailure("\(path):\(lineNumber): \(error)") }
+            if let e = rustUTF8Error(bytes) { throw CLIFailure("\(path):\(lineNumber): invalid UTF-8: \(e)") }
+            var scalars = String(decoding: bytes, as: UTF8.self).unicodeScalars[...]
+            if lineNumber == 1 { scalars = scalars.drop { $0 == "\u{FEFF}" } }
+            let command = String(rustTrim(String(String.UnicodeScalarView(scalars))))
+            if command.isEmpty || command.utf8.first == UInt8(ascii: "#") { continue }
+            do { try runCommand(s, command, print) } catch { throw CLIFailure("\(path):\(lineNumber): \(error.message)") }
+        }
+    }
+
+    /// `Utf8Error`'s text for bytes that aren't UTF-8 (nil when they are), as `str::from_utf8` finds it.
+    static func rustUTF8Error(_ b: [UInt8]) -> String? {
+        var i = 0
+        while i < b.count {
+            let first = b[i]
+            if first < 0x80 {
+                i += 1
+                continue
+            }
+            // The allowed range of each byte after the first, by the first byte (RFC 3629 §4).
+            let ranges: [ClosedRange<UInt8>]
+            switch first {
+            case 0xC2 ... 0xDF: ranges = [0x80 ... 0xBF]
+            case 0xE0: ranges = [0xA0 ... 0xBF, 0x80 ... 0xBF]
+            case 0xE1 ... 0xEC, 0xEE ... 0xEF: ranges = [0x80 ... 0xBF, 0x80 ... 0xBF]
+            case 0xED: ranges = [0x80 ... 0x9F, 0x80 ... 0xBF]
+            case 0xF0: ranges = [0x90 ... 0xBF, 0x80 ... 0xBF, 0x80 ... 0xBF]
+            case 0xF1 ... 0xF3: ranges = [0x80 ... 0xBF, 0x80 ... 0xBF, 0x80 ... 0xBF]
+            case 0xF4: ranges = [0x80 ... 0x8F, 0x80 ... 0xBF, 0x80 ... 0xBF]
+            default: return "invalid utf-8 sequence of 1 bytes from index \(i)"
+            }
+            for (k, r) in ranges.enumerated() {
+                guard let next = b.at(i + 1 + k) else { return "incomplete utf-8 byte sequence from index \(i)" }
+                if !r.contains(next) { return "invalid utf-8 sequence of \(k + 1) bytes from index \(i)" }
+            }
+            i += 1 + ranges.count
+        }
+        return nil
+    }
+
     static func run(_ args: [String]) throws(CLIFailure) {
         var input: String?
         var sample = false
-        var cmds: [String] = []
+        var cmds: [CommandSource] = []
         var save: String?
         var export: String?
         var exportParams = JSON.emptyObject
@@ -587,7 +722,10 @@ enum CLI {
             case "--sample": sample = true
             case "--cmd":
                 guard let v = it.next() else { throw CLIFailure("--cmd needs COMMAND[=PARAMS]") }
-                cmds.append(v)
+                cmds.append(.inline(v))
+            case "--cmd-file":
+                guard let v = it.next() else { throw CLIFailure("--cmd-file needs a file") }
+                cmds.append(.file(v))
             case "--save":
                 guard let v = it.next() else { throw CLIFailure("--save needs a path") }
                 save = v
@@ -609,18 +747,11 @@ enum CLI {
         for p in [save, export].compactMap({ $0 }) { _ = try outputFormat(p) }
         let s = Session()
         try open(s, input, sample)
-        for c in cmds {
-            let id: String
-            let p: JSON
-            if let eq = c.firstIndex(of: "=") {
-                id = String(c[..<eq])
-                do { p = try parseJSON(String(c[c.index(after: eq)...])) } catch { throw CLIFailure("\(id): bad JSON: \(error)") }
-            } else {
-                id = c
-                p = .emptyObject
+        for source in cmds {
+            switch source {
+            case .inline(let command): try runCommand(s, command, print)
+            case .file(let path): try runCommandFile(s, path, print)
             }
-            let r = try execute(s, id, p)
-            if print { Out.line("\(id) → \(r.display)") }
         }
         if let p = save { _ = try execute(s, "file.saveAs", ["path": .string(p)]) }
         if let p = export {
@@ -774,7 +905,7 @@ enum CLI {
             }
         }
         let confined: AutomationRoots?
-        do { confined = try AutomationRoots.make(read: roots.readRoot, write: roots.writeRoot) } catch { throw CLIFailure(error.message) }
+        do { confined = try AutomationRoots.make(read: roots.readRoots, write: roots.writeRoots) } catch { throw CLIFailure(error.message) }
         if confined != nil && connect != nil {
             throw CLIFailure("--automation-read-root and --automation-write-root confine the in-process server; a running app is not confined by them, so drop --connect (or use --connect without the roots)")
         }
@@ -790,7 +921,8 @@ enum CLI {
             if let r = confined {
                 // Every thread of this process, not only the server's: nothing reaches past the roots.
                 FileAccess.confineProcess(r)
-                Out.err("deckcraft-cli: files confined: read root \(r.readRoot ?? "none"), write root \(r.writeRoot ?? "none")")
+                func show(_ roots: [String]) -> String { roots.isEmpty ? "none" : roots.joined(separator: ", ") }
+                Out.err("deckcraft-cli: files confined: read roots \(show(r.readRoots)), write roots \(show(r.writeRoots))")
                 h.withAutomationRoots(r)
             }
             backend = h
