@@ -247,3 +247,41 @@ These sit on DCAnim, which computes the transition layers, meshes and Morph fram
   PowerPoint probes, every transition starting old and ending new, and dynamic content. So are the 6 Morph tests of
   `tests.rs` that Wave 2 skipped: `render_blend` ends and backdrops, text tokens, text and path morph ends, fill
   fades, and aligning once per transition.
+
+## Pin move 88c2ceff → a3fbf029
+
+Ported:
+
+- **Bar data labels skip missing values** (d8c18803). `ChartRender.barDataLabel` gives a bar no label when its
+  value is missing; an explicit zero still gets "0". The in-file test is ported in `ChartTests`.
+- **Shapes too large or not finite are skipped** (b1645b00, #1165). `drawable` in `Helpers.swift` is
+  deckcraft's `geometry::drawable`, and `geometryShape` returns early when it fails. It fails when any path has
+  a non-finite point, or when the outline's control box unioned with the frame spans more than 1e7 device
+  pixels. The control box is DCGeometry's new `BezPath.controlBox` (kurbo `control_box`).
+  - In deckcraft this kept vello's flattener from aborting the process. CoreGraphics would not abort, but it
+    would spend as long on such a shape, so the shape is skipped here too.
+  - deckcraft logs a warning when it skips a shape. DCRender has no logger, so nothing is logged.
+  - Both tests are ported in `CoreRenderTests`.
+- **Animation state never reaches backdrop shapes** (8c8ab956, 86801660, #1362). The state is now cleared
+  inside `Renderer.backdrop`, so it no longer applies only in `blend`. A master or layout shape whose id
+  matches a slide shape's is no longer hidden or tinted by that slide shape's state in a slide render. The test
+  is ported in `CoreRenderTests`.
+
+No port needed:
+
+- **7f1ebc2a** (Clippy refactor of the render crate). Functions were split and arguments packed into structs.
+  It was checked hunk by hunk for changed order, returns and conditions, and none changed.
+- **ad97533a, 04b0958b** (gradient flip). In render these touch only the tests' `Gradient` literals; the
+  renderer doesn't read `flip`.
+
+Doesn't apply:
+
+- **PDF transparent pixels take the backdrop colour** (d6f532bb, #1455). deckcraft's PDF draws two rasters per
+  slide, a backdrop and the slide's content over it. The content raster's transparent pixels were RGB 0, so a
+  viewer that smooths images showed a grey hairline at their edges. The fix copies the backdrop's colour into
+  those pixels. The PDF here is vector: shapes are paths, and there is no content raster over a backdrop raster.
+  - **A remaining edge case, not fixed.** Images can still be drawn with an alpha channel: a layer drawn as a
+    raster because it blurs or has a compose mode inside it, and a picture with transparency. CGPDFContext
+    writes such an image as RGB 0 under an SMask with `/Interpolate true`, without `/Matte` (checked
+    2026-10-31). A smoothing viewer could therefore show a dark fringe where such an image has a hard edge.
+    Blurred and soft-edged layers fade out, so they are unlikely to show one.

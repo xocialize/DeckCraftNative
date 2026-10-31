@@ -782,6 +782,65 @@ struct PasteboardRegion: Equatable {
         }
         #expect(sharp * 10 >= total * 9, "the stripes stay sharp: \(sharp) of \(total) pixels black or white")
     }
+
+    // tests.rs: animation_state_skips_layout_and_master_shapes_sharing_a_slide_shape_id
+    @Test func animationStateSkipsLayoutAndMasterShapesSharingASlideShapeId() throws {
+        var p = Presentation.default
+        func bar(_ x: Double) -> Shape { shapeWith(77, Xfrm(x, 400, 100, 60)) { $0.fill = .solid(.rgb(.rgb(200, 0, 0))) } }
+        let lid = p.slides[0].layout
+        p.masters[0].shapes.append(bar(100))
+        let li = try #require(p.masters[0].layouts.firstIndex { $0.id == lid }, "layout")
+        p.masters[0].layouts[li].shapes.append(bar(400))
+        p.slides[0].shapes.append(bar(700))
+        var hide = ShapeState()
+        hide.visible = false
+        let img = renderSlide(p, 0, renderOpts(1) { $0.state = { _ in hide } })
+        for x in [150, 450] {
+            #expect(Array(pixelAt(img, x, 430)[0 ..< 3]) == [200, 0, 0], "the backdrop bar at x=\(x) stays")
+        }
+        #expect(Array(pixelAt(img, 750, 430)[0 ..< 3]) != [200, 0, 0], "the slide's own shape with that id is hidden")
+    }
+
+    /// tests.rs: a_shape_far_larger_than_any_screen_is_skipped_not_flattened. #1165: an ellipse sized at
+    /// the EMU limit, crossing the slide, made vello's flattener allocate a buffer from its on-screen
+    /// length and abort. It is skipped; the rest of the slide still draws.
+    @Test func aShapeFarLargerThanAnyScreenIsSkippedNotFlattened() {
+        let huge = shapeWith(501, Xfrm(-5e17, -5e17, 1e18, 1e18)) {
+            $0.geom = .preset("ellipse")
+            $0.style = .accent(.accent2)
+        }
+        let normal = shapeWith(502, Xfrm(100, 100, 200, 100)) { $0.style = .accent(.accent1) }
+        let p = deckOf([huge, normal])
+        let img = renderSlide(p, 0, renderOpts(1))
+        let a = accent(p, .accent1)
+        let px = pixelAt(img, 200, 150)
+        #expect(Swift.abs(Int(px[0]) - Int(a.r)) <= 2, "\(px) vs \(a)")
+        #expect(pixelAt(img, 50, 50) == [255, 255, 255, 255], "the huge ellipse is not drawn")
+    }
+
+    /// tests.rs: a_shape_whose_outline_is_not_finite_is_not_drawable. #1165: a path with a NaN point is not
+    /// drawn, even when the shape's frame is finite and small (a bounding box, or a union with the frame,
+    /// would hide the NaN).
+    @Test func aShapeWhoseOutlineIsNotFiniteIsNotDrawable() {
+        func geo(_ pts: [(Double, Double)]) -> Preset.Geometry {
+            var path = BezPath()
+            path.moveTo(Point(pts[0].0, pts[0].1))
+            for p in pts.dropFirst() { path.lineTo(Point(p.0, p.1)) }
+            return Preset.Geometry(paths: [Preset.SubPath(path: path, fill: .norm, stroke: true, evenOdd: false)], textRect: .zero, handles: [], sites: [])
+        }
+        let m = Affine.identity
+        #expect(drawable(geo([(0, 0), (100, 50)]), m, 100, 50))
+        #expect(!drawable(geo([(0, 0), (.nan, 50)]), m, 100, 50))
+        #expect(!drawable(geo([(0, 0), (.infinity, 50)]), m, 100, 50))
+        #expect(!drawable(geo([(0, 0), (1e18, 50)]), m, 100, 50))
+        // A quadratic whose extremum overflows kurbo's bounding box: its control point still counts.
+        var path = BezPath()
+        path.moveTo(Point(0, 0))
+        path.quadTo(Point(1e308, 0), Point(0, 0))
+        var quad = geo([(0, 0), (1, 1)])
+        quad.paths[0].path = path
+        #expect(!drawable(quad, m, 100, 50))
+    }
 }
 
 /// extent.rs's own tests: how far a slide's drawing reaches. Its two `pasteboard_region` tests come with

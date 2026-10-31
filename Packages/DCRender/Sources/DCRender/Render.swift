@@ -246,7 +246,10 @@ final class Renderer {
     }
 
     /// Background plus the master and layout graphics the slide shows.
-    func backdrop(_ c: Canvas, _ f: Frame, _ rctx: Resolve.Ctx, _ slide: Slide, _ view: Affine) {
+    func backdrop(_ c: Canvas, _ f0: Frame, _ rctx: Resolve.Ctx, _ slide: Slide, _ view: Affine) {
+        // Backdrop graphics never take shape states: their ids may clash with the slide's shapes.
+        var f = f0
+        f.opts.state = nil
         background(c, f, rctx, slide, view)
         let (showLayout, showMaster) = Resolve.showMasterShapes(slide, rctx.layout)
         if showMaster {
@@ -555,6 +558,8 @@ final class Renderer {
             (scaledGeometry(s, m, depth, w, h), [])
         }
         func fade(_ i: Int) -> Morph.Fade { fades.at(i) ?? noFade }
+        // An outline that is not finite, or far larger than any screen, is not drawn (deckcraft #1165).
+        guard drawable(geo, m, w, h) else { return }
         var (fill, fillPh) = Resolve.fill(rctx, s)
         let (resolvedLine, linePh) = Resolve.line(rctx, s)
         let (effects, fxPh) = Resolve.effects(rctx, s)

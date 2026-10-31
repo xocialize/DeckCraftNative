@@ -86,6 +86,27 @@ public struct BezPath: Sendable, Hashable {
         }
         return bbox ?? .zero
     }
+
+    /// The box of every point, control points included (kurbo `control_box`); it always holds the
+    /// curves, even when finding their exact extrema overflows. `Rect.zero` for no points.
+    public var controlBox: Rect {
+        var cbox: Rect?
+        func add(_ p: Point) { cbox = cbox.map { $0.unionPoint(p) } ?? Rect.fromPoints(p, p) }
+        for el in elements {
+            switch el {
+            case .moveTo(let p), .lineTo(let p): add(p)
+            case .quadTo(let a, let b):
+                add(a)
+                add(b)
+            case .curveTo(let a, let b, let c):
+                add(a)
+                add(b)
+                add(c)
+            case .closePath: break
+            }
+        }
+        return cbox ?? .zero
+    }
 }
 
 /// kurbo's `segments` iterator over raw elements.

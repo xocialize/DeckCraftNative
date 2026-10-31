@@ -130,14 +130,11 @@ extension Renderer {
         let (cv, view) = canvas(pres, opts)
         guard let c = cv else { return RenderImage() }
         guard let co = Resolve.Ctx.forSlide(pres, old.0), let cn = Resolve.Ctx.forSlide(pres, new.0) else { return c.finish() }
-        // Backdrop graphics never take shape states: their ids may clash with the frame's shapes.
-        var bopts = opts
-        bopts.state = nil
         if mix < 1.0 {
-            backdrop(c, Frame(pres: pres, opts: bopts, fields: fields(pres, old.1, opts)), co, old.0, view)
+            backdrop(c, Frame(pres: pres, opts: opts, fields: fields(pres, old.1, opts)), co, old.0, view)
         }
         if mix > 0.0 {
-            let f = Frame(pres: pres, opts: bopts, fields: fields(pres, new.1, opts))
+            let f = Frame(pres: pres, opts: opts, fields: fields(pres, new.1, opts))
             let layered = mix < 1.0
             if layered { c.pushLayer(opacity: Double(Float(mix))) }
             backdrop(c, f, cn, new.0, view)
