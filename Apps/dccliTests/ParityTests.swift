@@ -32,7 +32,7 @@ struct ParityTests {
     @Test("`describe` of every command is the oracle's", .enabled(if: Binaries.haveOracle, "the oracle isn't built"))
     func describeEveryCommand() async throws {
         let ids = commandSpecs().map(\.id)
-        #expect(ids.count == 330)
+        #expect(ids.count == 331)
         let bad = try await withThrowingTaskGroup(of: String?.self) { group in
             for chunk in stride(from: 0, to: ids.count, by: 30).map({ Array(ids[$0 ..< min($0 + 30, ids.count)]) }) {
                 group.addTask {
