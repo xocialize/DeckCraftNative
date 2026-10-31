@@ -328,9 +328,14 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
             let p = collection.convert(info.draggingLocation, from: nil)
             return SorterLogic.moveDest(from, sectionSlot(p)) == nil ? [] : .move
         }
-        guard let from = dragged(info, .deckCraftSlideRow) else { return [] }
+        guard let drag = draggedSlides(info), let doc = link.state?.doc else { return [] }
         op.pointee = .before
-        return SorterLogic.moveDest(from, slideSlot(ip.pointee as IndexPath)) == nil ? [] : .move
+        return drag.moveParams(doc, slot: slideSlot(ip.pointee as IndexPath)) == nil ? [] : .move
+    }
+
+    /// The slides a drag carries, when it began in this presentation.
+    private func draggedSlides(_ info: any NSDraggingInfo) -> SlideDrag? {
+        info.draggingPasteboard.string(forType: .deckCraftSlideRow).flatMap { SlideDrag.read($0, uid: link.uid) }
     }
 
     func collectionView(_ collectionView: NSCollectionView, acceptDrop info: any NSDraggingInfo, indexPath ip: IndexPath, dropOperation: NSCollectionView.DropOperation) -> Bool {
@@ -339,14 +344,22 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
             guard let to = SorterLogic.moveDest(from, sectionSlot(p)) else { return false }
             return (try? link.run("section.move", ["index": .integer(from), "to": .integer(to)]).get()) != nil
         }
-        guard let from = dragged(info, .deckCraftSlideRow), let to = SorterLogic.moveDest(from, slideSlot(ip)) else { return false }
-        return (try? link.run("slide.move", ["from": .integer(from), "to": .integer(to)]).get()) != nil
+        // One `slide.move` for every dragged slide: one undo step, and they stay selected.
+        guard let drag = draggedSlides(info), let doc = link.state?.doc, let p = drag.moveParams(doc, slot: slideSlot(ip)) else { return false }
+        return (try? link.run("slide.move", p).get()) != nil
     }
 
-    /// The pasteboard item that drags slide `i` or section `si`.
+    /// Whether a press on slide `i` waits for the button to come up before selecting (`defersClick`).
+    func defersClick(slide i: Int, shift: Bool, command: Bool) -> Bool {
+        guard let st = link.state else { return false }
+        return NavigatorLogic.defersClick(st, index: i, shift: shift, command: command)
+    }
+
+    /// The pasteboard item that drags slide `i` (with the rest of the slide selection when it is part of it) or
+    /// section `si`.
     func dragItem(slide i: Int?, section si: Int?) -> NSPasteboardItem {
         let item = NSPasteboardItem()
-        if let i { item.setString("\(link.uid):\(i)", forType: .deckCraftSlideRow) }
+        if let i, let st = link.state, let drag = SlideDrag.start(st, index: i) { item.setString(drag.pasteboardString, forType: .deckCraftSlideRow) }
         if let si { item.setString("\(link.uid):\(si)", forType: .deckCraftSectionRow) }
         return item
     }
@@ -357,7 +370,8 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
 @MainActor
 final class SorterCollectionView: NSCollectionView {
     weak var controller: SorterViewController?
-    private var press: (point: NSPoint, slide: Int, ip: IndexPath)?
+    /// The press that may start a drag, and the click it holds back until the button comes up (`defersClick`).
+    private var press: (point: NSPoint, slide: Int, ip: IndexPath, pending: (shift: Bool, command: Bool)?)?
 
     override var acceptsFirstResponder: Bool { true }
 
@@ -370,8 +384,13 @@ final class SorterCollectionView: NSCollectionView {
             c.open(slide: i)
             return
         }
-        c.click(slide: i, shift: event.modifierFlags.contains(.shift), command: event.modifierFlags.contains(.command))
-        press = (p, i, ip)
+        let (shift, command) = (event.modifierFlags.contains(.shift), event.modifierFlags.contains(.command))
+        if c.defersClick(slide: i, shift: shift, command: command) {
+            press = (p, i, ip, (shift, command))
+        } else {
+            c.click(slide: i, shift: shift, command: command)
+            press = (p, i, ip, nil)
+        }
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -392,7 +411,10 @@ final class SorterCollectionView: NSCollectionView {
         beginDraggingSession(with: [dragItem], event: event, source: self)
     }
 
-    override func mouseUp(with event: NSEvent) { press = nil }
+    override func mouseUp(with event: NSEvent) {
+        if let pr = press, let m = pr.pending { controller?.click(slide: pr.slide, shift: m.shift, command: m.command) }
+        press = nil
+    }
 
     override func menu(for event: NSEvent) -> NSMenu? {
         let p = convert(event.locationInWindow, from: nil)

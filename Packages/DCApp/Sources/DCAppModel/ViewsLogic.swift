@@ -48,6 +48,64 @@ public enum SorterLogic {
         if slot == from || slot == from + 1 { return nil }
         return slot > from ? slot - 1 : slot
     }
+
+    /// `slides_move_dest`: `slide.move`'s `to` for the slides at `moving` (ascending indices) dropped in gap
+    /// `slot`, the gap counted without them; nil when the drop leaves the deck as it is (a run dropped inside or
+    /// beside itself). Scattered slides always gather.
+    public static func slidesMoveDest(_ moving: [Int], _ slot: Int) -> Int? {
+        guard let first = moving.first else { return nil }
+        let before = moving.filter { $0 < slot }.count
+        let dest = slot >= before ? slot - before : 0
+        let oneRun = moving.enumerated().allSatisfy { k, i in
+            let (v, overflow) = first.addingReportingOverflow(k)
+            return !overflow && v == i
+        }
+        return oneRun && dest == first ? nil : dest
+    }
+}
+
+/// A slide drag in the navigator or the Slide Sorter (`thumbs::SlideDrag`): the presentation it began in and the
+/// dragged slides in deck order. It travels on the pasteboard as `uid:id,id,…`.
+public struct SlideDrag: Equatable, Sendable {
+    public var uid: UInt64
+    public var ids: [SlideId]
+
+    public init(uid: UInt64, ids: [SlideId]) {
+        self.uid = uid
+        self.ids = ids
+    }
+
+    /// `start_slide_drag`: dragging slide `index` drags the whole slide selection when the slide is part of it,
+    /// else that slide alone.
+    public static func start(_ st: DocState, index: Int) -> SlideDrag? {
+        guard let id = st.doc.slides.at(index)?.id else { return nil }
+        let selected = Set(st.selection.slides)
+        let ids = selected.contains(id) ? st.doc.slides.map(\.id).filter { selected.contains($0) } : [id]
+        return SlideDrag(uid: st.uid, ids: ids)
+    }
+
+    public var pasteboardString: String { "\(uid):" + ids.map { String($0.rawValue) }.joined(separator: ",") }
+
+    /// The drag a pasteboard string carries, when it began in presentation `uid` (a drag from another is dropped).
+    public static func read(_ s: String, uid: UInt64) -> SlideDrag? {
+        let parts = s.split(separator: ":", omittingEmptySubsequences: false)
+        guard parts.count == 2, UInt64(parts[0]) == uid else { return nil }
+        var ids: [SlideId] = []
+        for p in parts[1].split(separator: ",") {
+            guard let n = UInt32(p) else { return nil }
+            ids.append(SlideId(n))
+        }
+        return ids.isEmpty ? nil : SlideDrag(uid: uid, ids: ids)
+    }
+
+    /// `drop_slide_drag`: the one `slide.move` (one undo step) that drops the dragged slides in gap `slot`; nil
+    /// when the drop leaves them where they are or one of them is gone.
+    public func moveParams(_ doc: Presentation, slot: Int) -> JSON? {
+        let dragged = Set(ids)
+        let moving = doc.slides.indices.filter { dragged.contains(doc.slides[$0].id) }
+        guard moving.count == dragged.count, let to = SorterLogic.slidesMoveDest(moving, slot) else { return nil }
+        return ["ids": .array(ids.map { .integer($0.rawValue) }), "to": .integer(to)]
+    }
 }
 
 /// A folded section, keyed by its document and its first slide, so moving a section doesn't fold another
@@ -96,6 +154,13 @@ public enum NavigatorLogic {
         if shift { return ("slide.selectRange", ["to": .integer(index), "add": .bool(command)]) }
         if command { return ("slide.selectSlides", ["ids": .array([.integer(slide.id.rawValue)]), "add": true]) }
         return ("slide.go", ["index": .integer(index)])
+    }
+
+    /// A plain press on one of several selected slides leaves the selection alone until the button comes up
+    /// without a drag, so the press can drag them all (`start_slide_drag`; egui acts on a click at release).
+    public static func defersClick(_ st: DocState, index: Int, shift: Bool, command: Bool) -> Bool {
+        guard !shift, !command, st.selection.slides.count > 1, let id = st.doc.slides.at(index)?.id else { return false }
+        return st.selection.slides.contains(id)
     }
 
     /// Whether slide `index` is drawn selected: the current slide or one of the selected slides.

@@ -19,6 +19,7 @@ public enum InspectorFill {
         case .gradient?: "gradient"
         case .picture?: "picture"
         case .pattern?: "pattern"
+        case .background?: "background"
         default: "auto"
         }
     }
@@ -26,8 +27,41 @@ public enum InspectorFill {
     /// The fill choices of Format Shape ▸ Fill: label and kind.
     public static let shapeKinds: [(label: String, kind: String)] = [
         (L10n.text("No fill"), "none"), (L10n.text("Solid fill"), "solid"), (L10n.text("Gradient fill"), "gradient"),
-        (L10n.text("Picture or texture fill"), "picture"), (L10n.text("Pattern fill"), "pattern"), (L10n.text("Automatic"), "auto"),
+        (L10n.text("Picture or texture fill"), "picture"), (L10n.text("Pattern fill"), "pattern"),
+        (L10n.text("Slide background fill"), "background"), (L10n.text("Automatic"), "auto"),
     ]
+
+    // MARK: Slide background fill (format_shape.rs)
+
+    /// `members_have_background_fill`: a group keeps no slide background fill of its own; it shows Slide background
+    /// fill when every shape or text box in it has one, also when the group keeps a fill a picture in it uses.
+    public static func membersHaveBackgroundFill(_ sh: Shape) -> Bool {
+        guard sh.isGroup else { return false }
+        var any = false, all = true
+        walk(sh.children) { m, _ in
+            if case .shape = m.kind {
+                any = true
+                all = all && m.fill == .background
+            }
+        }
+        return any && all
+    }
+
+    /// `selection_takes_background_fill`: only a shape or text box saves a slide background fill; a group offers it
+    /// when it holds one.
+    public static func takesBackgroundFill(_ shapes: [Shape]) -> Bool {
+        var ok = false
+        walk(shapes) { m, _ in if case .shape = m.kind { ok = true } }
+        return ok
+    }
+
+    /// Format Shape ▸ Fill's choice for `sh`: its fill's kind, or Slide background fill for a group whose shapes
+    /// all have it.
+    public static func shapeKind(_ sh: Shape) -> String { membersHaveBackgroundFill(sh) ? "background" : kind(sh.fill) }
+
+    /// The fill whose editor (gradient, pattern, picture options) Format Shape shows: none for a group that keeps a
+    /// fill for its pictures while its shapes have the slide background fill, so editing it can't replace theirs.
+    public static func shownFill(_ sh: Shape) -> Fill? { membersHaveBackgroundFill(sh) ? nil : sh.fill }
 
     /// The fill choices of Format Background.
     public static let backgroundKinds: [(label: String, kind: String)] = [
@@ -42,6 +76,7 @@ public enum InspectorFill {
         case "solid": ["color": "accent1"]
         case "gradient": ["gradient": ["stops": [[0, "accent1"], [1, ["scheme": "accent1", "lumMod": 50000]]], "angle": 90]]
         case "pattern": ["pattern": ["preset": "pct25", "fg": "accent1", "bg": "bg1"]]
+        case "background": ["background": true]
         case "auto": ["reset": true]
         default: nil
         }
@@ -129,6 +164,10 @@ public enum InspectorFill {
 
     /// The Color button sets a solid fill, so it shows only for a solid or automatic fill.
     public static func showsColor(_ fill: Fill?) -> Bool { ["solid", "auto"].contains(kind(fill)) }
+
+    /// `showsColor` and `showsTransparency` for a shape: neither for a group whose shapes have the slide background fill.
+    public static func showsColor(_ sh: Shape) -> Bool { ["solid", "auto"].contains(shapeKind(sh)) }
+    public static func showsTransparency(_ sh: Shape) -> Bool { !membersHaveBackgroundFill(sh) && showsTransparency(sh.fill) }
 
     /// `text_transparency_of`: the transparency (0–1) of a shape's first text run as stored on it.
     public static func textTransparency(_ sh: Shape) -> Double {

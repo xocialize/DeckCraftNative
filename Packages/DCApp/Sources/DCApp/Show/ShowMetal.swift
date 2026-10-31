@@ -5,6 +5,7 @@
 // solid fills are quads through the same pipeline. The shaders are compiled from source at first use, so the
 // package needs no Metal resource step.
 import DCAnim
+import DCAppModel
 import DCCore
 import DCMedia
 import DCRender
@@ -286,10 +287,11 @@ final class ShowMetal {
     /// The draws of transition `kind`/`option` at progress `t` over `rect` (the slide on screen, in pixels): the
     /// layer sources resolved as `show.rs` does (a missing old slide is black, a missing part falls back to its
     /// whole slide or is left out).
-    static func transitionDraws(_ kind: String, _ option: String, _ t: Double, aspect: Double, rect: CGRect, _ tex: ShowTransitionTextures) -> [ShowDraw] {
+    /// `reverse` runs it backwards with the slides trading places (going back, #1531).
+    static func transitionDraws(_ kind: String, _ option: String, _ t: Double, aspect: Double, rect: CGRect, _ tex: ShowTransitionTextures, reverse: Bool = false) -> [ShowDraw] {
         var out: [ShowDraw] = []
         let part: (Int) -> MTLTexture? = { tex.parts?.at($0) ?? nil }
-        for l in transitionFrame(kind, option, t, aspect) {
+        for l in ShowTransition.layers(kind, option, reverse: reverse, t, aspect) {
             if !(l.alpha.isFinite && l.alpha > 0) { continue }
             let black = SIMD3<Float>(0, 0, 0), white = SIMD3<Float>(1, 1, 1)
             func oldOrBlack(_ t: MTLTexture?) -> ShowDraw { t.map { ShowDraw.layer($0, rect, l) } ?? ShowDraw.layer(nil, rect, l, solid: black) }

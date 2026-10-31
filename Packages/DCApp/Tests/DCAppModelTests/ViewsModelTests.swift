@@ -43,6 +43,99 @@ import Testing
         #expect(SorterLogic.moveDest(0, 2) == 1)
     }
 
+    // thumbs.rs: slides_move_dest_counts_without_the_moved_slides (039395ae)
+    @Test func slidesMoveDestCountsWithoutTheMovedSlides() {
+        // One slide: the gaps on either side of it leave it where it is.
+        #expect(SorterLogic.slidesMoveDest([1], 1) == nil)
+        #expect(SorterLogic.slidesMoveDest([1], 2) == nil)
+        #expect(SorterLogic.slidesMoveDest([1], 0) == 0)
+        #expect(SorterLogic.slidesMoveDest([1], 4) == 3)
+        // A run: any gap inside or around it is a no-op.
+        for slot in 2 ... 5 { #expect(SorterLogic.slidesMoveDest([2, 3, 4], slot) == nil, "slot \(slot)") }
+        #expect(SorterLogic.slidesMoveDest([2, 3, 4], 0) == 0)
+        #expect(SorterLogic.slidesMoveDest([2, 3, 4], 6) == 3)
+        // Scattered slides always gather, even at a gap between them.
+        #expect(SorterLogic.slidesMoveDest([0, 2], 1) == 0)
+        #expect(SorterLogic.slidesMoveDest([0, 2], 0) == 0)
+        #expect(SorterLogic.slidesMoveDest([1, 3], 5) == 3)
+        #expect(SorterLogic.slidesMoveDest([], 3) == nil)
+        #expect(SorterLogic.slidesMoveDest([Int.max], Int.max) == nil)
+    }
+
+    func order(_ s: Session) -> [SlideId] { s.activeDoc?.doc.slides.map(\.id) ?? [] }
+
+    /// Drags slide `index` the way the navigator and sorter do (the pasteboard round trip included) and drops it in
+    /// gap `slot`; false when the drop does nothing.
+    @discardableResult
+    func drag(_ s: Session, _ index: Int, to slot: Int) throws -> Bool {
+        let st = try doc(s)
+        let started = try #require(SlideDrag.start(st, index: index))
+        let drag = try #require(SlideDrag.read(started.pasteboardString, uid: st.uid))
+        #expect(drag == started)
+        guard let p = drag.moveParams(st.doc, slot: slot) else { return false }
+        _ = try s.execute("slide.move", p)
+        return true
+    }
+
+    // sorter_tests.rs: dragging_a_selected_slide_moves_the_whole_selection; thumbs.rs:
+    // dragging_selected_thumbnails_moves_them_together (039395ae)
+    @Test func draggingASelectedSlideMovesTheWholeSelection() throws {
+        let s = try session(4)
+        let ids = order(s)
+        _ = try s.execute("slide.selectSlides", ["ids": [.integer(ids[0].rawValue), .integer(ids[2].rawValue)]])
+        let st = try doc(s)
+        #expect(NavigatorLogic.defersClick(st, index: 2, shift: false, command: false), "a press on a selected slide waits, so it can drag them all")
+        #expect(!NavigatorLogic.defersClick(st, index: 1, shift: false, command: false))
+        #expect(!NavigatorLogic.defersClick(st, index: 2, shift: false, command: true))
+        let undo = st.history.undo.count
+        #expect(try drag(s, 0, to: 4))
+        #expect(order(s) == [ids[1], ids[3], ids[0], ids[2]])
+        #expect(s.activeDoc?.selection.slides == [ids[0], ids[2]], "the moved slides stay selected")
+        #expect(s.activeDoc?.history.undo.count == undo + 1)
+        _ = try s.execute("edit.undo")
+        #expect(order(s) == ids, "one undo puts both back")
+    }
+
+    // sorter_tests.rs: dragging_an_unselected_slide_moves_only_it (039395ae)
+    @Test func draggingAnUnselectedSlideMovesOnlyIt() throws {
+        let s = try session(4)
+        let ids = order(s)
+        _ = try s.execute("slide.selectSlides", ["ids": [.integer(ids[0].rawValue), .integer(ids[2].rawValue)]])
+        // The press on an unselected slide selects it before the drag starts, as a click does.
+        if let (id, p) = NavigatorLogic.click(try doc(s).doc, index: 1, shift: false, command: false) { _ = try s.execute(id, p) }
+        #expect(try drag(s, 1, to: 4))
+        #expect(order(s) == [ids[0], ids[2], ids[3], ids[1]])
+        #expect(s.activeDoc?.selection.slides == [ids[1]])
+    }
+
+    // sorter_tests.rs: dropping_a_selection_where_it_is_changes_nothing (039395ae)
+    @Test func droppingASelectionWhereItIsChangesNothing() throws {
+        let s = try session(4)
+        let ids = order(s)
+        _ = try s.execute("slide.selectSlides", ["ids": [.integer(ids[1].rawValue), .integer(ids[2].rawValue)]])
+        let steps = try doc(s).history.undo.count
+        #expect(try !drag(s, 1, to: 3))
+        #expect(order(s) == ids)
+        #expect(try doc(s).history.undo.count == steps, "a drop in place adds no undo step")
+    }
+
+    // thumbs.rs: a_slide_drag_does_not_follow_into_another_presentation (039395ae)
+    @Test func aSlideDragDoesNotFollowIntoAnotherPresentation() throws {
+        let s = try session(3)
+        let st = try doc(s)
+        _ = try s.execute("slide.selectSlides", ["ids": .array(order(s).prefix(2).map { .integer($0.rawValue) })])
+        let drag = try #require(SlideDrag.start(try doc(s), index: 0))
+        #expect(drag.ids == Array(order(s).prefix(2)))
+        _ = try s.execute("file.new")
+        let other = try doc(s)
+        #expect(other.uid != st.uid)
+        #expect(SlideDrag.read(drag.pasteboardString, uid: other.uid) == nil, "the drag belongs to the first presentation")
+        #expect(SlideDrag.read("garbage", uid: st.uid) == nil)
+        #expect(SlideDrag.read("\(st.uid):", uid: st.uid) == nil)
+        // A dragged slide that is gone drops nothing.
+        #expect(SlideDrag(uid: st.uid, ids: [SlideId(999_999)]).moveParams(st.doc, slot: 0) == nil)
+    }
+
     // sorter.rs: groups — sections in order, then the slides in none.
     @Test func groupsFollowTheSections() throws {
         let plain = try doc(try session(3)).doc

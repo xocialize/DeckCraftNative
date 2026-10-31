@@ -33,25 +33,27 @@ struct FillLineView: View {
     var body: some View {
         let scheme = InspectorColors.scheme(ctl.session)
         Section(String(localized: "Fill", bundle: .module, comment: "Noun: a shape's fill")) {
-            Picker(String(localized: "Fill", bundle: .module, comment: "Noun: a shape's fill"), selection: Binding(get: { InspectorFill.kind(sh.fill) }, set: setKind)) {
-                ForEach(InspectorFill.shapeKinds, id: \.kind) { Text($0.label).tag($0.kind) }
+            // Slide background fill only where a selected shape or text box can take it (not a picture).
+            let backgroundOK = InspectorFill.takesBackgroundFill(ctl.doc?.selectedShapes ?? [sh])
+            Picker(String(localized: "Fill", bundle: .module, comment: "Noun: a shape's fill"), selection: Binding(get: { InspectorFill.shapeKind(sh) }, set: setKind)) {
+                ForEach(InspectorFill.shapeKinds.filter { $0.kind != "background" || backgroundOK }, id: \.kind) { Text($0.label).tag($0.kind) }
             }
             .pickerStyle(.radioGroup)
-            if InspectorFill.showsColor(sh.fill) {
+            if InspectorFill.showsColor(sh) {
                 ColorButton(label: String(localized: "Color", bundle: .module), color: fillColor(scheme), scheme: scheme, noneLabel: String(localized: "No Fill", bundle: .module)) { ctl.pickFill($0) }
             }
-            if InspectorFill.showsTransparency(sh.fill) {
+            if InspectorFill.showsTransparency(sh) {
                 let seed = InspectorFill.fillTransparencySeed(sh.fill)
                 CommitSlider(label: String(localized: "Transparency", bundle: .module), value: seed, range: 0 ... 100, suffix: "%") { v in
                     if let t = InspectorFill.fillTransparencyToApply(v, seed) { ctl.run("shape.fill", ["transparency": .num(t)]) }
                 }
             }
-            if case .picture(let pf)? = sh.fill {
+            if case .picture(let pf)? = InspectorFill.shownFill(sh) {
                 PictureFillOptions(fill: pf) { props in ctl.run("shape.fill", ["pictureProps": props]) } replace: {
                     if let p = pickPictureBase64() { ctl.run("shape.fill", ["picture": .string(p.data)]) }
                 }
             }
-            if case .gradient(let g)? = sh.fill {
+            if case .gradient(let g)? = InspectorFill.shownFill(sh) {
                 GradientEditor(gradient: g, scheme: scheme) { ctl.run("shape.fill", ["gradient": InspectorFill.gradientJSON($0)]) }
                 Toggle(String(localized: "Rotate with shape", bundle: .module), isOn: Binding(get: { g.rotateWithShape }, set: { on in
                     var n = g
@@ -59,7 +61,7 @@ struct FillLineView: View {
                     ctl.run("shape.fill", ["gradient": InspectorFill.gradientJSON(n)])
                 }))
             }
-            if case .pattern(let pt)? = sh.fill {
+            if case .pattern(let pt)? = InspectorFill.shownFill(sh) {
                 PatternEditor(pattern: pt, scheme: scheme) { ctl.run("shape.fill", ["pattern": InspectorFill.patternJSON($0)]) }
             }
         }
@@ -75,7 +77,7 @@ struct FillLineView: View {
     }
 
     private func setKind(_ k: String) {
-        guard k != InspectorFill.kind(sh.fill) else { return }
+        guard k != InspectorFill.shapeKind(sh) else { return }
         if k == "picture" {
             if let p = pickPictureBase64() { ctl.run("shape.fill", ["picture": .string(p.data)]) }
         } else if let p = InspectorFill.shapeKindParams(k) {
@@ -342,6 +344,8 @@ struct EffectsView: View {
                     ctl.run("shape.effects", ["shadowProps": ["color": c.map(InspectorColors.param) ?? .null]])
                 }
                 fxSlider(String(localized: "Transparency", bundle: .module), (1 - sw.color.alpha) * 100, 0 ... 100, "%", "shadowProps", "transparency", 0.01)
+                // PowerPoint's Size: 1–200 %, both axes.
+                fxSlider(String(localized: "Size", bundle: .module), sw.sx * 100, 1 ... 200, "%", "shadowProps", "size", 0.01)
                 fxSlider(String(localized: "Blur", bundle: .module), sw.blur, 0 ... 100, " pt", "shadowProps", "blur", 1)
                 fxSlider(String(localized: "Angle", bundle: .module), sw.dir, 0 ... 359, "°", "shadowProps", "dir", 1)
                 fxSlider(String(localized: "Distance", bundle: .module), sw.dist, 0 ... 200, " pt", "shadowProps", "dist", 1)

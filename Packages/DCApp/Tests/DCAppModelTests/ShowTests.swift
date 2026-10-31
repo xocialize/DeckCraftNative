@@ -291,6 +291,51 @@ import Testing
         #expect(sh.frame == nil, "the new slide gets a texture of its own instead of overwriting the old one")
     }
 
+    // show/tests.rs: going_back_plays_the_left_slides_transition_reversed (#1531)
+    @Test func goingBackPlaysTheLeftSlidesTransitionReversed() throws {
+        let s = Self.session(1)
+        _ = try s.execute("transition.set", ["kind": "fade", "index": 0])
+        _ = try s.execute("transition.set", ["kind": "push", "index": 1])
+        let doc = Self.doc(s)
+        let sh = ShowController(doc, from: 0, reading: false, presenter: false)
+        func shown(_ slide: Int) { sh.frame = (ShowFrameKey(slide: slide, step: 0, size: ShowSize(1, 1), doc: nil), NSObject()) }
+        shown(0)
+        var a = sh.state.next(doc)
+        #expect(a == .slide(1))
+        #expect(sh.apply(a, doc, 0))
+        var tr = try #require(sh.trans, "B's push plays")
+        #expect(tr.kind == "push" && !tr.reverse)
+
+        shown(1)
+        a = sh.state.prev(doc)
+        #expect(a == .slide(0))
+        #expect(sh.apply(a, doc, 1))
+        tr = try #require(sh.trans, "going back plays a transition")
+        #expect(tr.kind == "push" && tr.reverse && tr.from == 1, "B's push, reversed, not A's fade")
+
+        // Forward again: B's own transition, forward.
+        shown(0)
+        #expect(sh.apply(sh.state.next(doc), doc, 2))
+        tr = try #require(sh.trans, "B's push plays")
+        #expect(tr.kind == "push" && !tr.reverse)
+
+        // A jump to an earlier slide is not Back: the slide's own transition plays.
+        shown(1)
+        #expect(sh.apply(sh.state.goto(doc, 0), doc, 3))
+        tr = try #require(sh.trans, "A's fade plays")
+        #expect(tr.kind == "fade" && !tr.reverse)
+    }
+
+    // show/tests.rs: a_reversed_transition_starts_on_the_slide_left_and_ends_on_the_one_come_back_to (#1531)
+    @Test func aReversedTransitionStartsOnTheSlideLeftAndEndsOnTheOneComeBackTo() throws {
+        for kind in ["fade", "push", "wipe", "cover"] {
+            let top = try #require(ShowTransition.layers(kind, "", reverse: true, 0, 16.0 / 9.0).last, "\(kind): a frame")
+            #expect(top.source == .old && top.alpha == 1, "\(kind): the slide left is shown first")
+            let end = ShowTransition.layers(kind, "", reverse: true, 1, 16.0 / 9.0)
+            #expect(end.allSatisfy { $0.source == .new }, "\(kind): only the slide come back to is left")
+        }
+    }
+
     // show.rs: media_in_the_click_sequence_plays_with_its_step (#116)
     @Test func mediaInTheClickSequencePlaysWithItsStep() throws {
         let s = Session.withNew()

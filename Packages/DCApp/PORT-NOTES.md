@@ -1534,7 +1534,7 @@ port of the egui UI) needs. Tests are in DCAppModelTests (`InspectorEffectsAndSi
 `ShowTests`, `AppModelTests`, `DialogsTests`).
 
 **Ported.**
-- **Format ▸ Effects presets** (9ad147b3 without its Size slider, 322be04e, 5638b0ca, 9c24a63d): the Shadow
+- **Format ▸ Effects presets** (9ad147b3; its Size slider below, 322be04e, 5638b0ca, 9c24a63d): the Shadow
   picker shows the preset the shadow came from (`InspectorShape.shadowPresetId`) instead of "Choose…"; Glow and
   Soft Edges gain a Presets picker with the ribbon's sizes (`glowPresets`, `softEdgePresets`); a glow preset runs
   `glowProps {radius}`, so the glow keeps its colour and transparency; the detail controls read the inner shadow
@@ -1569,18 +1569,25 @@ inspector); cccc9064 (docs and credits comments).
 **Refactors and tests only.** 8c6c72e3 (strict Clippy), 5a235590 (test module moved), bcbdb76b (a test's
 textures).
 
-**Left: needs an engine or anim change not on this branch yet.**
-- 039395ae: dragging several selected slides moves them all, in one undo step, keeping them selected (navigator
-  and sorter). Needs DCEngine's `slide.move {ids, to}`; then `slides_move_dest` in `SorterLogic` and drag writers
-  carrying every selected row. Small to medium (half a day with tests).
-- 71352733, aef36486, fca04927, edbf5425: Fill ▸ "Slide background fill" (not for pictures; shown chosen for a
-  group whose shapes all have it; a kept group fill's editors hidden). Needs DCEngine's `shape.fill {background}`;
-  then a kind in `InspectorFill` and the group rule. Small (a couple of hours).
-- 9ad147b3's shadow Size slider (`shadowProps {size}`, 1–200 %): needs DCEngine's half. A one-line slider.
-- 8cc25169 (#1531): going back plays the left slide's transition reversed. Needs DCAnim's `ShowState.backward`;
-  then `ShowTransition.reverse` and the layers run from the end with old and new swapped
-  (`transition_layers`), in `ShowController.apply` and the Metal stage. Small.
+**Ported after the engine and DCAnim halves were merged** (sync/a3fbf029: DCEngine 5061e6d, DCAnim bc69ba5).
+Tests in `ViewsModelTests`, `InspectorFillTests`, `InspectorEffectsAndSizeTests` and `ShowTests`.
+- **Dragging several selected slides moves them all** (039395ae), in the navigator and the sorter: the drag
+  carries the slide selection when the pressed slide is part of it (`SlideDrag.start`; on the pasteboard as
+  `uid:id,id,…`, refused by another presentation), and the drop is one `slide.move {ids, to}` (one undo step; they
+  stay selected), with `to` from `SorterLogic.slidesMoveDest` (nil for a run dropped beside itself). A plain press
+  on one of several selected slides selects only when the button comes up without a drag
+  (`NavigatorLogic.defersClick`), as egui's click-on-release does; any other press selects at once, as before.
+- **Fill ▸ Slide background fill** (71352733, aef36486, fca04927, edbf5425): the kind `background`
+  (`shape.fill {background: true}`), offered only when a selected shape or text box can take it
+  (`InspectorFill.takesBackgroundFill`, not for a picture); a group whose shapes and text boxes all have it shows
+  it chosen even when the group keeps a fill its pictures use (`shapeKind`), and then shows no Color, Transparency
+  or editor for that kept fill (`showsColor(_:)`, `showsTransparency(_:)`, `shownFill`).
+- **Effects ▸ Shadow ▸ Size** (9ad147b3): 1–200 %, `shadowProps {size}` (1 = 100 %).
+- **Going back plays the left slide's transition reversed** (8cc25169): `ShowController.apply` takes the
+  transition of the slide left when `ShowState.backward` brought the show to the slide (a jump still plays the
+  target's), and `ShowTransition.reverse` makes `ShowTransition.layers` run the frames from the end with old and
+  new swapped (the Metal stage draws those); Morph is not reversed.
 
-**Left: a design choice.** 9ad147b3's drawn preset tiles (a card with each shadow, glow or soft edge drawn on
+**Left: the operator's call.** 9ad147b3's drawn preset tiles (a card with each shadow, glow or soft edge drawn on
 it). The pickers give the same choices; drawn tiles, as in PowerPoint's Presets galleries, are a medium SwiftUI
 piece (about 150 lines) for the inspector and the ribbon's effect menus together.

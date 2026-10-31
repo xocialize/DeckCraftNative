@@ -307,6 +307,13 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
 
     /// A click on a row: the slide's selection by modifiers (`thumbs.rs`), a master or layout in Slide
     /// Master view.
+    /// Whether a press on `row` waits for the button to come up before selecting: a plain press on one of several
+    /// selected slides, which may start dragging them all.
+    func defersClick(row: Int, shift: Bool, command: Bool) -> Bool {
+        guard case .slide(let i)? = items.at(row), let st = link.state else { return false }
+        return NavigatorLogic.defersClick(st, index: i, shift: shift, command: command)
+    }
+
     func click(row: Int, shift: Bool, command: Bool) {
         guard let item = items.at(row), let st = link.state else { return }
         switch item {
@@ -403,19 +410,18 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
 
     // MARK: Drag to reorder
 
+    /// Dragging a slide drags the whole slide selection when it is part of it (039395ae).
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> (any NSPasteboardWriting)? {
-        guard case .slide(let i)? = items.at(row), renaming == nil else { return nil }
+        guard case .slide(let i)? = items.at(row), renaming == nil, let st = link.state, let drag = SlideDrag.start(st, index: i) else { return nil }
+        (tableView as? NavigatorTable)?.pendingClick = nil
         let item = NSPasteboardItem()
-        item.setString("\(link.uid):\(i)", forType: .deckCraftSlideRow)
+        item.setString(drag.pasteboardString, forType: .deckCraftSlideRow)
         return item
     }
 
-    /// The slide a drag started from, when it is one of this presentation's.
-    private func draggedSlide(_ info: any NSDraggingInfo) -> Int? {
-        guard let s = info.draggingPasteboard.string(forType: .deckCraftSlideRow) else { return nil }
-        let parts = s.split(separator: ":")
-        guard parts.count == 2, UInt64(parts[0]) == link.uid, let i = Int(parts[1]) else { return nil }
-        return i
+    /// The slides a drag carries, when it began in this presentation.
+    private func draggedSlides(_ info: any NSDraggingInfo) -> SlideDrag? {
+        info.draggingPasteboard.string(forType: .deckCraftSlideRow).flatMap { SlideDrag.read($0, uid: link.uid) }
     }
 
     /// The slide gap (0…count) above table row `row`.
@@ -427,14 +433,15 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
     }
 
     func tableView(_ tableView: NSTableView, validateDrop info: any NSDraggingInfo, proposedRow row: Int, proposedDropOperation op: NSTableView.DropOperation) -> NSDragOperation {
-        guard let from = draggedSlide(info) else { return [] }
+        guard let drag = draggedSlides(info), let doc = link.state?.doc else { return [] }
         tableView.setDropRow(row, dropOperation: .above)
-        return SorterLogic.moveDest(from, slot(above: row)) == nil ? [] : .move
+        return drag.moveParams(doc, slot: slot(above: row)) == nil ? [] : .move
     }
 
+    /// One `slide.move` for every dragged slide: one undo step, and they stay selected.
     func tableView(_ tableView: NSTableView, acceptDrop info: any NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
-        guard let from = draggedSlide(info), let to = SorterLogic.moveDest(from, slot(above: row)) else { return false }
-        return (try? link.run("slide.move", ["from": .integer(from), "to": .integer(to)]).get()) != nil
+        guard let drag = draggedSlides(info), let doc = link.state?.doc, let p = drag.moveParams(doc, slot: slot(above: row)) else { return false }
+        return (try? link.run("slide.move", p).get()) != nil
     }
 }
 
@@ -443,6 +450,8 @@ final class NavigatorViewController: NSViewController, NSTableViewDataSource, NS
 @MainActor
 final class NavigatorTable: NSTableView {
     weak var controller: NavigatorViewController?
+    /// A press whose click waits for the button to come up (`defersClick`); a drag starting drops it.
+    var pendingClick: (row: Int, shift: Bool, command: Bool)?
 
     override var acceptsFirstResponder: Bool { true }
 
@@ -455,10 +464,19 @@ final class NavigatorTable: NSTableView {
                 return
             }
             let mods = event.modifierFlags
-            c.click(row: row, shift: mods.contains(.shift), command: mods.contains(.command))
+            let (shift, command) = (mods.contains(.shift), mods.contains(.command))
+            if c.defersClick(row: row, shift: shift, command: command) {
+                pendingClick = (row, shift, command)
+            } else {
+                c.click(row: row, shift: shift, command: command)
+            }
         }
-        // The table's tracking starts a drag (reorder).
+        // The table's tracking starts a drag (reorder); it returns once the button is up or the drag has begun.
         super.mouseDown(with: event)
+        if let p = pendingClick {
+            pendingClick = nil
+            controller?.click(row: p.row, shift: p.shift, command: p.command)
+        }
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {

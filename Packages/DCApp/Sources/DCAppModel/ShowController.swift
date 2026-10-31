@@ -161,6 +161,9 @@ public struct ShowTransition {
     public var dur: Double
     /// Whatever the drawing side keeps for this transition (slide parts, the Morph frame).
     public var cache: AnyObject?
+    /// Going back: the transition of the slide left behind plays from its end to its start, so the old slide takes
+    /// the new slide's part (#1531).
+    public var reverse = false
 
     /// Progress at `now` (0...1).
     public func progress(_ now: Double) -> Double {
@@ -169,6 +172,29 @@ public struct ShowTransition {
     }
 
     public var isMorph: Bool { kind == "morph" && from != nil }
+
+    /// The layers at progress `p` (`transition_layers`): a reversed transition runs from its end to its start, with
+    /// the slide being left playing the new slide's part and the slide come back to the old one's.
+    public static func layers(_ kind: String, _ option: String, reverse: Bool, _ p: Double, _ aspect: Double) -> [Layer] {
+        guard reverse else { return transitionFrame(kind, option, p, aspect) }
+        return transitionFrame(kind, option, 1 - p, aspect).map { l in
+            var l = l
+            l.source = swapOldNew(l.source)
+            return l
+        }
+    }
+
+    static func swapOldNew(_ s: Source) -> Source {
+        switch s {
+        case .old: .new
+        case .new: .old
+        case .oldBack: .newBack
+        case .newBack: .oldBack
+        case .oldContent: .newContent
+        case .newContent: .oldContent
+        case .black, .white: s
+        }
+    }
 }
 
 /// What a frame of the show was rendered for (`Key`): an unchanged key is not rendered again.
@@ -434,15 +460,19 @@ public final class ShowController {
             zoom = nil
             zoomArm = false
             if rehearse { timings.append((timelineCache?.0 ?? i, now - slideStart)) }
-            let t = doc.slides.at(i)?.transition
-            let (kind, option, dur) = t.map { ($0.kind, $0.option, Double($0.durationMs) / 1000) } ?? ("none", "", 0)
             // Take the old slide's frame rather than sharing it: the new slide gets a frame of its own (#33).
             let taken = frame
             frame = nil
             let from = taken?.key.slide
             if from != i { lastViewed = from }
+            // Going back plays the transition the slide left behind came in with, reversed (#1531); a queued Back
+            // that a later step overtook keeps the forward one.
+            let back = state.backward && state.slide == i && from.map { $0 != i } == true
+            let t = doc.slides.at(back ? from ?? i : i)?.transition
+            let (kind, option, dur) = t.map { ($0.kind, $0.option, Double($0.durationMs) / 1000) } ?? ("none", "", 0)
+            // Morph needs no reversing: a Morph from the old slide to the new one is the reversed Morph.
             trans = kind != "none" && dur > 0 && !doc.show.withoutAnimation
-                ? ShowTransition(old: taken?.image, from: from, start: now, kind: kind, option: option, dur: dur, cache: nil)
+                ? ShowTransition(old: taken?.image, from: from, start: now, kind: kind, option: option, dur: dur, cache: nil, reverse: back && kind != "morph")
                 : nil
             slideStart = now
             stepStart = now

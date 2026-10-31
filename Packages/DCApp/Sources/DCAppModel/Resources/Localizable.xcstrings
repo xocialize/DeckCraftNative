@@ -7054,6 +7054,16 @@
         }
       }
     },
+    "Slide background fill" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slide background fill"
+          }
+        }
+      }
+    },
     "Slide number" : {
       "localizations" : {
         "en" : {

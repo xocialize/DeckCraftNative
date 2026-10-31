@@ -124,6 +124,64 @@ final class RecordingHost: AppHost {
         }
     }
 
+    // panes.rs: slide_background_fill_is_a_fill_option (71352733)
+    @Test func slideBackgroundFillIsAFillOption() throws {
+        let s = Fx.blank()
+        let id = Fx.rect(s, 40)
+        Fx.select(s, [id])
+        let m = AppModel(session: s)
+        #expect(InspectorFill.shapeKinds.map(\.kind) == ["none", "solid", "gradient", "picture", "pattern", "background", "auto"])
+        let undo = Fx.undoCount(s)
+        m.run("shape.fill", try #require(InspectorFill.shapeKindParams("background")))
+        let sh = try #require(Fx.shape(s, id))
+        #expect(sh.fill == .background)
+        #expect(Fx.undoCount(s) == undo + 1, "one undo step")
+        #expect(InspectorFill.shapeKind(sh) == "background", "shown chosen, not Automatic")
+        #expect(!InspectorFill.showsColor(sh) && !InspectorFill.showsTransparency(sh), "no Color button or Transparency slider")
+    }
+
+    // panes.rs: a_picture_has_no_slide_background_fill_option (aef36486)
+    @Test func aPictureHasNoSlideBackgroundFillOption() throws {
+        let s = Fx.blank()
+        let pic = try #require(try s.execute("insert.picture", ["data": .string(Self.png), "name": "dot.png"])["id"])
+        #expect(!InspectorFill.takesBackgroundFill(s.activeDoc?.selectedShapes ?? []))
+        // A group that holds a shape keeps the option; its shapes take the fill, the picture keeps its own and the
+        // group's own fill is cleared.
+        let shape = try #require(try s.execute("shape.insert", ["preset": "rect", "rect": [500, 40, 120, 80]])["id"])
+        _ = try s.execute("edit.select", ["ids": [pic, shape]])
+        _ = try s.execute("arrange.group")
+        _ = try s.execute("shape.fill", ["color": "#ff0000"])
+        #expect(InspectorFill.takesBackgroundFill(s.activeDoc?.selectedShapes ?? []))
+        _ = try s.execute("shape.fill", try #require(InspectorFill.shapeKindParams("background")))
+        let group = try #require(s.activeDoc?.selectedShapes.first)
+        let fills = group.children.map(\.fill)
+        #expect(fills.at(1) == .some(.background), "the group's shape takes the fill")
+        if case .solid?? = fills.first {} else { Issue.record("the picture keeps its fill: \(String(describing: fills.first))") }
+        #expect(group.fill == nil, "the group's own fill is cleared")
+        #expect(InspectorFill.shapeKind(group) == "background")
+        #expect(!InspectorFill.showsColor(group) && !InspectorFill.showsTransparency(group))
+    }
+
+    // panes.rs: a_group_that_keeps_its_fill_shows_slide_background_fill (fca04927, edbf5425)
+    @Test func aGroupThatKeepsItsFillShowsSlideBackgroundFill() throws {
+        let s = Fx.blank()
+        let pic = try #require(try s.execute("insert.picture", ["data": .string(Self.png), "name": "dot.png"])["id"]?.asU32)
+        let shape = try #require(try s.execute("shape.insert", ["preset": "rect", "rect": [500, 40, 120, 80]])["id"]?.asU32)
+        _ = try s.execute("edit.select", ["ids": [.integer(pic), .integer(shape)]])
+        _ = try s.execute("arrange.group")
+        _ = try s.execute("shape.fill", ["gradient": ["stops": [[0, "#ff0000"], [1, "#0000ff"]]]])
+        try s.edit { doc, _ in
+            for i in doc.slides.indices { doc.slides[i].mutateShape(ShapeId(pic)) { $0.fill = .group } }
+        }
+        _ = try s.execute("shape.fill", ["background": true])
+        let group = try #require(s.activeDoc?.selectedShapes.first)
+        if case .gradient? = group.fill {} else { Issue.record("the group keeps the fill its picture uses") }
+        #expect(Fx.shape(s, shape)?.fill == .background)
+        #expect(InspectorFill.shapeKind(group) == "background")
+        #expect(InspectorFill.shownFill(group) == nil, "no editor for the group's kept gradient")
+        #expect(!InspectorFill.showsColor(group) && !InspectorFill.showsTransparency(group))
+    }
+
     // fillui.rs: the gradient editor's edits.
     @Test func gradientEditsKeepStopsSortedAndBounded() throws {
         var g = InspectorFill.defaultGradient(.scheme(.accent1), 90)
@@ -590,6 +648,17 @@ final class RecordingHost: AppHost {
         #expect(effects(s, id).softEdge == 10)
         _ = try s.execute("shape.effects", ["softEdges": 0])
         #expect(effects(s, id).softEdge == nil)
+    }
+
+    // 9ad147b3: the shadow's Size slider (percent) is `shadowProps {size}` (1 = 100 %), both axes.
+    @Test func theShadowSizeSliderScalesBothAxes() throws {
+        let s = Fx.blank()
+        let id = Fx.rect(s, 80)
+        Fx.select(s, [id])
+        _ = try s.execute("shape.effects", ["shadow": "outer"])
+        _ = try s.execute("shape.effects", ["shadowProps": ["size": 1.5]])
+        let sw = try #require(InspectorShape.detailShadow(effects(s, id)))
+        #expect((sw.sx, sw.sy) == (1.5, 1.5))
     }
 
     // 9c24a63d: the shadow detail controls read the inner shadow first, as the preset id does.

@@ -148,7 +148,7 @@ final class ShowStage {
                 s.trans = tr
                 let aspect = doc.slideSize.width / Swift.max(doc.slideSize.height, 1)
                 let textures = ShowTransitionTextures(old: tr.old as? MTLTexture, new: new, parts: cache.parts)
-                out += ShowMetal.transitionDraws(tr.kind, tr.option, p, aspect: aspect, rect: px(srect), textures)
+                out += ShowMetal.transitionDraws(tr.kind, tr.option, p, aspect: aspect, rect: px(srect), textures, reverse: tr.reverse)
                 drew = true
                 animatingOut = true
             }
