@@ -442,3 +442,30 @@ stack in a debug build, and Swift concurrency threads have 512 KiB. Rust's test 
 `PPTX.import`, `importChecked`, `export` and `exportAs` now run on a dedicated thread with a 32 MiB stack
 (`PPTX.onLargeStack` in `PPTX.swift`). `importTheme` is unchanged. The oracle
 tests are unchanged and green.
+
+## Pin move 88c2ceff → a3fbf029
+
+Ported (2026-10-31), each with its Rust tests:
+
+| Upstream | What | Swift |
+|---|---|---|
+| `ad97533a`, `04b0958b` | Gradient `flip` read and written (`a:gradFill flip`, before `rotWithShape`) | `ReadDML.gradient`, `WriteDML` `gradient`; `richDeck`'s Gradient Star flips `xy`; `gradientFlipModeSurvivesTwoPptxRoundTrips` |
+| `727b682d`, `4408ff61` | Line `algn` (`ctr`/`in` only, through DCModel's `LineAlign(xml:)`) | `ReadDML.line`, `WriteDML.line`; `lineAlignmentSurvivesTwoPptxRoundTrips` |
+| `479c3cc5`, `1de0101c` | `a:miter lim`, both the integer and the `200%` form, bounded by `Int32.max`; written only within it | `PPTXRead.parseMiterLimit`, `WriteDML.line`; `miterLimitAcceptsBothPercentageFormsWithSchemaBounds`, `lineMiterLimitSurvivesTwoPptxRoundTrips` |
+| `8770fb90`, `0e3f4cd3` | `a:buFontTx`/`buClrTx`/`buSzTx` read as follow-text resets and written only when no explicit value is set | `ReadDML.ppr`, `WriteDML.ppr`; `bulletFollowTextResetsSurviveTwoPptxRoundTrips` (the inheritance half is DCModel's) |
+| `c5994e16`, `8dfa6f19` | Auto-reverse also read when every behaviour `p:cBhvr/p:cTn` has `autoRev`, except for Color Pulse | `PPTXRead.behaviourAutoReverses`; new `IntegrationAnimAutoReverseTests` (2) |
+| `964f4759` | Volume, mute, loop, hide while not playing and full screen read from `p:video`/`p:audio` `p:cMediaNode` in the timing tree | `PPTXRead.mediaSettings` (through DCModel's `mutateShape`), called after `animations` in `readSlide`; new `IntegrationMediaTimingTests` (2) |
+| `1e842137` | Darken and Desaturate written as PowerPoint's HSL `p:animClr` shift on text, fill and line colour (preset ids 24/25 and the durations are DCModel's) | `WriteTiming`; `darkenAndDesaturateUsePowerpointsIds`, `darkenAndDesaturateWritePowerpointsHslShift`, `defaultDurationsMatchPowerpoint` |
+| `1de7b44a`, `3bf35c80` | Custom geometry paths: `E` is an exponent when a digit (or a sign and a digit) follows a number, else the end command; `-` after `E` stays in the number | `CustGeom.parsePath`; `parsePathUppercaseExponent` |
+| `939bd128`, `ba29b61f` | Zip entries named with `\`: keyed through `OPC.norm` and kept with `/` as the original name. This lives in `OPC.swift`, not DCZip, which is unchanged | `Package.openWithin`, `OPC.replacingBackslashes`; `backslashZipEntryNamesAreFound` |
+| `1705712a` | A picture without geometry in a placeholder takes its layout's shape | `ReadShapes.pic` (`markInheritedGeometry`); `aPicturePlaceholderWithoutGeometryTakesItsLayouts` |
+| `58968594` | Charts: `c:tickLblPos val="none"` hides axis labels like `c:delete`; a gridline whose `c:spPr/a:ln` is `a:noFill` isn't drawn | `ReadChart` (`deleted`, `grid`); `hiddenLabelsAndUnfilledGridlinesAreRead` |
+
+No port needed: `8e4d0e6b` (Clippy refactor of `read.rs`, `read/chart.rs`, `write/chart.rs` and the
+corpus tests: functions split, no behaviour change), `505a6f28` (its `read/dml.rs`
+part turns `br`/`fld` into match guards, which fall through to `_ => {}` as before), the `flip: None`
+lines added to `fills.rs` and `corpus_style.rs` (Swift's `Gradient` init defaults `flip` to nil), and the
+merge commits (conflict resolution only).
+
+Export parity, schema validation and deckcraft's read-back over the regenerated corpus
+(`oracle/a3fbf029/`) stay green; the chartEx style parts remain the only divergence.

@@ -25,6 +25,15 @@ import Testing
         #expect(try #require(PPTXRead.color(d.root)).base == .rgb(rgb: .rgb(255, 0, 0)))
     }
 
+    @Test func miterLimitAcceptsBothPercentageFormsWithSchemaBounds() {
+        #expect(PPTXRead.parseMiterLimit("200000") == 200_000)
+        #expect(PPTXRead.parseMiterLimit("200%") == 200_000)
+        #expect(PPTXRead.parseMiterLimit("1000001") == 1_000_001)
+        #expect(PPTXRead.parseMiterLimit("malformed") == nil)
+        #expect(PPTXRead.parseMiterLimit("2147483648") == nil)
+        #expect(PPTXRead.parseMiterLimit("2147483.648%") == nil)
+    }
+
     @Test func bodyProps() throws {
         var d = try parseXML(#"<a:bodyPr lIns="91440" anchor="ctr" wrap="none" vert="vert270" numCol="2"><a:normAutofit fontScale="62500" lnSpcReduction="20000"/></a:bodyPr>"#)
         let b = PPTXRead.bodyPr(d.root)
@@ -218,6 +227,17 @@ import Testing
         #expect(c.titleSize == nil)
         c = try Self.read(#"<c:chartSpace \#(ns)><c:chart><c:plotArea><c:barChart><c:barDir val="col"/></c:barChart></c:plotArea></c:chart></c:chartSpace>"#)
         #expect(c.textSize == nil, "no sizes: the renderer picks one")
+    }
+
+    @Test func hiddenLabelsAndUnfilledGridlinesAreRead() throws {
+        func xml(_ ax: String) -> String {
+            #"<c:chartSpace xmlns:c="\#(Self.nsC)" xmlns:a="\#(Self.nsA)"><c:chart><c:plotArea><c:barChart><c:barDir val="col"/><c:axId val="1"/><c:axId val="2"/></c:barChart><c:catAx><c:axId val="1"/></c:catAx><c:valAx><c:axId val="2"/>\#(ax)</c:valAx></c:plotArea></c:chart></c:chartSpace>"#
+        }
+        let noFill = #"<c:spPr><a:ln w="9525"><a:noFill/></a:ln></c:spPr>"#
+        var c = try Self.read(xml(#"<c:majorGridlines/><c:minorGridlines/><c:tickLblPos val="nextTo"/>"#))
+        #expect(c.gridlines && c.minorGridlines && !c.yHidden)
+        c = try Self.read(xml(#"<c:majorGridlines>\#(noFill)</c:majorGridlines><c:minorGridlines>\#(noFill)</c:minorGridlines><c:tickLblPos val="none"/>"#))
+        #expect(!c.gridlines && !c.minorGridlines && c.yHidden)
     }
 
     @Test func trendlinesAreRead() throws {

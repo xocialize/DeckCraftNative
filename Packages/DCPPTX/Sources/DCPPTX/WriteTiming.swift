@@ -343,7 +343,18 @@ extension PPTXWrite {
                         w.close("p:to")
                         w.close("p:animClr")
                     }
-                case "fillColor", "objectColor", "fontColor", "lineColor", "complementaryColor", "darken", "lighten":
+                // As PowerPoint writes them: a relative HSL shift of text, fill and line colour.
+                case "darken", "desaturate":
+                    let (sat, lum) = a.effect == "darken" ? (0, -25_098) : (-70_588, 0)
+                    for attr in ["style.color", "fillcolor", "stroke.color"] {
+                        w.open("p:animClr", A.new().a("clrSpc", "hsl").a("dir", "cw"))
+                        cBhvr(&w, &ids, e, dur, nil, [attr], nil)
+                        w.open0("p:by")
+                        w.empty("p:hsl", A.new().a("h", 0).a("s", sat).a("l", lum))
+                        w.close("p:by")
+                        w.close("p:animClr")
+                    }
+                case "fillColor", "objectColor", "fontColor", "lineColor", "complementaryColor", "lighten":
                     let attr = switch a.effect {
                     case "fontColor": "style.color"
                     case "lineColor": "stroke.color"

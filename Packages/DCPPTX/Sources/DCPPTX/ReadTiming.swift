@@ -80,6 +80,44 @@ extension PPTXRead {
         return best
     }
 
+    /// Does every behaviour time node (`p:cBhvr/p:cTn`) under the effect node `c` carry `autoRev`?
+    static func behaviourAutoReverses(_ c: XMLEl) -> Bool {
+        let behaviours = c.findAll("cBhvr")
+        return !behaviours.isEmpty && behaviours.allSatisfy { $0.child("cTn")?.bool("autoRev") ?? false }
+    }
+
+    /// Volume, mute, Loop until Stopped, Hide While Not Playing and Play Full Screen live in the timing tree
+    /// (`p:video`/`p:audio` > `p:cMediaNode`), not on the picture: copy them onto the target's `MediaClip`.
+    static func mediaSettings(_ timing: XMLEl, _ ctx: IdCtx, _ shapes: inout [Shape]) {
+        var nodes: [XMLEl] = []
+        for tag in ["video", "audio"] {
+            timing.findAll(tag, into: &nodes)
+        }
+        for node in nodes.prefix(10_000) {
+            guard let cm = node.child("cMediaNode"),
+                  let id = cm.path(["tgtEl", "spTgt"])?.u32("spid").flatMap({ ctx.lookup($0) }) else { continue }
+            mutateShape(&shapes, id) { s in
+                guard case .media(var clip) = s.kind else { return }
+                if let v = cm.attr("vol").flatMap({ rustParseF64(rustTrim($0)) }), v.isFinite {
+                    clip.volume = (v / 100_000.0).clamped(0.0, 1.0)
+                }
+                if cm.bool("mute") == true {
+                    clip.volume = 0.0
+                }
+                if cm.bool("showWhenStopped") == false {
+                    clip.hideWhileNotPlaying = true
+                }
+                if attrIs(cm.child("cTn")?.attr("repeatCount"), "indefinite") {
+                    clip.loopPlay = true
+                }
+                if node.bool("fullScrn") == true {
+                    clip.fullScreen = true
+                }
+                s.kind = .media(clip)
+            }
+        }
+    }
+
     /// One effect read from the file: the animation, its file shape id, its group id, and whether it
     /// is part of a paragraph build.
     private typealias Effect = (anim: Animation, fileId: UInt32, grp: String, build: Bool)
@@ -129,7 +167,9 @@ extension PPTXRead {
             a.trigger = f.trigger.flatMap { ctx.lookup($0) }
             a.presetId = preset
             a.presetSubtype = sub
-            a.autoReverse = c.bool("autoRev") ?? false
+            // PowerPoint's "Auto-reverse" is `autoRev` on the behaviour nodes (`p:cBhvr/p:cTn`); Color Pulse
+            // always writes it there and plays back and forth on its own, so it isn't read as the option.
+            a.autoReverse = (c.bool("autoRev") ?? false) || (!bytesEqual(effect, "colorPulse") && behaviourAutoReverses(c))
             // PowerPoint's "Rewind when done playing" is `fill="remove"` on the effect node.
             a.rewind = attrIs(c.attr("fill"), "remove")
             a.smoothStart = c.f64("accel").map { $0 / 100_000.0 } ?? 0.0

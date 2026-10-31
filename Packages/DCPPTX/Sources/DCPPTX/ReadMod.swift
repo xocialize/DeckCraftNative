@@ -948,6 +948,7 @@ enum PPTXRead {
         }
         if let t = root.child("timing") {
             s.animations = animations(ctx, t, s.shapes)
+            mediaSettings(t, ctx, &s.shapes)
         }
         if let ext = root.child("extLst"), !hasRelRefs(ext) {
             s.rawExt = ext.elements.map { part.keep($0) }.joined()

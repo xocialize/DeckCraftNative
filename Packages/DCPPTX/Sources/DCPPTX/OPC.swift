@@ -54,6 +54,11 @@ enum OPC {
         }, as: UTF8.self)
     }
 
+    /// `replace('\\', "/")`.
+    static func replacingBackslashes(_ s: String) -> String {
+        String(decoding: s.utf8.map { $0 == UInt8(ascii: "\\") ? UInt8(ascii: "/") : $0 }, as: UTF8.self)
+    }
+
     /// `trim_start_matches('/')`.
     static func trimLeadingSlashes(_ s: String) -> Substring {
         let u = s.utf8
@@ -291,7 +296,8 @@ final class Package: Sendable {
                 continue
             }
             total = total.addingReportingOverflow(data.count).overflow ? .max : total + data.count
-            parts[ByteKey(rustASCIILowercase(name))] = (name, data)
+            // A name kept with `\` would reach code that splits paths on `/`.
+            parts[ByteKey(OPC.norm(name))] = (OPC.replacingBackslashes(name), data)
         }
         return Package(parts: parts)
     }
