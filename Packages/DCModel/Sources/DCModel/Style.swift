@@ -120,6 +120,8 @@ extension Line {
         if dash == nil { dash = parent.dash }
         cap = cap ?? parent.cap
         join = join ?? parent.join
+        miterLimit = miterLimit ?? parent.miterLimit
+        align = align ?? parent.align
         compound = compound ?? parent.compound
         if head == nil { head = parent.head }
         if tail == nil { tail = parent.tail }
@@ -152,5 +154,43 @@ extension ShapeStyle {
             effectRef: Pair(0, .scheme(slot)),
             fontRef: Pair("minor", .scheme(.tx1))
         )
+    }
+}
+
+extension GradientFlip {
+    public var xml: String {
+        switch self {
+        case .none_: "none"
+        case .x: "x"
+        case .y: "y"
+        case .xy: "xy"
+        }
+    }
+
+    public init?(xml value: String) {
+        switch value {
+        case "none": self = .none_
+        case "x": self = .x
+        case "y": self = .y
+        case "xy": self = .xy
+        default: return nil
+        }
+    }
+}
+
+extension LineAlign {
+    public var xml: String {
+        switch self {
+        case .center: "ctr"
+        case .inside: "in"
+        }
+    }
+
+    public init?(xml value: String) {
+        switch value {
+        case "ctr": self = .center
+        case "in": self = .inside
+        default: return nil
+        }
     }
 }

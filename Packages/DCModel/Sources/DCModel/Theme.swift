@@ -45,6 +45,7 @@ public func defaultFormat() -> FormatScheme {
                 GradientStop(pos: 1.0, color: ph().with(.lumMod(b))),
             ],
             shape: .linear(angle: 90.0, scaled: false),
+            flip: nil,
             rotateWithShape: true,
             tile: [0, 0, 0, 0]
         ))

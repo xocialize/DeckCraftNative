@@ -279,6 +279,15 @@ private func obs(_ v: [Double]) -> Chart {
 }
 
 @Suite struct ChartexTests {
+    @Test func histogramValueOnABinEdgeCountsInThatBin() throws {
+        var c = obs([0.0, 2.1, 3.0])
+        c.binSize = 0.3
+        let bins = c.histogramBins()
+        let own = try #require(bins.first { $0.lo < 2.1 && 2.1 <= $0.hi })
+        #expect(own.count == 1, "2.1 must be counted in (\(own.lo), \(own.hi)]")
+        #expect(bins.reduce(0) { $0 + $1.count } == 3)
+    }
+
     @Test func histogramBinsByCountSizeAndScott() {
         var c = obs([1.0, 2.0, 2.0, 3.0, 4.0, 5.0, 9.0])
         c.binCount = 4

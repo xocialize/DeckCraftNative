@@ -329,4 +329,26 @@ private func ctx(_ p: Presentation, _ s: Slide) throws -> Resolve.Ctx {
         let b = try Bullet(fromJSON: try JSONParser.parse(#"{"kind":"autoNum","scheme":"arabicPeriod"}"#))
         #expect(b == .autoNum(scheme: "arabicPeriod", startAt: 1))
     }
+
+    // crates/model/src/text.rs tests
+    @Test func explicitBulletFollowTextResetsBlockInheritance() {
+        let parent = ParaProps(bulletFont: "Inter", bulletColor: .rgb(Rgba(r: 0, g: 0, b: 0, a: 255)), bulletSize: 2.0)
+        var child = ParaProps(bulletFontFollowText: true, bulletColorFollowText: true, bulletSizeFollowText: true)
+        child.inherit(parent)
+        #expect(child.bulletFont == nil)
+        #expect(child.bulletColor == nil)
+        #expect(child.bulletSize == nil)
+
+        var inheritedReset = ParaProps()
+        inheritedReset.inherit(ParaProps(bulletFontFollowText: true, bulletColorFollowText: true, bulletSizeFollowText: true))
+        #expect(inheritedReset.bulletFontFollowText == true)
+        #expect(inheritedReset.bulletColorFollowText == true)
+        #expect(inheritedReset.bulletSizeFollowText == true)
+
+        var explicitFalse = ParaProps(bulletFontFollowText: false, bulletColorFollowText: false, bulletSizeFollowText: false)
+        explicitFalse.inherit(parent)
+        #expect(explicitFalse.bulletFont == parent.bulletFont)
+        #expect(explicitFalse.bulletColor == parent.bulletColor)
+        #expect(explicitFalse.bulletSize == parent.bulletSize)
+    }
 }

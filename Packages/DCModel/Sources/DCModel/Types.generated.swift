@@ -1562,6 +1562,15 @@ extension GradientStop: JSONCodable {
     }
 }
 
+// MARK: GradientFlip (style.rs)
+
+public enum GradientFlip: String, JSONStringEnum, Sendable {
+    case none_ = "none"
+    case x = "x"
+    case y = "y"
+    case xy = "xy"
+}
+
 // MARK: GradientShape (style.rs)
 
 public indirect enum GradientShape: Sendable, Equatable {
@@ -1613,15 +1622,17 @@ extension GradientShape: JSONCodable {
 public struct Gradient: Sendable, Equatable {
     public var stops: [GradientStop]
     public var shape: GradientShape
+    public var flip: GradientFlip?
     public var rotateWithShape: Bool
     /// `a:tileRect`: the box the gradient is laid out in, as insets from the shape's box
     /// (fractions; negative reaches outside it). PowerPoint's "from corner" radial presets use it
     /// to centre the gradient on the corner.
     public var tile: [Double]
 
-    public init(stops: [GradientStop], shape: GradientShape, rotateWithShape: Bool, tile: [Double]) {
+    public init(stops: [GradientStop], shape: GradientShape, flip: GradientFlip? = nil, rotateWithShape: Bool, tile: [Double]) {
         self.stops = stops
         self.shape = shape
+        self.flip = flip
         self.rotateWithShape = rotateWithShape
         self.tile = tile
     }
@@ -1632,6 +1643,7 @@ extension Gradient: JSONCodable {
         var o = JSONObject()
         o.put("stops", stops)
         o.put("shape", shape)
+        o.putIfPresent("flip", flip)
         o.put("rotateWithShape", rotateWithShape)
         o.put("tile", tile, skipIf: tile.allSatisfy { $0 == 0 })
         return .object(o)
@@ -1639,7 +1651,7 @@ extension Gradient: JSONCodable {
 
     public init(fromJSON json: JSON) throws(JSONDecodeError) {
         let f = try JSONFields(json, "Gradient")
-        self.init(stops: try f.required("stops"), shape: try f.required("shape"), rotateWithShape: try f.get("rotateWithShape", default: true), tile: try f.getFixed("tile", count: 4, default: Array(repeating: 0, count: 4)))
+        self.init(stops: try f.required("stops"), shape: try f.required("shape"), flip: try f.get("flip", default: nil), rotateWithShape: try f.get("rotateWithShape", default: true), tile: try f.getFixed("tile", count: 4, default: Array(repeating: 0, count: 4)))
     }
 }
 
@@ -1949,6 +1961,15 @@ public enum LineJoin: String, JSONStringEnum, Sendable {
     public static var `default`: LineJoin { .round }
 }
 
+// MARK: LineAlign (style.rs)
+
+public enum LineAlign: String, JSONStringEnum, Sendable {
+    case center = "center"
+    case inside = "inside"
+
+    public static var `default`: LineAlign { .center }
+}
+
 // MARK: Compound (style.rs)
 
 public enum Compound: String, JSONStringEnum, Sendable {
@@ -2047,16 +2068,20 @@ public struct Line: Sendable, Equatable {
     public var dash: Dash?
     public var cap: LineCap?
     public var join: LineJoin?
+    public var miterLimit: UInt32?
+    public var align: LineAlign?
     public var compound: Compound?
     public var head: LineEnd?
     public var tail: LineEnd?
 
-    public init(fill: Fill? = nil, width: Double? = nil, dash: Dash? = nil, cap: LineCap? = nil, join: LineJoin? = nil, compound: Compound? = nil, head: LineEnd? = nil, tail: LineEnd? = nil) {
+    public init(fill: Fill? = nil, width: Double? = nil, dash: Dash? = nil, cap: LineCap? = nil, join: LineJoin? = nil, miterLimit: UInt32? = nil, align: LineAlign? = nil, compound: Compound? = nil, head: LineEnd? = nil, tail: LineEnd? = nil) {
         self.fill = fill
         self.width = width
         self.dash = dash
         self.cap = cap
         self.join = join
+        self.miterLimit = miterLimit
+        self.align = align
         self.compound = compound
         self.head = head
         self.tail = tail
@@ -2073,6 +2098,8 @@ extension Line: JSONCodable {
         o.put("dash", dash)
         o.put("cap", cap)
         o.put("join", join)
+        o.put("miterLimit", miterLimit)
+        o.put("align", align)
         o.put("compound", compound)
         o.put("head", head)
         o.put("tail", tail)
@@ -2082,7 +2109,7 @@ extension Line: JSONCodable {
     public init(fromJSON json: JSON) throws(JSONDecodeError) {
         let f = try JSONFields(json, "Line")
         let d = Line.default
-        self.init(fill: try f.get("fill", default: d.fill), width: try f.get("width", default: d.width), dash: try f.get("dash", default: d.dash), cap: try f.get("cap", default: d.cap), join: try f.get("join", default: d.join), compound: try f.get("compound", default: d.compound), head: try f.get("head", default: d.head), tail: try f.get("tail", default: d.tail))
+        self.init(fill: try f.get("fill", default: d.fill), width: try f.get("width", default: d.width), dash: try f.get("dash", default: d.dash), cap: try f.get("cap", default: d.cap), join: try f.get("join", default: d.join), miterLimit: try f.get("miterLimit", default: d.miterLimit), align: try f.get("align", default: d.align), compound: try f.get("compound", default: d.compound), head: try f.get("head", default: d.head), tail: try f.get("tail", default: d.tail))
     }
 }
 
@@ -2620,10 +2647,13 @@ public struct ParaProps: Sendable, Equatable {
     public var spaceAfter: Spacing?
     public var bullet: Bullet?
     public var bulletFont: String?
+    public var bulletFontFollowText: Bool?
     /// `None` = follow text colour.
     public var bulletColor: ColorRef?
+    public var bulletColorFollowText: Bool?
     /// Bullet size as a fraction of the text size.
     public var bulletSize: Double?
+    public var bulletSizeFollowText: Bool?
     public var tabs: [TabStop]?
     public var defaultTab: Double?
     public var rtl: Bool?
@@ -2634,7 +2664,7 @@ public struct ParaProps: Sendable, Equatable {
     /// `hangingPunct`: closing East Asian punctuation may hang past the end of a line.
     public var hangingPunct: Bool?
 
-    public init(align: Align? = nil, marginLeft: Double? = nil, marginRight: Double? = nil, indent: Double? = nil, lineSpacing: Spacing? = nil, spaceBefore: Spacing? = nil, spaceAfter: Spacing? = nil, bullet: Bullet? = nil, bulletFont: String? = nil, bulletColor: ColorRef? = nil, bulletSize: Double? = nil, tabs: [TabStop]? = nil, defaultTab: Double? = nil, rtl: Bool? = nil, fontAlign: String? = nil, eastAsianLineBreak: Bool? = nil, latinLineBreak: Bool? = nil, hangingPunct: Bool? = nil) {
+    public init(align: Align? = nil, marginLeft: Double? = nil, marginRight: Double? = nil, indent: Double? = nil, lineSpacing: Spacing? = nil, spaceBefore: Spacing? = nil, spaceAfter: Spacing? = nil, bullet: Bullet? = nil, bulletFont: String? = nil, bulletFontFollowText: Bool? = nil, bulletColor: ColorRef? = nil, bulletColorFollowText: Bool? = nil, bulletSize: Double? = nil, bulletSizeFollowText: Bool? = nil, tabs: [TabStop]? = nil, defaultTab: Double? = nil, rtl: Bool? = nil, fontAlign: String? = nil, eastAsianLineBreak: Bool? = nil, latinLineBreak: Bool? = nil, hangingPunct: Bool? = nil) {
         self.align = align
         self.marginLeft = marginLeft
         self.marginRight = marginRight
@@ -2644,8 +2674,11 @@ public struct ParaProps: Sendable, Equatable {
         self.spaceAfter = spaceAfter
         self.bullet = bullet
         self.bulletFont = bulletFont
+        self.bulletFontFollowText = bulletFontFollowText
         self.bulletColor = bulletColor
+        self.bulletColorFollowText = bulletColorFollowText
         self.bulletSize = bulletSize
+        self.bulletSizeFollowText = bulletSizeFollowText
         self.tabs = tabs
         self.defaultTab = defaultTab
         self.rtl = rtl
@@ -2670,8 +2703,11 @@ extension ParaProps: JSONCodable {
         o.put("spaceAfter", spaceAfter)
         o.put("bullet", bullet)
         o.put("bulletFont", bulletFont)
+        o.put("bulletFontFollowText", bulletFontFollowText)
         o.put("bulletColor", bulletColor)
+        o.put("bulletColorFollowText", bulletColorFollowText)
         o.put("bulletSize", bulletSize)
+        o.put("bulletSizeFollowText", bulletSizeFollowText)
         o.put("tabs", tabs)
         o.put("defaultTab", defaultTab)
         o.put("rtl", rtl)
@@ -2685,7 +2721,7 @@ extension ParaProps: JSONCodable {
     public init(fromJSON json: JSON) throws(JSONDecodeError) {
         let f = try JSONFields(json, "ParaProps")
         let d = ParaProps.default
-        self.init(align: try f.get("align", default: d.align), marginLeft: try f.get("marginLeft", default: d.marginLeft), marginRight: try f.get("marginRight", default: d.marginRight), indent: try f.get("indent", default: d.indent), lineSpacing: try f.get("lineSpacing", default: d.lineSpacing), spaceBefore: try f.get("spaceBefore", default: d.spaceBefore), spaceAfter: try f.get("spaceAfter", default: d.spaceAfter), bullet: try f.get("bullet", default: d.bullet), bulletFont: try f.get("bulletFont", default: d.bulletFont), bulletColor: try f.get("bulletColor", default: d.bulletColor), bulletSize: try f.get("bulletSize", default: d.bulletSize), tabs: try f.get("tabs", default: d.tabs), defaultTab: try f.get("defaultTab", default: d.defaultTab), rtl: try f.get("rtl", default: d.rtl), fontAlign: try f.get("fontAlign", default: d.fontAlign), eastAsianLineBreak: try f.get("eastAsianLineBreak", default: d.eastAsianLineBreak), latinLineBreak: try f.get("latinLineBreak", default: d.latinLineBreak), hangingPunct: try f.get("hangingPunct", default: d.hangingPunct))
+        self.init(align: try f.get("align", default: d.align), marginLeft: try f.get("marginLeft", default: d.marginLeft), marginRight: try f.get("marginRight", default: d.marginRight), indent: try f.get("indent", default: d.indent), lineSpacing: try f.get("lineSpacing", default: d.lineSpacing), spaceBefore: try f.get("spaceBefore", default: d.spaceBefore), spaceAfter: try f.get("spaceAfter", default: d.spaceAfter), bullet: try f.get("bullet", default: d.bullet), bulletFont: try f.get("bulletFont", default: d.bulletFont), bulletFontFollowText: try f.get("bulletFontFollowText", default: d.bulletFontFollowText), bulletColor: try f.get("bulletColor", default: d.bulletColor), bulletColorFollowText: try f.get("bulletColorFollowText", default: d.bulletColorFollowText), bulletSize: try f.get("bulletSize", default: d.bulletSize), bulletSizeFollowText: try f.get("bulletSizeFollowText", default: d.bulletSizeFollowText), tabs: try f.get("tabs", default: d.tabs), defaultTab: try f.get("defaultTab", default: d.defaultTab), rtl: try f.get("rtl", default: d.rtl), fontAlign: try f.get("fontAlign", default: d.fontAlign), eastAsianLineBreak: try f.get("eastAsianLineBreak", default: d.eastAsianLineBreak), latinLineBreak: try f.get("latinLineBreak", default: d.latinLineBreak), hangingPunct: try f.get("hangingPunct", default: d.hangingPunct))
     }
 }
 

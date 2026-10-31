@@ -293,6 +293,21 @@ private func same(_ got: (String, TextPos), _ want: (String, TextPos)) -> Bool {
         return b
     }
 
+    @Test func replaceTextCRLFMatchesFromText() {
+        // The kept suffix must not start inside a `\r\n` pair.
+        var b = body("x\ny")
+        TextEdit.replaceText(&b, "z\r\ny")
+        #expect(b.text == "z\ny")
+        // CRLF in the kept prefix, and the same text with CRLF changes nothing.
+        let before = notes()
+        b = before
+        TextEdit.replaceText(&b, "Overview\r\nFirst point\r\nSecond point")
+        #expect(b == before)
+        TextEdit.replaceText(&b, "Overview\r\nFirst point\r\nSecond\rpoint")
+        #expect(b.text == "Overview\nFirst point\nSecond\npoint")
+        #expect(b.paragraphs[0].runs[0].props.bold == true)
+    }
+
     @Test func replaceTextKeepsFormatting() {
         let before = notes()
         // Same text: nothing changes.

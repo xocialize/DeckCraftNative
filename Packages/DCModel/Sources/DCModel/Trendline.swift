@@ -411,7 +411,7 @@ private func trendNum(_ v: Double) -> String {
     if !v.isFinite { return "0" }
     let a = Swift.abs(v)
     if a == 0.0 { return "0" }
-    if a >= 1.0e6 || a < 1.0e-3 { return rsExp(v, 2, upper: false).replacingOccurrences(of: "+", with: "") }
+    if !(1.0e-3 ..< 1.0e6).contains(a) { return rsExp(v, 2, upper: false).replacingOccurrences(of: "+", with: "") }
     let digits = a >= 100.0 ? 1 : (a >= 10.0 ? 2 : 3)
     var s = rustFixed(v, places: digits)
     if let dot = s.firstIndex(of: ".") {

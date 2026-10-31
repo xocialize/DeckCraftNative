@@ -357,6 +357,8 @@ public enum TextEdit {
     /// its run and paragraph formatting and new text takes the formatting where it lands. Text that shares
     /// nothing with the old text replaces it as plain text.
     public static func replaceText(_ body: inout TextBody, _ text: String) {
+        // Normalise line endings first so the common prefix/suffix cannot split a `\r\n` pair.
+        let text = text.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
         let old = Array(body.text.unicodeScalars)
         let new = Array(text.unicodeScalars)
         if old == new { return }

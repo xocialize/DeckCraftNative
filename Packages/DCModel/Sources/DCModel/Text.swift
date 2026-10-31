@@ -120,9 +120,20 @@ extension ParaProps {
         spaceBefore = spaceBefore ?? p.spaceBefore
         spaceAfter = spaceAfter ?? p.spaceAfter
         bullet = bullet ?? p.bullet
-        bulletFont = bulletFont ?? p.bulletFont
-        bulletColor = bulletColor ?? p.bulletColor
-        bulletSize = bulletSize ?? p.bulletSize
+        // An explicit bullet (or an explicit "not following the text") ends a follow-text reset; a level
+        // with neither takes the parent's reset or its bullet font, colour and size.
+        if bulletFontFollowText == false || bulletFont != nil { bulletFontFollowText = nil }
+        if bulletFont == nil && bulletFontFollowText == nil {
+            if p.bulletFontFollowText == true { bulletFontFollowText = true } else { bulletFont = p.bulletFont }
+        }
+        if bulletColorFollowText == false || bulletColor != nil { bulletColorFollowText = nil }
+        if bulletColor == nil && bulletColorFollowText == nil {
+            if p.bulletColorFollowText == true { bulletColorFollowText = true } else { bulletColor = p.bulletColor }
+        }
+        if bulletSizeFollowText == false || bulletSize != nil { bulletSizeFollowText = nil }
+        if bulletSize == nil && bulletSizeFollowText == nil {
+            if p.bulletSizeFollowText == true { bulletSizeFollowText = true } else { bulletSize = p.bulletSize }
+        }
         tabs = tabs ?? p.tabs
         defaultTab = defaultTab ?? p.defaultTab
         rtl = rtl ?? p.rtl

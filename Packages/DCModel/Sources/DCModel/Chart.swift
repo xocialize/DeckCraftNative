@@ -623,7 +623,10 @@ extension Chart {
         for x in v {
             // (lo, hi] bins, the first one also holding the minimum.
             let raw = Int(rustCast: ((x - lo) / width).rounded(.up))
-            let i = Swift.min(Swift.max(raw - 1, 0), count - 1)
+            var i = Swift.min(Swift.max(raw - 1, 0), count - 1)
+            // The division can round across an edge: settle on the bin whose stored bounds hold x.
+            while i > 0 && x <= bins[i - 1].hi { i -= 1 }
+            while i + 1 < count && x > bins[i].hi { i += 1 }
             if bins.indices.contains(i) { bins[i].count += 1 }
         }
         return bins
