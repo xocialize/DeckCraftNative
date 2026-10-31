@@ -1526,3 +1526,61 @@ translator may need them split into distinct keys. ShowView compares the zoom la
 ShowController produces DCAppModel's: the two must be translated alike. The canvas control channel's `choose`
 finds a context-menu item by its (now localized) title. Theme Colors' right-hand colour wells touch the sheet's
 edge (English too); the Review inspector's segments clip in a long language.
+
+## Pin move 88c2ceff → a3fbf029
+
+The 44 upstream commits touching `crates/ui-egui` and `apps/deckcraft`, sorted by what our app (a rewrite, not a
+port of the egui UI) needs. Tests are in DCAppModelTests (`InspectorEffectsAndSizeTests`, `InspectorFillTests`,
+`ShowTests`, `AppModelTests`, `DialogsTests`).
+
+**Ported.**
+- **Format ▸ Effects presets** (9ad147b3 without its Size slider, 322be04e, 5638b0ca, 9c24a63d): the Shadow
+  picker shows the preset the shadow came from (`InspectorShape.shadowPresetId`) instead of "Choose…"; Glow and
+  Soft Edges gain a Presets picker with the ribbon's sizes (`glowPresets`, `softEdgePresets`); a glow preset runs
+  `glowProps {radius}`, so the glow keeps its colour and transparency; the detail controls read the inner shadow
+  first (`detailShadow`). deckcraft draws each preset as a tile; here they are pickers (see "Left").
+- **Format ▸ Size: Scale Height, Scale Width and Position ▸ From** (6fa873dc, d8c88cea): Scale is measured from
+  the size the pane first showed for that shape and runs `shape.sizePosition` (with Lock aspect ratio); From
+  switches Horizontal and Vertical between the top-left corner and the centre. Both need a single selected shape.
+- **Gradient flip kept when editing a fill** (72c86213, ad97533a, 04b0958b): `InspectorFill.gradientJSON` sends
+  `flip`. The engine reads it once its half of 72c86213 lands (DCEngine's).
+- **Show click targets follow their shape's animation** (14eef3ac, ef6fd299): `ShowController.under` hit-tests
+  each shape where its own animation state has moved, scaled and turned it (`hitPoint`), not its groups'.
+- **Keep mouse cursor visible** (b9842d0b, #1445): the UI command `show.keepCursor {on?}`, `UiState.showKeepCursor`
+  (`ui.json`), a check box in Set Up Slide Show, and `ShowController.hidesIdleCursor` (the running show reads the
+  setting as it goes).
+- **`show.presenter` answers `{on, window}`** (1ca71474), with deckcraft's longer `UI_COMMANDS` text.
+- **Presenter view's Next preview renders off the main thread** (356195ba, feecee0a, #964): `ShowNextPreview`
+  (one render at a time on `ShowPending`, keyed by the presentation's `DocRef` and the slide); the box stays empty,
+  not "End of slide show", while a preview is on its way.
+
+**Already how the app behaves.** 62ea6043 (the Add Animation menu scrolls: NSMenu does); 99bb0f0a, 0da9cac9,
+11b271b9 (the Picture Styles row leaves room: the ribbon's gallery already shows six with a menu for the rest);
+5a28760b, 1b2e5ea9, faf4c0ee, d9893894, 90ce7dcb (effect sliders committing a rounded or stale value: `CommitSlider`
+commits only at the end of a drag that moved, never on rounding or focus loss).
+
+**Not applicable.** 8333c371 (Alt+1…9 for the QAT: off on macOS, where ⌥-digit types characters); 505a6f28 and
+9678ed7d (craft-update's prompt and dialog: our updater is our own); 33b6e117 and b4c1905d (print previews as
+temporary PDFs opened in a viewer: we print with NSPrintOperation); b5928a18 (File › New tiles in egui's
+backstage: the start window is SwiftUI); 300872fb, c3981dae, 811758f7, 1956b6b4 (the editor's media bar taking its
+own clicks; click-to-play was added and then reverted: our canvas has no media bar, playback is in the
+inspector); cccc9064 (docs and credits comments).
+
+**Refactors and tests only.** 8c6c72e3 (strict Clippy), 5a235590 (test module moved), bcbdb76b (a test's
+textures).
+
+**Left: needs an engine or anim change not on this branch yet.**
+- 039395ae: dragging several selected slides moves them all, in one undo step, keeping them selected (navigator
+  and sorter). Needs DCEngine's `slide.move {ids, to}`; then `slides_move_dest` in `SorterLogic` and drag writers
+  carrying every selected row. Small to medium (half a day with tests).
+- 71352733, aef36486, fca04927, edbf5425: Fill ▸ "Slide background fill" (not for pictures; shown chosen for a
+  group whose shapes all have it; a kept group fill's editors hidden). Needs DCEngine's `shape.fill {background}`;
+  then a kind in `InspectorFill` and the group rule. Small (a couple of hours).
+- 9ad147b3's shadow Size slider (`shadowProps {size}`, 1–200 %): needs DCEngine's half. A one-line slider.
+- 8cc25169 (#1531): going back plays the left slide's transition reversed. Needs DCAnim's `ShowState.backward`;
+  then `ShowTransition.reverse` and the layers run from the end with old and new swapped
+  (`transition_layers`), in `ShowController.apply` and the Metal stage. Small.
+
+**Left: a design choice.** 9ad147b3's drawn preset tiles (a card with each shadow, glow or soft edge drawn on
+it). The pickers give the same choices; drawn tiles, as in PowerPoint's Presets galleries, are a medium SwiftUI
+piece (about 150 lines) for the inspector and the ribbon's effect menus together.

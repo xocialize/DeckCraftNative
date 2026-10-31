@@ -381,6 +381,10 @@ public final class ShowController {
     /// True while the pointer moved in the last 2.5 s: the toolbar, media bars and GIF buttons hide after that.
     public func pointerAwake(_ now: Double) -> Bool { now - lastMove < 2.5 }
 
+    /// `hides_idle_cursor`: a still pointer hides after 2.5 s in a full-screen show, unless Set Up Slide Show's
+    /// Keep mouse cursor visible (`keep`) is on (#1445). Reading View always keeps it.
+    public func hidesIdleCursor(_ now: Double, keep: Bool) -> Bool { !pointerAwake(now) && !reading && !keep }
+
     // MARK: Pointers
 
     /// Pen and laser are different pointers: turning one on puts the other away.
@@ -711,20 +715,28 @@ public final class ShowController {
     public func under(_ doc: Presentation, _ x: Double, _ y: Double, _ now: Double) -> ShowUnder {
         let placed = placed(doc)
         let tl = timeline(doc)
-        func inside(_ r: Rect) -> Bool { r.x0 <= x && x <= r.x1 && r.y0 <= y && y <= r.y1 }
-        let hits = placed.shapes.map { HitShape(id: $0.id, parent: $0.parent, isGroup: $0.isGroup, link: $0.link?.action, underPointer: inside($0.rect)) }
         let (step, plays, stamps) = (state.step, state.triggerPlays, state.triggerStamps)
         let t = stepTime(now)
-        let visible = placed.shapes.map { s -> Bool in
-            let a = tl.stateOrdered(s.id, nil, step, t, plays, stamps)
-            return a.visible && a.opacity > 0
+        let states = placed.shapes.map { tl.stateOrdered($0.id, nil, step, t, plays, stamps) }
+        // Each shape is hit where its own animation has put it (moved, scaled, turned), not where it was placed.
+        func at(_ i: Int) -> (Double, Double)? {
+            guard let s = placed.shapes.at(i), let a = states.at(i) else { return nil }
+            return Self.hitPoint((x, y), s.rect, a)
         }
+        func inside(_ r: Rect, _ p: (Double, Double)?) -> Bool {
+            guard let (x, y) = p else { return false }
+            return r.x0 <= x && x <= r.x1 && r.y0 <= y && y <= r.y1
+        }
+        let hits = placed.shapes.enumerated().map { i, s in
+            HitShape(id: s.id, parent: s.parent, isGroup: s.isGroup, link: s.link?.action, underPointer: inside(s.rect, at(i)))
+        }
+        let visible = states.map { $0.visible && $0.opacity > 0 }
         var under = ShowUnder(shapes: hits, visible: visible, pick: nil)
         let shown = { (id: ShapeId) in under.isVisible(id) }
         let top = state.top(doc, tl, under.shapes, shown)
         // A hyperlink in text applies when its shape is the one on top.
         let text = placed.links.reversed().first { l in
-            guard l.text && inside(l.rect) else { return false }
+            guard l.text, let i = placed.shapes.firstIndex(where: { $0.id == l.shape }), inside(l.rect, at(i)) else { return false }
             var at = top
             for _ in 0 ... under.shapes.count {
                 guard let k = at, let h = under.shapes.at(k) else { return false }
@@ -739,6 +751,18 @@ public final class ShowController {
             under.pick = .shape
         }
         return under
+    }
+
+    /// `hit_point`: slide point `p` in the coordinates a shape placed at `rect` had before animation state `a`
+    /// moved, scaled and turned it about its centre; nil when the animation has squashed it flat. Only the
+    /// shape's own animation counts, not its groups' (DC-1521).
+    public static func hitPoint(_ p: (Double, Double), _ rect: Rect, _ a: AnimState) -> (Double, Double)? {
+        guard abs(a.scaleX) > Double.ulpOfOne, abs(a.scaleY) > Double.ulpOfOne else { return nil }
+        let c = rect.center
+        let (x, y) = (p.0 - c.x - a.offsetX, p.1 - c.y - a.offsetY)
+        let angle = -a.rotate * .pi / 180
+        let (rx, ry) = (x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle))
+        return (c.x + rx / a.scaleX, c.y + ry / a.scaleY)
     }
 
     /// A click on the slide: the shape under the pointer acts, or the background advances (`click_slide`).

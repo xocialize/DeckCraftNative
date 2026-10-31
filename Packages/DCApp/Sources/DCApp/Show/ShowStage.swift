@@ -39,7 +39,9 @@ final class ShowStage {
     private(set) var current: (key: ShowFrameKey, image: RenderImage)?
     private var currentCG: (key: ShowFrameKey, image: CGImage)?
     private var thumbs: [Int: CGImage] = [:]
-    private var nextThumb: (index: Int, image: CGImage)?
+    /// Presenter view's Next preview, rendered on another thread (#964), and its picture.
+    private var nextPreview = ShowNextPreview()
+    private var nextThumb: (doc: DocRef, index: Int, image: CGImage)?
     /// The GIFs and media shapes of the last frame (the overlay draws their controls).
     private(set) var gifs: [ShowGif] = []
     private(set) var mediaPlaces: [ShowMediaPlace] = []
@@ -231,11 +233,12 @@ final class ShowStage {
         return img
     }
 
-    /// Presenter view's Next preview of slide `n` (480 pixels wide).
+    /// Presenter view's Next preview of slide `n` (480 pixels wide); nil while it is being rendered on another thread.
     func nextImage(_ n: Int) -> CGImage? {
-        if let t = nextThumb, t.index == n { return t.image }
-        guard let doc = coord.showState?.doc, let img = ShowRender.thumb(doc, n, width: 480).cgImage() else { return nil }
-        nextThumb = (n, img)
+        guard let ref = coord.showState?.docRef else { return nil }
+        if let t = nextThumb, t.doc === ref, t.index == n { return t.image }
+        guard let img = nextPreview.image(ref, n, width: 480)?.cgImage() else { return nil }
+        nextThumb = (ref, n, img)
         return img
     }
 }

@@ -77,6 +77,7 @@ extension DialogController {
             } else {
                 for (k, v) in [("type", "speaker"), ("loop", "0"), ("nn", "0"), ("na", "0"), ("ut", "1"), ("custom", "")] { d.seed(k, v) }
             }
+            d.seed("kc", model.ui.showKeepCursor ? "1" : "0")
         case "zoom":
             if d.fields["mode"] == nil {
                 let shown = model.ui.zoom ?? model.canvasScale
@@ -439,6 +440,7 @@ extension DialogController {
                 ]),
                 .check(label: L10n.text("Loop continuously until 'Esc'"), key: "loop"), .check(label: L10n.text("Show without narration"), key: "nn"),
                 .check(label: L10n.text("Show without animation"), key: "na"), .check(label: L10n.text("Use timings, if present"), key: "ut"),
+                .check(label: L10n.text("Keep mouse cursor visible"), key: "kc"),
                 .choice(label: L10n.text("Slides"), key: "custom", options: [FormOption("", L10n.text("All slides"))] + names.map { FormOption($0, $0) }),
             ]
         case "zoom":

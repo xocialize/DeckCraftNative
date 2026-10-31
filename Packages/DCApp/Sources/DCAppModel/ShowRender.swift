@@ -1,10 +1,12 @@
 // DCAppModel — the show's slide pictures: a slide at a step and time with its media hidden or shown, its
 // backdrop kept while it animates (only its own shapes are drawn again each frame), the shapes stacked over a
-// playing video, and the next slide's first frame rendered ahead of time on another thread. Port of
-// `render_frame`, `render_backdrop`, `over`, `render_overlay`, `start_prefetch` and the `backdrop` cache of
-// deckcraft `crates/ui-egui/src/show.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
+// playing video, the next slide's first frame rendered ahead of time on another thread, and presenter view's Next
+// preview, also rendered on another thread. Port of `render_frame`, `render_backdrop`, `over`, `render_overlay`,
+// `start_prefetch` and the `backdrop` cache of deckcraft `crates/ui-egui/src/show.rs`, and the preview of
+// `show/presenter.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCAnim
 import DCCore
+import DCEngine
 import DCModel
 import DCRender
 import Foundation
@@ -124,6 +126,37 @@ public final class ShowPending: @unchecked Sendable {
         cond.lock()
         defer { cond.unlock() }
         return value
+    }
+}
+
+/// Presenter view's Next preview (`next_tex`, `next_job`), rendered on another thread so turning the page doesn't
+/// wait for it (#964). One render at a time: paging faster than it renders asks for the newest preview once it is
+/// done, and a finished one no longer wanted is dropped. A preview is of one presentation as well as one slide,
+/// so one rendered before an edit is rendered again.
+public struct ShowNextPreview {
+    /// The preview ready to show: the presentation and slide it is of.
+    public private(set) var shown: (doc: DocRef, slide: Int, image: RenderImage)?
+    /// The one render under way.
+    public private(set) var job: (doc: DocRef, slide: Int, pending: ShowPending)?
+    /// Renders started.
+    public private(set) var spawns = 0
+
+    public init() {}
+
+    /// Slide `n` of `doc` `width` pixels wide when it is ready; nil while its render is under way (one is started
+    /// when none is).
+    public mutating func image(_ doc: DocRef, _ n: Int, width: Int) -> RenderImage? {
+        func wanted(_ d: DocRef, _ k: Int) -> Bool { d === doc && k == n }
+        if let j = job, let img = j.pending.ready {
+            job = nil
+            if wanted(j.doc, j.slide) { shown = (j.doc, j.slide, img) }
+        }
+        if let s = shown, wanted(s.doc, s.slide) { return s.image }
+        if job == nil {
+            spawns += 1
+            job = (doc, n, ShowPending { ShowRender.thumb(doc.value, n, width: width) })
+        }
+        return nil
     }
 }
 

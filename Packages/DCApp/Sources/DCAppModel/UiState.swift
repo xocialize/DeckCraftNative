@@ -46,6 +46,9 @@ public struct UiState: Codable, Sendable, Equatable {
     public var sorterZoom: Double = 1
     public var recent: [String] = []
     public var presenterView = true
+    /// Set Up Slide Show ▸ Keep mouse cursor visible: full-screen shows never hide a still pointer, for decks with
+    /// clickable choices (#1445). A preference of the app's, since a .pptx has no place for it.
+    public var showKeepCursor = false
     public var uiScale: Double = 1
     /// Format Shape pane: tab (`fill`, `effects`, `size`, `picture`, `text`).
     public var formatTab = "fill"
@@ -67,7 +70,7 @@ public struct UiState: Codable, Sendable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case brightness, tab, ribbonCollapsed, layout, view, notes, notesHeight, thumbsWidth, pane, paneWidth, ruler, gridlines,
-             handoutPerPage, guides, smartGuides, zoom, sorterZoom, recent, presenterView, uiScale, formatTab, grayscale,
+             handoutPerPage, guides, smartGuides, zoom, sorterZoom, recent, presenterView, showKeepCursor, uiScale, formatTab, grayscale,
              showStartScreen, startPage
     }
 
@@ -95,6 +98,7 @@ public struct UiState: Codable, Sendable, Equatable {
         sorterZoom = v(.sorterZoom, d.sorterZoom)
         recent = v(.recent, d.recent)
         presenterView = v(.presenterView, d.presenterView)
+        showKeepCursor = v(.showKeepCursor, d.showKeepCursor)
         uiScale = v(.uiScale, d.uiScale)
         formatTab = v(.formatTab, d.formatTab)
         grayscale = v(.grayscale, d.grayscale)

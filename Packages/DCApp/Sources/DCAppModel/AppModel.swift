@@ -145,7 +145,12 @@ public final class AppModel {
         case "view.dark":
             ui.brightness = flag(p, ui.brightness == .dark) ? .dark : .light
         case "view.grayscale": ui.grayscale = flag(p, ui.grayscale)
-        case "show.presenter": ui.presenterView = flag(p, ui.presenterView)
+        case "show.presenter":
+            ui.presenterView = flag(p, ui.presenterView)
+            // Presenter view is its own window beside the show's.
+            return .success(["on": .bool(ui.presenterView), "window": true])
+        // A running show reads the setting as it goes (`ShowCoordinator.cursor`).
+        case "show.keepCursor": ui.showKeepCursor = flag(p, ui.showKeepCursor)
         case "app.links":
             return .success([
                 "discord": .string(Links.discord), "website": .string(Links.website), "apps": .string(Links.apps),

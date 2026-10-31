@@ -173,6 +173,15 @@ final class RecordingHost: AppHost {
         #expect(back.stops.count == 2)
     }
 
+    // fillui.rs: gradient_json_retains_flip_mode
+    @Test func gradientJSONKeepsTheFlipMode() {
+        var g = InspectorFill.defaultGradient(.scheme(.accent1), 90)
+        #expect(InspectorFill.gradientJSON(g)["flip"] == .null)
+        g.flip = .xy
+        #expect(InspectorFill.gradientJSON(g)["flip"]?.asStr == "xy")
+        if let radial = InspectorFill.withType(g, "Radial") { #expect(InspectorFill.gradientJSON(radial)["flip"]?.asStr == "xy") } else { Issue.record("radial") }
+    }
+
     // pattern_fill_tests.rs: shape_pattern_fill_picks_a_preset_from_the_gallery (the gallery's content)
     @Test func patternGalleryHasFortyEightPresetsWithoutTheSixPowerPointLeavesOut() {
         #expect(InspectorFill.patternGallery.count == 48)
@@ -540,5 +549,97 @@ final class RecordingHost: AppHost {
         #expect(InspectorMotion.ms(1.25) == 1250)
         #expect(InspectorMotion.ms(-3) == 0)
         #expect(InspectorMotion.ms(.nan) == 0)
+    }
+}
+
+/// Format Shape ▸ Effects' presets and Size's Scale and From (`panels/effect_presets_tests.rs`,
+/// `panels/format_shape.rs`, `units_tests.rs`).
+@MainActor
+@Suite struct InspectorEffectsAndSizeTests {
+    private func effects(_ s: Session, _ id: UInt32) -> Effects { Fx.shape(s, id)?.effects ?? Effects() }
+
+    // effect_presets_tests.rs: preset_tiles_set_shadow_glow_and_soft_edges
+    @Test func presetsSetShadowGlowAndSoftEdges() throws {
+        let s = Fx.blank()
+        let id = Fx.rect(s, 80)
+        Fx.select(s, [id])
+        _ = try s.execute("shape.effects", ["shadow": "bottom"])
+        let sw = try #require(effects(s, id).outerShadow)
+        #expect((sw.dir, sw.dist) == (90, 3))
+        // Every preset reads back as itself, so the picker shows the one chosen.
+        for p in InspectorShape.shadowPresets {
+            _ = try s.execute("shape.effects", ["shadow": .string(p)])
+            #expect(InspectorShape.shadowPresetId(effects(s, id)) == p, "\(p)")
+        }
+        _ = try s.execute("shape.effects", ["shadow": "inner"])
+        #expect(effects(s, id).outerShadow == nil && effects(s, id).innerShadow != nil)
+        _ = try s.execute("shape.effects", ["shadow": "none"])
+        #expect(effects(s, id).outerShadow == nil && effects(s, id).innerShadow == nil)
+
+        // A radius preset keeps the glow's colour and transparency (322be04e); 0 removes it.
+        _ = try s.execute("shape.effects", ["glowProps": ["color": "accent2", "transparency": 0.35, "radius": 8]])
+        let colour = try #require(effects(s, id).glow).color
+        _ = try s.execute("shape.effects", InspectorShape.glowPresetParams(18))
+        let glow = try #require(effects(s, id).glow)
+        #expect(glow.radius == 18)
+        #expect(glow.color == colour)
+        _ = try s.execute("shape.effects", InspectorShape.glowPresetParams(0))
+        #expect(effects(s, id).glow == nil)
+
+        _ = try s.execute("shape.effects", ["softEdges": 10])
+        #expect(effects(s, id).softEdge == 10)
+        _ = try s.execute("shape.effects", ["softEdges": 0])
+        #expect(effects(s, id).softEdge == nil)
+    }
+
+    // 9c24a63d: the shadow detail controls read the inner shadow first, as the preset id does.
+    @Test func detailControlsReadTheInnerShadowFirst() {
+        let outer = Shadow(color: .scheme(.tx1), blur: 4, dist: 3, dir: 45, inner: false, sx: 1, sy: 1, kx: 0, ky: 0, align: "tl", rotateWithShape: true)
+        var inner = outer
+        inner.inner = true
+        inner.blur = 9
+        var fx = Effects()
+        fx.outerShadow = outer
+        fx.innerShadow = inner
+        #expect(InspectorShape.detailShadow(fx)?.blur == 9)
+        #expect(InspectorShape.shadowPresetId(fx) == "inner")
+        fx.innerShadow = nil
+        #expect(InspectorShape.detailShadow(fx)?.blur == 4)
+        #expect(InspectorShape.shadowPresetId(fx) == "outer")
+        #expect(InspectorShape.shadowPresetId(Effects()) == "none")
+    }
+
+    // 6fa873dc: Scale Height and Width are measured from the size the pane first showed and run
+    // shape.sizePosition, honouring Lock aspect ratio.
+    @Test func scaleRunsSizePositionFromTheFirstShownSize() throws {
+        let s = Fx.blank()
+        let id = Fx.rect(s, 40, w: 120, h: 80)
+        Fx.select(s, [id])
+        #expect(InspectorShape.scalePercent(80, base: 80) == 100)
+        #expect(InspectorShape.scalePercent(40, base: 0) == 100)
+        #expect(InspectorShape.scaleParams("h", base: 80, percent: 0, lockAspect: false) == nil)
+        #expect(InspectorShape.scaleParams("h", base: 80, percent: .nan, lockAspect: false) == nil)
+        _ = try s.execute("shape.sizePosition", try #require(InspectorShape.scaleParams("h", base: 80, percent: 150, lockAspect: false)))
+        var x = try #require(Fx.shape(s, id)?.xfrm)
+        #expect((x.w, x.h) == (120, 120))
+        #expect(InspectorShape.scalePercent(x.h, base: 80) == 150)
+        // 50 % of the first width with the aspect locked: the height follows.
+        _ = try s.execute("shape.sizePosition", try #require(InspectorShape.scaleParams("w", base: 120, percent: 50, lockAspect: true)))
+        x = try #require(Fx.shape(s, id)?.xfrm)
+        #expect((x.w, x.h) == (60, 60))
+    }
+
+    // 6fa873dc: From Center shows the centre and moves the corner by half the size.
+    @Test func positionFromCenterShiftsByHalfTheSize() throws {
+        let s = Fx.blank()
+        let id = Fx.rect(s, 40, 30, w: 120, h: 80)
+        Fx.select(s, [id])
+        let x = try #require(Fx.shape(s, id)?.xfrm)
+        #expect(InspectorShape.positionOffset(x, center: false) == (0, 0))
+        let (dx, dy) = InspectorShape.positionOffset(x, center: true)
+        #expect((x.x + dx, x.y + dy) == (100, 70))
+        // Typing 200 as the centre's Horizontal puts the corner at 140.
+        _ = try s.execute("shape.move", ["x": .num(200 - dx)])
+        #expect(Fx.shape(s, id)?.xfrm?.x == 140)
     }
 }

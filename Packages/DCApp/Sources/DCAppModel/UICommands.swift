@@ -47,7 +47,11 @@ public enum UICommands {
         .init(id: "view.grayscale", label: "Grayscale", shortcut: nil, params: "{on?: bool}"),
         .init(id: "view.newWindow", label: "New Window", shortcut: nil, params: "{on?: bool, slide?: index, delta?: int}"),
         .init(id: "show.start", label: "Slide Show", shortcut: "F5", params: "{from?: index, custom?: name}"),
-        .init(id: "show.presenter", label: "Presenter View", shortcut: nil, params: "{on?: bool}"),
+        .init(
+            id: "show.presenter", label: "Presenter View", shortcut: nil,
+            params: "{on?: bool} → {on, window} (presenter view, with notes, a clock and the next slide, appears in its own separate window beside the show window when the show starts; window is false in the browser build, which draws it inside the page)"
+        ),
+        .init(id: "show.keepCursor", label: "Keep Mouse Cursor Visible", shortcut: nil, params: "{on?: bool}"),
         .init(id: "show.end", label: "End Show", shortcut: nil, params: "{}"),
         .init(id: "animation.preview", label: "Preview Animations", shortcut: nil, params: "{on?: bool, from?: effect index}"),
         .init(id: "app.home", label: "Home", shortcut: nil, params: "{on?}"),

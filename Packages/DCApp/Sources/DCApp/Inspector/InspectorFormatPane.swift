@@ -333,11 +333,11 @@ struct EffectsView: View {
         let scheme = InspectorColors.scheme(ctl.session)
         let fx = sh.effects ?? Effects()
         Section(String(localized: "Shadow", bundle: .module)) {
-            Picker(String(localized: "Shadow", bundle: .module), selection: Binding(get: { "" }, set: { ctl.run("shape.effects", ["shadow": .string($0)]) })) {
-                Text("Choose…", bundle: .module).tag("")
+            // The preset the shadow came from is the one shown (`shadow_preset_id`); choosing one applies it.
+            Picker(String(localized: "Presets", bundle: .module), selection: Binding(get: { InspectorShape.shadowPresetId(fx) }, set: { ctl.run("shape.effects", ["shadow": .string($0)]) })) {
                 ForEach(Self.shadows, id: \.1) { Text($0.0).tag($0.1) }
             }
-            if let sw = fx.outerShadow ?? fx.innerShadow {
+            if let sw = InspectorShape.detailShadow(fx) {
                 ColorButton(label: String(localized: "Color", bundle: .module), color: sw.color.resolve(scheme, nil), scheme: scheme) { c in
                     ctl.run("shape.effects", ["shadowProps": ["color": c.map(InspectorColors.param) ?? .null]])
                 }
@@ -363,6 +363,7 @@ struct EffectsView: View {
             }
         }
         Section(String(localized: "Glow", bundle: .module)) {
+            presets(fx.glow?.radius ?? 0, InspectorShape.glowPresets, none: String(localized: "No glow", bundle: .module)) { ctl.run("shape.effects", InspectorShape.glowPresetParams($0)) }
             fxSlider(String(localized: "Size", bundle: .module), fx.glow?.radius ?? 0, 0 ... 150, " pt", "glowProps", "radius", 1)
             if let g = fx.glow {
                 ColorButton(label: String(localized: "Color", bundle: .module), color: g.color.resolve(scheme, nil), scheme: scheme) { c in
@@ -372,6 +373,7 @@ struct EffectsView: View {
             }
         }
         Section(String(localized: "Soft Edges", bundle: .module)) {
+            presets(fx.softEdge ?? 0, InspectorShape.softEdgePresets, none: String(localized: "No soft edges", bundle: .module)) { ctl.run("shape.effects", ["softEdges": .num($0)]) }
             CommitSlider(label: String(localized: "Size", bundle: .module), value: fx.softEdge ?? 0, range: 0 ... 50, suffix: " pt") { ctl.run("shape.effects", ["softEdges": .num($0)]) }
         }
         ThreeDSection(ctl: ctl, raw: fx.raw3d)
@@ -385,6 +387,17 @@ struct EffectsView: View {
         (String(localized: "Bottom", bundle: .module, comment: "A shadow preset"), "bottom"), (String(localized: "Center", bundle: .module, comment: "A shadow preset"), "center"),
         (String(localized: "Inner", bundle: .module, comment: "A shadow preset"), "inner"), (String(localized: "Perspective", bundle: .module, comment: "A shadow preset"), "perspective"),
     ]
+
+    /// Glow's and Soft Edges' preset sizes (`glow_row`, `soft_edge_row`): the current size is the one shown, or
+    /// itself when no preset has it; choosing one applies it.
+    private func presets(_ current: Double, _ values: [Double], none: String, apply: @escaping (Double) -> Void) -> some View {
+        Picker(String(localized: "Presets", bundle: .module), selection: Binding(get: { current }, set: { apply($0) })) {
+            if !values.contains(current) { Text(verbatim: "\(DialogMath.fmtNum(current)) pt").tag(current) }
+            ForEach(values, id: \.self) { v in
+                if v == 0 { Text(none).tag(v) } else { Text(String(localized: "\(DialogMath.fmtNum(v)) pt", bundle: .module, comment: "A glow or soft-edges size preset")).tag(v) }
+            }
+        }
+    }
 
     /// `fx_slider`: one property of an effect, committed as `{key: {prop: shown × scale}}`.
     private func fxSlider(_ label: String, _ value: Double, _ range: ClosedRange<Double>, _ suffix: String, _ key: String, _ prop: String, _ scale: Double) -> some View {
@@ -452,26 +465,57 @@ struct SizeView: View {
     let ctl: InspectorController
     let sh: DCModel.Shape
     @State private var lockAspect = false
+    /// Scale's 100 %: the size the shape had when the pane first showed it, like the Size and Position dialog.
+    @State private var scaleBase: (key: String, w: Double, h: Double)?
+    /// Position ▸ From: Center (else the top-left corner), kept while the pane is open.
+    @State private var fromCenter = false
 
     var body: some View {
         let x = ctl.box(sh) ?? Xfrm(0, 0, 0, 0)
         let unit = ctl.session.prefs.units
         let ppu = unit.pointsPerUnit
+        // Scale and a centre origin work from the shown shape's size, so they need a single shape.
+        let single = ctl.doc?.selection.shapes.count == 1
+        let key = "\(ctl.doc?.uid ?? 0)/\(sh.id.rawValue)"
+        let base = scaleBase.flatMap { $0.key == key ? ($0.w, $0.h) : nil } ?? (x.w, x.h)
+        let center = single && fromCenter
+        let (dx, dy) = InspectorShape.positionOffset(x, center: center)
         Section(String(localized: "Size", bundle: .module)) {
             NumberField(label: String(localized: "Height", bundle: .module), value: x.h / ppu, step: 0.1, suffix: unit.suffix) { resize("h", $0 * ppu) }
             NumberField(label: String(localized: "Width", bundle: .module), value: x.w / ppu, step: 0.1, suffix: unit.suffix) { resize("w", $0 * ppu) }
             NumberField(label: String(localized: "Rotation", bundle: .module), value: x.rot, step: 1, suffix: "°") { ctl.run("shape.rotate", ["deg": .num($0)]) }
+            Group {
+                NumberField(label: String(localized: "Scale Height", bundle: .module), value: InspectorShape.scalePercent(x.h, base: base.1), step: 1, suffix: "%") { scale("h", base.1, $0) }
+                NumberField(label: String(localized: "Scale Width", bundle: .module), value: InspectorShape.scalePercent(x.w, base: base.0), step: 1, suffix: "%") { scale("w", base.0, $0) }
+            }
+            .disabled(!single)
             Toggle(String(localized: "Lock aspect ratio", bundle: .module), isOn: $lockAspect)
             Button(String(localized: "Size and Position…", bundle: .module)) { ctl.run("shape.sizePosition") }
         }
+        .onAppear { keepScaleBase(key, x) }
+        .onChange(of: key) { keepScaleBase(key, x) }
         Section(String(localized: "Position", bundle: .module)) {
-            NumberField(label: String(localized: "Horizontal", bundle: .module), value: x.x / ppu, step: 0.1, suffix: unit.suffix) { ctl.run("shape.move", ["x": .num($0 * ppu)]) }
-            NumberField(label: String(localized: "Vertical", bundle: .module), value: x.y / ppu, step: 0.1, suffix: unit.suffix) { ctl.run("shape.move", ["y": .num($0 * ppu)]) }
+            Picker(String(localized: "From", bundle: .module, comment: "Position measured from a corner or the centre"), selection: Binding(get: { center }, set: { fromCenter = $0 })) {
+                Text("Top Left Corner", bundle: .module).tag(false)
+                Text("Center", bundle: .module, comment: "Position measured from the shape's centre").tag(true)
+            }
+            .disabled(!single)
+            NumberField(label: String(localized: "Horizontal", bundle: .module), value: (x.x + dx) / ppu, step: 0.1, suffix: unit.suffix) { ctl.run("shape.move", ["x": .num($0 * ppu - dx)]) }
+            NumberField(label: String(localized: "Vertical", bundle: .module), value: (x.y + dy) / ppu, step: 0.1, suffix: unit.suffix) { ctl.run("shape.move", ["y": .num($0 * ppu - dy)]) }
         }
         Section(String(localized: "Alt Text", bundle: .module)) {
             AltTextField(text: sh.descr) { ctl.run("shape.altText", ["text": .string($0)]) }
             Button(String(localized: "Alt Text…", bundle: .module)) { ctl.run("app.dialog", ["id": "altText"]) }
         }
+    }
+
+    /// Remembers the shown shape's size as Scale's 100 % the first time the pane shows it.
+    private func keepScaleBase(_ key: String, _ x: Xfrm) {
+        if scaleBase?.key != key { scaleBase = (key, x.w, x.h) }
+    }
+
+    private func scale(_ key: String, _ base: Double, _ percent: Double) {
+        if let p = InspectorShape.scaleParams(key, base: base, percent: percent, lockAspect: lockAspect) { ctl.run("shape.sizePosition", p) }
     }
 
     private func resize(_ key: String, _ v: Double) {
