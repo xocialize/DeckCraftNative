@@ -341,6 +341,18 @@ import Testing
         #expect([x.x, x.y, x.w, x.h, x.rot] == [40, 50, 288, 144, 0])
     }
 
+    // show/tests.rs: set_up_slide_show_keeps_the_cursor_visible (#1445)
+    @Test func setUpSlideShowKeepsTheCursorVisible() {
+        let h = DialogsHost()
+        for on in [true, false] {
+            h.run("app.dialog", ["id": "setupShow"])
+            #expect(h.dialog?.value("kc") == (on ? "0" : "1"), "seeded from the setting")
+            h.press("ok", ["kc": on ? "1" : "0"])
+            #expect(h.dialog == nil)
+            #expect(h.model.ui.showKeepCursor == on)
+        }
+    }
+
     // MARK: Header and Footer (dialogs.rs header_footer_apply_keeps_an_existing_date_format)
 
     @Test func headerFooterApplyKeepsAnExistingDateFormat() throws {

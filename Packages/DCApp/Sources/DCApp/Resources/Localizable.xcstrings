@@ -154,7 +154,7 @@
       }
     },
     "%@ pt" : {
-      "comment" : "A pen weight in points",
+      "comment" : "A glow or soft-edges size preset\nA pen weight in points",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1214,7 +1214,7 @@
       }
     },
     "Center" : {
-      "comment" : "A shadow preset",
+      "comment" : "A shadow preset\nPosition measured from the shape's centre",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2782,6 +2782,17 @@
         }
       }
     },
+    "From" : {
+      "comment" : "Position measured from a corner or the centre",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        }
+      }
+    },
     "Full" : {
       "comment" : "A reflection preset",
       "localizations" : {
@@ -3980,6 +3991,16 @@
         }
       }
     },
+    "No glow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No glow"
+          }
+        }
+      }
+    },
     "No line" : {
       "localizations" : {
         "en" : {
@@ -4047,6 +4068,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No slides."
+          }
+        }
+      }
+    },
+    "No soft edges" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No soft edges"
           }
         }
       }
@@ -5521,6 +5552,26 @@
         }
       }
     },
+    "Scale Height" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scale Height"
+          }
+        }
+      }
+    },
+    "Scale Width" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scale Width"
+          }
+        }
+      }
+    },
     "Scale X" : {
       "localizations" : {
         "en" : {
@@ -6739,6 +6790,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Top Border"
+          }
+        }
+      }
+    },
+    "Top Left Corner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top Left Corner"
           }
         }
       }

@@ -120,6 +120,7 @@ public enum CommandHelp {
         "show.fromStart": "Play the slide show from the first slide.",
         "show.fromCurrent": "Play the slide show from the current slide.",
         "show.presenter": "Use Presenter View, with notes and the next slide on your own screen.",
+        "show.keepCursor": "Keep the pointer showing during a slide show, even while it stays still.",
         "show.setup": "Choose how the show plays: its timings, narrations and media controls.",
         "app.dialog:customShow": "Make a show from a chosen set of slides.",
         "app.dialog:setupShow": "Choose the kind of show, the slides it plays and how it advances.",

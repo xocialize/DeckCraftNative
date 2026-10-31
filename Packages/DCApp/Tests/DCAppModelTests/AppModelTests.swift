@@ -41,6 +41,27 @@ import Testing
         #expect(m.ui.zoom == nil)
     }
 
+    // presenter_tests.rs: show_presenter_answers_on_and_window (JJ3)
+    @Test func showPresenterAnswersOnAndWindow() throws {
+        let m = AppModel(session: Session.withNew())
+        #expect(try m.run("show.presenter", ["on": true]).get() == ["on": true, "window": true])
+        #expect(try m.run("show.presenter").get()["on"] == false, "no `on` toggles")
+        #expect(UICommands.find("show.presenter")?.params.contains("separate window") == true)
+    }
+
+    // show/tests.rs: keep_cursor_visible_leaves_a_still_cursor_over_a_link (#1445): the setting is the app's, kept
+    // in ui.json for the next show.
+    @Test func keepCursorIsAUiSettingThatPersists() throws {
+        let m = AppModel(session: Session.withNew())
+        #expect(!m.ui.showKeepCursor)
+        m.run("show.keepCursor", ["on": true])
+        #expect(m.ui.showKeepCursor)
+        let back = try JSONDecoder().decode(UiState.self, from: try JSONEncoder().encode(m.ui))
+        #expect(back.showKeepCursor)
+        m.run("show.keepCursor")
+        #expect(!m.ui.showKeepCursor, "no `on` toggles")
+    }
+
     @Test func guidesAddTheCentreGuides() {
         let m = AppModel(session: Session.withNew())
         m.run("view.guides", ["on": true])

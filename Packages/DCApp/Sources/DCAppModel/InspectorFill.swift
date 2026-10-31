@@ -151,14 +151,16 @@ public enum InspectorFill {
     }
 
     /// `gradient_json`: the command parameter for `g` (`shape.fill {gradient}`, `design.background {gradient}`).
+    /// The flip mode rides along, so editing a gradient keeps it.
     public static func gradientJSON(_ g: Gradient) -> JSON {
         let stops: JSON = .array(g.stops.map { [.num($0.pos), InspectorColors.param($0.color)] })
+        let flip: JSON = g.flip.map { .string($0.xml) } ?? .null
         switch g.shape {
         case .linear(let angle, _):
-            return ["stops": stops, "kind": "linear", "angle": .num(angle), "rotateWithShape": .bool(g.rotateWithShape)]
+            return ["stops": stops, "kind": "linear", "angle": .num(angle), "rotateWithShape": .bool(g.rotateWithShape), "flip": flip]
         case .path(let path, let focus):
             let kind = path == "rect" ? "rectangular" : path == "shape" ? "path" : "radial"
-            return ["stops": stops, "kind": .string(kind), "focus": .array(focus.map { .num($0) }), "rotateWithShape": .bool(g.rotateWithShape)]
+            return ["stops": stops, "kind": .string(kind), "focus": .array(focus.map { .num($0) }), "rotateWithShape": .bool(g.rotateWithShape), "flip": flip]
         }
     }
 

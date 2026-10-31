@@ -4597,6 +4597,18 @@
         }
       }
     },
+    "help.show.keepCursor" : {
+      "comment" : "What command show.keepCursor does, in one line: the second line of its tooltip and its VoiceOver hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the pointer showing during a slide show, even while it stays still."
+          }
+        }
+      }
+    },
     "help.show.presenter" : {
       "comment" : "What command show.presenter does, in one line: the second line of its tooltip and its VoiceOver hint",
       "extractionState" : "manual",
@@ -8109,6 +8121,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play from Start"
+          }
+        }
+      }
+    },
+    "show.keepCursor" : {
+      "comment" : "The label of the app's command show.keepCursor",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep Mouse Cursor Visible"
           }
         }
       }

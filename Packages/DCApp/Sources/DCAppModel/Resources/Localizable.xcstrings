@@ -4203,6 +4203,16 @@
         }
       }
     },
+    "Keep mouse cursor visible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep mouse cursor visible"
+          }
+        }
+      }
+    },
     "Keep source formatting" : {
       "localizations" : {
         "en" : {

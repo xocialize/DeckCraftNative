@@ -398,7 +398,7 @@ public final class ShowCoordinator {
     public func cursor(_ p: CGPoint?, _ full: CGRect, _ now: Double) -> ShowCursorKind {
         guard let s = show else { return .arrow }
         if s.pen || s.zoomArm || s.grid { return .crosshair }
-        if s.laser || (!s.pointerAwake(now) && !s.reading) { return .hidden }
+        if s.laser || s.hidesIdleCursor(now, keep: model.ui.showKeepCursor) { return .hidden }
         if let p, pointing(p, full, now) { return .pointingHand }
         return .arrow
     }

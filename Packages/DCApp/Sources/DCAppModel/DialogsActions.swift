@@ -184,6 +184,7 @@ extension DialogController {
                 "type": .string(d.value("type").isEmpty ? "speaker" : d.value("type")), "loop": .bool(d.flag("loop")), "noNarration": .bool(d.flag("nn")),
                 "noAnimation": .bool(d.flag("na")), "useTimings": .bool(d.flag("ut")), "custom": .string(d.value("custom")),
             ])
+            run("show.keepCursor", ["on": .bool(d.flag("kc"))])
             return true
         case "zoom":
             guard id == "ok" else { return nil }

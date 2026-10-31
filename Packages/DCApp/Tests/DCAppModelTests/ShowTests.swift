@@ -66,6 +66,108 @@ import Testing
         #expect(c.cursor(CGPoint(x: 500, y: 350), full, 13) == .hidden, "still for 3 s: hidden")
     }
 
+    /// Asks for slide `n`'s preview of `doc` until it lands (at most 2 s).
+    static func landed(_ p: inout ShowNextPreview, _ doc: DocRef, _ n: Int) -> RenderImage? {
+        for _ in 0 ..< 400 {
+            if let img = p.image(doc, n, width: 96) { return img }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return nil
+    }
+
+    // show/tests.rs: the_presenter_next_preview_arrives_without_blocking_the_frame (#964)
+    @Test func thePresenterNextPreviewArrivesWithoutBlockingTheFrame() throws {
+        let s = Self.session(1)
+        let doc = try #require(s.activeDoc?.docRef)
+        var p = ShowNextPreview()
+        #expect(p.image(doc, 1, width: 96) == nil, "the first ask leaves the preview pending")
+        #expect(p.job != nil && p.spawns == 1)
+        #expect(Self.landed(&p, doc, 1) != nil)
+        #expect(p.job == nil)
+        #expect(p.spawns == 1, "the pending render landed; none started over")
+        #expect(p.shown?.slide == 1)
+    }
+
+    // show/tests.rs: paging_quickly_renders_one_preview_at_a_time_and_lands_on_the_newest (#964)
+    @Test func pagingQuicklyRendersOnePreviewAtATimeAndLandsOnTheNewest() throws {
+        let s = Self.session(7)
+        let doc = try #require(s.activeDoc?.docRef)
+        var p = ShowNextPreview()
+        for n in 1 ... 6 { _ = p.image(doc, n, width: 96) }
+        #expect(p.spawns == 1, "no render starts while one is pending")
+        #expect(Self.landed(&p, doc, 6) != nil, "the newest preview lands")
+        #expect(p.shown?.slide == 6)
+        #expect(p.spawns <= 2, "\(p.spawns) renders")
+    }
+
+    // show/tests.rs: a_preview_of_an_edited_presentation_is_rendered_again (#964)
+    @Test func aPreviewOfAnEditedPresentationIsRenderedAgain() throws {
+        let s = Self.session(1)
+        let doc = try #require(s.activeDoc?.docRef)
+        var p = ShowNextPreview()
+        #expect(Self.landed(&p, doc, 1) != nil)
+        let edited = DocRef(doc.value)
+        #expect(p.image(edited, 1, width: 96) == nil, "a preview of the presentation before the edit isn't shown")
+        #expect(Self.landed(&p, edited, 1) != nil)
+        #expect(p.shown?.doc === edited)
+        #expect(p.spawns == 2)
+    }
+
+    // show/tests.rs: keep_cursor_visible_leaves_a_still_cursor_over_a_link (#1445)
+    @Test func keepCursorVisibleLeavesAStillCursorOverALink() throws {
+        let s = Self.session(1)
+        _ = try s.execute("slide.go", ["index": 0])
+        let size = Self.doc(s).slideSize
+        let r = try s.execute("shape.insert", ["preset": "rect", "rect": [0, 0, .double(size.width), .double(size.height)]])
+        _ = try s.execute("insert.hyperlink", ["slide": 1, "ids": [r["id"] ?? .null]])
+        let c = Self.running(s)
+        c.model.run("show.keepCursor", ["on": true])
+        let full = CGRect(x: 0, y: 0, width: 1000, height: 700)
+        c.show?.lastMove = 10
+        #expect(c.cursor(CGPoint(x: 500, y: 350), full, 13) == .pointingHand, "still for 3 s: kept")
+        _ = c.click(CGPoint(x: 500, y: 350), full, 13)
+        #expect(c.show?.state.slide == 1, "the link still follows")
+        #expect(c.model.ui.showKeepCursor, "the setting is kept for the next show")
+    }
+
+    // show/tests.rs: the_idle_cursor_hides_only_when_asked (#1445)
+    @Test func theIdleCursorHidesOnlyWhenAsked() {
+        let show = ShowController(Self.doc(Self.session(0)), from: 0, reading: false, presenter: false)
+        show.lastMove = 10
+        #expect(!show.hidesIdleCursor(12, keep: false), "moved 2 s ago")
+        #expect(show.hidesIdleCursor(13, keep: false), "still for 3 s")
+        #expect(!show.hidesIdleCursor(13, keep: true), "kept visible")
+        show.reading = true
+        #expect(!show.hidesIdleCursor(13, keep: false), "Reading View never hides it")
+    }
+
+    // show/media.rs hit_tests (dc-show-click-targets, DC-1521): a click target follows its shape's own animation.
+    @Test func motionPathMovesTheHitBox() {
+        let r = Rect(10, 10, 30, 30)
+        func inside(_ p: (Double, Double)?) -> Bool { p.map { (10 ... 30).contains($0.0) && (10 ... 30).contains($0.1) } ?? false }
+        let a = AnimState(offsetX: 50, scaleX: 2)
+        #expect(inside(ShowController.hitPoint((65, 20), r, a)))
+        #expect(!inside(ShowController.hitPoint((15, 20), r, a)), "the place it left is not a target")
+        // Scale and rotation: the centre is (20, 20); local (25, 25) scales and turns to (15, 30).
+        let turned = ShowController.hitPoint((15, 30), r, AnimState(scaleX: 2, scaleY: 1, rotate: 90))
+        #expect(turned.map { abs($0.0 - 25) < 0.1 && abs($0.1 - 25) < 0.1 } == true)
+        // A shape squashed flat is no target.
+        #expect(ShowController.hitPoint((20, 20), r, AnimState(scaleX: 0)) == nil)
+    }
+
+    // show/media.rs: parent_animation_does_not_move_child_hit_box (DC-1521): a group's animation is not its child's.
+    @Test func aGroupsAnimationDoesNotMoveItsChildsHitBox() throws {
+        let s = Self.session(1, layout: "blank")
+        _ = try s.execute("slide.go", ["index": 1])
+        let a = try s.execute("shape.insert", ["preset": "rect", "rect": [100, 100, 100, 100]])
+        let b = try s.execute("shape.insert", ["preset": "rect", "rect": [300, 100, 100, 100]])
+        _ = try s.execute("edit.select", ["ids": [a["id"] ?? .null, b["id"] ?? .null]])
+        _ = try s.execute("arrange.group")
+        let c = Self.running(s, from: 1)
+        let under = c.show.map { $0.under(Self.doc(s), 150, 150, 10) }
+        #expect(under?.shapes.contains { $0.id == ShapeId(UInt32(a["id"]?.asU64 ?? 0)) && $0.underPointer } == true)
+    }
+
     // show.rs: presenter_all_slides_does_not_cover_the_audience_screen (#1130)
     @Test func presenterAllSlidesDoesNotCoverTheAudienceScreen() throws {
         let c = Self.running(Self.session(1), presenter: true)

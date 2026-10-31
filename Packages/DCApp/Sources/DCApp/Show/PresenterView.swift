@@ -241,7 +241,10 @@ struct PresenterView: View {
             } else {
                 ZStack {
                     Rectangle().fill(Tokens.Color.fillElevated)
-                    Text("End of slide show", bundle: .module).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+                    // A next slide whose preview is still on its way is not the end (#964).
+                    if !model.hasNext {
+                        Text("End of slide show", bundle: .module).font(Tokens.Font.caption).foregroundStyle(Tokens.Color.secondaryLabel)
+                    }
                 }
             }
         }
