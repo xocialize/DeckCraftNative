@@ -311,8 +311,11 @@ func shapePara(_ ctx: Resolve.Ctx, _ shape: Shape, _ body: TextBody, _ pi: Int, 
         // A symbol font that is installed draws its own glyph, found at U+F000 + the character code as such
         // fonts map them; otherwise common symbol bullets are mapped to Unicode look-alikes.
         let ch = symbolFontChar(st.face, char, props.bulletFont).map { String($0) } ?? mapSymbolBullet(char, props.bulletFont)
-        if !st.face.covers(ch.unicodeScalars.first ?? "•") { st.face = db.face("Inter", "Regular") }
-        bullet = (ch, st)
+        bulletFace(db, &st, ch)
+        // A face the cascade still picks may lack the bullet: draw the dot rather than .notdef.
+        let drawn = Fallback.coversCluster(st.face, Array(ch.unicodeScalars)) ? ch : "•"
+        bulletFace(db, &st, drawn)
+        bullet = (drawn, st)
     case .autoNum(let scheme, let startAt)?:
         var rp = lead
         if let c = props.bulletColor { rp.fill = .solid(color: c) }
@@ -399,8 +402,9 @@ func shapeCells(
         guard let st = styles.at(si) else { continue }
         let (sc, slot) = scripts.at(a) ?? (nil, .latin)
         // Spaces, digits and punctuation stay in the face of the text before them when it can draw them,
-        // so a phrase isn't cut into items at every space. Emoji, and pictographs asked to look like text
-        // (U+FE0E), pick their own face.
+        // so a phrase isn't cut into items at every space; not in a symbol font (`a:sym`), which PowerPoint
+        // uses for the symbol codes alone (Wingdings' space is about four times a text font's). Emoji, and
+        // pictographs asked to look like text (U+FE0E), pick their own face.
         let neutral = cluster.allSatisfy { Script.of($0) == nil } && !Fallback.isEmojiCluster(cluster) && !cluster.contains("\u{FE0E}")
         // A symbol-font character (U+F0xx) with an `a:sym` font draws in that font when it's there.
         var symFace: FontFace?
@@ -411,7 +415,7 @@ func shapeCells(
         let face: FontFace
         if let symFace {
             face = symFace
-        } else if let p = prev, neutral, !p.isColor, Fallback.coversCluster(p, cluster), a > 0, charStyle.at(a - 1) == si {
+        } else if let p = prev, neutral, !p.isColor, !isSymbolFont(p.family), Fallback.coversCluster(p, cluster), a > 0, charStyle.at(a - 1) == si {
             face = p
         } else {
             let key = ChainKey(style: si, slot: slot, script: sc)

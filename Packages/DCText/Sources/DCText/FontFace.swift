@@ -54,7 +54,7 @@ public final class FontFace: @unchecked Sendable, CustomStringConvertible {
         id = FontFace.nextID.add(1, ordering: .relaxed).oldValue
         family = info.family
         self.style = style ?? info.style
-        legacy = coords.isEmpty ? info.legacy : nil
+        legacy = coords.isEmpty ? info.legacy : instanceLegacyNames(info.family, style ?? info.style)
         let axis = { (tag: String) in coords.first { $0.0 == tag }?.1 }
         weight = axis("wght") ?? (coords.isEmpty ? info.weight : styleWeight(style ?? info.style))
         if let ital = axis("ital") {

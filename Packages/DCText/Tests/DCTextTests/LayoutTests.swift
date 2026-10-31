@@ -116,6 +116,26 @@ import Testing
         #expect(mapSymbolBullet("e\u{301}x", nil) == "e\u{301}")
     }
 
+    @Test func bulletInAnUnavailableUnicodeSymbolFontKeepsItsCharacter() throws {
+        // Google Slides bullets in "Noto Sans Symbols" (not installed) draw ❑ ❖, not a generic dot (#1347).
+        for c in ["\u{2751}", "\u{2756}", "\u{F0A7}"] {
+            #expect(mapSymbolBullet(c, "Noto Sans Symbols") == c)
+        }
+        // The legacy symbol fonts still map their codes.
+        #expect(mapSymbolBullet("q", "Wingdings") == "\u{2751}")
+        var f = setup("One", 600, 300)
+        f.body.paragraphs[0].props.bullet = .char(char: "\u{2751}")
+        f.body.paragraphs[0].props.bulletFont = "Noto Sans Symbols"
+        let l = f.lay(600, 300)
+        let bullet = try #require(l.runs.first { $0.chars == (0, 0) })
+        try #require(bullet.glyphs.count == 1)
+        // The bullet's face draws ❑ when it has it, else the dot: never .notdef, never another glyph.
+        let square = bullet.face.glyph(for: "\u{2751}")
+        let expected = square != 0 ? square : bullet.face.glyph(for: "\u{2022}")
+        #expect(expected != 0, "the selected face must draw ❑ or the fallback dot")
+        #expect(bullet.glyphs[0].gid == expected, "draw the requested bullet when covered, else the dot")
+    }
+
     @Test func shrinkOnOverflow() {
         let text = (0 ..< 30).map { "Line number \($0)" }.joined(separator: "\n")
         let l = setup(text, 600, 200).lay(600, 200)
@@ -555,5 +575,28 @@ import Testing
         let l = f.lay(400, 400)
         try #require(l.lines.count == 3)
         #expect(near(l.lines[1].bottom - l.lines[1].top, h10, 0.5))
+    }
+
+    @Test func aParagraphWithItsOwnStartAtRestartsTheCountThere() {
+        // PowerPoint's "Start at" on a paragraph begins a new run of numbers at that value, so setting start k on
+        // paragraph k reads 1, 2, 3, not 1, 3, 5. The bullets' glyph ids are compared with those of the expected labels.
+        func check(_ starts: [UInt32], _ expect: [UInt32]) {
+            var f = setup("a\nb\nc\nd", 600, 300)
+            for (i, start) in zip(f.body.paragraphs.indices, starts) {
+                f.body.paragraphs[i].props.bullet = .autoNum(scheme: "arabicPeriod", startAt: start)
+            }
+            let l = f.lay(600, 300)
+            let bullets = l.runs.filter { $0.cells.isEmpty }
+            #expect(bullets.count == expect.count)
+            for (b, n) in zip(bullets, expect) {
+                let want = measureStr(b.face, b.size, "\(n).").glyphs.map(\.gid)
+                #expect(b.glyphs.map(\.gid) == want, "expected \(n). for starts \(starts)")
+            }
+        }
+        check([1, 2, 3, 4], [1, 2, 3, 4])
+        // The same start on every paragraph still counts on from it (a whole box numbered at once).
+        check([3, 3, 3, 3], [3, 4, 5, 6])
+        // A later paragraph with a new start begins a fresh run.
+        check([1, 1, 7, 7], [1, 2, 7, 8])
     }
 }

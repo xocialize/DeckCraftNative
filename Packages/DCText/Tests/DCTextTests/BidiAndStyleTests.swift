@@ -324,6 +324,37 @@ let mixed = "سنة 2024 (Retrait) فقط"
         #expect(fams.allSatisfy { $0.start == 1 || $0.family != "symbol" }, "\(fams)")
     }
 
+    @Test func aSpaceAfterASymbolFontCharacterKeepsTheRunsFont() throws {
+        // PowerPoint stores "→ Only" typed in a Wingdings run as U+F0E0, a space and the words, all with
+        // `<a:sym typeface="Wingdings"/>`: only the symbol code draws in Wingdings. The space stayed in the arrow's
+        // face, and Wingdings' space is about four times as wide. Skipped without Wingdings.
+        guard db.hasFamily("Wingdings"), coversSymbol(db.face("Wingdings", "Regular"), "\u{F0E0}") else { return }
+        func laid(_ split: Bool) -> TextLayout {
+            var f = setup("\u{F0E0} Only", 900, 300)
+            f.body.paragraphs[0].props.bullet = .none_
+            f.body.paragraphs[0].runs[0].props.font = "Arial"
+            f.body.paragraphs[0].runs[0].props.fontSym = "Wingdings"
+            if split {
+                // The arrow alone carries the symbol font.
+                var rest = f.body.paragraphs[0].runs[0]
+                rest.text = " Only"
+                rest.props.fontSym = nil
+                f.body.paragraphs[0].runs[0].text = "\u{F0E0}"
+                f.body.paragraphs[0].runs.append(rest)
+            }
+            return f.lay(900, 300)
+        }
+        let whole = laid(false)
+        let fams = whole.runs.map { (family: $0.face.family.lowercased(), chars: $0.chars) }
+        #expect(fams.contains { $0.family == "wingdings" && $0.chars.start == 0 }, "the arrow: \(fams)")
+        func inWingdings(_ i: Int) -> Bool { fams.contains { ($0.chars.start ..< $0.chars.end).contains(i) && $0.family == "wingdings" } }
+        #expect(!inWingdings(1) && !inWingdings(2), "the space and words: \(fams)")
+        // "Only" starts where it does when the arrow alone is in Wingdings.
+        func only(_ l: TextLayout) -> Double? { l.lines.first.flatMap { $0.caretX.count > 2 ? $0.caretX[2] : nil } }
+        let (a, b) = (try #require(only(whole)), try #require(only(laid(true))))
+        #expect(near(a, b), "\(a) vs \(b)")
+    }
+
     @Test func smallCapitalsDrawSmallerThanTheCapitalsBesideThem() {
         var f = setup("HxHx", 2000, 300)
         f.body.paragraphs[0].props.bullet = .none_

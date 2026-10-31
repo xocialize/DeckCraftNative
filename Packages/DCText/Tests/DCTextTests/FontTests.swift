@@ -4,6 +4,7 @@
 // crates/text/src/{bidi,datetime}.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 // Font fixtures are read from the deckcraft checkout beside this repository; tests that need them return
 // early without it.
+import CoreText
 import DCCore
 import DCModel
 import Foundation
@@ -121,6 +122,63 @@ func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
         }
         #expect(iso.documentFace("DeckCraft Legacy Semibold", "Regular").family == "DeckCraft Legacy", "installed, so not Calibri")
         #expect(iso.face("DeckCraft Legacy", "Semibold").style == "Semibold")
+    }
+
+    @Test func variableFontInstancesAnswerToTheirWindowsNames() {
+        // Windows lists a variable font's named instances other than Regular, Italic, Bold and Bold Italic as families
+        // of their own, and documents name them that way ("Montserrat ExtraBold"). The bundled Montserrat is variable,
+        // so these names found no face and drew in Inter Regular, even with the family's static files installed.
+        let bundled = FontDB(craftFontsDir: FontDB.defaultCraftFontsDir(), systemFonts: false)
+        guard bundled.isLoaded("Montserrat") else { return } // no craft-fonts
+        for (name, style, weight, italic) in [
+            ("Montserrat ExtraBold", "Regular", 800.0, false), ("Montserrat SemiBold", "Regular", 600, false),
+            ("Montserrat Medium", "Regular", 500, false), ("Montserrat Medium", "Italic", 500, true), ("Montserrat Thin", "Bold", 100, false),
+        ] {
+            #expect(bundled.hasFamily(name), "\(name)")
+            let f = bundled.face(name, style)
+            #expect(f.family == "Montserrat" && f.weight == weight && f.italic == italic, "\(name) \(style): \(f.family) \(f.weight) \(f.italic)")
+            #expect(bundled.documentFace(name, style).family == "Montserrat", "\(name): installed, so not Calibri")
+        }
+        // Regular and Bold are the family itself, not families of their own.
+        #expect(!bundled.hasFamily("Montserrat Regular"))
+        #expect(!bundled.hasFamily("Montserrat Bold"))
+        #expect(bundled.face("Montserrat", "Bold").weight == 700)
+    }
+
+    @Test func duplicateCollectionOffsetsDoNotConsumeFaceCap() {
+        let cap = FontDB.maxCollectionFaces
+        let entries = [(index: Int, offset: UInt32)](repeating: (0, 7), count: cap) + (0 ..< cap).map { (index: $0 + cap, offset: UInt32($0 + 8)) }
+        let faces = FontDB.distinctFaceIndices(entries)
+        #expect(faces.count == cap)
+        #expect(faces.first == 0)
+        #expect(faces.dropFirst().first == cap)
+        #expect(faces.last == cap * 2 - 2)
+    }
+
+    @Test func namedInstanceLimitIsBoundedPerFace() {
+        let cap = FontDB.maxNamedInstancesPerFace
+        #expect(FontDB.cappedNamedInstanceCount(0) == 0)
+        #expect(FontDB.cappedNamedInstanceCount(cap) == cap)
+        #expect(FontDB.cappedNamedInstanceCount(cap + 1) == cap)
+    }
+
+    /// Not in deckcraft: CoreText already drops collection entries that share a table directory, so the faces picked
+    /// from its descriptors must be the distinct ones either way. A system collection with every other entry pointed
+    /// at the one before it gives half its faces.
+    @Test func aCollectionsSharedEntriesGiveOneFace() throws {
+        guard let data = try? Data(contentsOf: URL(filePath: "/System/Library/Fonts/AppleSDGothicNeo.ttc")) else { return }
+        var bytes = [UInt8](data)
+        let count = Int(bytes[8]) << 24 | Int(bytes[9]) << 16 | Int(bytes[10]) << 8 | Int(bytes[11])
+        try #require(count >= 2 && bytes.count > 12 + count * 4)
+        func picked(_ d: Data) -> Int {
+            let descs = (CTFontManagerCreateFontDescriptorsFromData(d as CFData) as? [CTFontDescriptor]) ?? []
+            return FontDB.collectionFaces(descs, d).count
+        }
+        #expect(picked(data) == count)
+        for i in stride(from: 1, to: count, by: 2) {
+            for k in 0 ..< 4 { bytes[12 + 4 * i + k] = bytes[12 + 4 * (i - 1) + k] }
+        }
+        #expect(picked(Data(bytes)) == (count + 1) / 2)
     }
 
     /// `documentFace` keeps its answers, and the fallback order is kept too; adding a font clears both, so a family
@@ -378,7 +436,31 @@ func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
         #expect(DateFields.fieldText("datetime10", "fr-FR", fri) == "20:05")
         #expect(DateFields.fieldText("datetime2", "de-DE", fri) == nil)
         #expect(DateFields.fieldText("datetime12", "fr-FR", fri) == nil)
-        #expect(DateFields.fieldText("datetime4", "en-GB", fri) == "October 9, 2026")
+        #expect(DateFields.fieldText("datetime4", "en-GB", fri) == "9 October 2026")
+        #expect(DateFields.fieldText("datetime2", "en-GB", fri) == "Friday, 9 October 2026")
+        #expect(DateFields.fieldText("datetime4", "en-AU", fri) == "9 October 2026")
+        #expect(DateFields.fieldText("datetime4", "en-US", fri) == "October 9, 2026")
+    }
+
+    /// The long English dates as PowerPoint on Windows shows them on Tuesday 27 October 2026, read per run
+    /// language (datetime2, datetime3, datetime4).
+    @Test func longEnglishDatesFollowEachLocale() {
+        let tue = DateTime(2026, 10, 27, 9, 0, 0)
+        let rows = [
+            ("en-US", "Tuesday, October 27, 2026", "27 October 2026", "October 27, 2026"),
+            ("en-GB", "Tuesday, 27 October 2026", "27 October, 2026", "27 October 2026"),
+            ("en-AU", "Tuesday, 27 October 2026", "27 October, 2026", "27 October 2026"),
+            ("en-NZ", "Tuesday, 27 October 2026", "27 October 2026", "27 October 2026"),
+            ("en-IE", "Tuesday 27 October 2026", "27 October 2026", "27 October 2026"),
+            ("en-IN", "Tuesday, 27 October 2026", "27 October 2026", "27 October 2026"),
+            ("en-CA", "Tuesday, October 27, 2026", "27 October 2026", "October 27, 2026"),
+        ]
+        for (lang, d2, d3, d4) in rows {
+            #expect(DateFields.fieldText("datetime2", lang, tue) == d2, "\(lang)")
+            #expect(DateFields.fieldText("datetime3", lang, tue) == d3, "\(lang)")
+            #expect(DateFields.fieldText("datetime4", lang, tue) == d4, "\(lang)")
+        }
+        #expect(DateFields.fieldText("datetime2", "en-ZA", tue) == "Tuesday, 27 October 2026")
     }
 
     @Test func unknownTypesAndImpossibleDatesGiveNothing() {

@@ -123,7 +123,9 @@ public func mapSymbolBullet(_ c: String, _ font: String?) -> String {
         }
         return String(m)
     }
-    if f.contains("wingdings") || f.contains("symbol") || (0xF000 ... 0xF0FF).contains(first.value) {
+    // Only the legacy symbol fonts: "Noto Sans Symbols" and the like are Unicode fonts whose characters (❑ ❖)
+    // are drawn as they are. Private-use codes are mapped only when no font is named.
+    if f.contains("wingdings") || f == "symbol" || (font == nil && (0xF000 ... 0xF0FF).contains(first.value)) {
         let code = first.value & 0xFF
         // Wingdings 2 and 3 put different shapes at the same codes.
         if f.hasPrefix("wingdings 2") {

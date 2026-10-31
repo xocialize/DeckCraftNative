@@ -108,6 +108,7 @@ public enum TextLayoutEngine {
         out.rotation = rotation
         var y = 0.0
         var numbering = [UInt32](repeating: 0, count: 9)
+        var runStart = [UInt32](repeating: 0, count: 9)
         var allLines: [PendingLine] = []
         var prevAfter = 0.0
         // How far the last line's full pitch reaches past the text (exact spacing; see below).
@@ -118,16 +119,23 @@ public enum TextLayoutEngine {
         for (pi, para) in body.paragraphs.enumerated() {
             let lvl = Int(Swift.min(para.level, 8))
             let pp = Resolve.para(ctx, shape, para)
-            let autoNum: Bool = if case .autoNum? = pp.bullet { true } else { false }
+            let startAt: UInt32? = if case .autoNum(_, let start)? = pp.bullet { start } else { nil }
             let number: UInt32?
-            if autoNum && !para.isEmpty {
+            // `runStart` holds the start each level's current run of numbers began with: a paragraph that
+            // changes it starts a new run (PowerPoint's "Start at").
+            if let startAt, !para.isEmpty {
+                if runStart[lvl] != startAt {
+                    runStart[lvl] = startAt
+                    numbering[lvl] = 0
+                }
                 numbering[lvl] &+= 1
                 for d in (lvl + 1) ..< 9 { numbering[d] = 0 }
                 number = numbering[lvl]
-            } else if autoNum {
-                // Preview the next number without consuming it: empty paragraphs do not advance numbering.
+            } else if let startAt {
+                // Preview the next number without consuming it: empty paragraphs do not advance numbering. A
+                // paragraph with its own start would begin a new run, so it previews that run's first number.
                 let (s, o) = numbering[lvl].addingReportingOverflow(1)
-                number = o ? .max : s
+                number = runStart[lvl] != startAt ? 1 : (o ? .max : s)
             } else {
                 if !para.isEmpty { for d in lvl ..< 9 { numbering[d] = 0 } }
                 number = nil
