@@ -560,6 +560,20 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
       - PowerPoint's own save of a pictures deck imports as the original;
       - the crash corpus, with every slide rendered.
     - **Still to come:** the slide show (P5) and hardening (P6). `.ppt` support isn't released yet.
+  - **P5 (2026-10-30): the `.ppt` slide show.**
+    - **What comes over:**
+      - transitions, by effect, direction and speed, with the slide's advance, sound and hidden state;
+      - animations from PowerPoint 2002's timing tree, read by the same reader as a `.pptx`'s `p:timing`;
+      - the `p:timing` PowerPoint 2007 embedded, where a slide has no tree;
+      - PowerPoint 97's per-shape effects, mapped to the nearest effect. A hash tells when PowerPoint 97 changed
+        them after a newer version saved the tree; then they win, as in PowerPoint.
+    - **Not in a `.ppt`:** PowerPoint 2010's transitions. PowerPoint saves them as Fade.
+    - **Checked:**
+      - PowerPoint's and LibreOffice's saves of a motion deck come back as the original, apart from how LibreOffice
+        writes some transitions and builds;
+      - PowerPoint's saves of five more decks;
+      - the crash corpus, with every slide rendered.
+    - **Still to come:** hardening (P6). `.ppt` support isn't released yet.
 
 ## Pin moves
 

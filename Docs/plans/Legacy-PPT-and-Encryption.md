@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P4 are done** (§5, the milestone notes); P5 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P5 are done** (§5, the milestone notes); P6 is next. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,43 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P5 notes (2026-10-30)
+
+- **Transitions** (`SlideShow.swift`): each slide's SlideShowSlideInfoAtom.
+  - Its effect and direction map to our transition and option. Its three speeds read as a `.pptx` that gives only
+    `spd` does.
+  - It also brings the advance (on click, after a time), a sound, "stop previous sound", and the hidden flag.
+  - Cut not through black counts as no transition, as the spec says. PowerPoint writes it for a hidden slide that
+    has none.
+  - PowerPoint 2010's transitions can't be stored in a `.ppt`; PowerPoint saves them as Fade.
+- **Animations** come from the newest place that is current:
+  1. **PowerPoint 2002's timing tree.** It is `p:timing` in records, so it is turned into that element and read by
+     DCPPTX's timing reader. A `.ppt` and a `.pptx` map their effects the same way.
+  2. **The `p:timing` PowerPoint 2007 embedded,** but only when there is no tree. This changes the plan's order,
+     which put it first:
+     - PowerPoint 16 writes none;
+     - a later PowerPoint 2002 or 2003 save keeps an old one unchanged, while the tree is always current;
+     - three files in the crash corpus have one.
+  3. **PowerPoint 97's per-shape effects,** mapped to the nearest entrance effect. A hash in the tree tells when
+     PowerPoint 97 or 2000 changed them after a newer version saved; then they win, as in PowerPoint. The spec's
+     pseudocode hashes every shape, but PowerPoint hashes only those with an effect; that was measured on its own
+     file.
+- **The crash corpus has animations in many files:**
+  - 114 of 206 files have a timing tree;
+  - 31 have only PowerPoint 97's effects;
+  - 87 have transitions.
+- **The motion deck** (`Tools/legacy/motion-deck.py`, §6.1) is the oracle:
+  - **PowerPoint's save** comes back as the original, transition by transition and animation by animation.
+  - **LibreOffice's save** comes back the same, apart from what LibreOffice writes differently (PORT-NOTES lists
+    each one).
+  - **PowerPoint's saves of five more decks** also come back with their slide shows.
+- **Checked:**
+  - **`SlideShowTests`:** the motion deck from both producers, and PowerPoint's other decks. They also cover
+    PowerPoint 97's effects, the hash against PowerPoint's own, an embedded timing, and hostile records.
+  - **An engine test:** the slide show opens, shows in the Animation Pane, and saves as `.pptx`.
+  - **The crash corpus** with every slide rendered: 205 files open and render and 2 fail cleanly, with no crashes or time-outs (9 min in Debug). Across it, 35 files bring over transitions (477 slides) and 65 bring over animations (1,733 effects); 3 slides are hidden.
+  - **The alpha gate:** step 2b also plays a `.ppt`'s slide show, in both layouts.
 
 ### P4 notes (2026-10-30)
 
@@ -496,6 +533,13 @@ properties are Word and Excel borders, positioning and toolbars that a PowerPoin
 - **Every gallery preset** (P3): `Tools/legacy/preset-deck.py` writes the `dccli` commands for a deck of the 180
   presets, each wide, tall and with its adjusts moved. It is converted like the others, and PowerPoint also saves it
   (below; `powerpoint-protect.sh --ppt`).
+- **The slide show** (P5): `Tools/legacy/motion-deck.py` writes the `dccli` commands for a deck of:
+  - 30 transitions at each speed: those a `.ppt` holds, and two it can't;
+  - a slide that advances on its own, and a hidden slide;
+  - 44 entrance, emphasis, exit and motion path effects with their options;
+  - a slide of starts, a delay, durations, a repeat, rewind, and text built by paragraph and by word.
+
+  LibreOffice converts it, and PowerPoint saves it (`powerpoint-protect.sh --ppt`).
 - **Pictures** (P4): `Tools/legacy/picture-deck.py` writes the `dccli` commands for a deck of pictures:
   - pictures cropped, corrected, recoloured, with a transparent colour, and a JPEG;
   - shapes with picture, tiled and pattern fills;
@@ -560,7 +604,7 @@ every slide, at quarter scale.
 | LibreOffice's `.ppt` files are simpler than PowerPoint's (fewer PP9/PP10 tags) | Hand-built streams for the tag extensions; the crash corpus; PowerPoint's counts in the sweep |
 | LibreOffice writes adjust values in DrawingML's meaning, not the legacy one (P3) | Shapes are checked against PowerPoint's own save of every preset; LibreOffice's files are checked by type and box only |
 | [MS-OFFCRYPTO]'s wording on decrypting the `.ppt` Pictures stream is unusual | Cross-check with POI and msoffcrypto-tool on E0's RC4 CryptoAPI files, and with PowerPoint's own encrypted `.ppt`, before trusting it |
-| Animation is big and in two generations | P5 starts with the embedded OOXML timing, which DCPPTX already reads; the rest maps to the nearest effect |
+| Animation is big and in two generations | Done in P5: PowerPoint 2002's tree is `p:timing` in records, so it is turned into that element and read by DCPPTX's reader; PowerPoint 97's effects map to the nearest |
 | Password handling | Passwords never logged, never in DCModel, `.deckcraft`, MCP replies or the clipboard; key buffers cleared after use where Swift allows; AutoRecover off or encrypted |
 | A spin count near the maximum takes seconds | Derivation off the main thread, cancellable, with the sheet showing progress |
 | A converted `.ppt` loses things PowerPoint keeps | The import report says what, per slide |

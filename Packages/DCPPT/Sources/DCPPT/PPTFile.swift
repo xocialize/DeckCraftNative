@@ -302,6 +302,37 @@ enum RT {
     static let binaryTagDataBlob: UInt16 = 0x138B
     static let comment10: UInt16 = 0x2EE0
     static let comment10Atom: UInt16 = 0x2EE1
+    // The slide show (P5): transitions ([MS-PPT] 2.6.6), PowerPoint 97's per-shape effects (2.8.1), and PowerPoint
+    // 2002's timing tree (2.8.15–2.8.82) with its builds, in the slide's `___PPT10` binary tag.
+    static let animationInfo: UInt16 = 0x1014
+    static let animationInfoAtom: UInt16 = 0x0FF1
+    static let hashCodeAtom: UInt16 = 0x2B00
+    static let visualPageAtom: UInt16 = 0x2B01
+    static let visualShapeAtom: UInt16 = 0x2AFB
+    static let buildList: UInt16 = 0x2B02
+    static let buildAtom: UInt16 = 0x2B03
+    static let paraBuild: UInt16 = 0x2B08
+    static let paraBuildAtom: UInt16 = 0x2B09
+    static let roundTripAnimation: UInt16 = 0x2B0B
+    static let timeConditionContainer: UInt16 = 0xF125
+    static let timeNode: UInt16 = 0xF127
+    static let timeCondition: UInt16 = 0xF128
+    static let timeModifier: UInt16 = 0xF129
+    static let timeBehaviorContainer: UInt16 = 0xF12A
+    static let timeAnimateBehavior: UInt16 = 0xF12B
+    static let timeColorBehavior: UInt16 = 0xF12C
+    static let timeEffectBehavior: UInt16 = 0xF12D
+    static let timeMotionBehavior: UInt16 = 0xF12E
+    static let timeRotationBehavior: UInt16 = 0xF12F
+    static let timeScaleBehavior: UInt16 = 0xF130
+    static let timeSetBehavior: UInt16 = 0xF131
+    static let timeCommandBehavior: UInt16 = 0xF132
+    static let timeClientVisualElement: UInt16 = 0xF13C
+    static let timePropertyList: UInt16 = 0xF13D
+    static let timeVariantList: UInt16 = 0xF13E
+    static let timeSequenceData: UInt16 = 0xF141
+    static let timeVariant: UInt16 = 0xF142
+    static let timeExtTimeNode: UInt16 = 0xF144
 }
 
 /// A record header ([MS-PPT] 2.3.1) and where its data is.

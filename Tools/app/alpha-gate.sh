@@ -93,7 +93,7 @@ check ".pptx reads back" $?
 shot 2-pptx
 quit
 
-echo "== 2b. Open a .ppt: a converted copy with its shapes and pictures, saved as .pptx (legacy plan P3–P4)"
+echo "== 2b. Open a .ppt: a converted copy with its shapes, pictures and slide show, saved as .pptx (legacy plan P3–P5)"
 launch "$FIX/legacy/ppt/corpus-shapes.ppt"
 N=$(app document.inspect | jq_ "['slides'][1]['shapes']")
 check "the .ppt opens with its shapes" $([ "${N:-0}" -ge 6 ]; echo $?)
@@ -111,6 +111,18 @@ app file.save "{\"path\":\"$OUT/pictures.pptx\",\"format\":\"pptx\"}" >/dev/null
 "$BIN/dccli" render "$OUT/pictures.pptx" --slide 1 --scale 0.5 "$OUT/2b-pictures.png" >/dev/null 2>&1
 check "its pictures save and render" $([ -s "$OUT/2b-pictures.png" ]; echo $?)
 shot 2b-pictures
+quit
+# Its slide show (legacy plan P5): the motion deck's animations come over, and its show plays.
+launch "$FIX/legacy/ppt/motion.ppt"
+A=$(app document.inspect | jq_ "['slides'][37]['animations']")
+check "the .ppt's animations come over" $([ "${A:-0}" -ge 7 ]; echo $?)
+method show.start '{"from":37}' >/dev/null
+sleep 1
+method show.next '{}' >/dev/null; sleep 1.2
+S=$(method ui.inspect '{}' | jq_ "['showing'] is not None")
+check "its slide show plays" $([ "$S" = True ]; echo $?)
+method ui.screenshot "{\"path\":\"$OUT/2b-show.png\"}" >/dev/null
+method show.end '{}' >/dev/null; sleep 0.5
 quit
 
 echo "== 3. Present: show, transitions, presenter view"

@@ -28,6 +28,8 @@ struct ExObjects {
     var sounds: [String: (name: String, ext: String, data: [UInt8])] = [:]
     /// Each object's media, once added.
     var media: [UInt32: MediaId] = [:]
+    /// Each sound's media, by its id in the SoundCollection, once added.
+    var soundMedia: [UInt32: MediaId] = [:]
 
     static func read(_ b: [UInt8], _ document: [Record]) -> ExObjects {
         var out = ExObjects()
@@ -102,6 +104,19 @@ struct ExObjects {
             added = p.addMedia(name, Self.contentType(name), s.data)
         }
         if let added { media[id] = added }
+        return added
+    }
+
+    /// The media of the SoundCollection's sound `soundId` (a transition's), adding it to `p` the first time.
+    mutating func sound(_ soundId: UInt32, _ p: inout Presentation) -> MediaId? {
+        if let m = soundMedia[soundId] { return m }
+        guard let s = sounds[String(soundId)], !s.data.isEmpty else { return nil }
+        var ext = s.ext.lowercased()
+        if ext.hasPrefix(".") { ext.removeFirst() }
+        if ext.isEmpty { ext = "wav" }
+        let name = (s.name.isEmpty ? "sound\(soundId)" : s.name) + "." + ext
+        let added = p.addMedia(name, Self.contentType(name), s.data)
+        if let added { soundMedia[soundId] = added }
         return added
     }
 

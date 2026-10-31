@@ -1,7 +1,8 @@
 // DCEngineTests — opening a legacy `.ppt` (Docs/plans/Legacy-PPT-and-Encryption.md, P1): it is converted and opens as
 // an untitled copy with the file's slides and slide size; the reply and the status line say what was converted and
 // what isn't brought over yet. An encrypted one needs its password, unless it used PowerPoint's default. Its OLE
-// objects come over as their pictures (P4), the reply naming each, and save to `.pptx` as pictures.
+// objects come over as their pictures (P4), the reply naming each, and save to `.pptx` as pictures. Its transitions,
+// hidden slides and animations come over (P5), show in the Animation Pane, and save to `.pptx`.
 import DCCore
 @testable import DCEngine
 import DCTestSupport
@@ -68,5 +69,28 @@ import Testing
         let pictures = saved.slides.flatMap(\.shapes).filter { if case .picture = $0.kind { true } else { false } }
         #expect(pictures.count == 2)
         #expect(pictures.allSatisfy { if case .picture(let f) = $0.kind { saved.media(f.media)?.data.isEmpty == false } else { false } })
+    }
+
+    @Test func theSlideShowComesOverAndSaves() throws {
+        let path = Self.legacy.appending(path: "ppt/motion.ppt").path
+        guard FileManager.default.fileExists(atPath: path) else { return }
+        let s = Session()
+        _ = try s.execute("file.open", ["path": .string(path)])
+        let doc = try s.doc().doc
+        #expect(doc.slides[2].transition?.kind == "fade" && doc.slides[2].transition?.option == "throughBlack")
+        #expect(doc.slides[32].hidden)
+        // The Animation Pane of the timings slide: five shapes flown in, then the text built by paragraph and the word build.
+        let pane = try s.execute("animation.get", ["slide": .int(37)])
+        #expect((pane.asArray ?? []).count == 9)
+        let out = FileManager.default.temporaryDirectory.appending(path: "dc-ppt-\(UUID().uuidString).pptx").path
+        defer { try? FileManager.default.removeItem(atPath: out) }
+        s.run("file.save", #"{"path": "\#(out)"}"#)
+        let saved = try FileCommands.readPresentationFile(out).doc
+        // LibreOffice writes a paragraph build as one effect per paragraph and no build list; saved as `.pptx`, the
+        // three read back as the one build by paragraph they play as.
+        #expect(saved.slides.map(\.animations.count).dropLast() == doc.slides.map(\.animations.count).dropLast())
+        #expect(saved.slides.last?.animations.count == 7 && doc.slides.last?.animations.count == 9)
+        #expect(saved.slides.map { $0.transition?.kind } == doc.slides.map { $0.transition?.kind })
+        #expect(saved.slides[32].hidden)
     }
 }

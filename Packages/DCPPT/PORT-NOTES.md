@@ -139,6 +139,67 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
     time-outs. Across it, 83 PICT pictures were converted and no picture was lost.
   - **The alpha gate:** step 2b also opens and saves the pictures deck, in both layouts.
 
+## P5: the slide show (2026-10-30)
+
+- **Transitions** (`SlideShow.transition`): the slide's SlideShowSlideInfoAtom.
+  - Its effect and direction map to our transition and option (PowerPoint 97's 22 effects). "Fade" is Fade through
+    black and "AlphaFade" Fade smoothly; Strips is a diagonal Wipe; Box is Shape In or Out; Newsflash is Zoom and
+    Rotate.
+  - Its three speeds read as a `.pptx` that gives only `spd` does: fast 0.5 s, medium 0.75 s, slow 1 s (or the
+    transition's own default when longer).
+  - It also holds whether the slide advances on click and after a time, a sound from the SoundCollection (with
+    loop), "stop previous sound", and whether the slide is hidden.
+  - Cut not through black "is the same as no transition at all" (the spec): PowerPoint writes it for a hidden slide
+    with no transition, so it reads as none.
+  - PowerPoint 2010's transitions have no place in a `.ppt`. PowerPoint saves them as Fade, and that is what comes
+    back.
+- **Animations** (`SlideShow.animations`), from the newest place that is current:
+  1. **PowerPoint 2002's timing tree**, in the slide's `___PPT10` binary tag, with its build list. The tree is
+     PresentationML's `p:timing` as records, node for node, so `TimingTree` turns it into that element:
+     - each node a `p:par`, `p:seq`, behaviour or media node;
+     - its `p:cTn` from the TimeNodeAtom and its properties: preset class, id and subtype, node type, group, fill,
+       restart and duration;
+     - its modifiers (floats: a repeat of 2.0 is `repeatCount` 2000), its conditions and its targets;
+     - the behaviours' values: scale (110 is 110%), rotation (degrees), the motion path, and the colour, with
+       scheme colours resolved.
+
+     DCPPTX's timing reader (`PPTXTiming`) then reads it as it reads a `.pptx`, so both map effects the same way.
+     A target's character range becomes the paragraph that holds it.
+  2. **The `p:timing` PowerPoint 2007 embedded** (RoundTripAnimationAtom, a package holding a timing part), read
+     the same way. It's used only without a tree: PowerPoint 16 writes none, and a later PowerPoint 2002 or 2003
+     save keeps an old one unchanged. Three files in the crash corpus have one. The plan had it first.
+  3. **PowerPoint 97's AnimationInfoAtoms**, one per shape, mapped to the nearest entrance preset (Fly In with its
+     eight directions, Wipe, Split, Blinds, Checkerboard, Random Bars, Strips, Box, Diamond, Wheel, Dissolve, Fade,
+     Appear…). They play in their order, on click or after the previous one with its delay, and build by
+     paragraph, word or letter.
+  - **The hash:** the tree carries a hash of the slide's AnimationInfoAtoms (HashCode10Atom). If PowerPoint 97 or
+    2000 changed the atoms after a newer version saved the tree, the hash no longer matches and the atoms win, as
+    in PowerPoint. The spec's pseudocode hashes every shape; PowerPoint hashes only the shapes that have an atom
+    (measured on its own file).
+- **Checked:**
+  - **The motion deck** (`Tools/legacy/motion-deck.py`) has 30 transitions at each speed, a slide that advances on
+    its own, a hidden slide, 44 effects with their options, and a slide of timings and text builds.
+    - **PowerPoint's save** of it (local only) comes back as the original: every transition by kind, option and
+      speed, the advance and the hidden slide, and every animation's shape, effect, option, start, delay,
+      duration, repeat, rewind, text build, paragraph, amount and path.
+    - **LibreOffice's save** comes back the same, apart from how LibreOffice writes some of it. Each is checked
+      in its records, and PowerPoint's save has none of them:
+      - Cut through black as Cut, Push Right as Left, Uncover Left as Right, a diagonal Wipe as Cover, Shape In
+        and Out as Cut, and Vortex and Ripple as Cut;
+      - an advance time in 1024ths of a second, with "on click" kept;
+      - a Pulse's and a Grow/Shrink's size as the change from 100%;
+      - paths without their closing `E`;
+      - no paragraph builds: each paragraph's effect is its own.
+  - **PowerPoint's saves** of five more of the corpus's and engine's decks come back with their slide shows.
+  - **Unit tests:** PowerPoint 97's effects, their order and their starts. The hash picks the tree while it
+    matches and the atoms once it doesn't, and it equals the one in PowerPoint's own file. An embedded timing is
+    read. Hostile records never trap: every byte of three real slides changed in turn, a tree nested 200 deep,
+    and every effect type and direction.
+  - **An engine test:** the motion deck opens with its transitions, hidden slide and Animation Pane, and saves as
+    `.pptx` with them.
+  - **The crash corpus** with every slide rendered: 205 files open and render and 2 fail cleanly, with no crashes or time-outs (9 min in Debug). Across it, 35 files bring over transitions (477 slides) and 65 bring over animations (1,733 effects); 3 slides are hidden.
+  - **The alpha gate:** step 2b also opens the motion deck and plays its slide show, in both layouts.
+
 ## P3: shapes (2026-10-30)
 
 - **`Drawing`:**

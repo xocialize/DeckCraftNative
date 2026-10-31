@@ -85,7 +85,7 @@ extension PPTXRead {
     private typealias Effect = (anim: Animation, fileId: UInt32, grp: String, build: Bool)
 
     /// Flatten the timing tree into the Animation Pane list.
-    static func animations(_ imp: Imp, _ part: Part, _ ctx: IdCtx, _ timing: XMLEl, _ shapes: [Shape]) -> [Animation] {
+    static func animations(_ ctx: IdCtx, _ timing: XMLEl, _ shapes: [Shape]) -> [Animation] {
         guard let tn = timing.child("tnLst") else { return [] }
         var found: [Found] = []
         collect(tn, nil, &found, 0)

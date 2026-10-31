@@ -144,7 +144,8 @@ import Testing
         let names = (try? FileManager.default.contentsOfDirectory(atPath: dir.path))?.filter { $0.hasSuffix(".ppt") } ?? []
         guard !names.isEmpty else { return }
         struct Meta: Decodable { let password: String; let from: String }
-        let counts = ["corpus-sample": 8, "corpus-content": 5, "corpus-charts": 6, "presets": 31, "pictures": 7]
+        let counts = ["corpus-sample": 8, "corpus-content": 5, "corpus-charts": 6, "presets": 31, "pictures": 7, "motion": 38, "corpus-motion": 4,
+                      "engine-design-animations": 2, "engine-design-transitions": 3, "engine-transitions": 57]
         for n in names {
             let meta = try JSONDecoder().decode(Meta.self, from: Data(contentsOf: dir.appending(path: "\(n).meta.json")))
             let bytes = Array(try Data(contentsOf: dir.appending(path: n)))

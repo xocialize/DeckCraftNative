@@ -66,6 +66,11 @@ $py -I $root/Tools/legacy/picture-deck.py --png "$pics/photo.png" && sips -s for
   && meta "$out/pptx/pictures.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/picture-deck.py\",\"producer\":\"dccli\"}" \
   || print -u2 "export failed: pictures"
 rm -rf "$pics"
+# Transitions at each speed, a hidden slide, and the common effects with their options and timings (P5's slide show
+# test; motion-deck.py).
+"$dccli" run "${(@f)$($py -I $root/Tools/legacy/motion-deck.py)}" --save "$out/pptx/motion.pptx" >/dev/null 2>&1 \
+  && meta "$out/pptx/motion.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/motion-deck.py\",\"producer\":\"dccli\"}" \
+  || print -u2 "export failed: motion"
 "$soffice" --headless --norestore "-env:UserInstallation=file://$lo_profile" --convert-to ppt --outdir "$out/ppt" $out/pptx/*.pptx >/dev/null 2>&1
 rm -rf "$lo_profile"
 for p in $out/ppt/*.ppt(N); do

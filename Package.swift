@@ -154,7 +154,7 @@ let package = Package(
         // MARK: DCPPTX — PPTX read and write from ECMA-376 (deckcraft-pptx). Wave 3.
         // MARK: DCPPT — legacy binary PowerPoint (.ppt, [MS-PPT] and [MS-ODRAW]) read into DCModel (Docs/plans/
         // Legacy-PPT-and-Encryption.md, P1–P6); its compound file is DCCFB's and its encryption DCOffCrypto's.
-        .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore", "DCCFB", "DCOffCrypto", "DCZip"], path: sources("DCPPT", "DCPPT")),
+        .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore", "DCCFB", "DCOffCrypto", "DCZip", "DCPPTX"], path: sources("DCPPT", "DCPPT")),
         .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCColor", "DCCFB", "DCOffCrypto", "DCPPTX", "DCEngine", "DCZip", "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
 
                 .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),

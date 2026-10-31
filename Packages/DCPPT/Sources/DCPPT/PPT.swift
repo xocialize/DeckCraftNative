@@ -6,8 +6,9 @@
 // main master's text styles, colour scheme and background to the default master, each slide's own scheme and
 // background, headers and footers, and hyperlinks. P3 brings every shape (Shapes.swift): geometry, fill, line, shadow,
 // groups, connectors, tables and WordArt. P4 brings the pictures (Pictures.swift: shapes, picture and pattern fills,
-// backgrounds), OLE objects as their pictures, movies and sounds (Objects.swift), and comments. The slide show comes in
-// P5; the import report lists what isn't brought over, and each object that became a picture.
+// backgrounds), OLE objects as their pictures, movies and sounds (Objects.swift), and comments. P5 brings the slide
+// show (SlideShow.swift): transitions, hidden slides and animations. The import report lists what isn't brought over,
+// and each object that became a picture.
 import DCCFB
 import DCColor
 import DCGeometry
@@ -134,6 +135,8 @@ public enum PPT {
                 builder.objects = objects
                 slide.shapes = builder.build(&p, drawn, rules: rules)
                 slide.comments = Document.comments(o, r)
+                (slide.transition, slide.hidden) = SlideShow.transition(o, r) { objects.sound($0, &p) }
+                slide.animations = SlideShow.animations(o, r, drawn: drawn, shapes: slide.shapes, ids: builder.ids, scheme: scheme)
                 let atom = Masters.slideAtom(o, r)
                 if let atom, atom.flags & 0x4 == 0, let bg = background(o, r, scheme) {
                     // Its own background.
@@ -150,7 +153,7 @@ public enum PPT {
             p.slides.append(slide)
         }
         var report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["the master's own shapes", "picture bullets", "transitions and animations"])
+                               notImported: ["the master's own shapes", "picture bullets"])
         report.asPictures = asPictures
         report.lostPictures = pictures.lost.count
         report.convertedPictures = pictures.converted
