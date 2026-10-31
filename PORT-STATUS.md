@@ -477,7 +477,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     its ticket is stapled.
   - A build that reports 0.1.5, installed in `/Applications`, finds 0.1.6 through Check for Updates.
 
-- **Legacy `.ppt` and password protection: E0–E3 released in 0.1.7; P1–P6 done on main (2026-10-31).** The plan is
+- **Legacy `.ppt` and password protection: E0–E3 released in 0.1.7, P1–P6 in 0.1.8 (2026-10-31).** The plan is
   `Docs/plans/Legacy-PPT-and-Encryption.md`: encryption first (E1–E3, its own release), then a `.ppt` reader (P1–P6).
   E0 installed the test tools outside the repo, downloaded [MS-CFB] and [MS-OLEPS], and added `Tools/legacy/`, which
   makes 363 test files from our own decks into the fixtures (every encrypted copy decrypts to its plaintext with two
@@ -587,8 +587,12 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     - **The whole corpus:** 49,485 files. In Debug, 49,175 open and 310 fail cleanly (211 PowerPoint 95, 98 not
       presentations, one damaged). Rendering every slide in Release, 49,170 render. No crash and no hang. Five
       decks take 36–101 s to render, in DCRender's metafile rasterizer and font fallback, which `.pptx` shares.
-    - **Release:** notes drafted in `Docs/releases/0.1.8.md`; EVALUATION lists `.ppt` as done. Releasing awaits the
-      operator.
+- **Released as [v0.1.8](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.8) (2026-10-31).** Legacy
+  `.ppt` files open as converted copies (P1–P6 above). Notes in `Docs/releases/0.1.8.md`.
+  - Built from `905d3ac` in a clean worktree, notarized, and accepted by Gatekeeper; the downloaded DMG matches its
+    `.sha256` and its ticket is stapled. The exported app opened the masters deck's `.ppt` with its template.
+  - The installed 0.1.7 finds 0.1.8 through Check for Updates (`ui.updates`); 0.1.8 is now installed in
+    `/Applications`.
 
 ## Pin moves
 
