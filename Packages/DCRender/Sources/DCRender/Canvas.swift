@@ -183,14 +183,15 @@ final class Surface {
         guard width > 0, height > 0 else { return nil }
         self.x = x
         self.y = y
-        let bytes = width * height * 4
-        data = UnsafeMutableRawPointer.allocate(byteCount: bytes, alignment: 16)
-        data.initializeMemory(as: UInt8.self, repeating: 0, count: bytes)
+        // Zeroed by calloc: a large bitmap gets fresh pages, which cost nothing until they are drawn on (a layer
+        // the size of the canvas holding one small item touches only that item's rows).
+        guard let data = calloc(width * height, 4) else { return nil }
+        self.data = data
         guard let c = CGContext(
             data: data, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4, space: Canvas.srgb,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
         ) else {
-            data.deallocate()
+            free(data)
             return nil
         }
         ctx = c
@@ -206,7 +207,7 @@ final class Surface {
         ctx.interpolationQuality = .medium
     }
 
-    deinit { data.deallocate() }
+    deinit { free(data) }
 
     var bytes: UnsafeMutableBufferPointer<UInt8> {
         UnsafeMutableBufferPointer(start: data.assumingMemoryBound(to: UInt8.self), count: width * height * 4)
@@ -214,6 +215,27 @@ final class Surface {
 
     /// The bitmap as an image, copied.
     func image() -> CGImage? { ctx.makeImage() }
+
+    /// The pixels of `r` (bitmap pixels, rows from the top) as an image that reads this bitmap in place and keeps the
+    /// surface alive while it exists. Draw it before drawing on the surface again.
+    func image(_ r: (x: Int, y: Int, w: Int, h: Int)) -> CGImage? {
+        guard r.x >= 0, r.y >= 0, r.w > 0, r.h > 0, r.x + r.w <= width, r.y + r.h <= height else { return nil }
+        let rowBytes = width * 4
+        let size = (r.h - 1) * rowBytes + r.w * 4
+        let keep = Unmanaged.passRetained(self)
+        guard let provider = CGDataProvider(
+            dataInfo: keep.toOpaque(), data: data + r.y * rowBytes + r.x * 4, size: size,
+            releaseData: { info, _, _ in if let info { Unmanaged<Surface>.fromOpaque(info).release() } }
+        ) else {
+            keep.release()
+            return nil
+        }
+        return CGImage(
+            width: r.w, height: r.h, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: rowBytes, space: Canvas.srgb,
+            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue),
+            provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent
+        )
+    }
 }
 
 public final class Canvas {
@@ -225,7 +247,8 @@ public final class Canvas {
     private enum Entry {
         /// A layer that couldn't be made (out of memory): drawing goes on below it.
         case none
-        case layer(Surface, clip: BezPath?, clipTransform: Affine, fillRule: FillRule, blend: BlendMode, opacity: Double, blur: Double)
+        /// `ink`: the part of the surface (its own pixels) drawing can reach, when `pushLayer` was told.
+        case layer(Surface, clip: BezPath?, clipTransform: Affine, fillRule: FillRule, blend: BlendMode, opacity: Double, blur: Double, ink: (x: Int, y: Int, w: Int, h: Int)?)
     }
 
     private var stack: [Entry] = []
@@ -265,7 +288,7 @@ public final class Canvas {
 
     var current: Surface {
         for e in stack.reversed() {
-            if case .layer(let s, _, _, _, _, _, _) = e { return s }
+            if case .layer(let s, _, _, _, _, _, _, _) = e { return s }
         }
         return base
     }
@@ -315,7 +338,7 @@ public final class Canvas {
         let (sx, sy) = Self.scales(transform)
         let k = Swift.max(sx, sy).isFinite ? Swift.max(1, Swift.min(Swift.max(sx, sy), 1e4)) : 1
         var up = CGAffineTransform(scaleX: k, y: k)
-        guard let cg = Self.cgPath(path).copy(using: &up) else { return }
+        guard let cg = Self.cgPath(Self.thinned(path, Swift.max(sx, sy))).copy(using: &up) else { return }
         let dashes = stroke.dashes.filter { $0.isFinite && $0 >= 0 }.map { $0 * k }
         let outlined = cg.copy(
             strokingWithWidth: stroke.width * k,
@@ -337,6 +360,98 @@ public final class Canvas {
         }
         var down = CGAffineTransform(scaleX: 1 / k, y: 1 / k)
         fillArea(k == 1 ? shape : (shape.copy(using: &down) ?? shape), evenOdd: false)
+    }
+
+    /// Paths of lines denser than the pixels they cross, before they are outlined: a path of more than
+    /// `thinMinPoints` points and more than `thinDensity` points per pixel of its extent has the points of its line
+    /// subpaths within `thinTolerance` px of the line through the points kept dropped (Douglas–Peucker, in windows of
+    /// `thinWindow` points so it stays linear). CoreGraphics fills the outline of such a stroke in time that grows
+    /// with the overlaps of its joins: a chart's sixteen series of 750 points plotted over each other across 108 px,
+    /// stroked 1 px wide, took 7 s (Govdocs1 crash run, 2026-10-31). The outline moves by at most the tolerance;
+    /// other paths are drawn unchanged. Not in deckcraft.
+    static let thinMinPoints = 1000
+    static let thinDensity = 8.0
+    static let thinTolerance = 1.0 / 16
+    static let thinWindow = 4096
+
+    /// `path` with its line subpaths thinned when it is dense (`thinMinPoints`); `scale` is the larger scale of
+    /// user space to pixels.
+    static func thinned(_ path: BezPath, _ scale: Double) -> BezPath {
+        guard path.elements.count > thinMinPoints, scale.isFinite, scale > 0 else { return path }
+        var bounds: (x0: Double, y0: Double, x1: Double, y1: Double)?
+        for el in path.elements {
+            guard let q = el.endPoint else { continue }
+            let b = bounds ?? (q.x, q.y, q.x, q.y)
+            bounds = (Swift.min(b.x0, q.x), Swift.min(b.y0, q.y), Swift.max(b.x1, q.x), Swift.max(b.y1, q.y))
+        }
+        guard let b = bounds else { return path }
+        let extent = ((b.x1 - b.x0) + (b.y1 - b.y0)) * scale
+        guard Double(path.elements.count) > thinDensity * Swift.max(extent, 1) else { return path }
+        let tol = thinTolerance / scale
+        var out: [PathEl] = []
+        out.reserveCapacity(path.elements.count)
+        // One subpath at a time: a move, then its lines (and closes); anything else passes unchanged.
+        var sub: [PathEl] = []
+        func flush() {
+            defer { sub.removeAll(keepingCapacity: true) }
+            var pts: [Point] = []
+            var closes = 0
+            for el in sub {
+                switch el {
+                case .moveTo(let q) where pts.isEmpty, .lineTo(let q) where !pts.isEmpty && closes == 0: pts.append(q)
+                case .closePath where !pts.isEmpty: closes += 1
+                default: return out.append(contentsOf: sub)
+                }
+            }
+            let kept = simplified(pts, tol)
+            guard let first = kept.first else { return out.append(contentsOf: sub) }
+            out.append(.moveTo(first))
+            for q in kept.dropFirst() { out.append(.lineTo(q)) }
+            out.append(contentsOf: repeatElement(PathEl.closePath, count: closes))
+        }
+        for el in path.elements {
+            if case .moveTo = el { flush() }
+            sub.append(el)
+        }
+        flush()
+        return BezPath(out)
+    }
+
+    /// Douglas–Peucker over `pts` in windows of `thinWindow` points (each window's ends kept): the points within
+    /// `tol` of the polyline that is kept are dropped.
+    static func simplified(_ pts: [Point], _ tol: Double) -> [Point] {
+        guard pts.count > 2 else { return pts }
+        var keep = [Bool](repeating: false, count: pts.count)
+        let tol2 = tol * tol
+        var stack: [(Int, Int)] = []
+        var start = 0
+        while start < pts.count - 1 {
+            let end = Swift.min(start + thinWindow, pts.count - 1)
+            keep[start] = true
+            keep[end] = true
+            stack.append((start, end))
+            while let (a, b) = stack.popLast() {
+                guard b > a + 1 else { continue }
+                let (p, q) = (pts[a], pts[b])
+                let (dx, dy) = (q.x - p.x, q.y - p.y)
+                let l2 = dx * dx + dy * dy
+                var (far, at) = (-1.0, a)
+                for i in a + 1 ..< b {
+                    let r = pts[i]
+                    let t = l2 > 0 ? (((r.x - p.x) * dx + (r.y - p.y) * dy) / l2).clamped(0, 1) : 0
+                    let (ex, ey) = (p.x + t * dx - r.x, p.y + t * dy - r.y)
+                    let d = ex * ex + ey * ey
+                    if d > far { (far, at) = (d, i) }
+                }
+                if far > tol2 {
+                    keep[at] = true
+                    stack.append((a, at))
+                    stack.append((at, b))
+                }
+            }
+            start = end
+        }
+        return pts.indices.filter { keep[$0] }.map { pts[$0] }
     }
 
     /// Fills `area` (user space, already under the transform) with `paint`, mapped by `paintTransform`.
@@ -451,7 +566,13 @@ public final class Canvas {
     /// faded by `opacity` and composited with `blend` onto what is below. Every layer is its own bitmap,
     /// as in vello, so a compose mode inside one (`DestIn`, `DestOut`) only reaches that layer's content;
     /// a clipped layer without blur only covers its clip's bounds.
-    public func pushLayer(clip: BezPath? = nil, blend: BlendMode? = nil, opacity: Double? = nil, blur: Double? = nil) {
+    ///
+    /// `bounds` (canvas pixels, antialiasing included): where everything drawn in the layer is known to stay. A
+    /// layer without blur that composes over what is below then has no rows above them or columns right of them, and
+    /// only its part inside them is composited, read in place. Outside them the layer is transparent, which
+    /// composites to nothing, so the pixels are the same; a layer per small item no longer costs a copy and a
+    /// composite of its whole clip. Not in vello's shape.
+    public func pushLayer(clip: BezPath? = nil, blend: BlendMode? = nil, opacity: Double? = nil, blur: Double? = nil, bounds: Rect? = nil) {
         if let r = recorder {
             r.push(DisplayList.Layer(clip: clip, transform: transform, fillRule: fillRule, blend: blend, opacity: opacity, blur: blur))
             return
@@ -472,14 +593,29 @@ public final class Canvas {
                 box = x1 > x0 && y1 > y0 ? (x0, y0, x1 - x0, y1 - y0) : (0, 0, 1, 1)
             }
         }
+        var ink: (x: Int, y: Int, w: Int, h: Int)?
+        if let b = bounds, sigma == 0, mode.compose == .srcOver, b.x0.isFinite, b.y0.isFinite, b.x1.isFinite, b.y1.isFinite {
+            let x0 = max(box.x, Int(rustCast: b.minX.rounded(.down)) - 1), y0 = max(box.y, Int(rustCast: b.minY.rounded(.down)) - 1)
+            let x1 = min(box.x + box.w, Int(rustCast: b.maxX.rounded(.up)) + 1), y1 = min(box.y + box.h, Int(rustCast: b.maxY.rounded(.up)) + 1)
+            if x1 > x0 && y1 > y0 {
+                // The bitmap loses the rows above the ink and the columns right of it, nothing else: CoreGraphics
+                // flips y about the bitmap's bottom edge and rasterizes in single precision, so a bitmap with another
+                // bottom or left edge rounds some coordinates differently, and self-overlapping outlines moved
+                // antialiased pixels by a level. Only the ink is composited (`popLayer`).
+                box = (box.x, y0, x1 - box.x, box.y + box.h - y0)
+                ink = (x0 - box.x, 0, x1 - x0, y1 - y0)
+            } else {
+                box = (0, 0, 1, 1)
+            }
+        }
         guard let s = Surface(x: box.x, y: box.y, width: box.w, height: box.h) else {
             stack.append(.none)
             return
         }
-        stack.append(.layer(s, clip: clip, clipTransform: transform, fillRule: fillRule, blend: mode, opacity: (opacity ?? 1).clamped(0, 1), blur: sigma))
+        stack.append(.layer(s, clip: clip, clipTransform: transform, fillRule: fillRule, blend: mode, opacity: (opacity ?? 1).clamped(0, 1), blur: sigma, ink: ink))
     }
 
-    public func pushClipLayer(_ clip: BezPath) { pushLayer(clip: clip) }
+    public func pushClipLayer(_ clip: BezPath, bounds: Rect? = nil) { pushLayer(clip: clip, bounds: bounds) }
     public func pushBlendLayer(_ blend: BlendMode) { pushLayer(blend: blend) }
 
     public func popLayer() {
@@ -488,9 +624,12 @@ public final class Canvas {
             return
         }
         guard let e = stack.popLast() else { return }
-        guard case .layer(let s, let clip, let clipTransform, let rule, let blend, let opacity, let sigma) = e else { return }
+        guard case .layer(let s, let clip, let clipTransform, let rule, let blend, let opacity, let sigma, let ink) = e else { return }
         if sigma > 0 { Self.gaussianBlur(s, sigma) }
-        guard let img = s.image() else { return }
+        // With its ink known, only that part of the layer is read, in place; the rest is transparent, which
+        // composites to nothing. Otherwise the whole bitmap, copied.
+        let part = ink.flatMap { r in s.image(r).map { ($0, r) } }
+        guard let img = part?.0 ?? s.image() else { return }
         let ctx = current.ctx
         ctx.saveGState()
         defer { ctx.restoreGState() }
@@ -507,7 +646,7 @@ public final class Canvas {
         if blend.compose == .srcOver || blend.compose == .destOver || blend.compose == .xor || blend.compose == .plus
             || blend.compose == .destOut || blend.compose == .srcAtop {
             // Compose modes that leave the backdrop alone where the layer is empty: only its box.
-            draw(img, at: s, in: ctx)
+            draw(img, at: s, part?.1, in: ctx)
         } else {
             // `SrcIn`, `DestIn`, `Copy`…: where the layer is empty the backdrop changes too, so the layer
             // covers the whole canvas (transparent outside its own bitmap).
@@ -517,12 +656,14 @@ public final class Canvas {
         }
     }
 
-    /// Draws a surface's image at its place in canvas space (y down) into `ctx`.
-    private func draw(_ img: CGImage, at s: Surface, in ctx: CGContext) {
+    /// Draws a surface's image (or the image of its part `r`, in its own pixels) at its place in canvas space
+    /// (y down) into `ctx`.
+    private func draw(_ img: CGImage, at s: Surface, _ r: (x: Int, y: Int, w: Int, h: Int)? = nil, in ctx: CGContext) {
+        let r = r ?? (0, 0, s.width, s.height)
         ctx.saveGState()
-        ctx.translateBy(x: CGFloat(s.x), y: CGFloat(s.y + s.height))
+        ctx.translateBy(x: CGFloat(s.x + r.x), y: CGFloat(s.y + r.y + r.h))
         ctx.scaleBy(x: 1, y: -1)
-        ctx.draw(img, in: CGRect(x: 0, y: 0, width: s.width, height: s.height))
+        ctx.draw(img, in: CGRect(x: 0, y: 0, width: r.w, height: r.h))
         ctx.restoreGState()
     }
 

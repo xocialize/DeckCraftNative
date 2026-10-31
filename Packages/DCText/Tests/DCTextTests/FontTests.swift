@@ -399,3 +399,31 @@ func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
         #expect(DateFields.fieldText("datetime1", nil, now) != nil)
     }
 }
+
+/// `FontDB.face` keeps its answers until a face is added. Not in deckcraft: font fallback asks for a face once per text
+/// cluster for each bundled family of the cluster's script, and each lookup walked every loaded face, so a deck with
+/// long runs of text in missing fonts took 100 s to draw (Govdocs1 crash run, 2026-10-31).
+@Suite struct FaceAnswerTests {
+    @Test func aKeptAnswerGivesWayToAFaceAdded() throws {
+        let bytes = try #require(deckcraftFixture("fonts", "legacy-semibold.ttf"), "no deckcraft checkout")
+        let iso = FontDB(craftFontsDir: nil, systemFonts: false)
+        let before = iso.face("DeckCraft Legacy", "Regular")
+        #expect(before.family != "DeckCraft Legacy")
+        #expect(iso.face("DeckCraft Legacy", "Regular") === before, "the answer is kept")
+        #expect(iso.addFont(bytes) == 1)
+        #expect(iso.face("DeckCraft Legacy", "Regular").family == "DeckCraft Legacy", "and replaced once the font is added")
+    }
+
+    @Test func longTextInAMissingFontFallsBackPromptly() {
+        // Hebrew, Arabic, Thai and Devanagari in a family nobody has: each cluster falls back through the bundled
+        // families of its script.
+        let missing = db.documentFace("DeckCraft No Such Family", "Regular")
+        let text = scalars(String(repeating: "שלום עולם مرحبا สวัสดี नमस्ते ", count: 800))
+        let start = Date()
+        var faces = Set<UInt32>()
+        for c in text { faces.insert(db.cascade([c], [missing], "Regular").id) }
+        // 24,000 clusters: 14 s in a debug build before the answers were kept; now a tenth of a second.
+        #expect(Date().timeIntervalSince(start) < 3)
+        #expect(faces.count > 1, "the scripts fall back to faces of their own")
+    }
+}

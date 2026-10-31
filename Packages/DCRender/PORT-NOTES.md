@@ -130,6 +130,46 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
   sub-pixel cells into other colours.
 - The image cache is keyed by the media bytes' storage plus the exact adjustments, not by a hash.
 
+## Render cost: metafile clip layers and dense strokes (2026-10-31)
+
+The full Govdocs1 `.ppt` crash run (`Packages/DCPPT/PORT-NOTES.md`, P6) found four decks that took 42–63 s to render
+every slide at quarter scale in a Release dccli. The cost was here, not in DCPPT; a `.pptx` with the same pictures is
+just as slow. Both fixes are departures from deckcraft, which has neither problem in vello.
+
+- **Clip layers sized to their items' ink.** Three of the decks were WMF/EMF pictures of thousands of items, each
+  under a clip region about the size of the picture. `MetafileRender.clipped` pushes a clip layer per item, and each
+  layer was a zeroed bitmap the size of its region. Each pop copied that bitmap (`CGBitmapContextCreateImage`) and
+  composited all of it.
+  - `Canvas.pushLayer(…, bounds:)` takes where the layer's drawing stays. `MetafileRender.ink` gives the bounds of a
+    path's points grown by half the pen and a pixel, a bitmap's rectangle, or a text item's own clip; other text gets
+    no bounds.
+  - Such a layer drops the rows above the ink and the columns right of it. At the pop only the ink rectangle is
+    composited, read in place through a no-copy image (`Surface.image(_:)`) that retains the surface.
+  - Bitmaps are `calloc`ed, so the untouched pages of a large layer are never written.
+  - **Why the left and bottom edges stay.** The pixels are unchanged, and that needs both edges kept. CoreGraphics
+    flips y about the bitmap's bottom edge and appears to rasterize in single precision, so a layer with another
+    bottom or left edge rounds some coordinates differently. Self-overlapping stroke outlines then moved
+    antialiased pixels by one premultiplied level, and a layer cropped on all four sides differed in a few hundred
+    bytes of a picture. Cropping the top and right, and compositing a sub-rectangle, changes nothing.
+  - `MetafileClipLayerTests` checks byte equality against the old full-region layers
+    (`rasterize(_:_:inkBounds: false)`) on a synthetic picture of 600 mixed items and on every metafile in the
+    oracle's `metafile/` vectors (326 files). A 6,000-item picture at 2048 px takes 1.4 s in a debug build, down
+    from 33 s.
+  - The decks render in 4.7–5.8 s, down from 42–63 s.
+- **Dense polylines thinned before they are outlined.** The fourth deck (58 s) is a chart picture: 8 to 21 series of
+  about 750 points each, plotted over each other across 108 px and stroked 1 px wide with round joins.
+  CoreGraphics filled each outline in up to 7 s, spending the time on its edge intersections.
+  - `Canvas.strokePath` now passes the path through `Canvas.thinned` first. A path of more than 1,000 points and
+    more than 8 points per pixel of its extent (width plus height, at the transform's larger scale) has each of its
+    move-and-line subpaths simplified (Douglas–Peucker, tolerance 1/16 px, in windows of 4,096 points so it stays
+    near-linear). Subpaths with curves pass unchanged, and so does every path below the thresholds, so ordinary
+    drawing and the parity corpus are untouched.
+  - The outline moves by at most 1/16 px. For such paths the old outline was itself unstable: moving the points by
+    1/64 px already changed pixels by up to 34 levels.
+  - CoreGraphics' own `strokePath` is not a substitute: it is fast, but it draws these strokes about 25 % heavier
+    and differs by up to 186 levels. An exact union (`CGPath.normalized`) is slower still.
+  - `DenseStrokeTests` checks the tolerance, the thresholds and the drawn band. The deck renders in 6.2 s.
+
 ## Transitions and Morph (Wave 4)
 
 These sit on DCAnim, which computes the transition layers, meshes and Morph frames.

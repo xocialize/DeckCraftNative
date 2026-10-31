@@ -134,6 +134,17 @@ machine that runs the tests.
    all for each document-face lookup. With the system fonts loaded, that made a text-heavy `.ppt` take over
    30 s to render. Here the fallback order is sorted once and the document-face answer is kept per family and
    style. Both are cleared whenever a face is added, so the answers are the same (`aFontAddedAfterALookupIsFound`).
+10. **`face` answers kept (2026-10-31).** Font fallback (`cascade`) asks `face(family, style)` once per text
+    cluster for each bundled family of the cluster's script, and each lookup walked every loaded face, lower-casing
+    each family. In the full Govdocs1 `.ppt` crash run, a deck with long runs of text in missing fonts took 94 s to
+    render every slide at quarter scale in Release. `face` now keeps its answer per family and style, cleared with
+    the others whenever a face is added: the same deck takes 1.1 s.
+    - **Generation guard.** An answer is kept only if no face was added while it was worked out (`State.generation`).
+      Otherwise a face added by another thread between the lookup and the store could be hidden behind a stale
+      answer. `documentFace` takes the same guard now.
+    - **Tests.** `FaceAnswerTests` checks that a kept answer gives way to an added font, and that 24,000 clusters of
+      Hebrew, Arabic, Thai and Devanagari in a missing family fall back quickly (14 s in a debug build before, 0.1 s
+      after).
 
 ## Port bugs found by the ported tests
 

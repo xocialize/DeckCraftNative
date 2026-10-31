@@ -86,7 +86,8 @@ A `.ppt` is never edited in place: it opens as an untitled converted copy, and S
     - one in text layout: `FontDB.find` scanning every loaded face once per text cell, for a long run of text in
       missing fonts falling back through the substitutes.
 
-    Left for a follow-up (DCRender performance), outside P6.
+    Left for a follow-up (DCRender performance), outside P6. Fixed on 2026-10-31: all five now render in 1.1–6.2 s
+    (`Packages/DCRender/PORT-NOTES.md`, "Render cost", and `Packages/DCText/PORT-NOTES.md`, divergence 10).
   - **It found a hang, outside DCPPT.** Four files in the first part timed out with almost no CPU. FontDB asked
     CoreText for "Osaka", a font macOS downloads on demand but hadn't. Every CoreText lookup of such a font starts
     the download and puts up macOS's download prompt, then blocks until someone answers it. Unattended, as dccli

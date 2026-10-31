@@ -31,7 +31,11 @@ public enum MetafileRender {
 
     /// Draws the metafile `bytes` into straight RGBA with its longer side `side` px (transparent where it
     /// draws nothing). nil when it doesn't parse or has no size.
-    public static func rasterize(_ bytes: [UInt8], _ side: Int) -> StraightImage? {
+    public static func rasterize(_ bytes: [UInt8], _ side: Int) -> StraightImage? { rasterize(bytes, side, inkBounds: true) }
+
+    /// `inkBounds` false gives each clip layer the size of its whole region, as before the layers were bounded by
+    /// their items' ink (for the tests, which check the pixels are the same).
+    static func rasterize(_ bytes: [UInt8], _ side: Int, inkBounds: Bool) -> StraightImage? {
         guard var pic = try? Metafile.parse(bytes), pic.hasSize else { return nil }
         let s = Double(Swift.min(Swift.max(side, 16), maxSide))
         let (pw, ph) = (Double(pic.width), Double(pic.height))
@@ -49,8 +53,8 @@ public enum MetafileRender {
         for it in pic.place(r, crop: .zero) {
             switch it {
             case .path(let path, let fill, let stroke, let evenOdd, let region):
-                clipped(c, region) {
-                    let p = bez(path)
+                let p = bez(path)
+                clipped(c, region, inkBounds ? ink(p, stroke.map { $0.1.rustMax(1) / 2 } ?? 0) : nil) {
                     if let f = fill {
                         c.setPaint(.solid(rgba(f), 1))
                         c.setFillRule(evenOdd ? .evenOdd : .nonZero)
@@ -64,7 +68,7 @@ public enum MetafileRender {
                     }
                 }
             case .bitmap(let index, let rect, let region):
-                clipped(c, region) {
+                clipped(c, region, inkBounds ? Rect(rect.x0, rect.y0, rect.x1, rect.y1) : nil) {
                     guard let img = images.at(index) ?? nil else { return }
                     let (bw, bh) = (Double(Swift.max(img.width, 1)), Double(Swift.max(img.height, 1)))
                     c.setPaint(.image(img, xExtend: .pad, yExtend: .pad, quality: .medium, alpha: 1))
@@ -73,7 +77,8 @@ public enum MetafileRender {
                     c.resetPaintTransform()
                 }
             case .pattern(let index, let path, let evenOdd, let tile, let region):
-                clipped(c, region) {
+                let p = bez(path)
+                clipped(c, region, inkBounds ? ink(p, 0) : nil) {
                     guard case .pattern(_, _, let t, _)? = pic.items.at(index) else { return }
                     let key = ObjectIdentifier(t)
                     let (img, avg) = tiles[key] ?? {
@@ -86,15 +91,16 @@ public enum MetafileRender {
                     if let img, Swift.abs(m.determinant).squareRoot() >= minCellPx {
                         c.setPaint(.image(img, xExtend: .repeat, yExtend: .repeat, quality: .low, alpha: 1))
                         c.setPaintTransform(m)
-                        c.fillPath(bez(path))
+                        c.fillPath(p)
                         c.resetPaintTransform()
                     } else {
                         c.setPaint(.solid(avg, 1))
-                        c.fillPath(bez(path))
+                        c.fillPath(p)
                     }
                 }
             case .text(let index, let transform, let clip, let region):
-                clipped(c, region) {
+                // Text is placed as it is drawn; its own clip, when it has one, bounds it.
+                clipped(c, region, inkBounds ? clip.map { Rect($0.x0, $0.y0, $0.x1, $0.y1) } : nil) {
                     guard case .text(let t)? = pic.items.at(index) else { return }
                     if let clip { c.pushClipLayer(rectPath(Rect(clip.x0, clip.y0, clip.x1, clip.y1))) }
                     drawText(c, t, affine(transform))
@@ -108,13 +114,36 @@ public enum MetafileRender {
         return StraightImage(width: w, height: h, pixels: img.toStraight())
     }
 
-    /// Draws `draw` inside the device-context clip. No region is the default clip.
-    static func clipped(_ c: Canvas, _ region: MetafilePath?, _ draw: () -> Void) {
+    /// Draws `draw` inside the device-context clip. No region is the default clip. `ink` (output pixels) is
+    /// where the item draws, when known: its clip layer covers no more (`Canvas.pushLayer`'s `bounds`). Not in
+    /// deckcraft's shape: a picture of thousands of items in a region as large as the canvas made a canvas-sized
+    /// layer for each, copied on every pop; the Govdocs1 crash run (2026-10-31) found decks that took a minute.
+    static func clipped(_ c: Canvas, _ region: MetafilePath?, _ ink: Rect?, _ draw: () -> Void) {
         guard let region else { return draw() }
         c.setTransform(.identity)
-        c.pushClipLayer(bez(region))
+        c.pushClipLayer(bez(region), bounds: ink)
         draw()
         c.popLayer()
+    }
+
+    /// Where filling `p` and stroking it `halfWidth` wide (round joins) can draw: its points' bounds (control
+    /// points included, so they hold the curves), grown by the half width and a pixel for antialiasing.
+    static func ink(_ p: BezPath, _ halfWidth: Double) -> Rect? {
+        var b: Rect?
+        for el in p.elements {
+            let pts: [Point] = switch el {
+            case .moveTo(let q), .lineTo(let q): [q]
+            case .quadTo(let a, let q): [a, q]
+            case .curveTo(let a, let e, let q): [a, e, q]
+            case .closePath: []
+            }
+            for q in pts {
+                let v = b ?? Rect(q.x, q.y, q.x, q.y)
+                b = Rect(Swift.min(v.x0, q.x), Swift.min(v.y0, q.y), Swift.max(v.x1, q.x), Swift.max(v.y1, q.y))
+            }
+        }
+        let g = halfWidth + 1
+        return b.map { Rect($0.x0 - g, $0.y0 - g, $0.x1 + g, $0.y1 + g) }
     }
 
     static func bez(_ p: MetafilePath) -> BezPath {

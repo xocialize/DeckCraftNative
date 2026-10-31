@@ -7,6 +7,7 @@ import DCCore
 import DCGeometry
 import DCModel
 @testable import DCRender
+import Foundation
 import Testing
 
 @Suite struct StrokeTests {
@@ -239,5 +240,106 @@ import Testing
         var one = BezPath()
         one.moveTo(Point(1, 1))
         #expect(endPoints(one) == nil)
+    }
+}
+
+/// Strokes of paths far denser than the pixels they cross (`Canvas.thinned`). Not in deckcraft: a chart's series of
+/// thousands of points plotted over each other, stroked 1 px wide, took CoreGraphics seconds a stroke to fill.
+@Suite struct DenseStrokeTests {
+    /// `series` polylines of `points` points across 108 px, each wandering in a band `band` px high at y = 40.
+    func chart(_ series: Int, _ points: Int, band: Double) -> BezPath {
+        var seed: UInt64 = 0xC4A7
+        func unit() -> Double {
+            seed = seed &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Double(seed >> 11) / Double(1 << 53)
+        }
+        var p = BezPath()
+        for _ in 0 ..< series {
+            for i in 0 ..< points {
+                let q = Point(10 + 108 * Double(i) / Double(points - 1), 40 + band * unit())
+                if i == 0 { p.moveTo(q) } else { p.lineTo(q) }
+            }
+        }
+        return p
+    }
+
+    /// The subpaths of `p` as their points (moves and lines only).
+    func polylines(_ p: BezPath) -> [[Point]] {
+        var out: [[Point]] = []
+        for el in p.elements {
+            switch el {
+            case .moveTo(let q): out.append([q])
+            case .lineTo(let q): if !out.isEmpty { out[out.count - 1].append(q) }
+            default: break
+            }
+        }
+        return out
+    }
+
+    func distance(_ r: Point, _ p: Point, _ q: Point) -> Double {
+        let (dx, dy) = (q.x - p.x, q.y - p.y)
+        let l2 = dx * dx + dy * dy
+        let t = l2 > 0 ? Swift.min(1, Swift.max(0, ((r.x - p.x) * dx + (r.y - p.y) * dy) / l2)) : 0
+        return ((p.x + t * dx - r.x) * (p.x + t * dx - r.x) + (p.y + t * dy - r.y) * (p.y + t * dy - r.y)).squareRoot()
+    }
+
+    @Test func aDenseChartIsThinnedWithinTheTolerance() throws {
+        for scale in [1.0, 4.0] {
+            let path = chart(16, 750, band: 0.3 / scale)
+            let thin = Canvas.thinned(path, scale)
+            // Random points keep more than a real series would (a deck's charts kept a sixth).
+            #expect(thin.elements.count * 10 < path.elements.count * 7, "\(thin.elements.count) of \(path.elements.count) elements kept at \(scale)×")
+            let (before, after) = (polylines(path), polylines(thin))
+            try #require(before.count == after.count)
+            var worst = 0.0
+            for (all, kept) in zip(before, after) {
+                // The points kept are some of the originals, in order, ends included; every point dropped is within the
+                // tolerance of the kept segment it falls under.
+                #expect(kept.first == all.first && kept.last == all.last)
+                var k = 0
+                for r in all {
+                    if k < kept.count, r == kept[k] {
+                        k += 1
+                        continue
+                    }
+                    guard k > 0, k < kept.count else { continue }
+                    worst = Swift.max(worst, distance(r, kept[k - 1], kept[k]) * scale)
+                }
+                #expect(k == kept.count, "the kept points are a subsequence")
+            }
+            #expect(worst <= Canvas.thinTolerance + 1e-9, "a dropped point is \(worst) px from the line at \(scale)×")
+        }
+    }
+
+    @Test func ordinaryPathsAreNotThinned() {
+        // Few points; many points around a large circle; dense, but in curves.
+        var circle = BezPath()
+        for i in 0 ..< 5000 {
+            let a = Double(i) / 5000 * 2 * Double.pi
+            let q = Point(300 + 290 * cos(a), 300 + 290 * sin(a))
+            if i == 0 { circle.moveTo(q) } else { circle.lineTo(q) }
+        }
+        circle.closePath()
+        var curves = BezPath()
+        curves.moveTo(Point(0, 0))
+        for i in 0 ..< 3000 { curves.curveTo(Point(Double(i % 7), 1), Point(Double(i % 5), 2), Point(Double(i % 3), 0)) }
+        for p in [chart(1, 900, band: 0.3), circle, curves] { #expect(Canvas.thinned(p, 1) == p) }
+        // A dense chart is thinned only once it is dense on the canvas.
+        let dense = chart(2, 750, band: 0.3)
+        #expect(Canvas.thinned(dense, 1) != dense)
+        #expect(Canvas.thinned(dense, 20) == dense)
+    }
+
+    /// Unthinned, CoreGraphics takes about 4 s to fill this outline; thinned, a quarter of a second.
+    @Test func aDenseChartStrokeDrawsWhereItIs() throws {
+        let c = try #require(Canvas(width: 128, height: 87))
+        c.setPaint(.solid(.rgb(0, 0, 255), 1))
+        c.setStroke(StrokeStyle(1).withCaps(.round).withJoin(.round))
+        c.strokePath(chart(16, 750, band: 0.3))
+        let img = c.finish()
+        func alpha(_ x: Int, _ y: Int) -> UInt8 { img.pixels[(y * img.width + x) * 4 + 3] }
+        // The stroke covers y 39.5 to 40.8: four fifths of row 40.
+        #expect((12 ..< 116).allSatisfy { alpha($0, 40) > 180 }, "the band is drawn along its length")
+        #expect(alpha(64, 37) == 0 && alpha(64, 43) == 0 && alpha(5, 40) == 0 && alpha(122, 40) == 0, "and nothing past it")
     }
 }

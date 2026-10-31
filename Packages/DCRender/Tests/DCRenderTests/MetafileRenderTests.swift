@@ -8,6 +8,8 @@ import DCCore
 import DCGeometry
 import DCModel
 @testable import DCRender
+import DCTestSupport
+import Foundation
 import Testing
 
 private extension Array where Element == UInt8 {
@@ -286,5 +288,80 @@ private func mfInk(_ img: StraightImage) -> (Int, Int, Int, Int)? {
         func opaque(_ x: Int, _ y: Int) -> Bool { px(img, x, y)[3] > 200 }
         #expect(opaque(20, 25), "the clipped half is drawn")
         #expect(!opaque(80, 25), "past the clip the picture stays clear, pixel \(px(img, 80, 25))")
+    }
+}
+
+/// A placeable WMF, 2 × 1 inch, of `count` items under one clip region a little inside the picture (its edges off
+/// the pixel grid): rectangles, ellipses and polylines in three brushes and a wide pen, and text, some of it
+/// clipped to its own rectangle, scattered by a fixed sequence so that some items cross the region's edges.
+private func clippedItemsWMF(_ count: Int) -> [UInt8] {
+    var seed: UInt64 = 0x5EED
+    func next(_ n: Int) -> Int {
+        seed = seed &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        return Int(seed >> 33) % n
+    }
+    // The font is object 0 (`fontRecords` selects it), the brushes 1–3, the pen 4.
+    var recs = fontRecords(-160, 0, "Arial", 0)
+    for (lo, hi) in [(0x00FF, 0), (0xC000, 0x0010), (0x2020, 0x00E0)] { recs.append((0x02FC, i16s([0, lo, hi, 0]))) }
+    recs += [(0x02FA, i16s([0, 30, 0, 0x0040, 0x0080])), (0x012D, i16s([4])), (0x0416, i16s([1395, 2850, 37, 23]))]
+    for i in 0 ..< count {
+        recs.append((0x012D, i16s([1 + i % 3])))
+        let (x, y, w, h) = (next(2900) - 20, next(1460) - 20, 20 + next(300), 20 + next(200))
+        switch i % 4 {
+        case 0: recs.append((0x041B, i16s([y + h, x + w, y, x])))
+        case 1: recs.append((0x0418, i16s([y + h, x + w, y, x])))
+        case 2: recs.append((0x0325, i16s([4, x, y, x + w, y + h / 3, x + w / 2, y + h, x + w / 3, y + h / 2])))
+        default:
+            if i % 8 == 3 {
+                // EXTTEXTOUT, ETO_CLIPPED to a rectangle narrower than the text.
+                recs.append((0x0A32, i16s([y, x, 2, 4, x, y - 40, x + 60, y + 180]) + Array("Ab".utf8)))
+            } else {
+                recs.append(textRecord(x, y, "Ab"))
+            }
+        }
+    }
+    return wmfWith(2880, 1440, recs)
+}
+
+/// Metafiles of many items under clip regions. Not in deckcraft: each clipped item made a clip layer the size of its
+/// region, which `Canvas.popLayer` copies, so a picture of thousands of items took a minute; the layers are now
+/// bounded by their items' ink (`MetafileRender.clipped`), and the pixels must not change.
+@Suite struct MetafileClipLayerTests {
+    @Test func clipLayersBoundedByTheirItemsChangeNoPixel() throws {
+        let wmf = clippedItemsWMF(600)
+        for side in [300, 1024] {
+            let bounded = try #require(MetafileRender.rasterize(wmf, side, inkBounds: true))
+            let whole = try #require(MetafileRender.rasterize(wmf, side, inkBounds: false))
+            #expect(bounded.pixels.contains { $0 != 0 }, "the picture draws at \(side)")
+            let differ = zip(bounded.pixels, whole.pixels).filter { $0 != $1 }.count
+            #expect(bounded.width == whole.width && bounded.height == whole.height && differ == 0, "\(differ) bytes differ at \(side)")
+        }
+    }
+
+    /// The oracle's metafiles (`Tools/oracle/metafile-vectors`: clips, text, brushes, bitmaps and mutations of each).
+    @Test func theOracleMetafilesDrawTheSameWithBoundedLayers() throws {
+        let dir = Fixtures.root.appending(path: "metafile", directoryHint: .isDirectory)
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: dir.path) else { return }
+        var drawn = 0
+        var differ: [String] = []
+        for name in names.sorted() where name.hasSuffix(".bin") {
+            guard let data = FileManager.default.contents(atPath: dir.appending(path: name).path) else { continue }
+            let bytes = [UInt8](data)
+            let bounded = MetafileRender.rasterize(bytes, 256, inkBounds: true)
+            let whole = MetafileRender.rasterize(bytes, 256, inkBounds: false)
+            if bounded?.pixels != whole?.pixels { differ.append(name) }
+            if bounded != nil { drawn += 1 }
+        }
+        #expect(drawn > 100, "\(drawn) metafiles drawn")
+        #expect(differ.isEmpty, "\(differ)")
+    }
+
+    @Test func thousandsOfClippedItemsDrawPromptly() throws {
+        let wmf = clippedItemsWMF(6000)
+        let start = Date()
+        let img = try #require(MetafileRender.rasterize(wmf, 2048))
+        // A zeroed, copied layer the size of the canvas per item took 33 s in a debug build; now about a second.
+        #expect(Date().timeIntervalSince(start) < 10)
+        #expect(img.pixels.contains { $0 != 0 })
     }
 }

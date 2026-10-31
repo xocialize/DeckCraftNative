@@ -15,11 +15,15 @@ public let missingFontFamily = "Calibri"
 
 public final class FontDB: Sendable {
     private struct State {
-        var faces: [FontFace] = [] { didSet { fallbackOrder = nil; documentFaces = [:] } }
+        var faces: [FontFace] = [] { didSet { fallbackOrder = nil; documentFaces = [:]; faceAnswers = [:]; generation &+= 1 } }
         /// `faces` in fallback order (`loadedFallback`), made when first needed after a change.
         var fallbackOrder: [FontFace]?
         /// `documentFace` answers by family and style, until a face is added.
         var documentFaces: [String: FontFace] = [:]
+        /// `face` answers by family and style, until a face is added.
+        var faceAnswers: [String: FontFace] = [:]
+        /// Counts changes to `faces`: an answer is kept only if no face was added while it was worked out.
+        var generation = 0
         /// Families (lower case) whose installed faces have been looked for.
         var loadedFamilies: Set<String> = []
         /// Characters no system font covers.
@@ -340,7 +344,20 @@ public final class FontDB: Sendable {
 
     /// Resolve a family + style to a face: the closest style of the family, then an open substitute,
     /// then Inter and the usual sans families.
+    ///
+    /// Not in deckcraft's shape: the answer is kept until a face is added (`faceAnswers`). Font fallback asks once per
+    /// text cluster for each bundled family of the cluster's script, and each lookup walked every loaded face: a deck
+    /// with long runs of text in missing fonts took 100 s to draw (Govdocs1 crash run, 2026-10-31).
     public func face(_ family: String, _ style: String) -> FontFace {
+        let key = family + "\u{0}" + style
+        let (known, generation) = state.withLock { ($0.faceAnswers[key], $0.generation) }
+        if let known { return known }
+        let f = resolveFace(family, style)
+        state.withLock { if $0.generation == generation { $0.faceAnswers[key] = f } }
+        return f
+    }
+
+    private func resolveFace(_ family: String, _ style: String) -> FontFace {
         if let f = tryFamily(family, style) { return f }
         for sub in FontDB.substitutes(family) {
             if let f = tryFamily(sub, style) { return f }
@@ -359,9 +376,10 @@ public final class FontDB: Sendable {
     /// text layout asks once per run, which with the system's fonts loaded was most of a slide's drawing time.
     public func documentFace(_ family: String, _ style: String) -> FontFace {
         let key = family + "\u{0}" + style
-        if let f = state.withLock({ $0.documentFaces[key] }) { return f }
+        let (known, generation) = state.withLock { ($0.documentFaces[key], $0.generation) }
+        if let known { return known }
         let f = resolveDocumentFace(family, style)
-        state.withLock { $0.documentFaces[key] = f }
+        state.withLock { if $0.generation == generation { $0.documentFaces[key] = f } }
         return f
     }
 
