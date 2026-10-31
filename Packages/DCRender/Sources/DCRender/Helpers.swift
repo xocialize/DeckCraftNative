@@ -26,6 +26,22 @@ public func scaleOf(_ m: Affine) -> Double { Swift.abs(m.determinant).squareRoot
 /// deckcraft's `blur(sigma)`: a Gaussian standard deviation, clamped as vello clamps it.
 func blurSigma(_ sigma: Double) -> Double { sigma.clamped(0, 500) }
 
+/// The widest a shape may reach on screen, in pixels, and still be drawn: ten thousand screens
+/// across, far past any real deck (deckcraft #1165).
+let maxDeviceExtent = 1e7
+
+/// Whether a shape's geometry is drawn (deckcraft's `geometry::drawable`). Geometry far beyond any
+/// screen (a size at the EMU limit, group scales compounding, custom-geometry guides) made vello's
+/// flattener allocate a buffer by its on-screen length and abort; here it would cost CoreGraphics as
+/// much, so such a shape is skipped as deckcraft skips it. Each path is checked for finite points
+/// first: a bounding box drops NaN, and a union with the frame would hide it. The extent is the
+/// control box, which always holds the curve, unioned with the `w` x `h` frame and placed by `m`.
+func drawable(_ geo: Preset.Geometry, _ m: Affine, _ w: Double, _ h: Double) -> Bool {
+    guard geo.paths.allSatisfy(\.path.isFinite) else { return false }
+    let dev = m.transformRectBBox(geo.outline.controlBox.union(Rect(0, 0, w, h)))
+    return dev.isFinite && dev.width.rustMax(dev.height) <= maxDeviceExtent
+}
+
 /// The rectangle a picture's image occupies given its crop (fractions; negative = padding).
 public func cropDest(_ bounds: Rect, _ crop: [Double]) -> Rect {
     let c = (0 ..< 4).map { i -> Double in

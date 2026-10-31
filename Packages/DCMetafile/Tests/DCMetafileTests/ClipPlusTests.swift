@@ -415,6 +415,29 @@ func fontObj(_ family: String, _ em: Float, _ unit: UInt32, _ style: UInt32) -> 
     #expect((p.width, p.height) == (20, 20))
 }
 
+@Test func emfplusRegionPathCannotReadIntoItsSibling() throws {
+    func rect(_ r: [Float]) -> [UInt8] { cat([h32(0x1000_0000), f32s(r)]) }
+    // The path declares only its 12-byte header, but claims three points. The following
+    // rectangle must not supply those points or be parsed twice as the next node.
+    let path = cat([h32(0x1000_0001), h32(12), h32(0), h32(3), h32(0)])
+    let region = cat([h32(0xDBC0_1002), h32(2), h32(1), path, rect([10, 10, 20, 20])])
+    let fill = prec(0x400A, 0x8000, cat([h32(0xFF00_0000), h32(1), f32s([0, 0, 100, 100])]))
+    let p = try plusPic([prec(0x4008, 0x0400 | 6, region), prec(0x4034, 6, []), fill])
+    #expect(p.items.count == 1)
+    #expect((p.width, p.height) == (100, 100))
+}
+
+@Test func emfplusRegionPathKeepsItsShape() throws {
+    var pathData = cat([h32(0), h32(4), h32(0x4000)])
+    for (x, y) in [(10, 10), (30, 10), (30, 30), (10, 30)] { pathData += h16(x) + h16(y) }
+    pathData += [0, 1, 1, 0x81]
+    let pathNode = cat([h32(0x1000_0001), h32(UInt32(pathData.count)), pathData])
+    let region = cat([h32(0xDBC0_1002), h32(1), pathNode])
+    let fill = prec(0x400A, 0x8000, cat([h32(0xFF00_0000), h32(1), f32s([0, 0, 100, 100])]))
+    let p = try plusPic([prec(0x4008, 0x0400 | 6, region), prec(0x4034, 6, []), fill])
+    #expect((p.width, p.height) == (20, 20))
+}
+
 @Test func emfplusPieAndArc() throws {
     // A quarter pie from 0 to 90 degrees in a 0..100 circle: centre, then (100, 50) round to (50, 100).
     let pie = prec(0x4010, 0x8000, cat([h32(0xFF00_0000), f32s([0, 90]), f32s([0, 0, 100, 100])]))

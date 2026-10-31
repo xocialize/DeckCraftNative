@@ -50,6 +50,9 @@ public struct ShowState: Sendable, Equatable {
     public var playing = false
     /// On the end screen.
     public var ended = false
+    /// The current slide was reached by going back (← / Backspace), so the show plays the transition of the
+    /// slide it left, in reverse, as PowerPoint does (#1531).
+    public var backward = false
     /// The show has entered a slide (so `slide` and `step` are meaningful and can be saved).
     private var active = false
     /// The time of the last `tick` (seconds), for the triggered animations' clocks.
@@ -191,6 +194,7 @@ extension ShowState {
         active = true
         slide = i
         ended = false
+        backward = false
         // Time spent elsewhere never counts for this slide's triggered animations.
         lastNow = nil
         let steps = ShowState.steps(pres, i)
@@ -273,6 +277,7 @@ extension ShowState {
             if slide >= pres.slides.count { return .none_ }
             step = ShowState.steps(pres, slide)
             playing = false
+            backward = false
             return .slide(slide)
         }
         // #844: undoing the automatic first step left the slide as before it appeared, and the show played
@@ -300,6 +305,7 @@ extension ShowState {
             step = ShowState.steps(pres, i)
             playing = false
         }
+        backward = true
         return .slide(i)
     }
 

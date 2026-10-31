@@ -886,6 +886,25 @@ private func tr(_ kind: String, _ option: String) -> Transition {
         #expect(a == .none_)
     }
 
+    @Test func showRemembersASlideWasReachedByGoingBack() {
+        // #1531: the UI plays the left slide's transition reversed only for Back.
+        let p = pres(3)
+        var s = ShowState(p)
+        #expect(s.next(p) == .slide(1))
+        #expect(!s.backward)
+        #expect(s.prev(p) == .slide(0))
+        #expect(s.backward)
+        #expect(s.next(p) == .slide(1))
+        #expect(!s.backward)
+        #expect(s.goto(p, 0) == .slide(0))
+        #expect(!s.backward, "a jump is not Back")
+        // Back from the end screen shows the last slide again, without a transition to reverse.
+        #expect(s.goto(p, 2) == .slide(2))
+        #expect(s.next(p) == .end)
+        #expect(s.prev(p) == .slide(2))
+        #expect(!s.backward)
+    }
+
     @Test func showLoops() {
         var p = pres(3)
         p.show.loopUntilEsc = true

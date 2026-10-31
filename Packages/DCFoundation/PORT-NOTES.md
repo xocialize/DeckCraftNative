@@ -88,3 +88,10 @@ of the JSON shape serde writes (8 tests).
   `rustTrim`.
 - **Signed zeros.** DCCore's `clamped`, `rustMin` and `rustMax` now treat signed zeros as Rust does on Apple
   silicon. The geometry port found the gap, and DCGeometry still uses its own copies, which agree.
+
+## Pin move 88c2ceff → a3fbf029
+
+- **DCGeometry: `BezPath.controlBox`** (kurbo `control_box`) is new. It gives the box of every point, control
+  points included, and DCRender's `drawable` needs it (deckcraft b1645b00).
+- **No port needed:** e03ff825 (geom's Clippy refactor). The preset `build` match was split into five groups
+  chained with `or_else`. No arm returned early, so the order and results are unchanged.

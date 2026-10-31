@@ -131,3 +131,13 @@ Tools/oracle/oracle.sh anim-vectors                 # anim/, deterministic: a re
 
 The whole of DCAnimTests (102 tests) takes about 35 s in a debug test run, most of it the vectors, and about
 10 s in release.
+
+## Pin move 88c2ceff → a3fbf029
+
+- **Ported: `ShowState.backward`** (8cc25169, #1531). `prev` sets it when it moves to another slide. Every
+  other way onto a slide clears it (`enter`), and so does Back from the end screen. The show uses it to play
+  the left slide's transition in reverse. The test is ported in `AnimTests`. Reversing the layers (deckcraft's
+  `ui-egui` `transition_layers`) belongs to the app, not here.
+- **Not here:** 1e842137 (Darken and Desaturate preset ids, the HSL shift and default durations) changes the
+  model's table and the PPTX writer. Neither `anim` nor `render` changed, and the emphasis tints in
+  `Effects.swift` stay as they were.

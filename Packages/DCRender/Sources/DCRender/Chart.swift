@@ -585,8 +585,7 @@ public enum ChartRender {
                             errMarks.append((mid, p0, p1, bar.rustMin(base * 0.8) * 0.5, e.endCap))
                         }
                     }
-                    if c.seriesDataLabels(s) {
-                        let t = c.dataLabel(s, (s.values.at(i) ?? nil) ?? 0)
+                    if let t = barDataLabel(c, s, i) {
                         let lr = horiz ? Rect(r.x1 + 2, r.y0, r.x1 + 40, r.y1) : Rect(r.x0 - 10, r.y0 - base * 1.4, r.x1 + 10, r.y0)
                         label(ctx, rctx, m, t, lr, base * 0.9, horiz ? .left : .center, horiz ? .middle : .bottom, textCol, false)
                     }
@@ -702,6 +701,13 @@ public enum ChartRender {
     static func clampSoft(_ v: Double, _ lo: Double, _ hi: Double) -> Double {
         let v = v < lo ? lo : v
         return v > hi ? hi : v
+    }
+
+    /// The data label of bar `i` of series `s`, if the series shows labels; a missing value has none,
+    /// an explicit zero does.
+    static func barDataLabel(_ c: Chart, _ s: Series, _ i: Int) -> String? {
+        guard c.seriesDataLabels(s), let v = s.values.at(i) ?? nil else { return nil }
+        return c.dataLabel(s, v)
     }
 
     /// A corner of `plot` whose box stays clear of `pts` (the drawn trendline).

@@ -131,6 +131,18 @@ let solidRed = Rgba.rgb(255, 0, 0)
         #expect(ChartRender.forecastPad(c) == (0, 0))
     }
 
+    @Test func missingBarValuesHaveNoLabelButExplicitZeroDoes() {
+        var chart = Chart.default
+        chart.dataLabels = true
+        var series = Series.default
+        series.values = [1, nil, 3]
+        let labels = series.values.indices.compactMap { ChartRender.barDataLabel(chart, series, $0) }
+        #expect(labels == ["1", "3"])
+        var zero = Series.default
+        zero.values = [0]
+        #expect(ChartRender.barDataLabel(chart, zero, 0) == "0")
+    }
+
     // MARK: tests.rs
 
     @Test func effectsTablesChartsRender() {

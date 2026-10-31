@@ -107,3 +107,16 @@ PATH=/opt/homebrew/opt/rustup/bin:$PATH CARGO_TARGET_DIR=~/Library/Caches/DeckCr
   256 × 256); the rest of the suite runs in about 1 s.
 - `Float.rustMin/rustMax` and `Int`/`Int64` saturating adds are internal here; they belong in DCCore if another
   port needs them.
+
+## Pin move 88c2ceff → a3fbf029
+
+- **Ported: EMF+ region path reads are bounded** (d9f90c51). The fix has two parts:
+  - A path node is now parsed from its own `size` bytes only. Before, it read to the end of the record, so a
+    path claiming more points than it holds could take them from the next node. A path node under 12 bytes,
+    or a path that doesn't parse, makes the whole region fail; before, it became an empty area.
+  - The nodes and path points of one region are counted together, sibling branches included, and capped at
+    `maxPoints`.
+
+  Both tests are ported in `ClipPlusTests`.
+- **No port needed:** f441ea93 (the Clippy split of `record`), checked arm by arm. The `emfplus.rs` change in
+  505a6f28 is the same condition rewritten by De Morgan's law.
