@@ -90,16 +90,28 @@ struct MasterStyles {
 struct Masters {
     /// Master id → its container's persist object.
     var byId: [UInt32: (bytes: [UInt8], record: Record)] = [:]
-    /// The first main master: its styles, scheme and background become the DCModel master's.
+    /// Each master object once, by persist id: a list naming one again (under another master id) shares it.
+    var objects: [UInt32: (bytes: [UInt8], record: Record)] = [:]
+    /// The first main master: its styles, scheme, background and graphics become the DCModel master's.
     var main: (bytes: [UInt8], record: Record)?
+    /// Its master id.
+    var mainId: UInt32?
 
     static func read(_ file: PPTFile, _ doc: [UInt8], _ document: [Record]) -> Masters {
         var m = Masters()
         guard let list = document.first(where: { $0.type == RT.slideListWithText && $0.instance == 1 }) else { return m }
         for r in list.children(doc) where r.type == RT.slidePersistAtom && r.body.count >= 16 {
-            guard let o = file.object(le32(doc, r.body.lowerBound)), let c = Record(o, at: 0), c.isContainer else { continue }
+            let ref = le32(doc, r.body.lowerBound)
+            if m.objects[ref] == nil {
+                guard m.objects.count < PPT.maxSlides, let o = file.object(ref), let c = Record(o, at: 0), c.isContainer else { continue }
+                m.objects[ref] = (o, c)
+            }
+            guard let (o, c) = m.objects[ref] else { continue }
             m.byId[le32(doc, r.body.lowerBound + 12)] = (o, c)
-            if m.main == nil, c.type == RT.mainMaster { m.main = (o, c) }
+            if m.main == nil, c.type == RT.mainMaster {
+                m.main = (o, c)
+                m.mainId = le32(doc, r.body.lowerBound + 12)
+            }
         }
         return m
     }
@@ -114,11 +126,17 @@ struct Masters {
                 add(d.children)
             }
         }
-        for (b, r) in byId.values { add(Drawing.tree(b, r).shapes) }
+        for (b, r) in objects.values { add(Drawing.tree(b, r).shapes) }
         return out
     }
 
-    /// A slide's (or title master's) SlideAtom: its master id and SlideFlags.
+    /// A main master's name ([MS-PPT] 2.5.3 MainMasterContainer's slideNameAtom, PowerPoint 2002 and later).
+    static func name(_ b: [UInt8], _ c: Record) -> String? {
+        c.children(b).first { $0.type == RT.cString && $0.instance == 3 }.map { Document.unicode(b, $0.body) }.flatMap { $0.isEmpty ? nil : $0 }
+    }
+
+    /// A slide's (or title master's) SlideAtom: its master id and SlideFlags (fMasterObjects 0x1, fMasterScheme 0x2,
+    /// fMasterBackground 0x4).
     static func slideAtom(_ b: [UInt8], _ c: Record) -> (masterId: UInt32, flags: UInt16)? {
         guard let a = c.children(b).first(where: { $0.type == RT.slideAtom }), a.body.count >= 22 else { return nil }
         return (le32(b, a.body.lowerBound + 12), le16(b, a.body.lowerBound + 20))

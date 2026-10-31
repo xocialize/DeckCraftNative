@@ -252,12 +252,34 @@ public final class FontDB: Sendable {
         }
     }
 
+    /// The fonts installed on this Mac by every name CoreText finds them by (family, PostScript and full names, ASCII
+    /// lower case), read once. CoreText is asked about a name only when it is one of these: asked about a font macOS
+    /// can download on demand but hasn't (Osaka, found by the legacy crash corpus), it starts the download and blocks
+    /// until a person answers a prompt that a process without windows (dccli, the extensions) never shows.
+    static let installedNames: Set<String> = {
+        var names = Set<String>()
+        for n in (CTFontManagerCopyAvailableFontFamilyNames() as? [String]) ?? [] { names.insert(rustASCIILowercase(n)) }
+        for n in (CTFontManagerCopyAvailablePostScriptNames() as? [String]) ?? [] { names.insert(rustASCIILowercase(n)) }
+        let all = CTFontCollectionCreateMatchingFontDescriptors(CTFontCollectionCreateFromAvailableFonts(nil)) as? [CTFontDescriptor] ?? []
+        for d in all {
+            if let n = CTFontDescriptorCopyAttribute(d, kCTFontDisplayNameAttribute) as? String { names.insert(rustASCIILowercase(n)) }
+        }
+        return names
+    }()
+
+    /// Whether a font is installed under `name` (a family, PostScript or full name): only then is it safe to look
+    /// it up through CoreText or AppKit (`installedNames`).
+    public static func isInstalled(_ name: String) -> Bool { installedNames.contains(rustASCIILowercase(name)) }
+
     private func installedFaces(_ family: String, _ key: String) -> [FontFace] {
         var new: [FontFace] = []
-        let byFamily = CTFontDescriptorCreateWithAttributes([kCTFontFamilyNameAttribute: family] as CFDictionary)
-        let matches = (CTFontDescriptorCreateMatchingFontDescriptors(byFamily, Set([kCTFontFamilyNameAttribute as String]) as CFSet) as? [CTFontDescriptor]) ?? []
-        for d in matches { new += FontDB.facesOf(descriptor: d, bundled: false) }
-        if new.isEmpty {
+        let installed = FontDB.installedNames.contains(key)
+        if installed {
+            let byFamily = CTFontDescriptorCreateWithAttributes([kCTFontFamilyNameAttribute: family] as CFDictionary)
+            let matches = (CTFontDescriptorCreateMatchingFontDescriptors(byFamily, Set([kCTFontFamilyNameAttribute as String]) as CFSet) as? [CTFontDescriptor]) ?? []
+            for d in matches { new += FontDB.facesOf(descriptor: d, bundled: false) }
+        }
+        if new.isEmpty, installed {
             // A Windows family name ("Segoe UI Semibold", "Arial Black"): CoreText finds it by name.
             let byName = CTFontDescriptorCreateWithNameAndSize(family as CFString, 0)
             let f = CTFontCreateWithFontDescriptor(byName, 0, nil)

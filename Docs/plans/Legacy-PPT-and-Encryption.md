@@ -1,6 +1,6 @@
 # Legacy .ppt and password-protected presentations
 
-**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P5 are done** (§5, the milestone notes); P6 is next. · **Pin:**
+**Status:** plan, draft 2, 2026-10-30. The operator's decisions are recorded (§9). **E0–E3 are done** and released in 0.1.7; **P1–P6 are done** (§5, the milestone notes); `.ppt` support awaits the operator's release decision. · **Pin:**
 deckcraft `88c2ceff` · **Reads with:** [PLAN.md](../../PLAN.md) §11, [EVALUATION.md](../../EVALUATION.md) §1,
 [PORT-STATUS.md](../../PORT-STATUS.md), DCPPTX's and DCEngine's PORT-NOTES.
 
@@ -152,6 +152,31 @@ PORT-STATUS, as before.
 
 [MS-PPT]'s animation chapter alone is 125 pages, and its text chapter 66; most of [MS-ODRAW]'s 373 pages of
 properties are Word and Excel borders, positioning and toolbars that a PowerPoint reader skips.
+
+### P6 notes (2026-10-31)
+
+- **Added with the operator: the masters' own graphics.** 63% of the first crash corpus's decks have shapes on
+  their main master, and none came over.
+  - The first main master's become the DCModel master's.
+  - Every other master a slide follows (a title master, or another main master) becomes a layout with its own
+    graphics and background.
+  - Slides hide them as their SlideFlags say.
+  - The oracle is `Tools/legacy/masters-deck.py`, saved by LibreOffice and by PowerPoint; POI's dump gained the
+    masters.
+- **Bounded work.**
+  - Each slide object is read once: a slide list repeating one is the cheapest amplification there is.
+  - At most 10,000 slides, 20,000 shapes in a drawing, and one drawing's worth of master shapes in all.
+  - One placeholder per outline text.
+- **Fuzzing:** `FuzzTests` damages records where the readers look, in every fixture and PowerPoint's own files. It
+  imports the result, exports it, plays its animations and draws it.
+  - 77,000 damaged files: no trap, nothing slow.
+  - 7,700 of them through dccli's open and render: no crash or time-out.
+  - Damaged PICTs through AppKit.
+- **The crash corpus at full size:** all of Govdocs1's `.ppt` (about 49,700 files), in parallel.
+  - It found a hang outside DCPPT: CoreText downloading a font macOS offers on demand (Osaka) and waiting on a
+    prompt no window shows. FontDB now asks CoreText only about installed fonts.
+  - Results are in PORT-STATUS.
+- Details are in `Packages/DCPPT/PORT-NOTES.md`.
 
 ### P5 notes (2026-10-30)
 

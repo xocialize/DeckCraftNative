@@ -50,6 +50,8 @@ struct ConnectorRule {
 
 enum Drawing {
     static let maxDepth = 64
+    /// Most shapes read from one drawing, groups' members included (DCPPTX's limit for a slide part).
+    static let maxShapes = 20_000
 
     /// The shapes of a slide, notes page or master container (its DrawingContainer), flattened in z-order.
     static func shapes(_ b: [UInt8], _ container: Record) -> [DrawnShape] {
@@ -58,7 +60,8 @@ enum Drawing {
               let root = dg.children(b).first(where: { $0.type == RT.spgrContainer })
         else { return [] }
         var out: [DrawnShape] = []
-        walk(b, root, transform: nil, depth: 0, into: &out)
+        var count = 0
+        walk(b, root, transform: nil, depth: 0, into: &out, count: &count)
         return out
     }
 
@@ -77,15 +80,18 @@ enum Drawing {
             }
         }
         guard let root = kids.first(where: { $0.type == RT.spgrContainer }) else { return ([], rules) }
-        return (members(b, root, depth: 0), rules)
+        var count = 0
+        return (members(b, root, depth: 0, count: &count), rules)
     }
 
     /// A group container's shapes after its first (the group's own shape; at the top, the patriarch). Top-level shapes
     /// keep their client anchors; deeper ones their child anchors, untransformed.
-    static func members(_ b: [UInt8], _ group: Record, depth: Int) -> [DrawnShape] {
+    static func members(_ b: [UInt8], _ group: Record, depth: Int, count: inout Int) -> [DrawnShape] {
         guard depth < maxDepth else { return [] }
         var out: [DrawnShape] = []
         for c in group.children(b).dropFirst() {
+            guard count < maxShapes else { break }
+            count += 1
             switch c.type {
             case RT.spContainer:
                 let s = shape(b, c, transform: depth == 0 ? nil : Transform())
@@ -95,7 +101,7 @@ enum Drawing {
                 var g = shape(b, first, transform: depth == 0 ? nil : Transform())
                 guard !g.isDeleted else { continue }
                 g.space = groupSpace(b, first)
-                g.children = members(b, c, depth: depth + 1)
+                g.children = members(b, c, depth: depth + 1, count: &count)
                 out.append(g)
             default: continue
             }
@@ -134,7 +140,7 @@ enum Drawing {
 
     /// The shapes in a group container. `transform` maps child anchors to slide coordinates; nil for the top level,
     /// whose shapes use client anchors.
-    static func walk(_ b: [UInt8], _ group: Record, transform: Transform?, depth: Int, into out: inout [DrawnShape]) {
+    static func walk(_ b: [UInt8], _ group: Record, transform: Transform?, depth: Int, into out: inout [DrawnShape], count: inout Int) {
         guard depth < maxDepth else { return }
         let children = group.children(b)
         guard let first = children.first else { return }
@@ -148,12 +154,14 @@ enum Drawing {
             }
         }
         for c in children.dropFirst() {
+            guard count < maxShapes else { break }
+            count += 1
             switch c.type {
             case RT.spContainer:
                 let s = shape(b, c, transform: depth == 0 ? nil : inner)
                 if !s.isDeleted { out.append(s) }
             case RT.spgrContainer:
-                walk(b, c, transform: depth == 0 ? nil : inner, depth: depth + 1, into: &out)
+                walk(b, c, transform: depth == 0 ? nil : inner, depth: depth + 1, into: &out, count: &count)
             default: continue
             }
         }

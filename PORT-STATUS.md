@@ -477,7 +477,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     its ticket is stapled.
   - A build that reports 0.1.5, installed in `/Applications`, finds 0.1.6 through Check for Updates.
 
-- **Legacy `.ppt` and password protection: planned, E0 done (2026-10-30).** The plan is
+- **Legacy `.ppt` and password protection: E0–E3 released in 0.1.7; P1–P6 done on main (2026-10-31).** The plan is
   `Docs/plans/Legacy-PPT-and-Encryption.md`: encryption first (E1–E3, its own release), then a `.ppt` reader (P1–P6).
   E0 installed the test tools outside the repo, downloaded [MS-CFB] and [MS-OLEPS], and added `Tools/legacy/`, which
   makes 363 test files from our own decks into the fixtures (every encrypted copy decrypts to its plaintext with two
@@ -573,7 +573,18 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
         writes some transitions and builds;
       - PowerPoint's saves of five more decks;
       - the crash corpus, with every slide rendered.
-    - **Still to come:** hardening (P6). `.ppt` support isn't released yet.
+  - **P6 (2026-10-31): hardening, and the masters' own graphics.**
+    - **The template's graphics come over** (added with the operator): logos, bars and lines on the slide master,
+      title masters as layouts, and slides hiding them. 63% of the real decks have them.
+    - **Bounded work:** each slide object is read once, at most 10,000 slides and 20,000 shapes in a drawing, one
+      owner per outline text.
+    - **Fuzzing:** structure-aware damage to every record reader, the Pictures stream, encryption headers and PICT.
+      77,000 damaged files with no trap, and 7,700 of them through dccli's open and render with no crash or time-out.
+    - **The crash corpus at full size**, all of Govdocs1's `.ppt`. Its first part (11,551 files) found a hang in
+      FontDB, outside DCPPT: a font macOS downloads on demand (Osaka) blocked CoreText on a prompt no window shows.
+      FontDB now asks CoreText only about installed fonts, and the four files open in under a second.
+    - **Release:** notes drafted in `Docs/releases/0.1.8.md`; EVALUATION lists `.ppt` as done. Releasing awaits the
+      operator.
 
 ## Pin moves
 

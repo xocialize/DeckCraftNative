@@ -12,6 +12,7 @@ import DCEngine
 import DCGeometry
 import DCModel
 import DCRender
+import DCText
 import DesignScaffold
 
 /// Colours of the printed page (Notes Page view): the page is paper whatever the appearance, as a slide
@@ -377,7 +378,9 @@ final class NotesPageView: NSView {
         if let m = st.doc.notesMaster {
             for t in PDF.masterTexts(st.doc, m, Self.paper, idx + 1) {
                 let r = toView(t.rect, page, k)
-                var font = NSFont(name: t.style.family, size: CGFloat(t.style.size) * k) ?? NSFont.systemFont(ofSize: max(4, CGFloat(t.style.size) * k))
+                // Only an installed font is looked up by name: asking AppKit for one macOS downloads on demand blocks.
+                let named = FontDB.isInstalled(t.style.family) ? NSFont(name: t.style.family, size: CGFloat(t.style.size) * k) : nil
+                var font = named ?? NSFont.systemFont(ofSize: max(4, CGFloat(t.style.size) * k))
                 var traits: NSFontTraitMask = []
                 if t.style.bold { traits.insert(.boldFontMask) }
                 if t.style.italic { traits.insert(.italicFontMask) }

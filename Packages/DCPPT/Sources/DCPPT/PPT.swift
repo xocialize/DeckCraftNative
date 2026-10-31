@@ -20,6 +20,8 @@ public struct PPTReport: Sendable, Equatable {
     public var slides: Int
     /// 1-based numbers of the slides whose record couldn't be read (they're blank).
     public var unreadSlides: [Int]
+    /// Slides past `PPT.maxSlides`, left out.
+    public var slidesLeftOut = 0
     /// Saves in the file's edit chain (more than one: PowerPoint saved it incrementally).
     public var edits: Int
     public var encrypted: Bool
@@ -31,6 +33,14 @@ public struct PPTReport: Sendable, Equatable {
     public var lostPictures = 0
     /// PICT pictures converted to JPEG or PNG.
     public var convertedPictures = 0
+
+    public init(slides: Int, unreadSlides: [Int], edits: Int, encrypted: Bool, notImported: [String]) {
+        self.slides = slides
+        self.unreadSlides = unreadSlides
+        self.edits = edits
+        self.encrypted = encrypted
+        self.notImported = notImported
+    }
 }
 
 public enum PPT {
@@ -41,6 +51,10 @@ public enum PPT {
     static let pointsPerMasterUnit = 1.0 / 8.0
     /// The DocumentAtom's sizes are clamped to what PowerPoint allows (1 to 56 inches).
     static let sizeRange = 72.0 ... 4032.0
+    /// Most slides read from a file; the rest are left out and counted. The Govdocs1 corpus's largest deck has 85.
+    static let maxSlides = 10_000
+    /// Most masters other than the first that become layouts (LibreOffice writes one per layout: 11 for a new deck).
+    static let maxMasterLayouts = 256
 
     /// The presentation in a `.ppt`, and what the import couldn't bring over.
     public static func importChecked(_ bytes: [UInt8], password: String? = nil, hooks: PPTHooks = PPTHooks()) throws(PPTError)
@@ -68,14 +82,16 @@ public enum PPT {
         // The slide list: SlidePersistAtoms in the SlideListWithTextContainer of instance 0, each followed by its
         // slide's outline text (what its placeholders' OutlineTextRefAtoms point at).
         var slideRefs: [(ref: UInt32, slideId: UInt32, outline: [PPTText])] = []
+        var leftOut = 0
         if let list = children.first(where: { $0.type == RT.slideListWithText && $0.instance == 0 }) {
             var pending: [Record] = []
             for r in list.children(doc) {
                 if r.type == RT.slidePersistAtom, r.body.count >= 16 {
+                    guard slideRefs.count < maxSlides else { leftOut += 1; continue }
                     if !slideRefs.isEmpty { slideRefs[slideRefs.count - 1].outline = PPTText.bodies(doc, pending) }
                     pending = []
                     slideRefs.append((le32(doc, r.body.lowerBound), le32(doc, r.body.lowerBound + 12), []))
-                } else {
+                } else if leftOut == 0 {
                     pending.append(r)
                 }
             }
@@ -115,12 +131,88 @@ public enum PPT {
         if let hf = Document.headerFooter(doc, children) { p.headerFooter = hf }
         let notesBodies = notesText(file, doc, children, base)
 
+        // The masters' own graphics. All of them together are held to one drawing's worth of shapes, so a file of
+        // many masters can't multiply the work.
+        var masterBudget = Drawing.maxShapes
+        func built(_ b: [UInt8], _ r: Record, _ scheme: [Rgba]) -> [Shape] {
+            guard masterBudget > 0 else { return [] }
+            var builder = ShapeBuilder(b: b, outline: [], ctx: TextContext(fonts: fonts, scheme: scheme, styles: styles), hyperlinks: hyperlinks,
+                                       defaults: shapeDefaults, masterShapes: masterShapes, linked: scheme == masterScheme)
+            let (drawn, rules) = Drawing.tree(b, r)
+            pictures.add(drawn, &p, master: masterShapes)
+            builder.pictures = pictures.refs
+            builder.objects = objects
+            let shapes = builder.build(&p, drawn, rules: rules)
+            masterBudget -= max(1, shapes.count)
+            return shapes
+        }
+        // The first main master's go on the DCModel master, and its placeholders move the DCModel master's to where
+        // they are (where a new slide's, and the footers, go).
+        if let main = masters.main, !p.masters.isEmpty {
+            let shapes = built(main.bytes, main.record, masterScheme)
+            for s in shapes {
+                guard let ph = s.ph, let x = s.xfrm, let i = p.masters[0].shapes.firstIndex(where: { $0.ph?.kind == ph.kind }) else { continue }
+                p.masters[0].shapes[i].xfrm = x
+            }
+            p.masters[0].shapes += shapes.filter { $0.ph == nil }
+        }
+        // Every other master a slide follows, a title master or another main master, becomes a layout with its own
+        // graphics, background and placeholders (their positions only). A title master shows its main master's
+        // graphics as it says (fMasterObjects): through the DCModel master when that is its main master, in the
+        // layout itself otherwise.
+        var masterLayouts: [UInt32: LayoutId] = [:]
+        var titleMasters = 0, mainMasters = 1
+        func masterLayout(_ id: UInt32) -> LayoutId? {
+            if let l = masterLayouts[id] { return l }
+            guard id != masters.mainId, masterLayouts.count < Self.maxMasterLayouts, let (b, r) = masters.byId[id], !p.masters.isEmpty,
+                  let raw = p.allocId()
+            else { return nil }
+            let scheme = masters.scheme(master: id) ?? masterScheme
+            let atom = Masters.slideAtom(b, r)
+            let title = r.type == RT.slide
+            var shapes = built(b, r, scheme).map { s -> Shape in
+                guard let ph = s.ph else { return s }
+                var q = Shape.default
+                q.id = s.id
+                q.name = s.name
+                q.ph = ph
+                q.xfrm = s.xfrm
+                return q
+            }
+            var showMaster = false, bg: Background?
+            if title, let atom {
+                let follows = atom.flags & 0x1 != 0
+                if atom.masterId == masters.mainId {
+                    showMaster = follows
+                } else if let (mb, mr) = masters.byId[atom.masterId] {
+                    if follows { shapes = built(mb, mr, scheme).filter { $0.ph == nil } + shapes }
+                    if atom.flags & 0x4 != 0 { bg = background(mb, mr, scheme) }
+                }
+            }
+            if !title || atom.map({ $0.flags & 0x4 == 0 }) ?? false, let own = background(b, r, scheme) { bg = own }
+            let name: String
+            if title {
+                titleMasters += 1
+                name = titleMasters == 1 ? "Title Master" : "Title Master \(titleMasters)"
+            } else {
+                mainMasters += 1
+                name = Masters.name(b, r) ?? "Master \(mainMasters)"
+            }
+            p.masters[0].layouts.append(Layout(id: LayoutId(raw), name: name, kind: title ? .title : .custom, shapes: shapes,
+                                               background: bg, showMasterShapes: showMaster))
+            masterLayouts[id] = LayoutId(raw)
+            return LayoutId(raw)
+        }
+
         let layout = layoutOfKind(p, .blank) ?? p.masters.first?.layouts.first?.id ?? LayoutId(0)
         var unread: [Int] = []
+        // Each slide object is read once: a slide list naming one again would multiply its work, so the repeat is
+        // left blank.
+        var read = Set<UInt32>()
         for (i, entry) in slideRefs.enumerated() {
             // The deck can run out of ids only past millions of slides; a file can't make that many.
             guard var slide = newSlide(&p, layout) else { break }
-            if let o = file.object(entry.ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {
+            if read.insert(entry.ref).inserted, let o = file.object(entry.ref), let r = Record(o, at: 0), r.type == RT.slide, r.isContainer {
                 let scheme = masters.scheme(slide: o, r) ?? masterScheme
                 let ctx = TextContext(fonts: fonts, scheme: scheme, styles: styles)
                 var builder = ShapeBuilder(b: o, outline: entry.outline, ctx: ctx, hyperlinks: hyperlinks, defaults: shapeDefaults,
@@ -138,6 +230,10 @@ public enum PPT {
                 (slide.transition, slide.hidden) = SlideShow.transition(o, r) { objects.sound($0, &p) }
                 slide.animations = SlideShow.animations(o, r, drawn: drawn, shapes: slide.shapes, ids: builder.ids, scheme: scheme)
                 let atom = Masters.slideAtom(o, r)
+                if let atom {
+                    slide.showMasterShapes = atom.flags & 0x1 != 0
+                    if let l = masterLayout(atom.masterId) { slide.layout = l }
+                }
                 if let atom, atom.flags & 0x4 == 0, let bg = background(o, r, scheme) {
                     // Its own background.
                     slide.background = bg
@@ -152,8 +248,9 @@ public enum PPT {
             if let n = notesBodies[entry.slideId] { slide.notes = n }
             p.slides.append(slide)
         }
-        var report = PPTReport(slides: slideRefs.count, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
-                               notImported: ["the master's own shapes", "picture bullets"])
+        var report = PPTReport(slides: slideRefs.count + leftOut, unreadSlides: unread, edits: file.edits, encrypted: file.isEncrypted,
+                               notImported: ["picture bullets"])
+        report.slidesLeftOut = leftOut
         report.asPictures = asPictures
         report.lostPictures = pictures.lost.count
         report.convertedPictures = pictures.converted
@@ -200,8 +297,10 @@ public enum PPT {
     static func notesText(_ file: PPTFile, _ b: [UInt8], _ document: [Record], _ ctx: TextContext) -> [UInt32: TextBody] {
         guard let list = document.first(where: { $0.type == RT.slideListWithText && $0.instance == 2 }) else { return [:] }
         var out: [UInt32: TextBody] = [:]
+        var read = Set<UInt32>()
         for r in list.children(b) where r.type == RT.slidePersistAtom && r.body.count >= 4 {
-            guard let o = file.object(le32(b, r.body.lowerBound)), let notes = Record(o, at: 0), notes.type == RT.notes,
+            guard read.count < maxSlides, read.insert(le32(b, r.body.lowerBound)).inserted,
+                  let o = file.object(le32(b, r.body.lowerBound)), let notes = Record(o, at: 0), notes.type == RT.notes,
                   let atom = notes.children(o).first(where: { $0.type == RT.notesAtom }), atom.body.count >= 4
             else { continue }
             let slideId = le32(o, atom.body.lowerBound)

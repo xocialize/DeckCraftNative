@@ -145,7 +145,7 @@ import Testing
         guard !names.isEmpty else { return }
         struct Meta: Decodable { let password: String; let from: String }
         let counts = ["corpus-sample": 8, "corpus-content": 5, "corpus-charts": 6, "presets": 31, "pictures": 7, "motion": 38, "corpus-motion": 4,
-                      "engine-design-animations": 2, "engine-design-transitions": 3, "engine-transitions": 57]
+                      "engine-design-animations": 2, "engine-design-transitions": 3, "engine-transitions": 57, "masters": 5]
         for n in names {
             let meta = try JSONDecoder().decode(Meta.self, from: Data(contentsOf: dir.appending(path: "\(n).meta.json")))
             let bytes = Array(try Data(contentsOf: dir.appending(path: n)))
@@ -167,14 +167,16 @@ import Testing
             le16(ver | inst << 4) + le16(type) + le32(UInt32(len))
         }
 
-        /// A DocumentContainer with a DocumentAtom and a slide list of `slides` persist refs; returns its offset.
-        mutating func document(size: (Int32, Int32), slides: [UInt32]) -> Int {
+        /// A DocumentContainer with a DocumentAtom and a slide list of `slides` persist refs, each followed by
+        /// `outline` (its outline text records); returns its offset.
+        mutating func document(size: (Int32, Int32), slides: [UInt32], outline: [UInt8] = []) -> Int {
             var atom = Self.header(1, 0, RT.documentAtom, 40)
             atom += le32(UInt32(bitPattern: size.0)) + le32(UInt32(bitPattern: size.1)) + le32(5760) + le32(7680)
             atom += [UInt8](repeating: 0, count: 24)
             var list: [UInt8] = []
             for (i, s) in slides.enumerated() {
                 list += Self.header(0, 0, RT.slidePersistAtom, 20) + le32(s) + le32(0) + le32(0) + le32(UInt32(256 + i)) + le32(0)
+                list += outline
             }
             let slideList = Self.header(0xF, 0, RT.slideListWithText, list.count) + list
             let body = atom + slideList

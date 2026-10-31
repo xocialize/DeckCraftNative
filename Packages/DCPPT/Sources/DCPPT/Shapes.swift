@@ -28,12 +28,26 @@ struct ShapeBuilder {
     /// that come after them.
     var ids: [UInt32: ShapeId] = [:]
     var rules: [UInt32: ConnectorRule] = [:]
+    /// Outline text index → where the OutlineTextRefAtom that shows it is (unique, where a shape id may not be).
+    var outlineOwner: [Int: Int] = [:]
 
     static let scale = PPT.pointsPerMasterUnit
 
     /// The slide's shapes, in z-order.
     mutating func build(_ p: inout Presentation, _ drawn: [DrawnShape], rules: [ConnectorRule]) -> [Shape] {
         for r in rules { self.rules[r.connector] = r }
+        // Each outline text goes to the first placeholder that names it, as PowerPoint writes them: a drawing naming
+        // one many times would otherwise copy it into each.
+        func own(_ list: [DrawnShape]) {
+            for d in list {
+                if let ref = d.textbox.first(where: { $0.type == RT.outlineTextRefAtom }), ref.body.count >= 4 {
+                    let i = Int(i32(b, ref.body.lowerBound))
+                    if outlineOwner[i] == nil { outlineOwner[i] = ref.body.lowerBound }
+                }
+                own(d.children)
+            }
+        }
+        own(drawn)
         func number(_ list: [DrawnShape]) {
             for d in list where ids[d.id] == nil {
                 if let raw = p.allocId() { ids[d.id] = ShapeId(raw) }
@@ -107,7 +121,7 @@ struct ShapeBuilder {
         var text = PPTText.bodies(b, d.textbox).first
         if text == nil, let ref = d.textbox.first(where: { $0.type == RT.outlineTextRefAtom }), ref.body.count >= 4 {
             let i = Int(i32(b, ref.body.lowerBound))
-            if outline.indices.contains(i) { text = outline[i] }
+            if outline.indices.contains(i), outlineOwner[i] == ref.body.lowerBound { text = outline[i] }
         }
         let kind = d.placeholder.flatMap { PPT.placeholderKind($0.type) }
         if let kind, let ph = d.placeholder {

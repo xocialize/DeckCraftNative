@@ -71,6 +71,11 @@ rm -rf "$pics"
 "$dccli" run "${(@f)$($py -I $root/Tools/legacy/motion-deck.py)}" --save "$out/pptx/motion.pptx" >/dev/null 2>&1 \
   && meta "$out/pptx/motion.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/motion-deck.py\",\"producer\":\"dccli\"}" \
   || print -u2 "export failed: motion"
+# A template with graphics of its own on the master and the Title Slide layout, and slides hiding them (P6's masters
+# test; masters-deck.py).
+"$dccli" run "${(@f)$($py -I $root/Tools/legacy/masters-deck.py)}" --save "$out/pptx/masters.pptx" >/dev/null 2>&1 \
+  && meta "$out/pptx/masters.pptx" "{\"kind\":\"pptx\",\"deck\":\"Tools/legacy/masters-deck.py\",\"producer\":\"dccli\"}" \
+  || print -u2 "export failed: masters"
 "$soffice" --headless --norestore "-env:UserInstallation=file://$lo_profile" --convert-to ppt --outdir "$out/ppt" $out/pptx/*.pptx >/dev/null 2>&1
 rm -rf "$lo_profile"
 for p in $out/ppt/*.ppt(N); do

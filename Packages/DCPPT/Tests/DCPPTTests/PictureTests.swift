@@ -27,7 +27,11 @@ import Testing
         var pictures = 0, comments = 0
         for c in try ShapeTests.cases() {
             guard FileManager.default.fileExists(atPath: c.ref.path) else { continue }
-            let ref = try JSONDecoder().decode(Dump.self, from: Data(contentsOf: c.ref))
+            let raw = try Data(contentsOf: c.ref)
+            let ref = try JSONDecoder().decode(Dump.self, from: raw)
+            // POI 6.0.0 can't decrypt the pictures of some of PowerPoint 16's encrypted files (masters.open.ppt: its
+            // RC4 picture decryption runs out of data), so there is nothing to compare them with.
+            if (ref.pictures ?? []).isEmpty, String(decoding: raw, as: UTF8.self).contains("CorruptPowerPointFileException") { continue }
             let bytes = Array(try Data(contentsOf: c.file))
             let file = try PPTFile(bytes, password: c.password)
             let doc = try #require(file.object(file.documentRef))

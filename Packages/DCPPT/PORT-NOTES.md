@@ -9,6 +9,79 @@ CryptoAPI).
 A `.ppt` is never edited in place: it opens as an untitled converted copy, and Save offers `.pptx` or `.deckcraft`
 (§9.1 of the plan).
 
+## P6: hardening, and the masters' own graphics (2026-10-31)
+
+- **The masters' own graphics** (added to P6 with the operator, 2026-10-31). 129 of the first crash corpus's 205
+  decks have shapes of their own on the main master and 91 on a title master, and none came over.
+  - The first main master's shapes (not its placeholders) go on the DCModel master. Its placeholders move the DCModel
+    master's to where they are, which is where a new slide's and the footers go.
+  - Every other master a slide follows becomes a layout with its own graphics, background and placeholders (their
+    positions only, so New Slide works on it). That is a title master, or another main master. A title master
+    shows its main master's graphics as its fMasterObjects says: through the DCModel master when that is its main,
+    in the layout itself otherwise.
+  - Layout names: "Title Master" for a title master, and for another main master its own name (slideNameAtom,
+    PowerPoint 2002 and later) or "Master 2", "Master 3"….
+  - Each slide hides them as its SlideFlags say (fMasterObjects), which DCModel's `showMasterShapes` does for the
+    layout and the master together, as PowerPoint's Hide Background Graphics does.
+  - All the masters' drawings together are held to one drawing's worth of shapes, and to 256 layouts.
+  - **How the producers write masters:** LibreOffice writes one main master per layout (11 for a new deck), each with
+    the master's graphics and that layout's. PowerPoint 16 writes one main master per layout that slides use, and no
+    title master. Title masters come only from older PowerPoints.
+  - The oracle is `Tools/legacy/masters-deck.py`: a banner, a logo, a rule and a text box on the master, and a shape
+    and background on the Title Slide layout, with slides hiding them. It is saved by LibreOffice and by PowerPoint
+    (`masters.open.ppt`, local). POI's dump gained each master's shapes, each shape's placeholder, and each slide's
+    master and fMasterObjects. `MasterTests` checks every fixture and PowerPoint's files against it.
+  - POI 6.0.0 can't decrypt the pictures of PowerPoint's `masters.open.ppt` (its RC4 picture decryption runs out of
+    data), so its dump now reports a picture it can't read and carries on. DCPPT reads that file's picture.
+- **Bounded work on hostile files.**
+  - **Each slide object is read once.** A slide list naming the same object again would multiply its work for a few
+    bytes per entry: an 18-shape slide named 400 more times took 0.18 s in Debug, and a 100 MB stream could name one
+    millions of times. The repeat comes in blank and is listed as unread.
+  - **At most 10,000 slides** (`PPT.maxSlides`); the rest are counted in the report's `slidesLeftOut`. The first
+    crash corpus's largest deck has 85.
+  - **At most 20,000 shapes in a drawing**, groups' members included (`Drawing.maxShapes`, DCPPTX's limit for a
+    slide).
+  - **The masters' and notes' lists** read each object once too.
+  - **Outline text has one owner.** A placeholder's OutlineTextRefAtom names the slide list's text for it. The first
+    placeholder naming a text shows it, as PowerPoint writes them (one placeholder per text). Many naming one would
+    otherwise each copy it. No fixture has outline text: LibreOffice and PowerPoint 16 keep text in the shape. It
+    comes from PowerPoint 97–2003, so the test builds its slide by hand.
+  - The status line names at most ten unread slides ("and N more").
+- **Fuzzing** (`FuzzTests`), structure-aware, of every record reader:
+  - **Seeds:** every `.ppt` fixture, and PowerPoint's own files decrypted into the local cache's `plain/` folder
+    when present (they carry the PP9 and PP10 records LibreOffice doesn't write).
+  - **What each round damages:**
+    - a record's length (boundary values, ±1, the rest of the stream), type (another one the file uses), container
+      flag or instance;
+    - a boundary integer at an aligned offset in an atom;
+    - one record copied over another, or a record repeated;
+    - random bytes, or the stream cut short;
+    - the Current User's pointer to the newest edit;
+    - the same for the Pictures stream's BLIP records.
+  - **What runs on the result:** the import, the export as `.pptx`, every slide's animations evaluated, and (one
+    round in four) the first slide drawn. Anything may fail; nothing may trap or take 20× the undamaged seed.
+  - **Encrypted files:** damage to the CryptSession10Container's encryption header and to encrypted records.
+  - **PICT:** AppKit's `NSPICTImageRep` reads PICT, so damaged PICTs go through DCEngine's hook too. No producer
+    of the fixtures writes PICT, so two version 2 PICTs are built opcode by opcode (shapes, lines, a polygon, an
+    8-bit PackBitsRect).
+  - `DCPPT_FUZZ_ROUNDS` scales a run (12 a seed by default; 1,000 for a long run) and `DCPPT_FUZZ_DIR` keeps every
+    tenth damaged file for `crash-run.sh`.
+  - **Long runs:** 1,000 rounds a seed found no trap and nothing slow. The run before the masters' graphics was
+    74,000 files in 12 min; the run with them, the masters deck and PowerPoint's files as seeds, was 77,000 files
+    in 13 min, plus 25,000 damaged PICTs. Every tenth of those files then went through dccli's open and render, all
+    slides. Before: 4,751 opened, 2,849 failed cleanly. After: 4,806 opened, 2,894 failed cleanly. Neither run had
+    a crash or time-out (8 min, 8 jobs).
+- **The crash corpus at full size.** The whole of Govdocs1's `.ppt` set (its four by-type zips, 103 GiB, approved
+  by the operator 2026-10-31), filtered by signature and stream to 49,7xx files, is kept in
+  `~/Library/Caches/DeckCraftNative/govdocs/ppt-all`. `crash-run.sh` now runs files in parallel (`CRASH_RUN_JOBS`)
+  and can use a Release dccli (`CRASH_RUN_CONFIG=release`) to render it.
+  - **It found a hang, outside DCPPT.** Four files in the first part timed out with almost no CPU. FontDB asked
+    CoreText for "Osaka", a font macOS downloads on demand but hadn't. Every CoreText lookup of such a font starts
+    the download and blocks until a person answers a prompt, which dccli and the extensions never show.
+    `kCTFontDownloadableAttribute` doesn't stop it. FontDB now asks CoreText only about installed names: families,
+    PostScript names and full names, read once in 26 ms. The Notes view's `NSFont(name:)` does the same. All four
+    files open in under a second; `FontTests.aFontMacOSWouldDownloadIsMissingAtOnce` is the regression test.
+
 ## P1: the container (2026-10-30)
 
 - **`PPTFile`:**

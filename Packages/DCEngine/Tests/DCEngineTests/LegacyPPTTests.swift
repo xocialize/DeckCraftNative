@@ -4,6 +4,7 @@
 // objects come over as their pictures (P4), the reply naming each, and save to `.pptx` as pictures. Its transitions,
 // hidden slides and animations come over (P5), show in the Animation Pane, and save to `.pptx`.
 import DCCore
+import DCPPT
 @testable import DCEngine
 import DCTestSupport
 import Foundation
@@ -30,6 +31,16 @@ import Testing
         defer { try? FileManager.default.removeItem(atPath: out) }
         s.run("file.save", #"{"path": "\#(out)"}"#)
         #expect(try FileCommands.readPresentationFile(out).doc.slides.count == 8)
+    }
+
+    /// A hostile file's report stays short: ten unread slide numbers at most, and slides past the cap are counted.
+    @Test func theStatusLineStaysShort() {
+        var report = PPTReport(slides: 10_500, unreadSlides: Array(2 ... 400), edits: 2, encrypted: false, notImported: ["picture bullets"])
+        report.slidesLeftOut = 500
+        let text = FileCommands.convertedMessage("big.ppt", report)
+        #expect(text.contains("Slides 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 and 389 more couldn't be read."))
+        #expect(text.contains("Only its first 10000 slides were brought over."))
+        #expect(text.count < 400)
     }
 
     @Test func anEncryptedPPTNeedsItsPassword() throws {

@@ -418,7 +418,11 @@ public enum FileCommands {
             text += " \(n) embedded object\(n == 1 ? " was" : "s were") brought over as \(n == 1 ? "a picture" : "pictures")."
         }
         if c.lostPictures > 0 { text += " \(c.lostPictures) picture\(c.lostPictures == 1 ? "" : "s") couldn't be read." }
-        if !c.unreadSlides.isEmpty { text += " Slide\(c.unreadSlides.count == 1 ? "" : "s") \(c.unreadSlides.map(String.init).joined(separator: ", ")) couldn't be read." }
+        if !c.unreadSlides.isEmpty {
+            let n = c.unreadSlides.count, shown = c.unreadSlides.prefix(10).map(String.init).joined(separator: ", ")
+            text += " Slide\(n == 1 ? "" : "s") \(shown)\(n > 10 ? " and \(n - 10) more" : "") couldn't be read."
+        }
+        if c.slidesLeftOut > 0 { text += " Only its first \(c.slides - c.slidesLeftOut) slides were brought over." }
         return text
     }
 
@@ -824,7 +828,7 @@ public enum FileCommands {
 extension PPTReport {
     /// The report in a command's reply (`file.open`'s `converted`).
     func toJSON() -> JSON {
-        ["from": "ppt", "slides": .integer(slides), "unreadSlides": .array(unreadSlides.map { .integer($0) }),
+        ["from": "ppt", "slides": .integer(slides), "unreadSlides": .array(unreadSlides.map { .integer($0) }), "slidesLeftOut": .integer(slidesLeftOut),
          "edits": .integer(edits), "encrypted": .bool(encrypted), "notImported": .array(notImported.map { .string($0) }),
          "asPictures": .array(asPictures.map { .string($0) }), "lostPictures": .integer(lostPictures),
          "convertedPictures": .integer(convertedPictures)]

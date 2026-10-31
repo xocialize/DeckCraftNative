@@ -155,7 +155,7 @@ let package = Package(
         // MARK: DCPPT — legacy binary PowerPoint (.ppt, [MS-PPT] and [MS-ODRAW]) read into DCModel (Docs/plans/
         // Legacy-PPT-and-Encryption.md, P1–P6); its compound file is DCCFB's and its encryption DCOffCrypto's.
         .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore", "DCCFB", "DCOffCrypto", "DCZip", "DCPPTX"], path: sources("DCPPT", "DCPPT")),
-        .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCColor", "DCCFB", "DCOffCrypto", "DCPPTX", "DCEngine", "DCZip", "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
+        .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCColor", "DCCFB", "DCOffCrypto", "DCPPTX", "DCEngine", "DCRender", "DCAnim", "DCZip", "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
 
                 .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),
         .testTarget(
@@ -173,7 +173,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DCEngineTests",
-            dependencies: ["DCEngine", "DCAnim", "DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCTestSupport"],
+            dependencies: ["DCEngine", "DCAnim", "DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCPPT", "DCMedia", "DCZip", "DCTestSupport"],
             path: tests("DCEngine", "DCEngineTests")
         ),
 
@@ -226,7 +226,7 @@ let package = Package(
         .target(
             name: "DCApp",
             dependencies: [
-                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore",
+                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore", "DCText",
                 "DCIntentsKit", "DCSpotlight",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "VpxSwift", package: "vpx-swift"),

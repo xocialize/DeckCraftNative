@@ -21,6 +21,22 @@ func deckcraftFixture(_ crate: String, _ name: String) -> [UInt8]? {
 func scalars(_ s: String) -> [Unicode.Scalar] { Array(s.unicodeScalars) }
 
 @Suite struct FontDBTests {
+    /// A family macOS downloads on demand but hasn't (Osaka, from the legacy crash corpus) is missing, at once:
+    /// asking CoreText about it would start the download and block on a prompt a window-less process never shows.
+    /// The lookup runs on its own thread, so a regression fails here rather than hanging the run.
+    @Test func aFontMacOSWouldDownloadIsMissingAtOnce() {
+        let fresh = FontDB(craftFontsDir: nil, systemFonts: true)
+        let done = DispatchSemaphore(value: 0)
+        let found = Mutex<Bool?>(nil)
+        Thread {
+            let has = fresh.hasFamily("Osaka")
+            found.withLock { $0 = has }
+            done.signal()
+        }.start()
+        #expect(done.wait(timeout: .now() + 20) == .success, "looking up Osaka blocked")
+        #expect(found.withLock { $0 } == FontDB.isInstalled("Osaka"))
+    }
+
     @Test func requestedFaceWinsWhenItCovers() {
         let inter = db.face(fallbackFamily, "Regular")
         #expect(db.cascade(["a"], [inter], "Regular") === inter)
