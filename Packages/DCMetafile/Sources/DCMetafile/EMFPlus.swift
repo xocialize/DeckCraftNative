@@ -38,6 +38,8 @@ private let plusMaxChars = 32_768
 private let maxObjectBytes = 64 * 1024 * 1024
 /// Nesting depth of region nodes.
 private let maxRegionDepth = 32
+/// Region nodes and path points parsed together, including nodes in sibling branches.
+private let maxRegionWork = maxPoints
 /// Metafile images inside metafile images, at most.
 private let maxNesting = 3
 
@@ -986,12 +988,15 @@ private func path(_ r: Bytes) -> [Op]? {
 
 /// A region object as a convex area in world units (non-convex parts become their bounding rectangle).
 private func region(_ r: Bytes) -> PlusObj? {
-    regionNode(r, 8, 0).map { .region($0.0) }
+    var work = 0
+    return regionNode(r, 8, 0, &work).map { .region($0.0) }
 }
 
-/// One region node at `off`: its area and its length in bytes.
-private func regionNode(_ r: Bytes, _ off: Int, _ depth: Int) -> (Area, Int)? {
-    if depth > maxRegionDepth { return nil }
+/// One region node at `off`: its area and its length in bytes. `work` counts the nodes and path points
+/// parsed so far, sibling branches included.
+private func regionNode(_ r: Bytes, _ off: Int, _ depth: Int, _ work: inout Int) -> (Area, Int)? {
+    work += 1
+    if depth > maxRegionDepth || work > maxRegionWork { return nil }
     guard let kind = r.u32(off) else { return nil }
     switch kind {
     case 0x1000_0000:
@@ -999,15 +1004,17 @@ private func regionNode(_ r: Bytes, _ off: Int, _ depth: Int) -> (Area, Int)? {
         let (x, y, w, h) = (f[0], f[1], f[2], f[3])
         return (ClipRect.rectPoly(R4(x.rustMin(x + w), y.rustMin(y + h), x.rustMax(x + w), y.rustMax(y + h))), 20)
     case 0x1000_0001:
-        guard let size = r.u32(off + 4), let t = r.tail(off + 8) else { return nil }
-        let area = path(t).map(areaOfOps) ?? []
-        return (area, 8 + Int(size))
+        // The path is read from its own bytes only, so it can't take points from the node after it.
+        guard let size = r.u32(off + 4), size >= 12, let data = r.slice(off + 8, Int(size)), let n = data.u32(4) else { return nil }
+        work += Swift.min(Int(n), maxPoints)
+        guard work <= maxRegionWork, let ops = path(data) else { return nil }
+        return (areaOfOps(ops), 8 + Int(size))
     case 0x1000_0002:
         return ([], 4)
     case 0x1000_0003:
         return (nil, 4)
     case 0 ... 5:
-        guard let (a, la) = regionNode(r, off + 4, depth + 1), let (b, lb) = regionNode(r, off + 4 + la, depth + 1) else { return nil }
+        guard let (a, la) = regionNode(r, off + 4, depth + 1, &work), let (b, lb) = regionNode(r, off + 4 + la, depth + 1, &work) else { return nil }
         let out: Area = switch kind {
         case 0: b
         case 1: areaIntersect(a, b)
