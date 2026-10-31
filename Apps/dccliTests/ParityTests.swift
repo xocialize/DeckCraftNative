@@ -88,7 +88,9 @@ struct ParityTests {
         ["mcp", "--bogus"], ["mcp", "--connect"], ["mcp", "--connect", "1"], ["mcp", "--automation-read-root"], ["mcp", "--automation-read-root", "-x"],
         ["mcp", "--automation-read-root="], ["mcp", "--automation-read-root=/a", "--automation-read-root=/b"],
         ["mcp", "--automation-read-root", "/nonexistent-root"], ["mcp", "--automation-write-root", "/etc/hosts"],
-        ["mcp", "--automation-read-root", "/tmp", "--connect", "1"],
+        ["mcp", "--automation-read-root", "/tmp", "--connect", "1"], ["mcp", "--automation-read-root", "/tmp", "--automation-read-root", "/nonexistent-root"],
+        ["mcp", "--automation-write-root", "/tmp", "--automation-write-root"], ["mcp", "--automation-write-root=/tmp", "--automation-write-root", "/tmp", "--connect", "1"],
+        ["run", "--cmd-file"], ["run", "--cmd-file", "/nonexistent.txt"], ["run", "--cmd-file", "<scratch>", "--save", "<scratch>/o.deckcraft"],
         ["bench"], ["bench", "--runs", "0", "--sample"], ["bench", "--runs"], ["bench", "--bogus"], ["bench", "/nonexistent.deckcraft"],
     ])
     func badInput(_ raw: [String]) throws {
@@ -364,5 +366,202 @@ struct ParityTests {
         defer { try? FileManager.default.removeItem(at: other) }
         let o = try oracle(["render-transition", decks.appending(path: "\(name).deckcraft").path, "--slide", "\(n - 1)", "--t", "0.25,0.5,0.75", other.appending(path: "slide-\(n).png").path])
         return o.stdout.replacingOccurrences(of: other.path, with: base.deletingLastPathComponent().path)
+    }
+}
+
+/// `run --cmd-file` (deckcraft-cli tests/it/cli.rs): each file's lines and the inline commands run in the order
+/// given, and every answer, refusal and exit code is the oracle's.
+@Suite("deckcraft-cli command files", .enabled(if: Binaries.haveDccli, "dccli isn't built"))
+struct CommandFileTests {
+    /// The titles in the last line's `document.inspect` answer.
+    static func inspectedTitles(_ out: String) -> [String] {
+        let last = out.split(separator: "\n").last.map(String.init) ?? ""
+        let answer = last.hasPrefix("document.inspect → ") ? String(last.dropFirst("document.inspect → ".count)) : ""
+        return ((try? JSONParser.parse(answer))?.get("slides")?.asArray ?? []).map { $0.get("title")?.asStr ?? "" }
+    }
+
+    @Test func commandFileRunsUTF8LinesInOrderAndSkipsComments() throws {
+        let dir = scratch("cmdfile-lines")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let file = dir.appending(path: "commands with spaces.txt")
+        try Data("\u{FEFF}# heading\r\n\r\n  # indented comment\r\n  slide.new={\"title\":\"Résumé = # 测试\"}  \r\nslide.new\r\nslide.new={\"title\":\"Last\"}".utf8).write(to: file)
+        let o = try dccli(["run", "--print", "--cmd-file", file.path, "--cmd", "document.inspect"])
+        #expect(o.code == 0, "\(o.stderr)")
+        let commands = o.stdout.split(separator: "\n").map { $0.components(separatedBy: " → ").first ?? "" }
+        #expect(commands == ["slide.new", "slide.new", "slide.new", "document.inspect"])
+        let titles = Self.inspectedTitles(o.stdout)
+        #expect(titles.count == 4)
+        #expect(titles.at(1) == "Résumé = # 测试")
+        #expect(titles.at(3) == "Last")
+    }
+
+    @Test func commandFilesAndInlineCommandsKeepArgumentOrder() throws {
+        let dir = scratch("cmdfile-mixed")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let first = dir.appending(path: "first.txt"), second = dir.appending(path: "second.txt"), saved = dir.appending(path: "result.deckcraft")
+        try Data("slide.new={\"title\":\"First file\"}\n".utf8).write(to: first)
+        try Data("slide.new={\"title\":\"Second file\"}\n".utf8).write(to: second)
+        let o = try dccli([
+            "run", "--cmd", #"slide.new={"title":"Inline first"}"#, "--cmd-file", first.path, "--cmd", #"slide.new={"title":"Inline middle"}"#,
+            "--cmd-file", second.path, "--cmd", "document.inspect", "--print", "--save", saved.path,
+        ])
+        let titles = Self.inspectedTitles(o.stdout)
+        #expect(Array(titles.dropFirst()) == ["Inline first", "First file", "Inline middle", "Second file"])
+        #expect(o.stdout.split(separator: "\n").count == 5)
+        let reopened = try dccli(["run", "--in", saved.path, "--cmd", "document.inspect", "--print"])
+        #expect(Self.inspectedTitles(reopened.stdout) == titles)
+    }
+
+    @Test func aFailedFileCommandStopsLaterCommandsAndFinalOutputs() throws {
+        let dir = scratch("cmdfile-failure")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let file = dir.appending(path: "commands.txt"), later = dir.appending(path: "later-in-file.deckcraft")
+        let inline = dir.appending(path: "later-inline.deckcraft"), save = dir.appending(path: "saved.deckcraft"), export = dir.appending(path: "exported.png")
+        let inlineCommand = "file.saveAs=" + (["path": .string(inline.path)] as JSON).display
+        for (command, message) in [("slide.new={", "bad JSON"), ("no.such.command", "unknown command"), (#"slide.go={"index":999}"#, "slide")] {
+            let laterCommand = "file.saveAs=" + (["path": .string(later.path)] as JSON).display
+            try Data("# header\nslide.new\n\(command)\n\(laterCommand)\n".utf8).write(to: file)
+            try Data("keep saved file".utf8).write(to: save)
+            try Data("keep exported file".utf8).write(to: export)
+            let o = try dccli(["run", "--print", "--cmd-file", file.path, "--cmd", inlineCommand, "--save", save.path, "--export", export.path])
+            #expect(o.stderr.contains("\(file.path):3:") && o.stderr.contains(message), "\(o.stderr)")
+            #expect(o.stdout.split(separator: "\n").count == 1, "only the first command ran")
+            #expect(!FileManager.default.fileExists(atPath: later.path) && !FileManager.default.fileExists(atPath: inline.path), "commands after the failure must not run")
+            #expect(try Data(contentsOf: save) == Data("keep saved file".utf8))
+            #expect(try Data(contentsOf: export) == Data("keep exported file".utf8))
+        }
+    }
+
+    @Test func commandFileReadErrorsNameThePathAndUTF8Line() throws {
+        let dir = scratch("cmdfile-read-errors")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let missing = dir.appending(path: "missing.txt"), invalid = dir.appending(path: "invalid.txt"), save = dir.appending(path: "out.deckcraft")
+        try Data([UInt8]("slide.new\n".utf8) + [0xFF, 0x0A]).write(to: invalid)
+        for file in [missing, dir, invalid] {
+            let o = try dccli(["run", "--cmd-file", file.path, "--save", save.path])
+            #expect(o.stderr.contains(file.path), "\(o.stderr)")
+            if file == invalid { #expect(o.stderr.contains("\(invalid.path):2:") && o.stderr.contains("UTF-8"), "\(o.stderr)") }
+            #expect(!FileManager.default.fileExists(atPath: save.path))
+        }
+        #expect(try dccli(["run", "--cmd-file"]).stderr.contains("--cmd-file needs a file"))
+    }
+
+    @Test func commandFileRejectsAnOversizedLineBeforeRunningIt() throws {
+        let dir = scratch("cmdfile-line-limit")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let file = dir.appending(path: "commands.txt")
+        try Data("slide.new={\"title\":\"\(String(repeating: "x", count: 16 * 1024 * 1024))\"}\nslide.new\n".utf8).write(to: file)
+        let o = try dccli(["run", "--print", "--cmd-file", file.path])
+        #expect(o.stderr.contains("\(file.path):1:") && o.stderr.contains("command line exceeds 16777216 byte limit"), "\(o.stderr)")
+        #expect(o.out.isEmpty, "the oversized command must not run")
+    }
+
+    @Test func inlineCommandsKeepTheirExistingSyntaxAndErrors() throws {
+        let o = try dccli(["run", "--cmd", "slide.new", "--cmd", #"slide.new={"title":"Inline = #"}"#, "--cmd", "document.inspect", "--print"])
+        let titles = Self.inspectedTitles(o.stdout)
+        #expect(titles.count == 3)
+        #expect(titles.at(2) == "Inline = #")
+        #expect(try dccli(["run", "--cmd", "slide.new={"]).stderr.hasPrefix("deckcraft-cli: slide.new: bad JSON:"))
+        #expect(try dccli(["run", "--cmd", "no.such.command"]).stderr.contains("unknown command `no.such.command`"))
+    }
+
+    /// Byte by byte against the oracle: BOMs, comments, CRLF, Unicode whitespace, every kind of bad UTF-8
+    /// (`Utf8Error`'s text), bad JSON, refusals, a line just under the limit.
+    static let oracleFiles: [[UInt8]] = {
+        let line: [UInt8] = Array("slide.new\n".utf8)
+        var files: [[UInt8]] = []
+        files.append(Array("\u{FEFF}\u{FEFF}slide.new\n#=x\n\u{2003}slide.new\u{2003}\n".utf8))
+        files.append(line + [0xFF, 0x0A])
+        files.append(line + Array("abc".utf8) + [0xE2, 0x82, 0x0A])
+        files.append(line + Array("ab".utf8) + [0xF0, 0x90, 0x80, 0x78, 0x0A])
+        files.append(line + Array("ab".utf8) + [0xED, 0xA0, 0x80, 0x0A])
+        files.append(line + Array("slide.new={\n".utf8))
+        files.append(Array("# x\nslide.new\nno.such.command\n".utf8))
+        files.append(line + Array("slide.go={\"index\":999}\n".utf8))
+        files.append(Array("slide.new=\u{301}{}\n".utf8))
+        files.append(Array("#".utf8) + [UInt8](repeating: 0x78, count: 16 * 1024 * 1024 - 1) + Array("\n".utf8) + line)
+        return files
+    }()
+
+    @Test("Command files give the oracle's answers and errors", .enabled(if: Binaries.haveOracle, "the oracle isn't built"), arguments: oracleFiles)
+    func againstTheOracle(_ bytes: [UInt8]) throws {
+        let dir = scratch("cmdfile-oracle")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try Data(bytes).write(to: dir.appending(path: "c.txt"))
+        let args = ["run", "--print", "--cmd-file", "c.txt", "--cmd", "document.inspect"]
+        let (a, b) = (try dccli(args, cwd: dir), try oracle(args, cwd: dir))
+        #expect(a.code == b.code, "exit \(a.code), the oracle's \(b.code)\n\(a.stderr)\n---\n\(b.stderr)")
+        #expect(a.stderr == b.stderr)
+        #expect(a.stdout == b.stdout)
+    }
+}
+
+/// A stdout whose reader has gone (deckcraft-cli tests/it/closed_stdout.rs): the work goes on, its failures
+/// are still reported, and a stdout that fails otherwise still ends the run.
+@Suite("deckcraft-cli closed stdout", .enabled(if: Binaries.haveDccli, "dccli isn't built"))
+struct ClosedStdoutTests {
+    /// Run dccli in `dir` with a stdout whose other end is closed.
+    static func closed(_ dir: URL, _ args: [String]) throws -> Ran {
+        var fds: [Int32] = [0, 0]
+        guard socketpair(AF_UNIX, SOCK_STREAM, 0, &fds) == 0 else { throw POSIXError(.EIO) }
+        close(fds[1])
+        defer { close(fds[0]) }
+        return try dccli(args, cwd: dir, stdout: fds[0])
+    }
+
+    @Test func brokenPipeDoesNotSkipLaterCommandsOrSave() throws {
+        let dir = scratch("closed-save")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let out = try Self.closed(dir, ["run", "--cmd", #"slide.new={"layout":"titleOnly","title":"First"}"#, "--cmd", #"slide.new={"layout":"titleOnly","title":"Later"}"#, "--print", "--save", "out.deckcraft"])
+        #expect(out.code == 0, "exit \(out.code): \(out.stderr)")
+        let saved = dir.appending(path: "out.deckcraft")
+        #expect(FileManager.default.fileExists(atPath: saved.path), "the requested save was skipped")
+        let info = try dccli(["info", saved.path])
+        #expect(info.code == 0, "\(info.stderr)")
+        let slides = (try? JSONParser.parse(info.stdout))?.get("slides")?.asArray ?? []
+        #expect(slides.contains { $0.get("title") == "Later" }, "the later command did not persist: \(info.stdout)")
+    }
+
+    @Test func brokenPipeDoesNotHideALaterCommandFailure() throws {
+        let dir = scratch("closed-command-failure")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let out = try Self.closed(dir, ["run", "--cmd", #"slide.new={"title":"First"}"#, "--cmd", #"slide.go={"index":999}"#, "--print", "--save", "out.deckcraft"])
+        #expect(out.code != 0, "a later command failure returned success")
+        #expect(!FileManager.default.fileExists(atPath: dir.appending(path: "out.deckcraft").path), "a failed run saved")
+        #expect(out.stderr.contains("no slide 999"), "\(out.stderr)")
+    }
+
+    @Test func brokenPipeDoesNotHideASaveFailure() throws {
+        let dir = scratch("closed-save-failure")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try FileManager.default.createDirectory(at: dir.appending(path: "out.deckcraft"), withIntermediateDirectories: true)
+        let out = try Self.closed(dir, ["run", "--cmd", #"slide.new={"title":"First"}"#, "--print", "--save", "out.deckcraft"])
+        #expect(out.code != 0, "a failed save returned success")
+        #expect(!out.stderr.isEmpty, "no diagnostic for the failed save")
+    }
+
+    @Test func brokenPipeDoesNotSkipLaterRenderedSlides() throws {
+        let dir = scratch("closed-render-all")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let baseline = try dccli(["render", "--sample", "--all", "--scale", "0.1", "normal"], cwd: dir)
+        #expect(baseline.code == 0, "\(baseline.stderr)")
+        let closed = try Self.closed(dir, ["render", "--sample", "--all", "--scale", "0.1", "closed"])
+        #expect(closed.code == 0, "\(closed.stderr)")
+        func names(_ folder: String) -> [String] { ((try? FileManager.default.contentsOfDirectory(atPath: dir.appending(path: folder).path)) ?? []).sorted() }
+        let expected = names("normal")
+        #expect(expected.count > 1, "the sample must have several slides")
+        #expect(names("closed") == expected, "rendering stopped after stdout closed")
+    }
+
+    @Test func otherStdoutWriteErrorsFail() throws {
+        let dir = scratch("closed-write-failure")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let path = dir.appending(path: "readonly").path
+        FileManager.default.createFile(atPath: path, contents: Data())
+        let readonly = open(path, O_RDONLY)
+        defer { close(readonly) }
+        let out = try dccli(["run", "--cmd", #"slide.new={"title":"First"}"#, "--print"], cwd: dir, stdout: readonly)
+        #expect(out.code != 0, "a stdout error other than a closed pipe returned success")
+        #expect(out.stderr.contains("can't write to stdout"))
     }
 }

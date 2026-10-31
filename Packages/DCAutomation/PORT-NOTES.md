@@ -6,7 +6,7 @@ see [dccli](#dccli)), at the pin in `Tools/oracle/pin.env`. **Status: done** (Wa
 at the start of Wave 5, and the pointer with DCEngine's `Session.pointer`; see [The pointer](#the-pointer)).
 
 - **Code:** about 2,600 lines in `Sources/DCAutomation` and 1,200 in `Apps/dccli`; 2,600 lines of tests.
-- **Tests:** DCAutomationTests 52, dccliTests 31, with 201 parameterised cases; all pass, with 1 known issue (one PDF page; see
+- **Tests:** DCAutomationTests 55, dccliTests 45, with 217 parameterised cases; all pass, with 1 known issue (one PDF page; see
   [Divergences](#divergences)); dccliTests' `PointerParityTests` adds 7 pointer sessions. `swift test --filter 'DCAutomationTests|dccliTests'` takes
   about 8 minutes in debug. Every
   `#[test]` of `crates/mcp` (25), `control.rs` (1 of 2), `control_server.rs` (14), `deckcraft-cli` (11) and
@@ -122,8 +122,6 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
 
 - **Pictures.** `render_slide` and `ui.render` PNGs are ImageIO's (DCEngine's `ImageEncoding`): same pixels' sizes,
   other bytes. Saved files' sizes in `save_presentation` answers are DCZip's deflate.
-- **Bounded lines.** deckcraft reads MCP lines without limit; here a line is at most 256 MiB (an oversized line ends
-  the session with an error).
 - **Ordering.** As in deckcraft, requests run one at a time in arrival order; a `notifications/cancelled` can't stop
   a request already running.
 - **PDF pictures.** `effects.pdf` page 3 scores 74.3: DCRender's vector PDF keeps an 8 px gradient picture at its
@@ -135,7 +133,7 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
   disconnects) and only at the reply timeout here (`ControlReply` has no drop signal); the reply text is the same.
   Requests queued when the server stops wait out their reply timeout in the same way. A client thread that can't be
   started isn't detected (Foundation's `Thread`), so there is no "could not start a client thread" log.
-- **Versions.** `serverInfo.version` and `dccli --version` say 0.11.1, deckcraft-cli's version, since the
+- **Versions.** `serverInfo.version` and `dccli --version` say 0.13.1, deckcraft-cli's version, since the
   answers are its answers.
 
 ## Lower-layer changes
@@ -176,7 +174,7 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
 | `commands` | the corpus's `commands.txt` | byte-identical (330 lines) |
 | `describe ID` | the oracle, all 330 commands | identical |
 | help pages, `--version`, `links`, unknown subcommands | the oracle, 27 invocations | identical stdout, stderr, exit code |
-| bad input | the oracle, 72 invocations (every subcommand's missing, malformed and unknown arguments, unreadable and unwritable files, bad JSON, failing commands, unreachable apps, bad roots) | identical stderr, stdout and exit code |
+| bad input | the oracle, 78 invocations (every subcommand's missing, malformed and unknown arguments, unreadable and unwritable files, bad JSON, failing commands, unreachable apps, bad roots) | identical stderr, stdout and exit code |
 | engine scripts (44) | `engine/<name>.results.txt`, `.errors.txt`, `.deckcraft` | answers, all 238 refusals and decks identical; the 6 `*-native-*` scripts compared as DCEngineTests compares them |
 | corpus scripts (8), `run --sample` | the oracle's `--print` output; the corpus decks | identical |
 | `info` | `<deck>.info.json`, 9 decks | byte-identical |
@@ -185,9 +183,57 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
 | `convert` → `.md` | `<deck>.md` | byte-identical |
 | `convert` → `.png`; `render --all --scale 2` (43 slides); `render-transition` (15 transitions × 3 frames) | file names, sizes, printed lines; SSIMULACRA2 at 480 px wide, floor 85 | PNG ≥ 96.0, slides ≥ 94.6, frames ≥ 92.8 |
 | `convert` → `.pdf` | the oracle's page count; each page drawn at 2 px/pt against the oracle's slide picture | same page counts; every page ≥ 95.1 but one (below) |
-| `mcp` | the oracle's 35 replies to a 36-line session | identical but saved files' sizes |
+| `mcp` | the oracle's 38 replies to a 39-line session | identical but saved files' sizes |
+| `run --cmd-file` | the oracle, 10 files (BOMs, CRLF, comments, every kind of bad UTF-8, bad JSON, refusals, a 16 MiB line) | identical stdout, stderr, exit code |
 | `mcp --connect`, `app` | the control server over a headless channel (`FakeApp`); the oracle's `app` against another | identical |
 
 One test-harness lesson: Foundation's `Process` passes arguments in their file-system representation, which
 decomposes `Ü` into `U` + U+0308; the harness spawns with `posix_spawn` so a script's `--cmd` reaches dccli byte
 for byte.
+
+## Pin move 88c2ceff → a3fbf029
+
+Ported:
+
+- **`insert_chart` takes x, y, w and h** (e83f9640, #1151): with all four the chart is placed at that box, as
+  `insert_picture` and `insert_table` are; the tool's schema and description are deckcraft's. Test
+  `insertChartTakesABox`; the process session (dccliTests) adds two boxed charts, one hostile.
+- **Bounded MCP stdio frames** (2ba45cdd): `LineReader.readFrame` is `read_frame` — through each newline, at most
+  16 MiB with it (`MCPServer.maxFrameBytes`, in step with `Remote`'s reply limit). A longer frame is drained without
+  being kept and answered `-32600 request frame exceeds 16 MiB`; a frame that isn't UTF-8 is answered `-32700
+  request frame is not valid UTF-8`; serving goes on after both. This replaces our own 256 MiB bound, which ended
+  the session (the divergence is gone). Tests `oversizedStdioFrameIsDrainedBeforeTheNextRequest`,
+  `invalidUTF8StdioFrameGetsAParseErrorAndDoesNotStopServing` (both lines checked against the oracle's bytes), and
+  `framesAreReadAsDeckcraftReadsThem` in place of the old line test.
+- **Multiple automation roots** (d1487e69): `--automation-read-root` and `--automation-write-root` may be repeated
+  (`AutomationArgs.readRoots`/`writeRoots`); any root of the kind grants access, a refusal names them all
+  (`outside the read roots A, B`), and the start-up line reads `files confined: read roots …, write roots …`. This
+  needed the engine's side (`file_access.rs`): `AutomationRoots.make(read: [String], write: [String])`,
+  `readRoots`/`writeRoots`, with `anyConfiguredRootGrantsAccess` in DCEngineTests — committed separately, as it is
+  DCEngine's file. Tests: `rootsAreRepeatedAndOtherArgumentsAreLeft`, the process test `multipleRoots` (stderr and
+  answers against the oracle), and four more bad-input invocations.
+- **`run --cmd-file FILE`** (6655a1d6, d0f0d14c, e0c64599): commands read from a file one per line and run as each
+  line is read, mixed with `--cmd` in argument order; BOM (line 1), CRLF, surrounding whitespace, blank lines and
+  `#` comments; lines up to 16 MiB (`command line exceeds 16777216 byte limit`, before the line runs); errors
+  `PATH: …`, `PATH:N: …`, `PATH:N: invalid UTF-8: <Utf8Error>` (`CLI.rustUTF8Error` gives `str::from_utf8`'s text).
+  `--cmd` now splits at the first `=` byte (`splitOnce`), as Rust's `split_once` does; before, a `=` followed by a
+  combining mark wasn't found. The help pages are deckcraft-cli's. Tests: `CommandFileTests`, the six tests of
+  `tests/it/cli.rs` plus 10 files against the oracle.
+- **Closed stdout** (d8961ebc): once a reader closes stdout, `Out.line` drops the lines and the work goes on — later
+  commands, saves, exports and rendered slides happen, failures still exit 1; any other stdout error still exits 1.
+  The overview help says so. Tests: `ClosedStdoutTests` (the five of `tests/it/closed_stdout.rs`); the same five
+  scenarios gave the oracle's exit codes and stderr.
+- **`bench`'s whole-deck row** (f7b76e78): `render all slides (1×)` is timed as one population (every slide per run)
+  instead of the sum of per-slide medians and the largest per-slide maximum. `CLI.summarizeMs`; test
+  `timingSummaryKeepsMedianAndMaxFromOnePopulation`.
+- **Version** 0.13.1 (`MCPProtocol.serverVersion`, `dccli --version`): the workspace version at the new pin. No
+  stored vector carries it; `FramingTests` checks `serverInfo` and its 14 literal replies were rechecked against the
+  oracle at a3fbf029.
+
+Until DCEngine's port of the new pin lands, two dccliTests disagree with the oracle on engine command docs (the
+`commands` list and the `deckcraft://commands` resource: `picture.reset` 7b424a46, `slide.move`, `slide.actions`,
+`review.*`, `animation.*` paths and others), not on anything this package writes.
+
+No port needed: db245a70 (deckcraft-cli for strict Clippy: an explicit `use` list), the `server.rs` refactors, and
+`apps/deckcraft/src/main.rs` (`cleanup_print_previews` at exit and the update helper's app id are the window app's,
+not the control server's).

@@ -52,8 +52,9 @@ enum Binaries {
 
 /// Run `exe` with `args` (stdin from `input`), its output through files so nothing can block. posix_spawn
 /// hands the arguments over byte for byte (Foundation's `Process` passes them in their file-system
-/// representation, which decomposes `Ü` into `U` and a combining diaeresis).
-func runProcess(_ exe: String, _ args: [String], input: Data? = nil, cwd: URL? = nil) throws -> Ran {
+/// representation, which decomposes `Ü` into `U` and a combining diaeresis). With `stdout`, the process
+/// writes to that descriptor instead (and `Ran.out` is empty).
+func runProcess(_ exe: String, _ args: [String], input: Data? = nil, cwd: URL? = nil, stdout: Int32? = nil) throws -> Ran {
     let dir = scratch("proc")
     defer { try? FileManager.default.removeItem(at: dir) }
     let outPath = dir.appending(path: "out").path, errPath = dir.appending(path: "err").path, inPath = dir.appending(path: "in").path
@@ -62,7 +63,12 @@ func runProcess(_ exe: String, _ args: [String], input: Data? = nil, cwd: URL? =
     posix_spawn_file_actions_init(&actions)
     defer { posix_spawn_file_actions_destroy(&actions) }
     posix_spawn_file_actions_addopen(&actions, 0, inPath, O_RDONLY, 0)
-    posix_spawn_file_actions_addopen(&actions, 1, outPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
+    if let stdout {
+        posix_spawn_file_actions_adddup2(&actions, stdout, 1)
+        FileManager.default.createFile(atPath: outPath, contents: Data())
+    } else {
+        posix_spawn_file_actions_addopen(&actions, 1, outPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
+    }
     posix_spawn_file_actions_addopen(&actions, 2, errPath, O_WRONLY | O_CREAT | O_TRUNC, 0o644)
     if let cwd { posix_spawn_file_actions_addchdir(&actions, cwd.path) }
     let argv: [UnsafeMutablePointer<CChar>?] = ([exe] + args).map { strdup($0) } + [nil]
@@ -76,12 +82,12 @@ func runProcess(_ exe: String, _ args: [String], input: Data? = nil, cwd: URL? =
     return Ran(code: code, out: try Data(contentsOf: URL(filePath: outPath)), err: try Data(contentsOf: URL(filePath: errPath)))
 }
 
-func dccli(_ args: [String], input: Data? = nil, cwd: URL? = nil) throws -> Ran {
-    try runProcess(try #require(Binaries.dccli, "dccli isn't built"), args, input: input, cwd: cwd)
+func dccli(_ args: [String], input: Data? = nil, cwd: URL? = nil, stdout: Int32? = nil) throws -> Ran {
+    try runProcess(try #require(Binaries.dccli, "dccli isn't built"), args, input: input, cwd: cwd, stdout: stdout)
 }
 
-func oracle(_ args: [String], input: Data? = nil, cwd: URL? = nil) throws -> Ran {
-    try runProcess(try #require(Binaries.oracle, "the oracle isn't built"), args, input: input, cwd: cwd)
+func oracle(_ args: [String], input: Data? = nil, cwd: URL? = nil, stdout: Int32? = nil) throws -> Ran {
+    try runProcess(try #require(Binaries.oracle, "the oracle isn't built"), args, input: input, cwd: cwd, stdout: stdout)
 }
 
 /// A fresh scratch folder.

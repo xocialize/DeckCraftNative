@@ -185,10 +185,11 @@ public enum MCPTools {
             false
         ),
         tool(
-            "insert_chart", "Insert chart", "Insert a chart (column, bar, line, pie, doughnut, area, scatter, stackedColumn…) with categories and series.",
+            "insert_chart", "Insert chart", "Insert a chart (column, bar, line, pie, doughnut, area, scatter, stackedColumn…) with categories and series, optionally at a box.",
             obj([
                 "type": string("Chart type"), "title": string("Chart title"), "categories": ["type": "array", "items": ["type": "string"]],
                 "series": ["type": "array", "items": obj(["name": string("Series name"), "values": ["type": "array", "items": ["type": "number"]]], ["values"])],
+                "x": num("Left"), "y": num("Top"), "w": num("Width"), "h": num("Height"),
             ]),
             false
         ),
@@ -336,14 +337,13 @@ public enum MCPTools {
             if let al = a.get("align")?.asStr { _ = try? exec(b, "format.align", ["align": .string(al)]) }
             return .json(v)
         case "set_text": return wrap { () throws(AutomationError) -> JSON in try exec(b, "text.set", a) }
-        case "insert_picture", "insert_table":
+        case "insert_picture", "insert_table", "insert_chart":
             var p = a
             if let x = f(a, "x"), let y = f(a, "y"), let w = f(a, "w"), let h = f(a, "h") {
                 p.set("rect", [.num(x), .num(y), .num(w), .num(h)])
             }
-            let cmd = name == "insert_picture" ? "insert.picture" : "insert.table"
+            let cmd = name == "insert_picture" ? "insert.picture" : name == "insert_table" ? "insert.table" : "insert.chart"
             return wrap { () throws(AutomationError) -> JSON in try exec(b, cmd, p.canonical) }
-        case "insert_chart": return wrap { () throws(AutomationError) -> JSON in try exec(b, "insert.chart", a) }
         case "select": return wrap { () throws(AutomationError) -> JSON in try exec(b, "edit.select", a) }
         case "pointer": return wrap { () throws(AutomationError) -> JSON in try b.call("ui.pointer", a) }
         case "select_tool": return wrap { () throws(AutomationError) -> JSON in try b.call("ui.tool.select", a) }

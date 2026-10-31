@@ -3,13 +3,13 @@
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors), with PhotoCraftNative's reader
 // thread.
 //
-// Lines are read as Rust's `BufRead::lines` reads them: split at `\n`, a trailing `\r` dropped, the last
-// line kept without its newline, and a line that isn't UTF-8 ends the session with an error. Unlike
-// deckcraft, a line is bounded (`maxLineBytes`), so a peer can't grow memory without end.
+// Frames are read as deckcraft's `read_frame` reads them: through each `\n` (the last frame may end
+// without one), at most 16 MiB with the newline. A longer frame is drained to its newline without being
+// kept and answered with an error; a frame that isn't UTF-8 gets a parse error. Either way serving goes on.
 import Darwin
 import Foundation
 
-/// Reads lines from a file descriptor (or bytes in memory) on the calling thread.
+/// Reads request frames from a file descriptor (or bytes in memory) on the calling thread.
 public final class LineReader {
     let source: (UnsafeMutableRawBufferPointer) throws(IOFailure) -> Int
     var buffer: [UInt8] = []
@@ -60,53 +60,57 @@ public final class LineReader {
         return true
     }
 
-    /// The next line without its `\n` (and a `\r` before it); nil at the end. A line longer than
-    /// `maximum` bytes, or not UTF-8, is an error.
-    public func readLine(maximum: Int) throws(IOFailure) -> String? {
-        var line: [UInt8] = []
-        var sawAny = false
-        while try fill() {
-            sawAny = true
-            let rest = buffer[position...]
-            if let nl = rest.firstIndex(of: 0x0A) {
-                line.append(contentsOf: buffer[position ..< nl])
-                position = nl + 1
-                if line.count > maximum { throw IOFailure("a request line exceeds \(maximum) bytes") }
-                return try Self.text(line)
-            }
-            line.append(contentsOf: rest)
-            position = buffer.count
-            if line.count > maximum { throw IOFailure("a request line exceeds \(maximum) bytes") }
-        }
-        return sawAny ? try Self.text(line) : nil
+    /// One request frame: its bytes through the `\n`, or word that it was longer than allowed.
+    public enum Frame: Equatable, Sendable {
+        case complete([UInt8])
+        case tooLarge
     }
 
-    private static func text(_ bytes: [UInt8]) throws(IOFailure) -> String {
-        var b = bytes
-        if b.last == 0x0D { b.removeLast() }
-        guard let s = String(validating: b, as: UTF8.self) else { throw IOFailure("stream did not contain valid UTF-8") }
-        return s
+    /// The next frame, read through one newline while keeping no more than `maximum` bytes; nil at the end.
+    public func readFrame(maximum: Int) throws(IOFailure) -> Frame? {
+        var bytes: [UInt8] = []
+        var tooLarge = false
+        while true {
+            guard try fill() else {
+                if bytes.isEmpty && !tooLarge { return nil }
+                return tooLarge ? .tooLarge : .complete(bytes)
+            }
+            let rest = buffer[position...]
+            let end = rest.firstIndex(of: 0x0A).map { $0 + 1 } ?? buffer.count
+            if !tooLarge {
+                if end - position > maximum - bytes.count {
+                    tooLarge = true
+                    bytes = []
+                } else {
+                    bytes.append(contentsOf: buffer[position ..< end])
+                }
+            }
+            let ended = buffer[end - 1] == 0x0A
+            position = end
+            if ended { return tooLarge ? .tooLarge : .complete(bytes) }
+        }
     }
 }
 
 extension MCPServer {
-    /// The longest request line read: 256 MiB (a picture sent as base64 fits).
-    public static let maxLineBytes = 256 << 20
+    /// The longest request frame kept, its newline included: 16 MiB, in step with the connected backend's
+    /// reply limit.
+    public static let maxFrameBytes = 16 << 20
 
     /// Serve newline-delimited JSON-RPC from `reader` until it ends, writing each reply line with `write`.
     /// Logs go to stderr only (stdout is the protocol stream).
     public func serve(_ reader: LineReader, write: @escaping @Sendable ([UInt8]) throws(IOFailure) -> Void) async throws(IOFailure) {
         enum Event: Sendable {
-            case line(String)
+            case frame(LineReader.Frame)
             case failed(IOFailure)
         }
         let (events, continuation) = AsyncStream<Event>.makeStream()
         let box = EngineConfined(reader)
         let thread = Thread {
             reading: while true {
-                switch Result(catching: { () throws(IOFailure) -> String? in try box.value.readLine(maximum: MCPServer.maxLineBytes) }) {
-                case .success(let line?):
-                    continuation.yield(.line(line))
+                switch Result(catching: { () throws(IOFailure) -> LineReader.Frame? in try box.value.readFrame(maximum: MCPServer.maxFrameBytes) }) {
+                case .success(let frame?):
+                    continuation.yield(.frame(frame))
                 case .success(nil):
                     break reading
                 case .failure(let e):
@@ -120,8 +124,19 @@ extension MCPServer {
         thread.start()
         for await event in events {
             switch event {
-            case .line(let line):
-                if let reply = await handleLine(line) { try write(Array("\(reply)\n".utf8)) }
+            case .frame(let frame):
+                let reply: String?
+                switch frame {
+                case .complete(let bytes):
+                    if let line = String(validating: bytes, as: UTF8.self) {
+                        reply = await handleLine(line)
+                    } else {
+                        reply = Self.error(.null, RPCCode.parseError, "request frame is not valid UTF-8").display
+                    }
+                case .tooLarge:
+                    reply = Self.error(.null, RPCCode.invalidRequest, "request frame exceeds 16 MiB").display
+                }
+                if let reply { try write(Array("\(reply)\n".utf8)) }
             case .failed(let e):
                 throw e
             }

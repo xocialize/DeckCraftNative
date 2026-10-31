@@ -64,6 +64,35 @@ struct MCPServerTests {
         await s.stop()
     }
 
+    /// #1151: `insert_chart` takes x, y, w and h like `insert_picture` and `insert_table`.
+    @Test func insertChartTakesABox() async {
+        let s = headless()
+        await tool(s, "new_presentation", j(#"{"theme": "Harbor"}"#))
+        let chart = j(#"{"type": "pie", "categories": ["A", "B"], "series": [{"name": "S", "values": [3, 5]}]}"#)
+        func boxOf(_ id: UInt64) async -> JSON {
+            let shape = shapes(await tool(s, "inspect_slide", .emptyObject)).first { $0.get("id")?.asU64 == id } ?? .null
+            #expect(shape.get("kind") == "chart")
+            return shape.get("box") ?? .null
+        }
+        var args = chart
+        for (k, v) in [("x", 50), ("y", 60), ("w", 300), ("h", 200)] { args.set(k, .integer(Int64(v))) }
+        let placed = (await tool(s, "insert_chart", args)).get("id")?.asU64 ?? 0
+        #expect(await boxOf(placed) == j("[50.0, 60.0, 300.0, 200.0]"))
+        // Without a full box the chart keeps its default place, as for pictures and tables.
+        let plain = (await tool(s, "insert_chart", chart)).get("id")?.asU64 ?? 0
+        let defaultBox = await boxOf(plain)
+        var partial = chart
+        partial.set("x", 50)
+        let partialId = (await tool(s, "insert_chart", partial)).get("id")?.asU64 ?? 0
+        #expect(await boxOf(partialId) == defaultBox)
+        // A hostile box is answered, not a crash.
+        var odd = chart
+        for (k, v) in [("x", JSON.num(-1e300)), ("y", .num(1e300)), ("w", .integer(-5)), ("h", .integer(0))] { odd.set(k, v) }
+        let r = await call(s, 11, "tools/call", ["name": "insert_chart", "arguments": odd])
+        #expect(r.get("result")?.asObject != nil, "\(r.display)")
+        await s.stop()
+    }
+
     @Test func agentBuildsADeck() async {
         let s = headless()
         await tool(s, "new_presentation", j(#"{"theme": "Harbor"}"#))
