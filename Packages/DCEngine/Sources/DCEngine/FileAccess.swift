@@ -2,16 +2,17 @@
 // Port of deckcraft crates/engine/src/file_access.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
 //
-// `dccli mcp --automation-read-root <dir> --automation-write-root <dir>` confines the files an agent's
-// commands reach. `AutomationRoots` holds the two folders. While they are in force, every path a command
+// `dccli mcp --automation-read-root <dir> --automation-write-root <dir>` (each flag repeatable) confines the
+// files an agent's commands reach. `AutomationRoots` holds the folders. While they are in force, every path a command
 // reads goes through `FileAccess.checkRead` and every path it writes through `checkWrite`:
 //
 // - The path is made absolute against the working directory, as the file system reads it. Its links are
 //   followed: for a file that doesn't exist yet, the links of its nearest existing folder, the rest of
 //   the path being plain names (`..` below a missing folder is refused, and so is a link that leads
 //   nowhere).
-// - The result must lie inside the root, compared by whole components (`/work2` isn't inside `/work`).
-// - Read and write access are separate: a root given alone grants only its own kind of access.
+// - The result must lie inside one of the roots, compared by whole components (`/work2` isn't inside
+//   `/work`).
+// - Read and write access are separate: roots of one kind alone grant only their own kind of access.
 //
 // Roots are in force inside `FileAccess.confine` (a task-local scope, so it stays on the thread or task
 // that set it), and in the whole process after `confineProcess`, except inside `unconfined`. Without
@@ -32,10 +33,10 @@ public final class AutomationRoots: Sendable {
         var resolved: String
     }
 
-    let read: Root?
-    let write: Root?
+    let read: [Root]
+    let write: [Root]
 
-    private init(read: Root?, write: Root?) {
+    private init(read: [Root], write: [Root]) {
         self.read = read
         self.write = write
     }
@@ -54,30 +55,31 @@ public final class AutomationRoots: Sendable {
         }
     }
 
-    /// The roots `read` and `write`, which must be existing folders; nil when neither is given (nothing is
+    /// The read and write roots, which must be existing folders; nil when both are empty (nothing is
     /// confined then).
-    public static func make(read: String?, write: String?) throws(FileAccessError) -> AutomationRoots? {
-        if read == nil && write == nil { return nil }
+    public static func make(read: [String], write: [String]) throws(FileAccessError) -> AutomationRoots? {
+        if read.isEmpty && write.isEmpty { return nil }
         let r = try read.map { (p: String) throws(FileAccessError) -> Root in try open(p, .read) }
         let w = try write.map { (p: String) throws(FileAccessError) -> Root in try open(p, .write) }
         return AutomationRoots(read: r, write: w)
     }
 
-    /// The read root, absolute with its links followed.
-    public var readRoot: String? { read?.resolved }
-    /// The write root, absolute with its links followed.
-    public var writeRoot: String? { write?.resolved }
+    /// The read roots, absolute with their links followed.
+    public var readRoots: [String] { read.map(\.resolved) }
+    /// The write roots, absolute with their links followed.
+    public var writeRoots: [String] { write.map(\.resolved) }
 
     /// May the file or folder at `path` be read (or written)? The error says why not.
     public func check(_ path: String, _ access: Access) throws(FileAccessError) {
-        guard let root = access == .read ? read : write else {
-            let kind = access == .read ? "read" : "write"
+        let roots = access == .read ? read : write
+        let kind = access == .read ? "read" : "write"
+        if roots.isEmpty {
             throw FileAccessError("automation filesystem access is not granted: \(kind) authority is absent: \(path)")
         }
         let resolved = try FileAccess.resolve(path)
-        if FileAccess.inside(resolved, root.resolved) { return }
-        let kind = access == .read ? "read" : "write"
-        throw FileAccessError("automation path rejected: outside the \(kind) root \(root.resolved): \(path)")
+        if roots.contains(where: { FileAccess.inside(resolved, $0.resolved) }) { return }
+        let shown = roots.map(\.resolved).joined(separator: ", ")
+        throw FileAccessError("automation path rejected: outside the \(kind) roots \(shown): \(path)")
     }
 }
 
