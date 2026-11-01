@@ -652,12 +652,16 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Release:** built from `a998ea3` and notarized; the downloaded DMG is identical to the build. The release
     build opened four presentations without a crash. The installed 0.1.12 finds 0.1.13 through Check for Updates;
     0.1.13 is now installed in `/Applications`.
-- **After 0.1.13 (unreleased): Slide Show › Set Up Show… opened nothing.**
+- **After 0.1.13 (unreleased): Slide Show › Set Up Show… and Insert › Table… opened no dialog.**
   - **Cause:** the menu tree (deckcraft's `menu_tree`) runs `show.setup` with no settings, which changes nothing.
     deckcraft's own menu does the same; its dialog opens only from the ribbon.
   - **Fix:** the menu item is now "Set Up Slide Show…" and opens the dialog, as the ribbon and the inspector do.
     `DialogsMenuTarget` entries take a `replaces:` command, which File › Properties… now uses too.
   - **Test:** `DialogsWindowTests.menuItemsForTheDialogs`. Checked in a signed build through the real menu bar.
+  - **Insert › Table…:** found by an audit of every "…" menu item that runs an engine command. It inserted a 2 × 2
+    table at once, as deckcraft's menu does. It now opens the Insert Table dialog, keeping its translated title.
+    The other "…" items (Photo Album, Font, Paragraph, Size and Position) already open their dialogs, and Edit Photo
+    Album explains when the slide isn't in an album.
 
 ## Pin moves
 

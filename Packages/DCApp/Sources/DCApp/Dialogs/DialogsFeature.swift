@@ -139,7 +139,7 @@ final class DialogsMenuTarget: NSObject {
         var key: String = ""
         var mods: NSEvent.ModifierFlags = [.command]
         /// The tree's command this entry takes the place of, in the same spot: one whose engine command, run as the
-        /// menu runs it (no parameters), has nothing to show.
+        /// menu runs it (no parameters), has nothing to show. An empty `title` keeps the tree's (translated) title.
         var replaces: String?
     }
 
@@ -147,6 +147,8 @@ final class DialogsMenuTarget: NSObject {
         // Set Up Show… ran `show.setup` with nothing to set (as deckcraft's menu does): open the dialog, as the ribbon
         // and the inspector do. First in the list, so Custom Shows… is placed after it before it is replaced.
         Entry(menu: "Slide Show", after: nil, title: String(localized: "Set Up Slide Show…", bundle: .module), command: "app.dialog", params: ["id": "setupShow"], replaces: "show.setup"),
+        // Table… inserted a 2 × 2 table at once (deckcraft's menu does): ask for its size first, as PowerPoint does.
+        Entry(menu: "Insert", after: nil, title: "", command: "app.dialog", params: ["id": "table"], replaces: "insert.table"),
         Entry(menu: "File", after: "file.new", title: String(localized: "New from Template…", bundle: .module), command: "app.backstage", params: ["page": "new"], key: "n", mods: [.command, .option]),
         // The tree's Properties runs the engine's query, which has nothing to show: open the sheet instead.
         Entry(menu: "File", after: nil, title: String(localized: "Properties…", bundle: .module), command: "app.backstage", params: ["page": "info"], replaces: "file.properties"),
@@ -171,8 +173,9 @@ final class DialogsMenuTarget: NSObject {
         guard let main = NSApp.mainMenu else { return }
         for e in Self.entries.reversed() {
             guard let menu = main.items.first(where: { $0.title == L10n.menuTitle(e.menu) })?.submenu else { continue }
-            if let replaced = e.replaces, let old = menu.items.first(where: { ($0.representedObject as? String) == replaced }) {
-                retarget(old, e)
+            if let replaced = e.replaces {
+                // Replaced once already (a second install) or not in this menu: nothing to add.
+                if let old = menu.items.first(where: { ($0.representedObject as? String) == replaced }) { retarget(old, e) }
                 continue
             }
             if e.command == "app.palette", menu.items.contains(where: { ($0.representedObject as? String) == "app.palette" }) { continue }
@@ -187,7 +190,7 @@ final class DialogsMenuTarget: NSObject {
     }
 
     private func retarget(_ item: NSMenuItem, _ e: Entry) {
-        item.title = e.title
+        if !e.title.isEmpty { item.title = e.title }
         item.target = self
         item.action = #selector(run(_:))
         item.representedObject = Box(e)

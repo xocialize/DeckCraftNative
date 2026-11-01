@@ -139,6 +139,14 @@ import Testing
         target.run(setUp)
         #expect(dialogs.current?.id == "setupShow")
         dialogs.cancel()
+        // Insert › Table… inserted a 2 × 2 table at once; it asks for the size first, keeping its title.
+        let table = try #require(insert.items.first { $0.title == "Table…" })
+        #expect(insert.items.filter { $0.title == "Table…" }.count == 1)
+        let shapes = app.model.session.activeDoc?.doc.slides.first?.shapes.count
+        target.run(table)
+        #expect(dialogs.current?.id == "table")
+        #expect(app.model.session.activeDoc?.doc.slides.first?.shapes.count == shapes, "nothing inserted before the dialog")
+        dialogs.cancel()
     }
 
     @Test func panelsOfferDeckcraftsFileTypes() {
