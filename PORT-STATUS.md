@@ -636,7 +636,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     it their resource bundle stayed English.
   - **Release:** built from `18abd66` and notarized; the downloaded DMG is identical to the build. The installed 0.1.11
     finds 0.1.12 through Check for Updates; 0.1.12 is now installed in `/Applications`.
-- **After 0.1.12 (unreleased): creating a second presentation crashed.**
+- **Released as [v0.1.13](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.13) (2026-11-01): creating a second presentation crashed.**
   - **What happened:** with one presentation open, a new one opening beside it ended the app with AppKit's "needs
     update constraints" exception (`EXC_BREAKPOINT` in `_postWindowNeedsUpdateConstraints`).
   - **Cause:**
@@ -649,6 +649,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Fix:** only the active presentation's canvas publishes its scale, on the run loop's next turn.
   - **Test:** `RibbonWindowTests.twoPresentationWindowsLayOutWithoutFighting`. With the old code the test process
     dies with the same trap.
+  - **Release:** built from `a998ea3` and notarized; the downloaded DMG is identical to the build. The release
+    build opened four presentations without a crash. The installed 0.1.12 finds 0.1.13 through Check for Updates;
+    0.1.13 is now installed in `/Applications`.
 
 ## Pin moves
 
