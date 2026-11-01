@@ -114,7 +114,12 @@ shot 2b-pictures
 quit
 # Its slide show (legacy plan P5): the motion deck's animations come over, and its show plays.
 launch "$FIX/legacy/ppt/motion.ppt"
-A=$(app document.inspect | jq_ "['slides'][37]['animations']")
+# The app answers before the .ppt has finished converting: wait for it (5 s at most).
+for i in {1..20}; do
+  A=$(app document.inspect | jq_ "['slides'][37]['animations']")
+  [ "${A:-0}" -ge 7 ] 2>/dev/null && break
+  sleep 0.25
+done
 check "the .ppt's animations come over" $([ "${A:-0}" -ge 7 ]; echo $?)
 method show.start '{"from":37}' >/dev/null
 sleep 1
