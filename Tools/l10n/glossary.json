@@ -23,6 +23,10 @@
     "picture": {"fr": "image", "it": "immagine", "de": "Bild", "es": "imagen"},
     "table": {"fr": "tableau", "it": "tabella", "de": "Tabelle", "es": "tabla"},
     "chart": {"fr": "graphique", "it": "grafico", "de": "Diagramm", "es": "gráfico"},
+    "chart title": {"fr": "titre du graphique", "it": "titolo del grafico", "de": "Diagrammtitel", "es": "título del gráfico"},
+    "legend": {"fr": "légende", "it": "legenda", "de": "Legende", "es": "leyenda"},
+    "data labels": {"fr": "étiquettes de données", "it": "etichette dati", "de": "Datenbeschriftungen", "es": "etiquetas de datos"},
+    "gridlines (chart)": {"fr": "quadrillage", "it": "griglia", "de": "Gitternetzlinien", "es": "líneas de cuadrícula"},
     "transition": {"fr": "transition", "it": "transizione", "de": "Übergang", "es": "transición"},
     "animation": {"fr": "animation", "it": "animazione", "de": "Animation", "es": "animación"},
     "Normal (view)": {"fr": "Normal", "it": "Normale", "de": "Normal", "es": "Normal"},
@@ -96,6 +100,7 @@
     "Notes Master": {"fr": "Masque des pages de notes", "it": "Schema note", "de": "Notizenmaster", "es": "Patrón de notas"}
   },
   "ribbon groups": {
+    "Chart Layouts": {"fr": "Dispositions du graphique", "it": "Layout grafici", "de": "Diagrammlayouts", "es": "Diseños de gráfico"},
     "Clipboard": {"fr": "Presse-papiers", "it": "Appunti", "de": "Zwischenablage", "es": "Portapapeles"},
     "Slides": {"fr": "Diapositives", "it": "Diapositive", "de": "Folien", "es": "Diapositivas"},
     "Font": {"fr": "Police", "it": "Carattere", "de": "Schriftart", "es": "Fuente"},

@@ -665,6 +665,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Release:** built from `923d7e5` and notarized; the downloaded DMG is identical to the build. Both menu items
     open their dialogs in the release build. The installed 0.1.13 finds 0.1.14 through Check for Updates; 0.1.14
     is now installed in `/Applications`.
+- **After 0.1.14 (unreleased): chart elements can be edited.** A chart's title, legend, data labels and gridlines
+  had no control. The engine's `chart.options` sets them, but neither deckcraft's UI nor ours called it.
+  - **Ribbon:** Chart Design has a Chart Layouts group with PowerPoint's Add Chart Element menu: Chart Title (None,
+    Above Chart), Legend (None, Right, Top, Left, Bottom), Data Labels (None, Show) and Gridlines (None, Major
+    Gridlines). The items come from `ChartElements` (DCAppModel).
+  - **Inspector:** Format › Chart has a Chart Elements section:
+    - a Chart Title switch, and a Title field that commits on Return or when it loses focus (emptying it removes the
+      title);
+    - a Legend position;
+    - Data Labels and Gridlines switches.
+  - **Undo:** each change is one `chart.options` command, so one undo step.
+  - **Mac layout:** the Mac layout's map lists the new group.
+  - **Strings:** new strings in French, Italian, German and Spanish, marked "needs review". The review sheets are
+    regenerated, and the glossary has the chart terms.
+  - **Tests:** `RibbonModelTests.addChartElementChangesTheChart`. Ribbon widths pass in en, fr, it, de and es. The
+    section was checked in DeckCraftDev.
+  - **Later:** editing the title on the canvas with a double-click.
 
 ## Pin moves
 

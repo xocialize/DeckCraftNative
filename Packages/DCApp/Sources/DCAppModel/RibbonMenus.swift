@@ -248,6 +248,9 @@ public enum RibbonMenus {
                 out += group.map { .item($0.label, "chart.type", ["id": .integer(first.rawValue), "type": .string(ChartMenu.param($0))]) }
             }
             return out
+        case "chartDesign.addElement":
+            guard let (id, chart) = ChartElements.selected(doc) else { return [] }
+            return ChartElements.menu(id, chart)
         // SmartArt Design (`smartart.rs`)
         case "smartArtDesign.addShape":
             guard let (gid, d) = doc.flatMap(SmartArtCommands.selected) else { return [] }

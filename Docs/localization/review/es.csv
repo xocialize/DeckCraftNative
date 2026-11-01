@@ -39,6 +39,7 @@ DCAppModel|4 pictures with title,,4 pictures with title,4 imágenes con título,
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Un álbum de fotos admite como máximo 48 imágenes o cuadros de texto,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,TODAS las imágenes en blanco y negro,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,Acerca de DeckCraftNative,needs_review,,,
+DCAppModel|Above Chart,,Above Chart,Encima del gráfico,needs_review,,,Where the chart title is
 DCAppModel|Accent 1,,Accent 1,Énfasis 1,needs_review,,,A theme colour slot
 DCAppModel|Accent 2,,Accent 2,Énfasis 2,needs_review,,,A theme colour slot
 DCAppModel|Accent 3,,Accent 3,Énfasis 3,needs_review,,,A theme colour slot
@@ -131,6 +132,7 @@ DCAppModel|Body:,,Body:,Cuerpo:,needs_review,,,
 DCAppModel|Bold,,Bold,Negrita,needs_review,,,
 DCAppModel|Both,,Both,Ambos,needs_review,,,mirror both ways
 DCAppModel|Bottom,,Bottom,Inferior,needs_review,,,"A shadow
+Where a chart's legend is
 text box inset
 tile alignment
 vertical text alignment"
@@ -166,6 +168,8 @@ DCAppModel|Change to:,,Change to:,Cambiar a:,needs_review,,,
 DCAppModel|Character spacing must be a number,,Character spacing must be a number,El espaciado entre caracteres debe ser un número,needs_review,,,
 DCAppModel|Chart,,Chart,Gráfico,needs_review,,,A placeholder kind
 DCAppModel|Chart Data,,Chart Data,Datos del gráfico,needs_review,,,
+DCAppModel|Chart Title,,Chart Title,Título del gráfico,needs_review,,,"Add Chart Element › Chart Title
+The text a new chart title starts with"
 DCAppModel|Check for Issues,,Check for Issues,Comprobar si hay problemas,needs_review,,,
 DCAppModel|Choose a SmartArt Graphic,,Choose a SmartArt Graphic,Elegir un gráfico SmartArt,needs_review,,,
 DCAppModel|Choose a body font.,,Choose a body font.,Elija una fuente para el cuerpo.,needs_review,,,
@@ -232,6 +236,7 @@ DCAppModel|Dashed horizontal,,Dashed horizontal,Horizontal discontinua,needs_rev
 DCAppModel|Dashed upward diagonal,,Dashed upward diagonal,Diagonal discontinua hacia arriba,needs_review,,,
 DCAppModel|Dashed vertical,,Dashed vertical,Vertical discontinua,needs_review,,,
 DCAppModel|Dashes,,Dashes,Guiones,needs_review,,,
+DCAppModel|Data Labels,,Data Labels,Etiquetas de datos,needs_review,,,
 DCAppModel|Date and Time,,Date and Time,Fecha y hora,needs_review,,,
 DCAppModel|Date and time,,Date and time,Fecha y hora,needs_review,,,
 DCAppModel|Decimal,,Decimal,Decimal,needs_review,,,
@@ -356,6 +361,7 @@ DCAppModel|Greek,,Greek,Griego,needs_review,,,
 DCAppModel|Green,,Green,Verde,needs_review,,,A standard colour
 DCAppModel|Grid Options,,Grid Options,Opciones de cuadrícula,needs_review,,,
 DCAppModel|Grid and Guides,,Grid and Guides,Cuadrícula y guías,needs_review,,,
+DCAppModel|Gridlines,,Gridlines,Líneas de cuadrícula,needs_review,,,
 DCAppModel|Group,,Group,Agrupar,needs_review,,,
 DCAppModel|Guides,,Guides,Guías,needs_review,,,
 DCAppModel|HD (330 ppi): good quality for high-definition displays,,HD (330 ppi): good quality for high-definition displays,HD (330 ppp): buena calidad para pantallas de alta definición,needs_review,,,
@@ -431,9 +437,11 @@ DCAppModel|Large grid,,Large grid,Cuadrícula grande,needs_review,,,
 DCAppModel|Last Slide,,Last Slide,Última diapositiva,needs_review,,,
 DCAppModel|Last Slide Viewed,,Last Slide Viewed,Última diapositiva vista,needs_review,,,
 DCAppModel|Layout,,Layout,Diseño,needs_review,,,
-DCAppModel|Left,,Left,Izquierda,needs_review,,,"text box inset
+DCAppModel|Left,,Left,Izquierda,needs_review,,,"Where a chart's legend is
+text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Borde izquierdo,needs_review,,,
+DCAppModel|Legend,,Legend,Leyenda,needs_review,,,
 DCAppModel|Less Brightness,,Less Brightness,Menos brillo,needs_review,,,
 DCAppModel|Less Contrast,,Less Contrast,Menos contraste,needs_review,,,
 "DCAppModel|Licensed under MIT OR Apache-2.0. Includes code ported from DeckCraft, © 2026 ArtCraft Team and the DeckCraft contributors (MIT OR Apache-2.0).",,"Licensed under MIT OR Apache-2.0. Includes code ported from DeckCraft, © 2026 ArtCraft Team and the DeckCraft contributors (MIT OR Apache-2.0).","Con licencia MIT OR Apache-2.0. Incluye código portado de DeckCraft, © 2026 ArtCraft Team y los colaboradores de DeckCraft (MIT OR Apache-2.0).",needs_review,,,
@@ -465,6 +473,7 @@ DCAppModel|Loop continuously until 'Esc',,Loop continuously until 'Esc',Repetir 
 DCAppModel|Loop forever,,Loop forever,Repetir indefinidamente,needs_review,,,
 DCAppModel|Loose,,Loose,Expandido,needs_review,,,character spacing
 DCAppModel|Low,,Low,Bajo,needs_review,,,Media volume
+DCAppModel|Major Gridlines,,Major Gridlines,Líneas de cuadrícula principales,needs_review,,,
 DCAppModel|Manage Presentation: %@,,Manage Presentation: %@,Administrar presentación: %@,needs_review,,,
 DCAppModel|Mark all text in the presentation as:,,Mark all text in the presentation as:,Marcar todo el texto de la presentación como:,needs_review,,,
 DCAppModel|Mark as decorative,,Mark as decorative,Marcar como decorativo,needs_review,,,
@@ -513,6 +522,10 @@ DCAppModel|No pictures yet,,No pictures yet,Aún no hay imágenes,needs_review,,
 DCAppModel|No presentation is open.,,No presentation is open.,No hay ninguna presentación abierta.,needs_review,,,
 DCAppModel|No themes or templates match “%@”.,,No themes or templates match “%@”.,Ningún tema o plantilla coincide con “%@”.,needs_review,,,
 DCAppModel|None,,None,Ninguno,needs_review,,,"No arrowheads
+No chart title
+No data labels on the chart
+No gridlines on the chart
+No legend on the chart
 Table cell margins
 no arrowheads
 no mirroring / no arrow"
@@ -637,7 +650,8 @@ DCAppModel|Reuse Slides…,,Reuse Slides…,Volver a usar diapositivas…,needs_
 DCAppModel|Revert,,Revert,Revertir,needs_review,,,
 DCAppModel|Review,,Review,Revisar,needs_review,,,
 DCAppModel|Ribbon,,Ribbon,Cinta de opciones,needs_review,,,
-DCAppModel|Right,,Right,Derecha,needs_review,,,"text box inset
+DCAppModel|Right,,Right,Derecha,needs_review,,,"Where a chart's legend is
+text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Borde derecho,needs_review,,,
 DCAppModel|Rotate,,Rotate,Girar,needs_review,,,
@@ -684,7 +698,7 @@ DCAppModel|Shadow,,Shadow,Sombra,needs_review,,,
 DCAppModel|Shape %@,,Shape %@,Forma %@,needs_review,,,
 DCAppModel|Shapes,,Shapes,Formas,needs_review,,,
 DCAppModel|Shingle,,Shingle,Teja,needs_review,,,
-DCAppModel|Show,,Show,Mostrar,needs_review,,,
+DCAppModel|Show,,Show,Mostrar,needs_review,,,Show the chart's data labels
 DCAppModel|Show in Finder,,Show in Finder,Mostrar en Finder,needs_review,,,
 DCAppModel|Show smart guides,,Show smart guides,Mostrar guías inteligentes,needs_review,,,
 DCAppModel|Show the start screen when DeckCraftNative opens,,Show the start screen when DeckCraftNative opens,Mostrar la pantalla de inicio al abrir DeckCraftNative,needs_review,,,
@@ -820,7 +834,8 @@ character spacing"
 DCAppModel|Title,,Title,Título,needs_review,,,
 DCAppModel|To slide:,,To slide:,Hasta la diapositiva:,needs_review,,,
 DCAppModel|Toolbar and inspector,,Toolbar and inspector,Barra de herramientas e inspector,needs_review,,,
-DCAppModel|Top,,Top,Superior,needs_review,,,"text box inset
+DCAppModel|Top,,Top,Superior,needs_review,,,"Where a chart's legend is
+text box inset
 tile alignment
 vertical text alignment"
 DCAppModel|Top Border,,Top Border,Borde superior,needs_review,,,
@@ -1695,6 +1710,7 @@ Ribbon|ribbon.control.animations.pane,,Animation Pane,Panel de animación,needs_
 Ribbon|ribbon.control.animations.preview,,Preview,Vista previa,needs_review,,,A control in the Animations tab's Preview group (runs animation.preview)
 Ribbon|ribbon.control.animations.start,,Start,Inicio,needs_review,,,A control in the Animations tab's Timing group (runs animation.timing)
 Ribbon|ribbon.control.animations.trigger,,Trigger,Desencadenar,needs_review,,,A control in the Animations tab's Advanced Animation group (runs animation.timing)
+Ribbon|ribbon.control.chartDesign.addElement,,Add Chart Element,Agregar elemento de gráfico,needs_review,,,A control in the Chart Design tab's Chart Layouts group (runs chart.options)
 Ribbon|ribbon.control.chartDesign.align,,Align,Alinear,needs_review,,,A control in the Chart Design tab's Arrange group (runs arrange.align)
 Ribbon|ribbon.control.chartDesign.changeType,,Change Chart Type,Cambiar tipo de gráfico,needs_review,,,A control in the Chart Design tab's Type group (runs chart.type)
 Ribbon|ribbon.control.chartDesign.editData,,Edit Data,Editar datos,needs_review,,,A control in the Chart Design tab's Data group (runs app.dialog)
@@ -1865,6 +1881,7 @@ Ribbon|ribbon.group.animations.preview,,Preview,Vista previa,needs_review,,,"A g
 Ribbon|ribbon.group.animations.timing,,Timing,Intervalos,needs_review,,,"A group of the Animations ribbon tab: VoiceOver's name for it, and its button when it folds"
 Ribbon|ribbon.group.chartDesign.arrange,,Arrange,Organizar,needs_review,,,"A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds"
 Ribbon|ribbon.group.chartDesign.data,,Data,Datos,needs_review,,,"A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds"
+Ribbon|ribbon.group.chartDesign.layouts,,Chart Layouts,Diseños de gráfico,needs_review,,,"A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds"
 Ribbon|ribbon.group.chartDesign.type,,Type,Tipo,needs_review,,,"A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds"
 Ribbon|ribbon.group.design.customize,,Customize,Personalizar,needs_review,,,"A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds"
 Ribbon|ribbon.group.design.designer,,Designer,Diseñador,needs_review,,,"A group of the Design ribbon tab: VoiceOver's name for it, and its button when it folds"
@@ -2094,6 +2111,8 @@ DCApp|Change Picture…,,Change Picture…,Cambiar imagen…,needs_review,,,
 DCApp|Change Shape,,Change Shape,Cambiar forma,needs_review,,,
 DCApp|Character Spacing,,Character Spacing,Espaciado entre caracteres,needs_review,,,
 DCApp|Chart,,Chart,Gráfico,needs_review,,,A placeholder kind
+DCApp|Chart Elements,,Chart Elements,Elementos de gráfico,needs_review,,,
+DCApp|Chart Title,,Chart Title,Título del gráfico,needs_review,,,
 DCApp|Chart Type,,Chart Type,Tipo de gráfico,needs_review,,,
 DCApp|Chart cell,,Chart cell,Celda del gráfico,needs_review,,,Accessibility label of a cell in the Chart Data grid
 DCApp|Check Accessibility…,,Check Accessibility…,Comprobar accesibilidad…,needs_review,,,
@@ -2158,6 +2177,7 @@ DCApp|Cut,,Cut,Cortar,needs_review,,,
 DCApp|Cycle,,Cycle,Ciclo,needs_review,,,A SmartArt category
 DCApp|Dash,,Dash,Guion,needs_review,,,A line style
 DCApp|Dash Dot,,Dash Dot,Guion punto,needs_review,,,A line style
+DCApp|Data Labels,,Data Labels,Etiquetas de datos,needs_review,,,
 DCApp|Date,,Date,Fecha,needs_review,,,
 DCApp|Decimal Tab,,Decimal Tab,Tabulación decimal,needs_review,,,
 DCApp|DeckCraftNative %@ is available,,DeckCraftNative %@ is available,DeckCraftNative %@ está disponible,needs_review,,,
@@ -2252,6 +2272,7 @@ DCApp|Gradient bar,,Gradient bar,Barra de degradado,needs_review,,,
 DCApp|Gradient stop %lld,,Gradient stop %lld,Punto de degradado %lld,needs_review,,,
 DCApp|Gradient stops,,Gradient stops,Puntos de degradado,needs_review,,,
 DCApp|Grayscale,,Grayscale,Escala de grises,needs_review,,,Print panel: print in grayscale
+DCApp|Gridlines,,Gridlines,Líneas de cuadrícula,needs_review,,,
 DCApp|Group,,Group,Agrupar,needs_review,,,
 "DCApp|Group, Rotate and Flip",,"Group, Rotate and Flip","Agrupar, girar y voltear",needs_review,,,
 DCApp|HD (330 ppi),,HD (330 ppi),HD (330 ppp),needs_review,,,
@@ -2310,6 +2331,7 @@ DCApp|Layout:,,Layout:,Diseño:,needs_review,,,"Print panel: the pages' layout (
 DCApp|Layouts,,Layouts,Diseños,needs_review,,,
 DCApp|Left Border,,Left Border,Borde izquierdo,needs_review,,,
 DCApp|Left Tab,,Left Tab,Tabulación izquierda,needs_review,,,
+DCApp|Legend,,Legend,Leyenda,needs_review,,,
 DCApp|Lighting,,Lighting,Iluminación,needs_review,,,
 DCApp|Line,,Line,Línea,needs_review,,,Noun: a shape's outline
 DCApp|Line Spacing,,Line Spacing,Interlineado,needs_review,,,
