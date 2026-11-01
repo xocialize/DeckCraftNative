@@ -636,9 +636,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
 - **The oracle at the new pin.** `deckcraft-cli` 0.13.1 built from `a3fbf029`; the corpus and every vector set
   regenerated (fixtures `3426eba`, local). The 88c2ceff corpus is kept beside it until this move is released.
 - **Tests.** The full suite passes, apart from two cases. `aDenseShapeGradientRendersPromptly` timed out under the
-  load of the full run and passes alone, as before. `outlineRowsFollowTheScrollerStyle` fails: the outline's rows keep
-  their estimated heights, not the ones measured. It fails the same way on `main` (`86df54c`), so it isn't from this
-  move. It passed on 2026-10-29, so something on the test Mac has changed since then. The alpha gate passes in both
+  load of the full run and passes alone, as before. `outlineRowsFollowTheScrollerStyle` failed the same way on `86df54c`. It only passed
+  on a Mac that started with legacy scroll bars; `cce8e12` makes it independent of that. Checking the Outline in the
+  app found long titles drawn on one line and cut off, fixed in the same commit. The alpha gate passes in both
   layouts (24/24 each).
 
 ### 27009cd9 → 88c2ceff (2026-10-27, after Wave 6)
