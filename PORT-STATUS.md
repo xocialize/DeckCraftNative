@@ -600,9 +600,15 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     its `.sha256` and its ticket is stapled.
   - The installed 0.1.8 finds 0.1.9 through Check for Updates (`ui.updates`); 0.1.9 is now installed in
     `/Applications`, where it reports itself up to date.
-- **After 0.1.9 (unreleased).** PDF export carries an image's edge colour under its transparent pixels, so a viewer that
-  smooths images shows no dark fringe along hard edges (`3425a74`, DCRender `EdgeBleed`). Format ▸ Effects draws its
-  Shadow, Glow and Soft Edges presets as tiles (DCApp `EffectPresetTiles`).
+- **Released as [v0.1.10](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.10) (2026-11-01).** PDF export
+  carries an image's edge colour under its transparent pixels, so a viewer that smooths images shows no dark fringe
+  along hard edges (`3425a74`, DCRender `EdgeBleed`). Format ▸ Effects draws its Shadow, Glow and Soft Edges presets as
+  tiles (`d3e1a59`, DCApp `EffectPresetTiles`). Notes in `Docs/releases/0.1.10.md`.
+  - Built from `073326a`, notarized, and accepted by Gatekeeper; the downloaded DMG is identical to the build, matches
+    its `.sha256` and its ticket is stapled. The first two-digit patch number: the update check orders versions by
+    number (`UpdatesTests.ordersByPrecedence` now has 1.0.9 < 1.0.10).
+  - The installed 0.1.9 finds 0.1.10 through Check for Updates (`ui.updates`); 0.1.10 is now installed in
+    `/Applications`, where it reports itself up to date.
 
 ## Pin moves
 
