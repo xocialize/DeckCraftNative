@@ -636,6 +636,19 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     it their resource bundle stayed English.
   - **Release:** built from `18abd66` and notarized; the downloaded DMG is identical to the build. The installed 0.1.11
     finds 0.1.12 through Check for Updates; 0.1.12 is now installed in `/Applications`.
+- **After 0.1.12 (unreleased): creating a second presentation crashed.**
+  - **What happened:** with one presentation open, a new one opening beside it ended the app with AppKit's "needs
+    update constraints" exception (`EXC_BREAKPOINT` in `_postWindowNeedsUpdateConstraints`).
+  - **Cause:**
+    - Each window's canvas wrote its fit scale into the app model's `canvasScale` during layout
+      (`CanvasView.relayout`, from `CanvasContainerView.layout`).
+    - The status bars read that value, so SwiftUI asked for new constraints in the middle of the window's layout
+      pass.
+    - With two windows of different sizes, their canvases took turns writing different scales until AppKit threw.
+    - The code dates from Wave 5. It reproduces on macOS 27.2 with any second presentation.
+  - **Fix:** only the active presentation's canvas publishes its scale, on the run loop's next turn.
+  - **Test:** `RibbonWindowTests.twoPresentationWindowsLayOutWithoutFighting`. With the old code the test process
+    dies with the same trap.
 
 ## Pin moves
 

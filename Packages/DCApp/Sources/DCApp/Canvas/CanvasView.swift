@@ -48,6 +48,8 @@ final class CanvasView: NSView {
     private var picture: Picture?
     /// How many times the slide's picture was made (recorded or rasterised): an unchanged slide isn't again.
     private(set) var pictureCount = 0
+    /// The scale `relayout` last asked to publish, until the main loop's next turn publishes it.
+    private var pendingScale: Double?
 
     var model: AppModel? { AppController.shared?.model }
 
@@ -123,12 +125,37 @@ final class CanvasView: NSView {
             scroll.reflectScrolledClipView(clip)
         }
         zoomAnchor = nil
-        if model.canvasScale != new.scale { model.canvasScale = new.scale }
+        if model.canvasScale != new.scale, isActiveDocument { publishScale(new.scale) }
         if old != new {
             needsDisplay = true
             overlay.needsDisplay = true
         }
         onLayout?()
+    }
+
+    /// Whether this canvas shows the document the engine works on: only its scale is the model's.
+    private var isActiveDocument: Bool {
+        guard let uid = document?.uid, let model else { return false }
+        return model.session.activeDoc?.uid == uid
+    }
+
+    /// The model's `canvasScale` (the status bar's zoom, the zoom commands' starting point) is set on the run loop's
+    /// next turn, never during layout: SwiftUI views that read it asked for new constraints in the middle of the
+    /// window's layout pass. With two presentations open, their canvases wrote their own scales in turn until AppKit
+    /// threw (0.1.12: creating a second presentation crashed). A run-loop block, not the main queue: it also runs in
+    /// the common modes (a live resize) and in a nested run of the loop.
+    private func publishScale(_ scale: Double) {
+        let scheduled = pendingScale != nil
+        pendingScale = scale
+        guard !scheduled else { return }
+        RunLoop.main.perform(inModes: [.common]) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, let scale = self.pendingScale else { return }
+                self.pendingScale = nil
+                guard self.isActiveDocument, let model = self.model, model.canvasScale != scale else { return }
+                model.canvasScale = scale
+            }
+        }
     }
 
     /// The part of the scroll view the canvas shows (inside the insets the toolbar takes), how far it is

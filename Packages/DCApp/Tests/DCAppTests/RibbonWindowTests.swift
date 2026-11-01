@@ -236,6 +236,52 @@ import Testing
         #expect(key(97) == nil && key(49) == nil, "F6 is the menu's; Space is the button's")
     }
 
+    // 0.1.12: creating a second presentation crashed. Each window's canvas wrote its own fit scale into the app
+    // model during layout; the status bars read it, so SwiftUI asked for new constraints in the middle of the layout
+    // pass, the two windows took turns, and AppKit threw (an exception that ended the test process too). Now only
+    // the active presentation's canvas publishes its scale, after layout.
+    @Test func twoPresentationWindowsLayOutWithoutFighting() throws {
+        _ = NSApplication.shared
+        let app = AppController()
+        app.syncSuspended += 1
+        app.model.ui = UiState()
+        // The canvas holds its document weakly; the app's document controller keeps it, here the test does.
+        var docs: [PresentationDocument] = []
+        var windows: [(DocumentWindowController, NSWindow)] = []
+        defer { windows.forEach { $0.1.close() } }
+        for size in [NSSize(width: 1300, height: 860), NSSize(width: 820, height: 600)] {
+            app.model.run("file.new")
+            let doc = PresentationDocument(adopting: app.model.session.activeDoc?.uid ?? 0)
+            docs.append(doc)
+            let wc = DocumentWindowController(document: doc)
+            let window = try #require(wc.window)
+            window.isReleasedWhenClosed = false
+            window.setContentSize(size)
+            wc.showWindow(nil)
+            windows.append((wc, window))
+        }
+        // The scale is published on the run loop's next turn.
+        func settle() {
+            for _ in 0 ..< 8 {
+                for (_, w) in windows {
+                    w.contentView?.layoutSubtreeIfNeeded()
+                    w.displayIfNeeded()
+                }
+                RunLoop.main.run(until: Date().addingTimeInterval(0.03))
+            }
+        }
+        settle()
+        let scales = windows.compactMap { $0.0.canvas.canvas.layoutInfo?.scale }
+        #expect(scales.count == 2)
+        #expect(scales.first != scales.last, "the two windows fit their slides at different scales")
+        // The model holds the active presentation's scale: the second, made last.
+        #expect(app.model.canvasScale == scales.last)
+        app.model.session.setActive(0)
+        app.model.changed()
+        settle()
+        #expect(app.model.canvasScale == scales.first)
+    }
+
     // After 0.1.10 (the Accessibility Inspector audit): the SwiftUI regions of the document window had no name, so
     // VoiceOver announced an unnamed group on entering the ribbon, the inspector or the status bar.
     @Test func documentWindowRegionsAreNamed() throws {

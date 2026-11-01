@@ -69,6 +69,8 @@ import Testing
         let viewport = try #require(f.canvas.viewportInfo()).size
         #expect(abs(l.slideRect.midX - viewport.width / 2) < 1 && abs(l.slideRect.midY - viewport.height / 2) < 1)
         #expect(l.slideRect.minX >= CanvasLayout.margin - 0.5 || l.slideRect.minY >= CanvasLayout.margin - 0.5)
+        // Published on the run loop's next turn, after layout (0.1.12's crash).
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
         #expect(f.model.canvasScale == l.scale, "Zoom In/Out start from the canvas's scale")
         let rect = try #require(f.app.inspectors["slideRect"]?().asArray)
         #expect(rect.count == 4 && abs((rect[2].asF64 ?? 0) - l.slideRect.width) < 0.5)
