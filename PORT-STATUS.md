@@ -652,6 +652,12 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Release:** built from `a998ea3` and notarized; the downloaded DMG is identical to the build. The release
     build opened four presentations without a crash. The installed 0.1.12 finds 0.1.13 through Check for Updates;
     0.1.13 is now installed in `/Applications`.
+- **After 0.1.13 (unreleased): Slide Show › Set Up Show… opened nothing.**
+  - **Cause:** the menu tree (deckcraft's `menu_tree`) runs `show.setup` with no settings, which changes nothing.
+    deckcraft's own menu does the same; its dialog opens only from the ribbon.
+  - **Fix:** the menu item is now "Set Up Slide Show…" and opens the dialog, as the ribbon and the inspector do.
+    `DialogsMenuTarget` entries take a `replaces:` command, which File › Properties… now uses too.
+  - **Test:** `DialogsWindowTests.menuItemsForTheDialogs`. Checked in a signed build through the real menu bar.
 
 ## Pin moves
 

@@ -138,11 +138,18 @@ final class DialogsMenuTarget: NSObject {
         var params: JSON
         var key: String = ""
         var mods: NSEvent.ModifierFlags = [.command]
+        /// The tree's command this entry takes the place of, in the same spot: one whose engine command, run as the
+        /// menu runs it (no parameters), has nothing to show.
+        var replaces: String?
     }
 
     static let entries: [Entry] = [
+        // Set Up Show… ran `show.setup` with nothing to set (as deckcraft's menu does): open the dialog, as the ribbon
+        // and the inspector do. First in the list, so Custom Shows… is placed after it before it is replaced.
+        Entry(menu: "Slide Show", after: nil, title: String(localized: "Set Up Slide Show…", bundle: .module), command: "app.dialog", params: ["id": "setupShow"], replaces: "show.setup"),
         Entry(menu: "File", after: "file.new", title: String(localized: "New from Template…", bundle: .module), command: "app.backstage", params: ["page": "new"], key: "n", mods: [.command, .option]),
-        Entry(menu: "File", after: "file.properties", title: String(localized: "Properties…", bundle: .module), command: "app.backstage", params: ["page": "info"]),
+        // The tree's Properties runs the engine's query, which has nothing to show: open the sheet instead.
+        Entry(menu: "File", after: nil, title: String(localized: "Properties…", bundle: .module), command: "app.backstage", params: ["page": "info"], replaces: "file.properties"),
         Entry(menu: "Edit", after: "app.replace", title: String(localized: "Spelling…", bundle: .module), command: "app.dialog", params: ["id": "spelling"]),
         Entry(menu: "Edit", after: "app.replace", title: String(localized: "Accessibility Checker…", bundle: .module), command: "app.dialog", params: ["id": "accessibility"]),
         Entry(menu: "Edit", after: "app.replace", title: String(localized: "Language…", bundle: .module), command: "app.dialog", params: ["id": "language"]),
@@ -164,8 +171,7 @@ final class DialogsMenuTarget: NSObject {
         guard let main = NSApp.mainMenu else { return }
         for e in Self.entries.reversed() {
             guard let menu = main.items.first(where: { $0.title == L10n.menuTitle(e.menu) })?.submenu else { continue }
-            if e.title == String(localized: "Properties…", bundle: .module), let old = menu.items.first(where: { ($0.representedObject as? String) == "file.properties" }) {
-                // The tree's Properties runs the engine's query, which has nothing to show: open the sheet instead.
+            if let replaced = e.replaces, let old = menu.items.first(where: { ($0.representedObject as? String) == replaced }) {
                 retarget(old, e)
                 continue
             }

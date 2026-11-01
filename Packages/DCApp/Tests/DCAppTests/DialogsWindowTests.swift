@@ -129,6 +129,16 @@ import Testing
         target.run(props)
         #expect(dialogs.current?.id == "info")
         dialogs.cancel()
+        // After 0.1.13: Slide Show › Set Up Show… ran `show.setup` with no settings and opened nothing.
+        let show = try #require(NSApp.mainMenu?.items.first { $0.title == "Slide Show" }?.submenu)
+        let setUp = try #require(show.items.first { $0.title == "Set Up Slide Show…" })
+        #expect(show.items.filter { $0.title == "Set Up Slide Show…" }.count == 1)
+        #expect(!show.items.contains { ($0.representedObject as? String) == "show.setup" }, "the tree's item is replaced, not doubled")
+        let titles = show.items.map(\.title)
+        #expect(titles.firstIndex(of: "Custom Shows…") == titles.firstIndex(of: "Set Up Slide Show…").map { $0 + 1 })
+        target.run(setUp)
+        #expect(dialogs.current?.id == "setupShow")
+        dialogs.cancel()
     }
 
     @Test func panelsOfferDeckcraftsFileTypes() {
