@@ -2,7 +2,7 @@
 // Chart Design › Add Chart Element and in the Format pane. deckcraft's engine sets them (`chart.options`), but
 // its UI has no control for them, so these follow PowerPoint, not a deckcraft source. No AppKit: the inspector
 // and the ribbon build their controls from these.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation
