@@ -665,7 +665,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Release:** built from `923d7e5` and notarized; the downloaded DMG is identical to the build. Both menu items
     open their dialogs in the release build. The installed 0.1.13 finds 0.1.14 through Check for Updates; 0.1.14
     is now installed in `/Applications`.
-- **After 0.1.14 (unreleased): chart elements can be edited.** A chart's title, legend, data labels and gridlines
+- **Released as [v0.1.15](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.15) (2026-11-01): chart elements can be edited.** A chart's title, legend, data labels and gridlines
   had no control. The engine's `chart.options` sets them, but neither deckcraft's UI nor ours called it.
   - **Ribbon:** Chart Design has a Chart Layouts group with PowerPoint's Add Chart Element menu: Chart Title (None,
     Above Chart), Legend (None, Right, Top, Left, Bottom), Data Labels (None, Show) and Gridlines (None, Major
@@ -682,6 +682,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Tests:** `RibbonModelTests.addChartElementChangesTheChart`. Ribbon widths pass in en, fr, it, de and es. The
     section was checked in DeckCraftDev.
   - **Later:** editing the title on the canvas with a double-click.
+  - **Release:** built from `2ff8aba` and notarized; the downloaded DMG is identical to the build. The release
+    build shows the Chart Elements section with the chart's settings. It is the first release with the base
+    packages in CraftNativeKit; its licence is now in `Acknowledgements.txt` (`Tools/acknowledgements.sh` reads a
+    `LICENSE-MIT`). The installed 0.1.14 finds 0.1.15 through Check for Updates; 0.1.15 is now installed in
+    `/Applications`.
 
 ## CraftNativeKit (2026-11-01)
 
