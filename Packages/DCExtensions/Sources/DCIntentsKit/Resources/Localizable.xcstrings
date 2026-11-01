@@ -4,9 +4,33 @@
     "%@" : {
       "comment" : "An engine error message, shown as is.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "%@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "%@"
           }
         }
@@ -15,10 +39,34 @@
     "%@ couldn't be opened: %@" : {
       "comment" : "A presentation file an intent was given can't be read. The first value is the file name, the second the engine's reason.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ konnte nicht geöffnet werden: %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ couldn't be opened: %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se ha podido abrir %1$@: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible d'ouvrir %1$@ : %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossibile aprire %1$@: %2$@"
           }
         }
       }
@@ -26,6 +74,24 @@
     "Exported %lld files." : {
       "comment" : "Export Presentation finished. The value is how many files it wrote.",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld Datei exportiert."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld Dateien exportiert."
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -43,16 +109,94 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se ha exportado %lld archivo."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Se han exportado %lld archivos."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fichier exporté."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld fichiers exportés."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld file esportato."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld file esportati."
+                }
+              }
+            }
+          }
         }
       }
     },
     "Presentation" : {
       "comment" : "The file name an export uses when the input has none.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione"
           }
         }
       }
@@ -60,6 +204,24 @@
     "The presentation has %lld slides." : {
       "comment" : "Get Slide Count's answer.",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Die Präsentation hat %lld Folie."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Die Präsentation hat %lld Folien."
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -77,12 +239,94 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La presentación tiene %lld diapositiva."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La presentación tiene %lld diapositivas."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La présentation contient %lld diapositive."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La présentation contient %lld diapositives."
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La presentazione contiene %lld diapositiva."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "La presentazione contiene %lld diapositive."
+                }
+              }
+            }
+          }
         }
       }
     },
     "There's no slide %lld: the presentation has %lld slides." : {
       "comment" : "An intent was asked for a slide past the end. The first value is the slide asked for (1-based), the second the slide count.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folie %1$lld gibt es nicht: Die Präsentation hat %#@slides@."
+          },
+          "substitutions" : {
+            "slides" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg Folie"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg Folien"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -110,15 +354,123 @@
               }
             }
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No existe la diapositiva %1$lld: la presentación tiene %#@slides@."
+          },
+          "substitutions" : {
+            "slides" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositiva"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositivas"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Il n'y a pas de diapositive %1$lld : la présentation contient %#@slides@."
+          },
+          "substitutions" : {
+            "slides" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositive"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositives"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La diapositiva %1$lld non esiste: la presentazione contiene %#@slides@."
+          },
+          "substitutions" : {
+            "slides" : {
+              "argNum" : 2,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositiva"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%arg diapositive"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
     "the file is empty or can't be read" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "die Datei ist leer oder kann nicht gelesen werden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "the file is empty or can't be read"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "el archivo está vacío o no se puede leer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "le fichier est vide ou illisible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "il file è vuoto o non può essere letto"
           }
         }
       }

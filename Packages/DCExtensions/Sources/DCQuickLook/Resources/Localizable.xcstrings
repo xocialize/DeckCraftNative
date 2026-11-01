@@ -3,39 +3,273 @@
   "strings" : {
     "%@ (first %lld of %lld slides)" : {
       "comment" : "Quick Look title of a preview that shows only the first slides: title, shown, total",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (erste %lld von %lld Folien)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$@ (primeras %2$lld de %3$lld diapositivas)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (les %lld premières diapositives sur %lld)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (prime %lld di %lld diapositive)"
+          }
+        }
+      }
     },
     "%@ (without pictures)" : {
       "comment" : "Quick Look title of a preview of a file too large to read its pictures",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (ohne Bilder)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (sin imágenes)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (sans les images)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ (senza immagini)"
+          }
+        }
+      }
     },
     "DeckCraftNative can't open password-protected presentations yet." : {
       "comment" : "Quick Look preview detail for an encrypted file",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DeckCraftNative kann kennwortgeschützte Präsentationen noch nicht öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DeckCraftNative aún no puede abrir presentaciones protegidas con contraseña."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DeckCraftNative ne peut pas encore ouvrir les présentations protégées par un mot de passe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DeckCraftNative non può ancora aprire presentazioni protette da password."
+          }
+        }
+      }
     },
     "“%@” can't be previewed." : {
       "comment" : "Quick Look preview headline when drawing the slides failed",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Für „%@“ kann keine Vorschau angezeigt werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se puede previsualizar “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible d'afficher l'aperçu de « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossibile mostrare l'anteprima di “%@”."
+          }
+        }
+      }
     },
     "“%@” couldn't be read." : {
       "comment" : "Quick Look preview headline: the file couldn't be opened",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„%@“ konnte nicht gelesen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No se ha podido leer “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de lire « %@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossibile leggere “%@”."
+          }
+        }
+      }
     },
     "“%@” has no slides." : {
       "comment" : "Quick Look preview of an empty presentation",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„%@“ enthält keine Folien."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” no tiene diapositivas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "« %@ » ne contient aucune diapositive."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” non contiene diapositive."
+          }
+        }
+      }
     },
     "“%@” is password-protected." : {
       "comment" : "Quick Look preview headline: an encrypted file",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„%@“ ist kennwortgeschützt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” está protegido con contraseña."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "« %@ » est protégé par un mot de passe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” è protetto da password."
+          }
+        }
+      }
     },
     "“%@” is too large to preview (%@)." : {
       "comment" : "Quick Look preview headline: name, file size",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„%@“ ist zu groß für eine Vorschau (%@)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%1$@” es demasiado grande para previsualizarlo (%2$@)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "« %@ » est trop volumineux pour l'aperçu (%@)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” è troppo grande per l'anteprima (%@)."
+          }
+        }
+      }
     },
     "“%@” isn't a presentation DeckCraftNative can read." : {
       "comment" : "Quick Look preview headline: not a presentation",
-      "extractionState" : "manual"
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„%@“ ist keine Präsentation, die DeckCraftNative lesen kann."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” no es una presentación que DeckCraftNative pueda leer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "« %@ » n'est pas une présentation que DeckCraftNative peut lire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "“%@” non è una presentazione che DeckCraftNative può leggere."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

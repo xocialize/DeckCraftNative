@@ -5,7 +5,7 @@ A native macOS presentation editor in Swift, AppKit, SwiftUI and Metal. It is a 
 keeps DeckCraft's engine and behaviour, file for file and command for command, and replaces the rest with macOS
 frameworks.
 
-**[Download DeckCraftNative 0.1.4](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
+**[Download the latest DeckCraftNative](https://github.com/xocialize/DeckCraftNative/releases/latest)**: macOS 26 or
 later on Apple silicon. The app is signed with a Developer ID and notarized by Apple. It's an early preview.
 
 ## What it does
@@ -19,11 +19,19 @@ later on Apple silicon. The app is signed with a Developer ID and notarized by A
   Print with the same layouts.
 - **Review:** comments with replies, spelling and the thesaurus.
 - **macOS integration:** Quick Look previews and thumbnails, Shortcuts actions (exporting and reading a file run in
-  the background, without opening the app), Check for Updates, and an interface ready for translation.
+  the background, without opening the app), Check for Updates, VoiceOver, and an interface in English with French,
+  Italian, German and Spanish as preview translations (see [Languages](#languages)).
 - **Automation:** every command can be scripted. The `dccli` tool runs command scripts, renders and converts files,
   and serves MCP. A running app answers on a local control channel (`--control PORT`).
 
 What isn't native yet, and why, is in [EVALUATION.md](EVALUATION.md).
+
+## Languages
+
+The interface is in English. **French, Italian, German and Spanish are previews**: AI-drafted from the English text
+and PowerPoint's own terms in each language, and not yet reviewed by native speakers. macOS shows them when one of
+those is your preferred language; anything not translated shows in English. Reviewers are welcome: the review
+sheets and how to use them are in [Docs/localization](Docs/localization/README.md).
 
 ## How it was ported
 

@@ -248,12 +248,15 @@ def infoplist(plist_path, catalog_path):
         for t in info.get(group, []):
             if isinstance(t.get("UTTypeDescription"), str):
                 strings[t["UTTypeDescription"]] = (t["UTTypeDescription"], f"The description of the file type {t.get('UTTypeIdentifier', '')}")
+    # Translations of a key still there are kept (Docs/localization); the English is rewritten from the plist.
+    old = load(catalog_path).get("strings", {}) if os.path.exists(catalog_path) else {}
     catalog = {"sourceLanguage": "en", "version": "1.0", "strings": {}}
     for key, (value, comment) in strings.items():
+        kept = {lang: loc for lang, loc in old.get(key, {}).get("localizations", {}).items() if lang != "en"}
         catalog["strings"][key] = {
             "comment": comment,
             "extractionState": "manual",
-            "localizations": {"en": {"stringUnit": {"state": "translated", "value": value}}},
+            "localizations": dict(sorted(({"en": {"stringUnit": {"state": "translated", "value": value}}} | kept).items())),
         }
     save(catalog_path, catalog)
 

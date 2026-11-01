@@ -9,8 +9,9 @@
 #   pseudo  en-XA, every catalog string accented and bracketed (Tools/l10n/pseudo.sh)
 #   double  every localized string twice as long (-NSDoubleLocalizedStrings YES)
 #   rtl     right to left (-AppleTextDirection YES -NSForceRightToLeftWritingDirection YES): the ribbon mirrors
+#   fr it de es   a translation (Docs/localization); `languages` runs the four
 #
-#   Tools/app/ribbon-widths.sh [en|pseudo|double|rtl|all …] [--shots DIR]   # default: pseudo double rtl
+#   Tools/app/ribbon-widths.sh [en|pseudo|double|rtl|fr|it|de|es|languages|all …] [--shots DIR]   # default: pseudo double rtl
 #
 # Every tab and width prints PASS or FAIL; the exit status is the number of failures. --shots saves a screenshot of
 # each tab at each width (our app's window only). Builds into .build-strings, as pseudo.sh does.
@@ -24,8 +25,9 @@ modes=()
 while (( $# )); do
   case $1 in
     --shots) SHOTS=${2:A}; shift ;;
-    all) modes+=(en pseudo double rtl) ;;
-    en|pseudo|double|rtl) modes+=($1) ;;
+    all) modes+=(en pseudo double rtl fr it de es) ;;
+    languages) modes+=(fr it de es) ;;
+    en|pseudo|double|rtl|fr|it|de|es) modes+=($1) ;;
     *) echo "unknown argument $1"; exit 99 ;;
   esac
   shift
@@ -46,6 +48,8 @@ launch() {
     pseudo) SCRATCH=$SCRATCH "$ROOT/Tools/l10n/pseudo.sh" --control $PORT ;;
     double) "$BIN/DeckCraftDev" --control $PORT -AppleLanguages '(en)' -NSDoubleLocalizedStrings YES ;;
     rtl) "$BIN/DeckCraftDev" --control $PORT -AppleLanguages '(en)' -AppleTextDirection YES -NSForceRightToLeftWritingDirection YES ;;
+    # The resource bundles take the language the main bundle picks, and DeckCraftDev's is its folder: give it one.
+    fr|it|de|es) mkdir -p "$BIN/$1.lproj" && "$BIN/DeckCraftDev" --control $PORT -AppleLanguages "($1)" ;;
   esac >"${TMPDIR:-/tmp}/dc-ribbon-widths-$1.log" 2>&1 &
   for i in {1..120}; do "$BIN/dccli" app --port $PORT --method ui.inspect '{}' >/dev/null 2>&1 && return 0; sleep 0.25; done
   echo "the app didn't answer on port $PORT ($1)"; exit 98

@@ -29,10 +29,34 @@
       "comment" : "The description of the file type ai.storyteller.deckcraft.presentation",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "DeckCraft-Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "DeckCraft Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación de DeckCraft"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation DeckCraft"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione DeckCraft"
           }
         }
       }
@@ -41,10 +65,34 @@
       "comment" : "The copyright line in About and Finder's Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eine native Portierung von DeckCraft (MIT OR Apache-2.0)."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "A native port of DeckCraft (MIT OR Apache-2.0)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Una adaptación nativa de DeckCraft (MIT OR Apache-2.0)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un portage natif de DeckCraft (MIT OR Apache-2.0)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un port nativo di DeckCraft (MIT OR Apache-2.0)."
           }
         }
       }
@@ -53,10 +101,34 @@
       "comment" : "The description of the file type org.openxmlformats.presentationml.presentation",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open XML-Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open XML Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación Open XML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation Open XML"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione Open XML"
           }
         }
       }
@@ -65,10 +137,34 @@
       "comment" : "The description of the file type org.openxmlformats.presentationml.template",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open XML-Präsentationsvorlage"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open XML Presentation Template"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Plantilla de presentación Open XML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modèle de présentation Open XML"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modello di presentazione Open XML"
           }
         }
       }
@@ -77,10 +173,34 @@
       "comment" : "The description of the file type org.openxmlformats.presentationml.slideshow",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open XML-Bildschirmpräsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open XML Slide Show"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación con diapositivas Open XML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diaporama Open XML"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione Open XML (solo proiezione)"
           }
         }
       }
@@ -89,10 +209,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint 97–2003-Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint 97–2003 Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación de PowerPoint 97–2003"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation PowerPoint 97–2003"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione di PowerPoint 97–2003"
           }
         }
       }
@@ -101,10 +245,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint 97–2003-Bildschirmpräsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint 97–2003 Slide Show"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación con diapositivas de PowerPoint 97–2003"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diaporama PowerPoint 97–2003"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione di PowerPoint 97–2003 (solo proiezione)"
           }
         }
       }
@@ -113,10 +281,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint 97–2003-Vorlage"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint 97–2003 Template"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Plantilla de PowerPoint 97–2003"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modèle PowerPoint 97–2003"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modello di PowerPoint 97–2003"
           }
         }
       }
@@ -125,10 +317,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint-Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación de PowerPoint"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation PowerPoint"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione di PowerPoint"
           }
         }
       }
@@ -137,10 +353,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint-Bildschirmpräsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint Slide Show"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación con diapositivas de PowerPoint"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diaporama PowerPoint"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione di PowerPoint (solo proiezione)"
           }
         }
       }
@@ -149,10 +389,34 @@
       "comment" : "A document type's name, in Finder (Kind) and Get Info",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint-Vorlage"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PowerPoint Template"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Plantilla de PowerPoint"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modèle PowerPoint"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Modello di PowerPoint"
           }
         }
       }

@@ -3,60 +3,204 @@
   "strings" : {
     "1 slide per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 Folie pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 slide per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 diapositiva por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 diapositive par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1 diapositiva per pagina"
           }
         }
       }
     },
     "2 slides per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "2 Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "2 slides per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "2 diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "2 diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "2 diapositive per pagina"
           }
         }
       }
     },
     "3 slides per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "3 Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 slides per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "3 diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "3 diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "3 diapositive per pagina"
           }
         }
       }
     },
     "4 slides per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "4 Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "4 slides per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "4 diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "4 diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "4 diapositive per pagina"
           }
         }
       }
     },
     "6 slides per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "6 Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "6 slides per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "6 diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "6 diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "6 diapositive per pagina"
           }
         }
       }
     },
     "9 slides per page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "9 Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "9 slides per page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "9 diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "9 diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "9 diapositive per pagina"
           }
         }
       }
@@ -64,120 +208,408 @@
     "All Slides" : {
       "comment" : "Export every slide as an image, one file each.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle Folien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "All Slides"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Todas las diapositivas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toutes les diapositives"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tutte le diapositive"
           }
         }
       }
     },
     "Export ${file} as ${format}" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "${file} als ${format} exportieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export ${file} as ${format}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportar ${file} como ${format}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporter ${file} au format ${format}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esporta ${file} come ${format}"
           }
         }
       }
     },
     "Export Format" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportformat"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Formato de exportación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Format d'exportation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Formato di esportazione"
           }
         }
       }
     },
     "Export Presentation" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Präsentation exportieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportar presentación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporter la présentation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esporta presentazione"
           }
         }
       }
     },
     "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exportiert eine Präsentation als PDF ihrer Folien, Notizenseiten oder Handzettel, als PowerPoint-Datei oder als PNG- oder JPEG-Bilder einer Folie oder aller Folien. Die Präsentation wird nicht in einem Fenster geöffnet."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exports a presentation as a PDF of its slides, notes pages or handouts, as a PowerPoint file, or as PNG or JPEG images of one slide or every slide. The presentation isn't opened in a window."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporta una presentación como PDF de sus diapositivas, páginas de notas o documentos, como archivo de PowerPoint, o como imágenes PNG o JPEG de una diapositiva o de todas. La presentación no se abre en una ventana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exporte une présentation au format PDF (diapositives, pages de notes ou documents), au format PowerPoint, ou en images PNG ou JPEG d'une diapositive ou de toutes les diapositives. La présentation n'est pas ouverte dans une fenêtre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esporta una presentazione come PDF delle diapositive, delle pagine note o degli stampati, come file PowerPoint oppure come immagini PNG o JPEG di una diapositiva o di tutte. La presentazione non viene aperta in una finestra."
           }
         }
       }
     },
     "Format" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Format"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Formato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Format"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Formato"
           }
         }
       }
     },
     "Get Presentation Outline" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Präsentationsgliederung abrufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Get Presentation Outline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtener esquema de la presentación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtenir le plan de la présentation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ottieni struttura presentazione"
           }
         }
       }
     },
     "Get Slide Count" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folienanzahl abrufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Get Slide Count"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtener número de diapositivas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtenir le nombre de diapositives"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ottieni numero di diapositive"
           }
         }
       }
     },
     "Get the outline of ${file}" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gliederung von ${file} abrufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Get the outline of ${file}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtener el esquema de ${file}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtenir le plan de ${file}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ottieni la struttura di ${file}"
           }
         }
       }
     },
     "Get the slide count of ${file}" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folienanzahl von ${file} abrufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Get the slide count of ${file}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtener el número de diapositivas de ${file}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtenir le nombre de diapositives de ${file}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ottieni il numero di diapositive di ${file}"
           }
         }
       }
     },
     "Gets how many slides a presentation has. The presentation isn't opened in a window." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ermittelt, wie viele Folien eine Präsentation hat. Die Präsentation wird nicht in einem Fenster geöffnet."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gets how many slides a presentation has. The presentation isn't opened in a window."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtiene cuántas diapositivas tiene una presentación. La presentación no se abre en una ventana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Indique le nombre de diapositives d'une présentation. La présentation n'est pas ouverte dans une fenêtre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Indica quante diapositive contiene una presentazione. La presentazione non viene aperta in una finestra."
           }
         }
       }
     },
     "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ruft die Gliederung einer Präsentation ab: Titel und Text jeder Folie, mit Tabulatoren eingerückt. Die Präsentation wird nicht in einem Fenster geöffnet."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gets the outline of a presentation: each slide's title and text, indented by tabs. The presentation isn't opened in a window."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtiene el esquema de una presentación: el título y el texto de cada diapositiva, con sangría mediante tabulaciones. La presentación no se abre en una ventana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obtient le plan d'une présentation : le titre et le texte de chaque diapositive, mis en retrait par des tabulations. La présentation n'est pas ouverte dans une fenêtre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ottiene la struttura di una presentazione: titolo e testo di ogni diapositiva, rientrati con tabulazioni. La presentazione non viene aperta in una finestra."
           }
         }
       }
@@ -185,10 +617,34 @@
     "Handouts" : {
       "comment" : "PDF layout: several slides per page.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Handzettel"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Handouts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Documentos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Documents"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Stampati"
           }
         }
       }
@@ -196,10 +652,34 @@
     "JPEG Image" : {
       "comment" : "A file format name.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "JPEG-Bild"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "JPEG Image"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Imagen JPEG"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Image JPEG"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Immagine JPEG"
           }
         }
       }
@@ -207,9 +687,33 @@
     "Layout" : {
       "comment" : "What a PDF export lays out.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Layout"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Layout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diseño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Disposition"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "Layout"
           }
         }
@@ -218,10 +722,34 @@
     "Notes Pages" : {
       "comment" : "PDF layout: each slide with its speaker notes.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Notizenseiten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notes Pages"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Páginas de notas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pages de notes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pagine note"
           }
         }
       }
@@ -229,9 +757,33 @@
     "PDF" : {
       "comment" : "A file format name.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "PDF"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "PDF"
           }
         }
@@ -239,10 +791,34 @@
     },
     "PDF Layout" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PDF-Layout"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PDF Layout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diseño del PDF"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Disposition du PDF"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Layout PDF"
           }
         }
       }
@@ -250,10 +826,34 @@
     "PNG Image" : {
       "comment" : "A file format name.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PNG-Bild"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PNG Image"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Imagen PNG"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Image PNG"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Immagine PNG"
           }
         }
       }
@@ -261,9 +861,33 @@
     "PowerPoint (PPTX)" : {
       "comment" : "A file format name.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint (PPTX)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "PowerPoint (PPTX)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint (PPTX)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "PowerPoint (PPTX)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "PowerPoint (PPTX)"
           }
         }
@@ -272,10 +896,34 @@
     "Presentation" : {
       "comment" : "The presentation file an intent works on.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Präsentation"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presentation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Présentation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presentazione"
           }
         }
       }
@@ -283,10 +931,34 @@
     "Slide" : {
       "comment" : "The slide to export as an image, from 1.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folie"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slide"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositiva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositive"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositiva"
           }
         }
       }
@@ -294,20 +966,68 @@
     "Slides" : {
       "comment" : "PDF layout: one slide per page.",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slides"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositivas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositives"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositive"
           }
         }
       }
     },
     "Slides per Page" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Folien pro Seite"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slides per Page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositivas por página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositives par page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diapositive per pagina"
           }
         }
       }

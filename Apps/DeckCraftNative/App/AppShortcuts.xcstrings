@@ -3,6 +3,15 @@
   "strings" : {
     "Add a slide in ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Folie in ${applicationName} hinzufügen",
+              "Füge meiner ${applicationName}-Präsentation eine Folie hinzu"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -11,11 +20,47 @@
               "Add a slide to my ${applicationName} presentation"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Agregar una diapositiva en ${applicationName}",
+              "Agregar una diapositiva a mi presentación de ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Ajouter une diapositive dans ${applicationName}",
+              "Ajouter une diapositive à ma présentation ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Aggiungi una diapositiva in ${applicationName}",
+              "Aggiungi una diapositiva alla mia presentazione di ${applicationName}"
+            ]
+          }
         }
       }
     },
     "Count the slides in a presentation with ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Folien einer Präsentation mit ${applicationName} zählen",
+              "Wie viele Folien hat eine ${applicationName}-Präsentation"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -24,11 +69,48 @@
               "How many slides are in a ${applicationName} presentation"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Contar las diapositivas de una presentación con ${applicationName}",
+              "¿Cuántas diapositivas tiene una presentación de ${applicationName}?"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Compter les diapositives d'une présentation avec ${applicationName}",
+              "Combien de diapositives contient une présentation ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Conta le diapositive di una presentazione con ${applicationName}",
+              "Quante diapositive ci sono in una presentazione di ${applicationName}"
+            ]
+          }
         }
       }
     },
     "Export a presentation with ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Präsentation mit ${applicationName} exportieren",
+              "${applicationName}-Präsentation exportieren",
+              "PDF einer Präsentation mit ${applicationName} erstellen"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -38,11 +120,50 @@
               "Make a PDF of a presentation with ${applicationName}"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Exportar una presentación con ${applicationName}",
+              "Exportar una presentación de ${applicationName}",
+              "Crear un PDF de una presentación con ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Exporter une présentation avec ${applicationName}",
+              "Exporter une présentation ${applicationName}",
+              "Créer un PDF d'une présentation avec ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Esporta una presentazione con ${applicationName}",
+              "Esporta una presentazione di ${applicationName}",
+              "Crea un PDF di una presentazione con ${applicationName}"
+            ]
+          }
         }
       }
     },
     "Get a presentation's outline with ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Gliederung einer Präsentation mit ${applicationName} abrufen",
+              "Gliederung einer ${applicationName}-Präsentation abrufen"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -51,11 +172,48 @@
               "Get the outline of a ${applicationName} presentation"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Obtener el esquema de una presentación con ${applicationName}",
+              "Obtener el esquema de una presentación de ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Obtenir le plan d'une présentation avec ${applicationName}",
+              "Obtenir le plan d'une présentation ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Ottieni la struttura di una presentazione con ${applicationName}",
+              "Ottieni la struttura di una presentazione di ${applicationName}"
+            ]
+          }
         }
       }
     },
     "New ${applicationName} presentation" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Neue ${applicationName}-Präsentation",
+              "Präsentation in ${applicationName} erstellen",
+              "Neue Präsentation in ${applicationName} beginnen"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -65,11 +223,50 @@
               "Start a new presentation in ${applicationName}"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Nueva presentación de ${applicationName}",
+              "Crear una presentación en ${applicationName}",
+              "Empezar una presentación nueva en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Nouvelle présentation ${applicationName}",
+              "Créer une présentation dans ${applicationName}",
+              "Commencer une nouvelle présentation dans ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Nuova presentazione di ${applicationName}",
+              "Crea una presentazione in ${applicationName}",
+              "Inizia una nuova presentazione in ${applicationName}"
+            ]
+          }
         }
       }
     },
     "Open a presentation in ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Präsentation in ${applicationName} öffnen",
+              "${applicationName}-Präsentation öffnen"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -78,11 +275,48 @@
               "Open a ${applicationName} presentation"
             ]
           }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Abrir una presentación en ${applicationName}",
+              "Abrir una presentación de ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Ouvrir une présentation dans ${applicationName}",
+              "Ouvrir une présentation ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Apri una presentazione in ${applicationName}",
+              "Apri una presentazione di ${applicationName}"
+            ]
+          }
         }
       }
     },
     "Start the slide show in ${applicationName}" : {
       "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Bildschirmpräsentation in ${applicationName} starten",
+              "${applicationName}-Bildschirmpräsentation abspielen",
+              "Mit ${applicationName} präsentieren"
+            ]
+          }
+        },
         "en" : {
           "stringSet" : {
             "state" : "translated",
@@ -90,6 +324,36 @@
               "Start the slide show in ${applicationName}",
               "Play the ${applicationName} slide show",
               "Present with ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Iniciar la presentación con diapositivas en ${applicationName}",
+              "Reproducir la presentación con diapositivas de ${applicationName}",
+              "Presentar con ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Lancer le diaporama dans ${applicationName}",
+              "Lire le diaporama ${applicationName}",
+              "Présenter avec ${applicationName}"
+            ]
+          }
+        },
+        "it" : {
+          "stringSet" : {
+            "state" : "needs_review",
+            "values" : [
+              "Avvia la presentazione in ${applicationName}",
+              "Riproduci la presentazione di ${applicationName}",
+              "Presenta con ${applicationName}"
             ]
           }
         }
