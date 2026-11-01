@@ -5,7 +5,7 @@
 // `crates/ui-egui/src/show.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCMedia
 import DCModel
 import DesignScaffold

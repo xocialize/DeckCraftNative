@@ -2,7 +2,7 @@
 // the running app: every one of them goes through `AppModel.run`, as a menu item or the control channel does.
 import AppIntents
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCIntentsKit
 import Foundation

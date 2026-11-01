@@ -1,7 +1,7 @@
 // DCEngineTests — slides: new, duplicate, delete, move, layouts, ranges, sections, outlines.
 // Ports the tests of deckcraft crates/engine/src/cmd/slide.rs and the slide tests of tests.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCModel
 import Testing

@@ -13,7 +13,7 @@
 // from deckcraft's decoders by codec rounding; frame counts follow the containers (no gapless trimming of
 // AAC, as deckcraft's MP4 path does none either).
 import AudioToolbox
-import DCCore
+import CNCore
 
 /// Decoded audio: interleaved float samples in −1…1.
 public struct Pcm: Sendable, Equatable {

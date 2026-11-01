@@ -6,7 +6,7 @@
 // as the fallback for older versions.
 // Port of deckcraft crates/engine/src/cmd/zoom.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

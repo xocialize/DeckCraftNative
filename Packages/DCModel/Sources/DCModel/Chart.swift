@@ -3,7 +3,7 @@
 // trees). Port of deckcraft crates/model/src/chart.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import Foundation
 
 extension ChartType {

@@ -3,7 +3,7 @@
 // (`color_grid` in `widgets.rs`), and the scheme a pane draws them in. MIT OR Apache-2.0, © ArtCraft Team and
 // the DeckCraft contributors.
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 

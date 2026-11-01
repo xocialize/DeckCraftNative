@@ -1,7 +1,7 @@
 // DCText — auto-number bullet labels (`a:buAutoNum`): Latin, Roman, East Asian, Thai, Hindi, Arabic and
 // Hebrew schemes as PowerPoint writes them. Port of deckcraft crates/text/src/lib.rs (`autonum` and its
 // numerals; MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 
 private func scalar(_ v: UInt32) -> Character? { Unicode.Scalar(v).map(Character.init) }
 

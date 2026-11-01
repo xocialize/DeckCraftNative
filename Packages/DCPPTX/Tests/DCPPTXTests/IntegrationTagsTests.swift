@@ -1,9 +1,9 @@
 // Port of deckcraft crates/pptx/tests/it/tags.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors). Add-in tags (`p:custDataLst` → `ppt/tags/tagN.xml`) on the presentation, slides and shapes
 // survive a save and reopen.
-import DCCore
+import CNCore
 import DCModel
-import DCZip
+import CNZip
 import Testing
 @testable import DCPPTX
 

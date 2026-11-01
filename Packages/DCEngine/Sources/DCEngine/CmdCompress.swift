@@ -9,7 +9,7 @@
 // JPEG or PNG are deckcraft's; the bytes differ (see PORT-NOTES, Divergences).
 import Accelerate
 import CoreGraphics
-import DCCore
+import CNCore
 import DCModel
 import DCRender
 import Foundation

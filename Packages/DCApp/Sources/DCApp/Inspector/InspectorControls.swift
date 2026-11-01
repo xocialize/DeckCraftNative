@@ -6,7 +6,7 @@
 import AppKit
 import DCAppModel
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

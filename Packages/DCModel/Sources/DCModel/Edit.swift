@@ -3,7 +3,7 @@
 // crates/model/src/edit.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 //
 // Character offsets count Unicode scalars, as Rust's `chars()` does.
-import DCCore
+import CNCore
 
 /// (paragraph, char offset in the paragraph).
 public typealias TextPos = (Int, Int)

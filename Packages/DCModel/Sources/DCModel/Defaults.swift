@@ -3,7 +3,7 @@
 // Port of deckcraft crates/model/src/defaults.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 public let wideSlideSize = Size(960.0, 540.0)

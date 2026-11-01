@@ -4,7 +4,7 @@
 // folding cleanly at the four widths.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import SwiftUI
 import Testing

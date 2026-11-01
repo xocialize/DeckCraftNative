@@ -1,6 +1,6 @@
 // DCAppModelTests — the app model without a window: UI state, the UI-only commands, the palette and the
 // menu tree. Tests ported from deckcraft `crates/ui-egui` name their source.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Testing

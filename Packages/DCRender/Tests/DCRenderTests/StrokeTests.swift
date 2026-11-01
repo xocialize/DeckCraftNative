@@ -3,7 +3,7 @@
 // pixel tests draw the line straight onto a `Canvas` where the Rust ones render a slide holding it;
 // tolerances are the Rust ones unless noted.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

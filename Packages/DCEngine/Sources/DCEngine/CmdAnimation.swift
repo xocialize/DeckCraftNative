@@ -1,7 +1,7 @@
 // DCEngine — the `animation` command module: the Animations tab and the Animation Pane.
 // Port of deckcraft crates/engine/src/cmd/animation.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum AnimationCommands {

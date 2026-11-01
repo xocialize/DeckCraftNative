@@ -2,7 +2,7 @@
 // exists, duplicate ids are re-id'd, and numbers no view can draw are brought into range. Port of
 // deckcraft crates/format/src/lib.rs (`repair` and the `sane_*` functions; MIT OR Apache-2.0, ©
 // ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

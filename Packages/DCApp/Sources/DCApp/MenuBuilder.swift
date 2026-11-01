@@ -2,7 +2,7 @@
 // taken from the registry's shortcut, and enabled by the command's own `enabled` check.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 
 @MainActor

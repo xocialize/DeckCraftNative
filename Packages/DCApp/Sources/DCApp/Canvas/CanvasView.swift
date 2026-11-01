@@ -13,7 +13,7 @@
 // them).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

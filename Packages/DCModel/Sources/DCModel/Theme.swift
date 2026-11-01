@@ -2,7 +2,7 @@
 // crates/model/src/theme.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The
 // built-in themes' colours and names are deckcraft's own.
 import DCColor
-import DCCore
+import CNCore
 
 extension Theme {
     public static var `default`: Theme {

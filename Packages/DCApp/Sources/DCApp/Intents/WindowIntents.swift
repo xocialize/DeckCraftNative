@@ -4,7 +4,7 @@
 import AppIntents
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCIntentsKit
 import DCModel

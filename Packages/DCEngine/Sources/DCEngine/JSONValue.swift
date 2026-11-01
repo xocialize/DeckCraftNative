@@ -1,11 +1,11 @@
-// DCEngine — serde_json's `Value` as the engine uses it, on DCCore's `JSON`.
+// DCEngine — serde_json's `Value` as the engine uses it, on CNCore's `JSON`.
 //
 // deckcraft's commands take and answer `serde_json::Value`s. Its maps are `BTreeMap`s (no
 // `preserve_order`), so every answer the CLI prints has its keys sorted, and `to_value` turns an `f32` into
 // an `f64` and a non-finite float into `null`. `canonical` applies those rules to a `JSON` the engine
 // built, and `JSON.display` is `format!("{}", value)`. Port of serde_json 1.0.154's `Value` accessors
 // (MIT OR Apache-2.0); deckcraft (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 
 // MARK: - Literals, so `json!({...})` reads as a Swift literal
 

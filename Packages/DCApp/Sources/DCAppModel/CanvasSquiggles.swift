@@ -8,7 +8,7 @@
 // path is the only one: the session and the system spell checker live on the main thread, so the canvas
 // spends a budget per pass and asks for another pass until the check is done. Results are cached by
 // paragraph, so typing re-checks only the paragraph typed in.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

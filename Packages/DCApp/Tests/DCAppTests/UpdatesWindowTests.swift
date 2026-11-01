@@ -3,7 +3,7 @@
 // state (the release notes too), and closing it is "Later". deckcraft `crates/ui-egui/src/updates_ui.rs`
 // (`an_offered_release_opens_the_prompt`; MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import AppKit
-import DCCore
+import CNCore
 import Foundation
 import SwiftUI
 import Testing

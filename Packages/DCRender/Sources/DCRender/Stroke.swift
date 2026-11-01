@@ -5,7 +5,7 @@
 // `arrowheads`, `border_outside`, `outside_line`, `fill_opacity`, `shadow_local`; MIT OR Apache-2.0, ©
 // ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

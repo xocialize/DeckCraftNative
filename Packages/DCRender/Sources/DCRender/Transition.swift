@@ -9,7 +9,7 @@
 @_exported import func DCAnim.transitionLayers
 @_exported import func DCAnim.usesSlideParts
 import DCAnim
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

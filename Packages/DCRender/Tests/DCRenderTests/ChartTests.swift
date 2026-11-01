@@ -2,7 +2,7 @@
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The pixel tests render a slide
 // holding the chart, as the Rust ones do; tolerances are the Rust ones unless noted.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

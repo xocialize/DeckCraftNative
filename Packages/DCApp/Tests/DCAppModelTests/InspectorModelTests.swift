@@ -3,7 +3,7 @@
 // ribbon's effect options, the Quick Access Toolbar and the controller's actions. Each test names the
 // deckcraft test (`crates/ui-egui`) whose behaviour it ports; Rust names in camelCase.
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

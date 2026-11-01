@@ -5,7 +5,7 @@
 // placeholders that inherit from the layout. Embedded fonts stay out of this check; another open change
 // owns that part.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Testing

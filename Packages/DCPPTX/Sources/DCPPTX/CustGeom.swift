@@ -4,9 +4,9 @@
 //
 // Formulas follow the ECMA-376 shape guide semantics (§20.1.9.11): angles are in 1/60 000 degree, and
 // every operand is a guide name, a built-in variable or an integer literal. Numbers are written as
-// deckcraft writes them (`{}` of an `f64`, DCCore's `rustDisplay`), and the trigonometry is the
+// deckcraft writes them (`{}` of an `f64`, CNCore's `rustDisplay`), and the trigonometry is the
 // system libm's, as Rust's `f64` methods are on macOS.
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Darwin

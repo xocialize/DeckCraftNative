@@ -3,7 +3,7 @@
 // deckcraft's start screen is File › Home with nothing open (`crates/ui-egui/src/backstage.rs`,
 // `backstage/files.rs`; MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors); here it is a
 // window of its own, as Docs/plans/Ribbon-and-StartScreen.md §7 describes.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Observation

@@ -3,7 +3,7 @@
 // Ports the tests of deckcraft crates/engine/src/tools.rs and the pointer tests of crates/engine/src/tests.rs,
 // cmd/selection_tests.rs and cmd/guides_tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors). Each test names its source.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

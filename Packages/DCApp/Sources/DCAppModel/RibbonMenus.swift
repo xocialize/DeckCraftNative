@@ -4,7 +4,7 @@
 // `effects_menu` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors), with deckcraft's parameters.
 // R2 adds the contextual tabs' menus (`shape_format.rs`, `picture_format.rs`, `table.rs`, `chart.rs`, `smartart.rs`,
 // `playback.rs`, `masters.rs`); the galleries are tiles (`RibbonGalleries`).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

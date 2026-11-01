@@ -4,7 +4,7 @@
 // The document model keeps positions in points (1/72 inch) as `Double`. Office Open XML stores EMU
 // (English Metric Units, 12 700 per point); `emuToPt` and `ptToEmu` convert losslessly for integer EMU
 // values, so files round-trip exactly.
-import DCCore
+import CNCore
 import Foundation
 
 /// EMU per point.

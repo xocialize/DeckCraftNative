@@ -2,7 +2,7 @@
 // 16-bit WAVs named like PowerPoint's (Chime, Click, Camera, Whoosh, Drum Roll, Laser).
 // Port of deckcraft crates/engine/src/sounds.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors). The arithmetic is Rust's, step for step, so the bytes are the same.
-import DCCore
+import CNCore
 import Foundation
 
 public enum Sounds {

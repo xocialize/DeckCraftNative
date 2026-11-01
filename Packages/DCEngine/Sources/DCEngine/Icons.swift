@@ -7,7 +7,7 @@
 // The paths in `IconData.swift` are Lucide 1.56.0 centerlines (24×24, fill none). They are converted to
 // DeckCraft's `M`/`L`/`C`/`Q`/`Z` syntax when inserted, so the shape is a stroked outline rather than a filled
 // silhouette or an SVG picture.
-import DCCore
+import CNCore
 import DCGeometry
 import Foundation
 

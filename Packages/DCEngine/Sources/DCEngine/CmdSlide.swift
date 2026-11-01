@@ -1,7 +1,7 @@
 // DCEngine — slides: new, duplicate, delete, move, layout, reset, hide, notes, sections, navigation.
 // Port of deckcraft crates/engine/src/cmd/slide.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCFormat
 import DCModel
 

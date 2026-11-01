@@ -7,7 +7,7 @@
 // settle, then captures it.
 import AppKit
 import DCAutomation
-import DCCore
+import CNCore
 import DCEngine
 import DCRender
 import os

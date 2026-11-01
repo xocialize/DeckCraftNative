@@ -2,7 +2,7 @@
 // (`Headless`) or by a running DeckCraft app over its loopback control port (`Remote`).
 // Port of deckcraft crates/mcp/src/backend.rs and lib.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors), on BSD sockets.
-import DCCore
+import CNCore
 import DCEngine
 import Darwin
 import Foundation

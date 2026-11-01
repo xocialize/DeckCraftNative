@@ -7,7 +7,7 @@
 // (continuous checking, suggestions in its menu), in place of deckcraft's notes squiggles.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

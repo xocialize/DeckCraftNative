@@ -13,7 +13,7 @@
 // The server answers nothing itself: each request goes into a bounded queue (Rust's `sync_channel`) that
 // the app drains on its main thread (`tryReceive`), after the server's `wake` callback (egui's
 // `request_repaint`) says there is something to drain.
-import DCCore
+import CNCore
 import DCEngine
 import Darwin
 import Foundation

@@ -5,7 +5,7 @@
 // `start_prefetch` and the `backdrop` cache of deckcraft `crates/ui-egui/src/show.rs`, and the preview of
 // `show/presenter.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCAnim
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

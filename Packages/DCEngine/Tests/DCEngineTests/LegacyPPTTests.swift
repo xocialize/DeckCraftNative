@@ -3,7 +3,7 @@
 // what isn't brought over yet. An encrypted one needs its password, unless it used PowerPoint's default. Its OLE
 // objects come over as their pictures (P4), the reply naming each, and save to `.pptx` as pictures. Its transitions,
 // hidden slides and animations come over (P5), show in the Animation Pane, and save to `.pptx`.
-import DCCore
+import CNCore
 import DCPPT
 @testable import DCEngine
 import DCTestSupport

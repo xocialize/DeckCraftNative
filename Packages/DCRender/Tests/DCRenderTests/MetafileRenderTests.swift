@@ -4,7 +4,7 @@
 // test files are built byte by byte as there. Pixel positions and tolerances are the Rust ones unless a
 // comment says otherwise.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

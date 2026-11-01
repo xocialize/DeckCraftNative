@@ -6,7 +6,7 @@
 import AppKit
 import DCAppModel
 import DCAutomation
-import DCCore
+import CNCore
 import DCEngine
 
 @MainActor

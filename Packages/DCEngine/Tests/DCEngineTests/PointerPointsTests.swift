@@ -2,7 +2,7 @@
 // the point type a modifier chooses and its memory across Undo, Redo and shapes, and right clicks that pick
 // the point or the segment. Ports the Edit Points pointer tests of deckcraft crates/engine/src/tests.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

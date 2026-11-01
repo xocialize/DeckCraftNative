@@ -2,7 +2,7 @@
 // (`shade`, `scale_of`, `crop_dest`, `shape_geometry`, `parse_path`, `blur`; MIT OR Apache-2.0, ©
 // ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

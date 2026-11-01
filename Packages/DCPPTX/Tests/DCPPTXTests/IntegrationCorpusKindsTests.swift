@@ -5,7 +5,7 @@
 //
 // Each package is built here. The check is open → save → reopen: text in the package and the content
 // parts. A second save keeps the same part names and text.
-import DCCore
+import CNCore
 import DCModel
 import Testing
 @testable import DCPPTX

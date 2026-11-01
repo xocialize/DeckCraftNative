@@ -3,7 +3,7 @@
 // `EncryptedPackage` streams (ECMA-376 / [MS-OFFCRYPTO]) instead of a zip. Every read is bounds-checked
 // and every loop bounded. Port of deckcraft crates/pptx/src/cfb.rs (MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors), itself copied from GridCraft's `crates/xlsx/src/cfb.rs`.
-import DCCore
+import CNCore
 
 /// The `cfb` module.
 enum CFB {

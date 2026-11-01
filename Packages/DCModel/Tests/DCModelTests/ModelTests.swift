@@ -1,7 +1,7 @@
 // Ported from deckcraft crates/model/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors), plus checks of the JSON shape serde writes.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 @testable import DCModel
 import Testing

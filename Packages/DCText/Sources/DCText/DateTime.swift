@@ -7,7 +7,7 @@
 // `datetimeFigureOut` show the language's short date. Numeric dates follow the run's language; formats
 // with month or day names, or AM/PM, are only computed for English, so other languages keep the text the
 // file was saved with.
-import DCCore
+import CNCore
 import Foundation
 
 /// A local date and time: what the clock read, or a fixed moment (tests, deterministic output).

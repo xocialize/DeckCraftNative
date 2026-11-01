@@ -1,7 +1,7 @@
 // DCAutomationTests — the connected backend against a fake app on a loopback socket. Port of the tests in
 // deckcraft crates/mcp/src/backend.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 @testable import DCAutomation
 import Darwin
 import Foundation

@@ -1,7 +1,7 @@
 // DCAppModel — the Selection Pane without a window: its rows (front-most first, groups expanded), the pane's
 // own state, where a dragged row lands, and what a click, Shift+click or arrow key selects. Port of deckcraft
 // `crates/ui-egui/src/selpane.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 

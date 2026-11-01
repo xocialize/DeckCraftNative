@@ -4,7 +4,7 @@
 // the shape's fill and line). P4 adds pictures (a picture shape's picture with its crop and corrections), OLE objects
 // (their preview, as an `opaque` shape) and movies and sounds (their file, with the shape's picture as the poster).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

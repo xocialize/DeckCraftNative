@@ -1,7 +1,7 @@
 // DCAppModelTests — R1 of Docs/plans/Ribbon-and-StartScreen.md without a window: every ribbon control runs its
 // command with deckcraft's parameters, the toggles and check boxes follow the session, switching layouts keeps the
 // document, the arrangement into columns, and the tooltip descriptions (decision 3).
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

@@ -1,10 +1,10 @@
 // Ported from deckcraft crates/format/src/{lib.rs, chart_parts_tests.rs, rtf.rs} tests (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCFormat
 import DCGeometry
 import DCModel
-import DCZip
+import CNZip
 import Testing
 
 // MARK: - Archive surgery helpers

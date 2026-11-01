@@ -4,7 +4,7 @@
 // Owned corpus: text effects, body layout, theme effects, fills, bevels and connectors.
 // Open → save → reopen, twice, and compare the model.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Testing

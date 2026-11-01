@@ -2,7 +2,7 @@
 // ArtCraft Team and the DeckCraft contributors). table.rs has no tests of its own. Tolerances are the Rust
 // ones unless noted.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

@@ -1,5 +1,5 @@
 // DCRender — Windows Metafile and Enhanced Metafile pictures (`image/x-wmf`, `image/x-emf`): parsed by
-// DCMetafile and drawn as vectors into a bitmap of the size the slide needs, so they go through the same
+// CNMetafile and drawn as vectors into a bitmap of the size the slide needs, so they go through the same
 // crop, tile and recolour path as any other picture. Port of deckcraft crates/render/src/metafile.rs (MIT
 // OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors); `Images.metafile` by default.
 //
@@ -9,9 +9,9 @@
 import CoreGraphics
 import CoreText
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
-import DCMetafile
+import CNMetafile
 import DCText
 import Foundation
 

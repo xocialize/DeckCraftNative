@@ -2,7 +2,7 @@
 // sections, New Window's state, the status bar's texts, the outline, the thumbnail cache, the notes draft
 // and the pasteboard's routing. Ported from deckcraft `crates/ui-egui` (`sorter_tests.rs`, `doc_window.rs`,
 // `notes.rs`, `status.rs`, `lib.rs`); each test names its source, Rust names in camelCase.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

@@ -4,7 +4,7 @@
 // ArtCraft Team and the DeckCraft contributors). Fonts are never registered system-wide: faces come from
 // descriptors made from the files' bytes, visible to this process only.
 import CoreText
-import DCCore
+import CNCore
 import Foundation
 import Synchronization
 

@@ -2,7 +2,7 @@
 // save and export, File › Info, properties, the Print page's ranges, and the file reads and writes.
 // Ports the file tests of deckcraft crates/engine/src/tests.rs, cmd/file.rs, io.rs and templates.rs (MIT
 // OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCGeometry
@@ -10,7 +10,7 @@ import DCModel
 import DCPPTX
 import DCRender
 import DCText
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

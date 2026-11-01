@@ -1,10 +1,10 @@
 // Port of deckcraft crates/pptx/tests/it/roundtrip.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors): round trips of decks built in code, model → PPTX → model.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
-import DCZip
+import CNZip
 import Foundation
 import Testing
 @testable import DCPPTX

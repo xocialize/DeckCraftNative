@@ -2,7 +2,7 @@
 // oracle's `deckcraft-cli mcp`, through the MCP Swift SDK's own client, against a fake app on a loopback
 // control port, and with engine work deep enough to need the engine thread's stack.
 import DCAutomation
-import DCCore
+import CNCore
 import DCEngine
 import Darwin
 import Foundation
@@ -111,7 +111,7 @@ struct MCPProcessTests {
         let (b, theirs) = try session(.oracle, [], lines)
         #expect(a.code == 0 && b.code == 0, "\(a.stderr)\(b.stderr)")
         #expect(ours.count == theirs.count, "\(ours.count) replies, the oracle's \(theirs.count)")
-        // A saved file's size is DCZip's deflate, not deckcraft's (the presentation inside is the same).
+        // A saved file's size is CNZip's deflate, not deckcraft's (the presentation inside is the same).
         func masked(_ line: String) -> String { line.replacingOccurrences(of: #"\\"bytes\\": \d+"#, with: "<bytes>", options: .regularExpression) }
         for (i, (x, y)) in zip(ours.map(masked), theirs.map(masked)).enumerated() where x != y {
             Issue.record("reply \(i + 1):\n  ours:   \(x.prefix(600))\n  oracle: \(y.prefix(600))")

@@ -11,7 +11,7 @@
 //
 // `circle` stays a radial gradient (see `PaintFill.gradient`).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 public enum PathGradient {

@@ -5,7 +5,7 @@
 // in, the percentage that opens Zoom…, Fit). In the Slide Sorter the slider sizes the thumbnails.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DesignScaffold

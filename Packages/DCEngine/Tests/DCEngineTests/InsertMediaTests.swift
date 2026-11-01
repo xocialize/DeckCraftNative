@@ -3,7 +3,7 @@
 // crates/pptx/tests/it/roundtrip.rs: `reuse_slides_from_another_presentation`,
 // `compress_pictures_shrinks_the_file_and_keeps_shared_originals`, `zoom_inserts_linked_slide_pictures`).
 import CoreGraphics
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCGeometry

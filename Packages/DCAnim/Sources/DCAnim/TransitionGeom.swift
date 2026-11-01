@@ -1,6 +1,6 @@
 // DCAnim — geometry for transition effects: easing, 3-D cards, opacity fields, polygons. Port of deckcraft
 // crates/anim/src/transition_geom.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import Darwin
 
 // MARK: easing

@@ -1,7 +1,7 @@
 // DCAutomationTests — JSON-RPC framing, the MCP lifecycle and resources, as deckcraft's server answers
 // them (crates/mcp/src/server.rs, MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The
 // expected lines are deckcraft-cli 0.13.1's own replies to the same lines, byte for byte.
-import DCCore
+import CNCore
 @testable import DCAutomation
 import DCEngine
 import Foundation

@@ -3,7 +3,7 @@
 // show alike. Port of `MediaHost` and the helpers of deckcraft `crates/ui-egui/src/media.rs` (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors). Textures are the window side's: this keeps the current
 // decoded frame of each video and a counter that changes with it.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCMedia

@@ -4,7 +4,7 @@
 // DeckCraft contributors). A 1,000-slide deck asks only for the rows in view (`huge_deck_tests.rs`).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

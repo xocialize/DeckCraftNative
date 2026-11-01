@@ -5,7 +5,7 @@
 import AppKit
 import DCAppModel
 import DCAutomation
-import DCCore
+import CNCore
 
 @MainActor
 enum UpdatesFeature {

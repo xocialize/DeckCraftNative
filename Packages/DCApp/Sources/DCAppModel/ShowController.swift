@@ -5,7 +5,7 @@
 // the drawing is the Mac app's (DCApp/Show).
 import CoreGraphics
 import DCAnim
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

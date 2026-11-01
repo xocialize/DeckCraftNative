@@ -3,7 +3,7 @@
 // `crates/ui-egui/src/ribbon.rs`), Format Shape ▸ Text Options (`panes.rs`), Text Effects ▸ Transform, and
 // the kept-draft rule of `widgets::text_draft`. MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

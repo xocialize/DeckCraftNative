@@ -10,7 +10,7 @@
 //
 // Port of deckcraft crates/engine/src/spell.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 import Synchronization

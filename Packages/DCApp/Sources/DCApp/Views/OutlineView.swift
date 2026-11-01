@@ -7,7 +7,7 @@
 // 2,000-slide outline stays fast (`huge_deck_tests.rs`).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DesignScaffold

@@ -6,8 +6,8 @@
 // ignored, every size and depth is bounded) into the DeckCraft model; `PPTX.export` writes a valid
 // package that PowerPoint opens without repair. Both live in the `read/` and `write/` ports, as
 // extensions of `PPTX`; this file holds the crate root's error type, sniffing and content types.
-import DCCore
-import DCZip
+import CNCore
+import CNZip
 import Foundation
 import os
 

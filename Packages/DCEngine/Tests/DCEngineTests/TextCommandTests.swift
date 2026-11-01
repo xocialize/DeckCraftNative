@@ -15,7 +15,7 @@
 //   `smartart_text_pane_edits_regenerate_the_diagram` (insert.smartArt) belong to the design and insert
 //   groups' commands.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

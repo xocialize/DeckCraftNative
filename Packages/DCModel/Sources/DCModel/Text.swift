@@ -4,7 +4,7 @@
 // Text positions count Unicode scalar values, as Rust's `chars()` does, never grapheme clusters: a
 // caret offset means the same character in both ports.
 import DCColor
-import DCCore
+import CNCore
 
 extension String {
     /// Rust's `s.chars().count()`.

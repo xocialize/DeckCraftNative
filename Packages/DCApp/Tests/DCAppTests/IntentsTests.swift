@@ -3,7 +3,7 @@
 // entity. The file intents' tests are DCIntentsKitTests' (`Packages/DCExtensions/Tests/DCIntentsKitTests`).
 import AppIntents
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCIntentsKit
 import Foundation

@@ -5,7 +5,7 @@
 // `find_dialog_tests.rs`, `preferences_tests.rs` (MIT OR Apache-2.0); each test names its source. Where the
 // Rust test clicked an egui widget, this one sets the field or presses the button through the controller,
 // which is what the Mac window's controls do.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCText

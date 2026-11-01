@@ -9,7 +9,7 @@
 // metadata, `tref`, `sdtp`, sample-group contents, the timecode start frame and the colour, HDR and
 // aperture fields of visual sample entries (their boxes are still parsed where a parse can fail).
 
-import DCCore
+import CNCore
 
 /// Hard cap on the samples of the whole file.
 private let maxSamples = 1 << 26

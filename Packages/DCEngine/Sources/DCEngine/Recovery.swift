@@ -12,7 +12,7 @@
 // it). Several instances share the folder: document uids are unique across processes, each instance
 // holds a lock (`flock`) on `owner-<instance>.lock` while it runs, and `file.recovery.open` leaves alone
 // the entries of an instance whose lock is still held.
-import DCCore
+import CNCore
 import DCFormat
 import DCModel
 import Darwin

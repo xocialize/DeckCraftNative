@@ -2,7 +2,7 @@
 // commands and requests to a `DialogController`, and mock file panels (deckcraft's `Services`
 // `pick_open` / `pick_save` in its tests).
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

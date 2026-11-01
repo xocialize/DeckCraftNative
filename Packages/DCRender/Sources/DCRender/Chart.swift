@@ -4,7 +4,7 @@
 // Number formatting (axis and data labels) is DCModel's (`Chart.axisLabel`, `Chart.dataLabel`, NumFmt),
 // so labels read as deckcraft's do.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

@@ -6,7 +6,7 @@
 // like and what their adjust values mean, not from any reference geometry table. Adjust values use the
 // file convention: ratios in 1/100 000 of the shorter side (or of the width/height), angles in 1/60 000
 // degree.
-import DCCore
+import CNCore
 import Darwin
 
 /// How a sub-path is filled. `lighten`/`darken` variants shade the shape's fill (3-D looking faces).

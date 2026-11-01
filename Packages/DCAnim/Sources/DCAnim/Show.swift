@@ -1,7 +1,7 @@
 // DCAnim — slide show navigation: click steps, slide order (hidden slides, custom shows, ranges), loop and
 // automatic advance. Port of deckcraft crates/anim/src/show.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 // Which links the show opens on a click; PDF export writes the same ones (deckcraft re-exports it here).

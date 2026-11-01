@@ -6,7 +6,7 @@
 import CoreGraphics
 import CoreText
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

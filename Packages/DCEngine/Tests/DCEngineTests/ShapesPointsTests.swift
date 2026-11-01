@@ -4,7 +4,7 @@
 // the DeckCraft contributors). The tests that drag, click or right-click with the pointer are in
 // PointerPointsTests.swift, apart from `edit_points_types_and_handles` and
 // `edit_points_right_click_records_the_place_on_the_segment`, whole here.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

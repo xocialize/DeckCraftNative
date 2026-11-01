@@ -4,7 +4,7 @@
 // Team and the DeckCraft contributors). The gestures are in ToolsPointer.swift, hit testing in
 // ToolsHit.swift, and resizing and snapping in ToolsGeometry.swift.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

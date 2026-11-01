@@ -3,7 +3,7 @@
 // `clicks_in_flipped_shapes_hit_the_text_where_it_is_drawn` of deckcraft crates/engine/src/tests.rs and the
 // Format Painter pointer tests of crates/engine/src/tests_keys.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

@@ -13,7 +13,7 @@
 // - `app.open {path}` / `app.save {path?}` / `app.export {path, …}`
 // - everything else (`ui.ime`, `ui.move`/`click`/`drag`, `ui.set`, `ui.dialog.*`, `ui.screenshot`,
 //   `ui.resize`, `ui.focus`, `show.*`, `app.quit`) through `ControlHost.handleUI`.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Synchronization

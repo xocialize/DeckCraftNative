@@ -1,7 +1,7 @@
 // DCAnim — evaluation of one animation effect at a progress value. Port of deckcraft
 // crates/anim/src/effects.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Darwin

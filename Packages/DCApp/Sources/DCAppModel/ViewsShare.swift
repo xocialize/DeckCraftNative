@@ -4,7 +4,7 @@
 // parameters (`print_pdf`, which prints through `file.export`'s PDF), plus the Outline layout and the
 // colour choice the Mac print panel adds (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

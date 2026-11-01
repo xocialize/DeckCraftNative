@@ -4,7 +4,7 @@
 // specifications (RIFF/WAVE, AIFF 1.3 and AIFF-C, Apple's CAF specification, the FLAC format, ISO/IEC
 // 11172-3 and 13818-3 with the Xing/Info and LAME tags, ISO/IEC 13818-7 ADTS, Vorbis I) and checked
 // against symphonia's answers by the oracle (Tools/oracle/media-vectors).
-import DCCore
+import CNCore
 
 enum PlainAudio {
     /// (codec short name, sample rate, channels, frames if the header says) or nil when symphonia

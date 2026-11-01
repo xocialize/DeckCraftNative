@@ -7,7 +7,7 @@
 // placeholder on its layout and master (`Resolve.swift`). Swift arrays of value types give the
 // copy-on-write sharing deckcraft gets from `Arc`, so an undo snapshot copies only what changed.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 public enum ModelError: Error, Sendable, Equatable, CustomStringConvertible {

@@ -18,7 +18,7 @@
 // Positions are character (Unicode scalar) offsets in the paragraph text, where a line break is one
 // `\u{0B}`. A token never splits a grapheme cluster (Swift's `Character` is the same extended grapheme
 // cluster as Rust's `unicode-segmentation`).
-import DCCore
+import CNCore
 
 private enum WordClass {
     case space, tab, lineBreak, word, ideo, punct, symbol

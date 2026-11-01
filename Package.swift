@@ -28,15 +28,10 @@ let package = Package(
     platforms: [.macOS(.v26)],
     products: [
         // L0
-        .library(name: "DCCore", targets: ["DCCore"]),
-        .library(name: "DCZip", targets: ["DCZip"]),
-        .library(name: "DCCFB", targets: ["DCCFB"]),
         .library(name: "DCGeometry", targets: ["DCGeometry"]),
         .library(name: "DCColor", targets: ["DCColor"]),
-        .library(name: "DCMetafile", targets: ["DCMetafile"]),
         // L1
         .library(name: "DCModel", targets: ["DCModel"]),
-        .library(name: "DCOffCrypto", targets: ["DCOffCrypto"]),
         // L2
         .library(name: "DCText", targets: ["DCText"]),
         .library(name: "DCAnim", targets: ["DCAnim"]),
@@ -63,6 +58,9 @@ let package = Package(
         .library(name: "DCTestSupport", targets: ["DCTestSupport"]),
     ],
     dependencies: [
+        // The base packages shared with Marquee Documents (moved out of this repo 2026-11-01): CNCore, CNZip,
+        // CNCFB, CNOffCrypto, CNMetafile.
+        .package(url: "https://github.com/xocialize/CraftNativeKit.git", from: "0.1.0"),
         // SSIMULACRA2 for render parity (DCTestSupport only): media-bridge's dependency-free metric core.
         .package(url: "https://github.com/xocialize/media-bridge.git", from: "0.40.0"),
         // The official MCP Swift SDK (DCAutomation), at the version PhotoCraftNative uses.
@@ -76,91 +74,71 @@ let package = Package(
         .package(url: "https://github.com/xocialize/vpx-swift.git", from: "0.3.1"),
     ],
     targets: [
-        // MARK: DCCore — serde_json-compatible JSON (value, writer, parser, serde-style coding) and
-        // Rust's numeric semantics (saturating casts, NaN-propagating clamp). Every package builds on it.
-        .target(name: "DCCore", path: sources("DCCore", "DCCore")),
-        .testTarget(name: "DCCoreTests", dependencies: ["DCCore", "DCTestSupport"], path: tests("DCCore", "DCCoreTests")),
-
-        // MARK: DCZip — ZIP (ZIP64 included) and raw DEFLATE through Apple's Compression framework, from
-        // PhotoCraftNative. Used by DCFormat and DCPPTX.
-        .target(name: "DCZip", path: sources("DCZip", "DCZip")),
-        .testTarget(name: "DCZipTests", dependencies: ["DCZip"], path: tests("DCZip", "DCZipTests")),
-
-        // MARK: DCCFB — the Compound File Binary format ([MS-CFB]), read and written: the container of password-
-        // protected OOXML and of legacy .ppt (Docs/plans/Legacy-PPT-and-Encryption.md, E1). No dependencies.
-        .target(name: "DCCFB", path: sources("DCCFB", "DCCFB")),
-        .testTarget(name: "DCCFBTests", dependencies: ["DCCFB", "DCTestSupport"], path: tests("DCCFB", "DCCFBTests")),
+        // CNCore (serde_json-compatible JSON, Rust semantics), CNZip, CNCFB, CNOffCrypto and CNMetafile were targets
+        // here until 2026-11-01; they are CraftNativeKit's products now (its README; history up to the move is in
+        // PORT-STATUS.md).
 
         // MARK: DCFoundation — EMU/pt units, transforms, preset shapes, warps (deckcraft-geom);
         // RGB/HSL and DrawingML colour transforms (deckcraft-color). Wave 1.
-        .target(name: "DCGeometry", dependencies: ["DCCore"], path: sources("DCFoundation", "DCGeometry")),
-        .testTarget(name: "DCGeometryTests", dependencies: ["DCGeometry", "DCCore", "DCTestSupport"], path: tests("DCFoundation", "DCGeometryTests")),
-        .target(name: "DCColor", dependencies: ["DCCore"], path: sources("DCFoundation", "DCColor")),
-        .testTarget(name: "DCColorTests", dependencies: ["DCColor", "DCCore"], path: tests("DCFoundation", "DCColorTests")),
-
-        // MARK: DCMetafile — EMF, EMF+ and WMF read into a neutral vector model (deckcraft-metafile). Wave 2.
-        .target(name: "DCMetafile", dependencies: ["DCCore"], path: sources("DCMetafile", "DCMetafile")),
-        .testTarget(name: "DCMetafileTests", dependencies: ["DCMetafile", "DCCore", "DCTestSupport"], path: tests("DCMetafile", "DCMetafileTests")),
+        .target(name: "DCGeometry", dependencies: [.product(name: "CNCore", package: "CraftNativeKit")], path: sources("DCFoundation", "DCGeometry")),
+        .testTarget(name: "DCGeometryTests", dependencies: ["DCGeometry", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"], path: tests("DCFoundation", "DCGeometryTests")),
+        .target(name: "DCColor", dependencies: [.product(name: "CNCore", package: "CraftNativeKit")], path: sources("DCFoundation", "DCColor")),
+        .testTarget(name: "DCColorTests", dependencies: ["DCColor", .product(name: "CNCore", package: "CraftNativeKit")], path: tests("DCFoundation", "DCColorTests")),
 
         // MARK: DCModel — presentation, masters, layouts, slides, shapes, text, tables, charts,
         // animations, placeholder inheritance (deckcraft-model). Wave 1.
-        // MARK: DCOffCrypto — password-protected OOXML ([MS-OFFCRYPTO]): Agile and Standard encryption, read
-        // (and, from E3, written) through CommonCrypto (Docs/plans/Legacy-PPT-and-Encryption.md, E2).
-        .target(name: "DCOffCrypto", dependencies: ["DCCFB"], path: sources("DCOffCrypto", "DCOffCrypto")),
-        .testTarget(name: "DCOffCryptoTests", dependencies: ["DCOffCrypto", "DCCFB", "DCTestSupport"], path: tests("DCOffCrypto", "DCOffCryptoTests")),
-
-        .target(name: "DCModel", dependencies: ["DCCore", "DCGeometry", "DCColor"], path: sources("DCModel", "DCModel")),
-        .testTarget(name: "DCModelTests", dependencies: ["DCModel", "DCCore", "DCGeometry", "DCColor", "DCTestSupport"], path: tests("DCModel", "DCModelTests")),
+        .target(name: "DCModel", dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), "DCGeometry", "DCColor"], path: sources("DCModel", "DCModel")),
+        .testTarget(name: "DCModelTests", dependencies: ["DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCGeometry", "DCColor", "DCTestSupport"], path: tests("DCModel", "DCModelTests")),
 
         // MARK: DCText — CoreText layout under deckcraft's autofit, bullets, columns, caret and field
         // rules; the font substitutes (deckcraft-text, -fonts). Wave 2.
-        .target(name: "DCText", dependencies: ["DCCore", "DCModel", "DCGeometry", "DCColor"], path: sources("DCText", "DCText")),
-        .testTarget(name: "DCTextTests", dependencies: ["DCText", "DCModel", "DCGeometry", "DCColor", "DCCore", "DCTestSupport"], path: tests("DCText", "DCTextTests")),
+        .target(name: "DCText", dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), "DCModel", "DCGeometry", "DCColor"], path: sources("DCText", "DCText")),
+        .testTarget(name: "DCTextTests", dependencies: ["DCText", "DCModel", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"], path: tests("DCText", "DCTextTests")),
 
         // MARK: DCAnim — timeline, show state machine, transition frames, Morph (deckcraft-anim). Wave 4.
-        .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore"], path: sources("DCAnim", "DCAnim")),
+        .target(name: "DCAnim", dependencies: ["DCModel", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit")], path: sources("DCAnim", "DCAnim")),
         .testTarget(
             name: "DCAnimTests",
-            dependencies: ["DCAnim", "DCModel", "DCGeometry", "DCColor", "DCCore", "DCFormat", "DCTestSupport"],
+            dependencies: ["DCAnim", "DCModel", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit"), "DCFormat", "DCTestSupport"],
             path: tests("DCAnim", "DCAnimTests")
         ),
 
         // MARK: DCFormat — `.deckcraft` (zip + JSON + media), outline text, RTF (deckcraft-format). Wave 1.
-        .target(name: "DCFormat", dependencies: ["DCCore", "DCZip", "DCModel"], path: sources("DCFormat", "DCFormat")),
-        .testTarget(name: "DCFormatTests", dependencies: ["DCFormat", "DCModel", "DCCore", "DCZip", "DCTestSupport"], path: tests("DCFormat", "DCFormatTests")),
+        .target(name: "DCFormat", dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCModel"], path: sources("DCFormat", "DCFormat")),
+        .testTarget(name: "DCFormatTests", dependencies: ["DCFormat", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport"], path: tests("DCFormat", "DCFormatTests")),
 
         // MARK: DCMedia — AVFoundation and media-bridge in place of deckcraft-media and its codec
         // crates. Wave 4.
         .target(
             name: "DCMedia",
-            dependencies: ["DCCore", .product(name: "MediaImport", package: "media-bridge")],
+            dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), .product(name: "MediaImport", package: "media-bridge")],
             path: sources("DCMedia", "DCMedia")
         ),
-        .testTarget(name: "DCMediaTests", dependencies: ["DCMedia", "DCCore", "DCTestSupport"], path: tests("DCMedia", "DCMediaTests")),
+        .testTarget(name: "DCMediaTests", dependencies: ["DCMedia", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"], path: tests("DCMedia", "DCMediaTests")),
 
         // MARK: DCRender — the CoreGraphics slide renderer, PDF through CGPDFContext, Metal transition
         // compositing (deckcraft-render, -pdf). Wave 2.
         .target(
             name: "DCRender",
-            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCMetafile", "DCModel", "DCAnim", "DCText"],
+            dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), "DCGeometry", "DCColor", .product(name: "CNMetafile", package: "CraftNativeKit"), "DCModel", "DCAnim", "DCText"],
             path: sources("DCRender", "DCRender")
         ),
         .testTarget(
             name: "DCRenderTests",
-            dependencies: ["DCRender", "DCText", "DCModel", "DCFormat", "DCGeometry", "DCColor", "DCCore", "DCTestSupport"],
+            dependencies: ["DCRender", "DCText", "DCModel", "DCFormat", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCRender", "DCRenderTests")
         ),
 
         // MARK: DCPPTX — PPTX read and write from ECMA-376 (deckcraft-pptx). Wave 3.
         // MARK: DCPPT — legacy binary PowerPoint (.ppt, [MS-PPT] and [MS-ODRAW]) read into DCModel (Docs/plans/
-        // Legacy-PPT-and-Encryption.md, P1–P6); its compound file is DCCFB's and its encryption DCOffCrypto's.
-        .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCCore", "DCCFB", "DCOffCrypto", "DCZip", "DCPPTX"], path: sources("DCPPT", "DCPPT")),
-        .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCColor", "DCCFB", "DCOffCrypto", "DCPPTX", "DCEngine", "DCRender", "DCAnim", "DCZip", "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
+        // Legacy-PPT-and-Encryption.md, P1–P6); its compound file is CNCFB's and its encryption CNOffCrypto's.
+        .target(name: "DCPPT", dependencies: ["DCModel", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNCFB", package: "CraftNativeKit"), .product(name: "CNOffCrypto", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCPPTX"], path: sources("DCPPT", "DCPPT")),
+        .testTarget(name: "DCPPTTests", dependencies: ["DCPPT", "DCModel", "DCGeometry", "DCColor", .product(name: "CNCFB", package: "CraftNativeKit"), .product(name: "CNOffCrypto", package: "CraftNativeKit"), "DCPPTX", "DCEngine", "DCRender", "DCAnim", .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport"], path: tests("DCPPT", "DCPPTTests")),
 
-                .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", "DCZip", "DCCore"], path: sources("DCPPTX", "DCPPTX")),
+                .target(name: "DCPPTX", dependencies: ["DCModel", "DCGeometry", "DCColor", .product(name: "CNZip", package: "CraftNativeKit"), .product(name: "CNCore", package: "CraftNativeKit")], path: sources("DCPPTX", "DCPPTX")),
         .testTarget(
             name: "DCPPTXTests",
-            dependencies: ["DCPPTX", "DCModel", "DCFormat", "DCRender", "DCGeometry", "DCColor", "DCZip", "DCCore", "DCTestSupport"],
+            dependencies: ["DCPPTX", "DCModel", "DCFormat", "DCRender", "DCGeometry", "DCColor", .product(name: "CNZip", package: "CraftNativeKit"), .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCPPTX", "DCPPTXTests")
         ),
 
@@ -168,12 +146,12 @@ let package = Package(
         // sample deck (deckcraft-engine). Wave 4.
         .target(
             name: "DCEngine",
-            dependencies: ["DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", "DCZip", "DCOffCrypto", "DCPPT"],
+            dependencies: [.product(name: "CNCore", package: "CraftNativeKit"), "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCMedia", .product(name: "CNZip", package: "CraftNativeKit"), .product(name: "CNOffCrypto", package: "CraftNativeKit"), "DCPPT"],
             path: sources("DCEngine", "DCEngine")
         ),
         .testTarget(
             name: "DCEngineTests",
-            dependencies: ["DCEngine", "DCAnim", "DCCore", "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCPPT", "DCMedia", "DCZip", "DCTestSupport"],
+            dependencies: ["DCEngine", "DCAnim", .product(name: "CNCore", package: "CraftNativeKit"), "DCGeometry", "DCColor", "DCModel", "DCText", "DCRender", "DCFormat", "DCPPTX", "DCPPT", "DCMedia", .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCEngine", "DCEngineTests")
         ),
 
@@ -181,18 +159,18 @@ let package = Package(
         // ui-egui's control.rs). Wave 4.
         .target(
             name: "DCAutomation",
-            dependencies: ["DCEngine", "DCRender", "DCModel", "DCGeometry", "DCColor", "DCCore", .product(name: "MCP", package: "swift-sdk")],
+            dependencies: ["DCEngine", "DCRender", "DCModel", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "MCP", package: "swift-sdk")],
             path: sources("DCAutomation", "DCAutomation")
         ),
         .testTarget(
             name: "DCAutomationTests",
-            dependencies: ["DCAutomation", "DCEngine", "DCCore", "DCTestSupport", .product(name: "MCP", package: "swift-sdk")],
+            dependencies: ["DCAutomation", "DCEngine", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport", .product(name: "MCP", package: "swift-sdk")],
             path: tests("DCAutomation", "DCAutomationTests")
         ),
         .executableTarget(
             name: "dccli",
             dependencies: [
-                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCCore",
+                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
             ],
@@ -201,7 +179,7 @@ let package = Package(
         .testTarget(
             name: "dccliTests",
             dependencies: [
-                "dccli", "DCAutomation", "DCEngine", "DCRender", "DCModel", "DCCore", "DCZip", "DCTestSupport",
+                "dccli", "DCAutomation", "DCEngine", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport",
                 .product(name: "MCP", package: "swift-sdk"),
             ],
             path: "Apps/dccliTests"
@@ -211,13 +189,13 @@ let package = Package(
         // commands, the menu tree, the palette, and routing between them and the engine. No AppKit. Wave 5.
         .target(
             name: "DCAppModel",
-            dependencies: ["DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCFormat", "DCModel", "DCText", "DCGeometry", "DCColor", "DCCore"],
+            dependencies: ["DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCFormat", "DCModel", "DCText", "DCGeometry", "DCColor", .product(name: "CNCore", package: "CraftNativeKit")],
             path: sources("DCApp", "DCAppModel"),
             resources: [.process("Resources")]
         ),
         .testTarget(
             name: "DCAppModelTests",
-            dependencies: ["DCAppModel", "DCEngine", "DCAutomation", "DCModel", "DCCore", "DCTestSupport"],
+            dependencies: ["DCAppModel", "DCEngine", "DCAutomation", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCApp", "DCAppModelTests")
         ),
 
@@ -226,7 +204,7 @@ let package = Package(
         .target(
             name: "DCApp",
             dependencies: [
-                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", "DCCore", "DCText",
+                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", .product(name: "CNCore", package: "CraftNativeKit"), "DCText",
                 "DCIntentsKit", "DCSpotlight",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
@@ -237,7 +215,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DCAppTests",
-            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", "DCCore", "DCTestSupport", "DCIntentsKit", "DCSpotlight"],
+            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport", "DCIntentsKit", "DCSpotlight"],
             path: tests("DCApp", "DCAppTests")
         ),
         // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev
@@ -249,19 +227,19 @@ let package = Package(
         // attributes and text Spotlight indexes (DCSpotlight). No AppKit. Wave 6.
         .target(
             name: "DCExtensionKit",
-            dependencies: ["DCEngine", "DCFormat", "DCPPTX", "DCText", "DCModel", "DCZip", "DCCore"],
+            dependencies: ["DCEngine", "DCFormat", "DCPPTX", "DCText", "DCModel", .product(name: "CNZip", package: "CraftNativeKit"), .product(name: "CNCore", package: "CraftNativeKit")],
             path: sources("DCExtensions", "DCExtensionKit")
         ),
         .target(
             name: "DCQuickLook",
-            dependencies: ["DCExtensionKit", "DCEngine", "DCRender", "DCModel", "DCCore"],
+            dependencies: ["DCExtensionKit", "DCEngine", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit")],
             path: sources("DCExtensions", "DCQuickLook"),
             resources: [.process("Resources")]
         ),
-        .target(name: "DCSpotlight", dependencies: ["DCExtensionKit", "DCModel", "DCCore"], path: sources("DCExtensions", "DCSpotlight")),
+        .target(name: "DCSpotlight", dependencies: ["DCExtensionKit", "DCModel", .product(name: "CNCore", package: "CraftNativeKit")], path: sources("DCExtensions", "DCSpotlight")),
         .testTarget(
             name: "DCExtensionsTests",
-            dependencies: ["DCQuickLook", "DCSpotlight", "DCExtensionKit", "DCEngine", "DCRender", "DCModel", "DCZip", "DCCore", "DCTestSupport"],
+            dependencies: ["DCQuickLook", "DCSpotlight", "DCExtensionKit", "DCEngine", "DCRender", "DCModel", .product(name: "CNZip", package: "CraftNativeKit"), .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCExtensions", "DCExtensionsTests")
         ),
         // The file intents (Export Presentation, Get Outline, Get Slide Count) as an App Intents package: the App
@@ -269,13 +247,13 @@ let package = Package(
         // Shortcuts can name them. No AppKit. Wave 6.
         .target(
             name: "DCIntentsKit",
-            dependencies: ["DCExtensionKit", "DCEngine", "DCCore"],
+            dependencies: ["DCExtensionKit", "DCEngine", .product(name: "CNCore", package: "CraftNativeKit")],
             path: sources("DCExtensions", "DCIntentsKit"),
             resources: [.process("Resources")]
         ),
         .testTarget(
             name: "DCIntentsKitTests",
-            dependencies: ["DCIntentsKit", "DCEngine", "DCCore", "DCTestSupport"],
+            dependencies: ["DCIntentsKit", "DCEngine", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
             path: tests("DCExtensions", "DCIntentsKitTests")
         ),
 

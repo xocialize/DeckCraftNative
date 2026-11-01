@@ -7,7 +7,7 @@
 // with three or more stops, or a stop moved off an end, blend linearly in sRGB. The canvas interpolates
 // linearly in sRGB, so a two-colour gradient is expanded into short pieces following PowerPoint's ramp.
 import DCColor
-import DCCore
+import CNCore
 import Foundation
 
 public enum Ramp {

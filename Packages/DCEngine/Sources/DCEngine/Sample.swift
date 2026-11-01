@@ -3,7 +3,7 @@
 // Port of deckcraft crates/engine/src/sample.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors). Every command and parameter is deckcraft's, in order, so the deck is the corpus's
 // `sample.deckcraft`.
-import DCCore
+import CNCore
 import DCModel
 
 public enum Sample {

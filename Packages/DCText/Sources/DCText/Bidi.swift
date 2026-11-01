@@ -6,7 +6,7 @@
 // controls (LRE…PDI) to unicode-bidi's full UAX #9. Here those rare paragraphs take their levels from
 // CoreText's own bidi analysis (CTLine run directions), the one place this file is not a literal port.
 import CoreText
-import DCCore
+import CNCore
 import Foundation
 
 enum Bidi {

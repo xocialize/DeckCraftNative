@@ -2,6 +2,15 @@
   "originHash" : "efd1b7d3e69daeaa78682b13305d7d81485aecb84ef3af0cb3df6b6a7f78555b",
   "pins" : [
     {
+      "identity" : "craftnativekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xocialize/CraftNativeKit.git",
+      "state" : {
+        "revision" : "db15e22b1e89efc452dce10f4cc92940279504ab",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "designscaffold",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xocialize/DesignScaffold.git",

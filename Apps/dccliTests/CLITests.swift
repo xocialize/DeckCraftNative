@@ -2,7 +2,7 @@
 // apps/deckcraft-cli/src/main.rs and automation_args.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
 import DCAutomation
-import DCCore
+import CNCore
 @testable import dccli
 import DCRender
 import Foundation

@@ -12,7 +12,7 @@
 // Holes are oriented against their outer contour, as i_overlay writes them, so non-zero fill keeps them.
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

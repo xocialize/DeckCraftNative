@@ -5,13 +5,13 @@
 // - the pixels of the pictures Artistic Effects stores, against deckcraft's (the PNG streams differ);
 // - the error messages of refused commands, which a script can't hold (the oracle stops at the first).
 // deckcraft crates/engine (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCModel
 import DCRender
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

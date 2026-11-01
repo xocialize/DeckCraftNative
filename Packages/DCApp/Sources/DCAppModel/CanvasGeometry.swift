@@ -4,7 +4,7 @@
 // `wheel_slide_target`, `grid_line_step`, `grid_fits`, `ruler_steps` and `resize_cursor` in deckcraft
 // `crates/ui-egui/src/canvas.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

@@ -7,7 +7,7 @@
 // as images, and the same invisible real-text layer over it for search, selection and copy.
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

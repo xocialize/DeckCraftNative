@@ -666,6 +666,15 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     open their dialogs in the release build. The installed 0.1.13 finds 0.1.14 through Check for Updates; 0.1.14
     is now installed in `/Applications`.
 
+## CraftNativeKit (2026-11-01)
+
+DCCore, DCZip, DCCFB, DCOffCrypto and DCMetafile moved out of this repo at `5991914` into
+[xocialize/CraftNativeKit](https://github.com/xocialize/CraftNativeKit) 0.1.0, renamed CNCore, CNZip, CNCFB,
+CNOffCrypto and CNMetafile, so Marquee Documents (the WordCraft port) builds on the same code. Their 182 tests
+moved with them and pass there unchanged. `serde2swift.py` moved too; `Tools/port/generate.sh` runs the kit's copy
+and writes the same `Types.generated.swift` apart from `import CNCore`. The fixtures stay here, and the kit reads
+them from `../DeckCraftNative-Fixtures`. The figures for these packages above are history up to the move.
+
 ## Pin moves
 
 ### 88c2ceff → a3fbf029 (2026-10-31, after 0.1.8)
@@ -764,7 +773,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
 | color | 831 | Port | DCColor | 1 | **done** — 8 tests |
 | model | 9,114 | Port (types generated) | DCModel | 1 | **done** — 96 tests |
 | format | 2,140 | Port, byte-compatible | DCFormat | 1 | **done** — 42 tests; corpus round-trips byte-identical |
-| metafile | 7,172 | Port | DCMetafile | 2 | **done** — 113 tests; bit-identical to the oracle on 325 cases |
+| metafile | 7,172 | Port | DCMetafile → CNMetafile (CraftNativeKit, 2026-11-01) | 2 | **done** — 113 tests; bit-identical to the oracle on 325 cases |
 | fonts | 3,173 | Replace (CoreText); port the substitution table | DCText | 2 | **done** — with text |
 | text | 5,452 | Combine: CoreText plus the ported layout policy | DCText | 2 | **done** — 110 tests; line breaks identical on the corpus |
 | render | 13,813 | Port onto CoreGraphics | DCRender | 2, 4 | **done** — 225 tests; SSIMULACRA2 ≥ 89.2 on every corpus slide; Morph and transitions added in Wave 4 |

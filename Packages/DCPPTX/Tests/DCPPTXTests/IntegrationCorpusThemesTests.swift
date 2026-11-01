@@ -8,10 +8,10 @@
 // relationships are replaced with PowerPoint-shaped XML, and a two-master deck built in the model. The
 // check is open → save → reopen with nothing lost.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
-import DCZip
+import CNZip
 import Testing
 @testable import DCPPTX
 

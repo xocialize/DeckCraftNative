@@ -2,7 +2,7 @@
 // anchoring, autofit shrink, vertical text, decorations), and the heights and widths that fit it. Port of
 // deckcraft crates/text/src/lib.rs (`layout`, `layout_scaled`, `merge_decos`, `kashida_opportunities`,
 // `fit_height`, `fit_width`; MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Synchronization

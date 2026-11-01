@@ -6,7 +6,7 @@
 // within `tolerance`. Everything else (the synthetic deck's scripts, fonts and features) is measured and
 // reported, not asserted: CoreText shapes where deckcraft runs HarfRust, so advances can differ by a
 // fraction of a point and a line can break one word earlier or later (PORT-NOTES.md).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCText

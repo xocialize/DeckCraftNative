@@ -6,8 +6,12 @@ set -euo pipefail
 here=${0:A:h}
 repo=${here:h:h}
 : ${DECKCRAFT_SRC:=${repo:h}/deckcraft}
+# serde2swift.py lives in CraftNativeKit (moved there with CNCore, 2026-11-01): its checkout beside this repo, else
+# the copy SwiftPM fetched.
+: ${CRAFTNATIVEKIT:=${repo:h}/CraftNativeKit}
+[[ -f $CRAFTNATIVEKIT/Tools/port/serde2swift.py ]] || CRAFTNATIVEKIT=$repo/.build/checkouts/CraftNativeKit
 M=$DECKCRAFT_SRC/crates/model/src
-python3 -I $here/serde2swift.py $repo/Packages/DCModel/Sources/DCModel/Types.generated.swift \
+python3 -I $CRAFTNATIVEKIT/Tools/port/serde2swift.py $repo/Packages/DCModel/Sources/DCModel/Types.generated.swift \
   --module DCModel \
   --header "deckcraft crates/model at the pin in Tools/oracle/pin.env (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors)." \
   --import DCColor --import DCGeometry \

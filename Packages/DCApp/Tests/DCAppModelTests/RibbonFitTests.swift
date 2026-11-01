@@ -1,6 +1,6 @@
 // DCAppModelTests — R3 of Docs/plans/Ribbon-and-StartScreen.md: folding the ribbon (`RibbonFit`) and moving keyboard
 // focus through it (`RibbonFocus`), without a window. The widths are made up here; the app measures its own.
-import DCCore
+import CNCore
 import Testing
 @testable import DCAppModel
 

@@ -4,7 +4,7 @@
 // tolerances are the Rust ones unless a comment says otherwise.
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

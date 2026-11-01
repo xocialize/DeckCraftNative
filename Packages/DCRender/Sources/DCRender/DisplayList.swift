@@ -8,7 +8,7 @@
 // resolution asked for: on its own when it only needs its own content (blur, or a compose mode inside
 // it), or with everything below it when it composes onto the backdrop.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCGeometry
 
 public struct DisplayList: Sendable {

@@ -6,7 +6,7 @@
 // lay the grid back out, so merges anywhere in the table survive.
 // Port of deckcraft crates/engine/src/drawtable.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum DrawTable {

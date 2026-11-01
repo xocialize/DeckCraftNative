@@ -2,7 +2,7 @@
 // the contextual sections, comments, the Thesaurus, the SmartArt Text Pane, the Design tab's menus, Align to
 // Slide, split buttons' main halves and the Quick Access Toolbar. Each test names the deckcraft test
 // (`crates/ui-egui`) whose behaviour it ports; Rust names in camelCase.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

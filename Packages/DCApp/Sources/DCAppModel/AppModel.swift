@@ -6,7 +6,7 @@
 // `AppModel.run`. UI commands that only change UI state are answered here; the ones that need a window
 // (dialogs, the show, file pickers, printing, the backstage) go to the `AppHost`; everything else is the
 // engine's. The model owns the one `Session` every window shares, as deckcraft's app does.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Observation

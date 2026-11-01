@@ -2,7 +2,7 @@
 // Ports the tests of deckcraft crates/engine/src/recovery.rs and file_access.rs (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors).
 import Darwin
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import Foundation

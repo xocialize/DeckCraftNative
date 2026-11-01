@@ -4,7 +4,7 @@
 // slide read without pictures; a file the engine can't read gives that package picture or nothing (Quick
 // Look then shows the generic icon). Not a port: deckcraft has no Quick Look extension.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCExtensionKit
 import DCModel
 import DCRender

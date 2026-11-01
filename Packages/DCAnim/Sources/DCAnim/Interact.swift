@@ -11,7 +11,7 @@
 //   while its slide is shown, so it goes on where it stopped when the show returns;
 // - with "advance on click" off a click never leaves the slide, but it still plays animation steps;
 // - a slide the show returns to (link or arrow keys) looks as it was left.
-import DCCore
+import CNCore
 import DCModel
 
 /// What was played on one slide.

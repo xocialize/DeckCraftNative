@@ -3,7 +3,7 @@
 // ascent/descent choice (FreeType's: OS/2 typo with USE_TYPO_METRICS, else hhea, else typo, else win),
 // weight, italic, underline and strikeout, and the `name` strings `english_or_first` picks.
 import CoreText
-import DCCore
+import CNCore
 import Foundation
 
 /// Big-endian readers over a table's bytes; out of range reads are nil.

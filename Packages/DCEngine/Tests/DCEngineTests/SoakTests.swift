@@ -4,7 +4,7 @@
 //
 // Seeded and deterministic. A failure gives the seed and the last commands so it replays.
 // `DECKCRAFT_SOAK_STEPS=50000 swift test --filter SoakTests` runs a long soak (with `DECKCRAFT_SOAK_SEED`).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCModel
 import Foundation

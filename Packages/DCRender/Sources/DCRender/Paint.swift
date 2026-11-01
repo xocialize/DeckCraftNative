@@ -3,7 +3,7 @@
 // contributors).
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

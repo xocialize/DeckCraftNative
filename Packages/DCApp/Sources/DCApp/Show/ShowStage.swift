@@ -6,7 +6,7 @@
 import AppKit
 import DCAnim
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCMedia
 import DCModel

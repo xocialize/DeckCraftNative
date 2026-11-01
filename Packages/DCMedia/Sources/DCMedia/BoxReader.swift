@@ -6,7 +6,7 @@
 // Every read checks the remaining length. Payloads are `ArraySlice`s of the one file buffer, so nothing
 // is copied; their indices are the file's.
 
-import DCCore
+import CNCore
 
 typealias Slice = ArraySlice<UInt8>
 

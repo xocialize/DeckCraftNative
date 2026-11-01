@@ -7,7 +7,7 @@
 import Accelerate
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 import ImageIO

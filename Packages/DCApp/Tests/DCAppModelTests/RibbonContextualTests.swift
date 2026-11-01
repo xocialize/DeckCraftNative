@@ -2,7 +2,7 @@
 // selection and are never switched to on their own (`ribbon.rs` `contextual` and `show`), every contextual
 // control runs its command with deckcraft's parameters, the galleries' sources, and a gallery pick being one undo
 // step. The theme gallery's tiles are the start window's.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

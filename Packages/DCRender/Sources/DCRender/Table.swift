@@ -1,7 +1,7 @@
 // DCRender — tables: cell fills from the table style (or overrides), borders, and cell text. Port of
 // deckcraft crates/render/src/table.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

@@ -1,7 +1,7 @@
 // DCEngineTests — the insert module: deckcraft crates/engine/src/cmd/insert.rs's tests (Date & Time, icons,
 // pictures and photo albums), icons.rs's, and the tests of tests.rs that exercise insert commands.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

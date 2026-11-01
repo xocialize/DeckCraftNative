@@ -2,7 +2,7 @@
 // Ported from kurbo 0.13.1 (MIT OR Apache-2.0, © the kurbo authors), keeping its formulas and operand
 // order so results match deckcraft's to the bit. CoreGraphics types appear only at the rendering
 // boundary, never in the model.
-import DCCore
+import CNCore
 import Darwin
 
 // MARK: - Rust float semantics

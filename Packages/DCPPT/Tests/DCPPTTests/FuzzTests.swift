@@ -10,7 +10,7 @@
 // Tools/legacy/crash-run.sh to open and render through dccli) and `current.ppt`, the input being read, which is what
 // a trap leaves behind to reproduce it.
 import DCAnim
-import DCCFB
+import CNCFB
 import DCEngine
 import DCModel
 import DCPPTX

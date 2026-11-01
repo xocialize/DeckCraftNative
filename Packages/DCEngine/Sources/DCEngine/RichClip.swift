@@ -6,7 +6,7 @@
 // pair when it copies, and reads it back on paste: bold, italic and underline survive. Anything else in
 // the markup is skipped. A hostile fragment is capped, never executed. Indices are UTF-8 byte offsets,
 // as in Rust; every cut falls on an ASCII delimiter, so it is always a character boundary.
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 

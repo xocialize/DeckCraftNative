@@ -1,7 +1,7 @@
 // DCPPTX — transitions and the animation timing tree. Port of deckcraft crates/pptx/src/write/timing.rs
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 
 extension PPTXWrite {

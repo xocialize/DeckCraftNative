@@ -7,7 +7,7 @@
 // Relationship-bearing SmartArt and OLE parts stay with issue #203. Media playback options stay with
 // #74. Animation rewind (`cTn fill="remove"`) stays with #77. This file does not assert those.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Testing

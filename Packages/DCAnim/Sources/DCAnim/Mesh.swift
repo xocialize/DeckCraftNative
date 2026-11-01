@@ -6,7 +6,7 @@
 // in screen space. `layerMesh` splits such quads into a grid whose vertices follow the projective map from
 // the source rectangle to the quad, so the picture looks like a flat card turned in 3-D. Rectangles and
 // parallelograms stay two triangles, wedges one: the per-frame cost stays a handful of vertices per layer.
-import DCCore
+import CNCore
 
 /// One mesh vertex: position in slide-unit space (0...1, y down), texture coordinate (0...1) and opacity
 /// (the layer's alpha times its corner fade, interpolated).

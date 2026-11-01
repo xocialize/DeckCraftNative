@@ -1,7 +1,7 @@
 // DCMedia — the Ogg demuxer (RFC 3533; pages, CRC, packet assembly across pages, codec headers) and
 // Ogg Opus timing (RFC 7845 §4). Port of deckcraft crates/ogg/src/lib.rs and the `OpusHead` parser of
 // crates/opus/src/header.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 
 enum OggCodec: Equatable {
     case opus, vorbis, flac, theora, speex, unknown

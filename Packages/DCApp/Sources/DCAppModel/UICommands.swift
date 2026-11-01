@@ -1,7 +1,7 @@
 // DCAppModel — the UI-only commands and the command palette. Port of `UI_COMMANDS` in deckcraft
 // `crates/ui-egui/src/lib.rs` and `palette_items` in `crates/ui-egui/src/menus.rs` (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 
 /// A command the UI handles itself (views, panes, zoom, the show, dialogs) rather than the engine.

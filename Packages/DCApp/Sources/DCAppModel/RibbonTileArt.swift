@@ -2,7 +2,7 @@
 // in the style, or of the layout's preview graphic (`SmartArtCommands.preview`, as deckcraft's `smartart_gallery`
 // draws its tiles), in the presentation's own theme. Pure and safe off the main thread: the presentation is a
 // value, and nothing is written to it. Not a port beyond what it names.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

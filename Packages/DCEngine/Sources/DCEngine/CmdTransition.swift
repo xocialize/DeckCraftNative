@@ -1,7 +1,7 @@
 // DCEngine — the `transition` command module: the Transitions tab.
 // Port of deckcraft crates/engine/src/cmd/transition.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCMedia
 import DCModel
 

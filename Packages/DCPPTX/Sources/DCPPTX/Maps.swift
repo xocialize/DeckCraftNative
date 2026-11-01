@@ -1,7 +1,7 @@
 // DCPPTX — mappings between our transition / animation ids and PresentationML elements and preset
 // numbers, shared by the reader and the writer. Port of deckcraft crates/pptx/src/maps.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 /// The `maps` module.

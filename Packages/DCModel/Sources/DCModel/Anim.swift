@@ -3,7 +3,7 @@
 //
 // Animations are kept as the flat, ordered list the Animation Pane shows; the PPTX writer builds the
 // nested timing tree from it and the reader flattens files back into it.
-import DCCore
+import CNCore
 import Darwin
 
 extension Transition {

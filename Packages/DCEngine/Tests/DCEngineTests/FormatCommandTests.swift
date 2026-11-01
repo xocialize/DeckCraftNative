@@ -6,7 +6,7 @@
 // Not ported here: tests.rs `what_a_command_acts_on_names_only_keys_it_takes` (ported by the core,
 // RegistryTests).
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCModel
 import Foundation

@@ -3,7 +3,7 @@
 // order (Docs/plans/Ribbon-and-StartScreen.md §4): every command deckcraft's ribbon runs has a control here, or is
 // left out with a reason; tab and group order follow what someone who knows PowerPoint expects.
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCTestSupport
 import Foundation

@@ -1,7 +1,7 @@
 // DCIntentsKit — what an intent run from the app's control channel produced (`intents.run`, DCApp's
 // `IntentsFeature`): the values each intent's `perform` reports, and the folder Export Presentation writes to.
 // Outside such a run (Shortcuts, Siri, Spotlight, the App Intents extension) reporting is a no-op.
-import DCCore
+import CNCore
 import Foundation
 
 /// The values an intent run from the control channel reported.

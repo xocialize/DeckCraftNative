@@ -3,7 +3,7 @@
 //
 // The deck is built here: an export of a new presentation with a SmartArt frame, data part and drawing
 // part written by the test. `deckcraft_engine::render::place_slide` is DCRender's `placeSlide`.
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

@@ -3,7 +3,7 @@
 // It registers no commands: `shape.effects` (`threeD`, `bevel`) and the picture styles use it.
 // Port of deckcraft crates/engine/src/cmd/three_d.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 import DCPPTX
 

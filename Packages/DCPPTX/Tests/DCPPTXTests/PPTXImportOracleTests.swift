@@ -4,11 +4,11 @@
 // - export: Swift writing a `.deckcraft` gives the package deckcraft wrote, part for part, byte for byte;
 // - the package Swift writes validates against the ECMA-376 Transitional schemas (`Tools/pptx/validate.sh`);
 // - deckcraft itself reads the Swift package back to the same model (when the oracle binary is built).
-import DCCore
+import CNCore
 import DCFormat
 import DCModel
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import Testing
 @testable import DCPPTX

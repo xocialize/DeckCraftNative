@@ -2,7 +2,7 @@
 // histogram, Pareto and box & whisker. Their data sits in `cx:chartData` as levels of points, and each
 // series names its layout (`layoutId`). Port of deckcraft crates/pptx/src/read/chartex.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 extension PPTXRead {

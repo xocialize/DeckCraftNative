@@ -2,7 +2,7 @@
 // draws in a stand-in; see `FontDB.documentFace`), and Replace Fonts.
 // Port of deckcraft crates/engine/src/fonts.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 import DCText
 

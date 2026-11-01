@@ -9,7 +9,7 @@
 // `Arc<Presentation>` becomes `DocRef`, an immutable box: its identity (`===`) is what Rust's
 // `Arc::ptr_eq` compares, so "the document changed" and "the document is saved" mean the same here.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

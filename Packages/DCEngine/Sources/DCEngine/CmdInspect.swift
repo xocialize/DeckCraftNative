@@ -1,7 +1,7 @@
 // DCEngine — inspection for agents: the deck, slides and shapes as JSON (verify work without screenshots).
 // Port of deckcraft crates/engine/src/cmd/inspect.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

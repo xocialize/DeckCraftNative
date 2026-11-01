@@ -1,7 +1,7 @@
 // DCFormat — outline text: slides from a tab-indented outline or Markdown, and the deck as an outline.
 // Port of deckcraft crates/format/src/lib.rs (`outline_to_slides`, `markdown_to_slides`,
 // `slides_to_outline`; MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 extension DeckFormat {

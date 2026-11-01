@@ -1,17 +1,19 @@
 #!/bin/zsh
-# Checks that compound files DCCFB writes open in two independent readers, olefile and Apache POI, with every storage
-# and stream where DCCFB put it and every stream's bytes intact (Docs/plans/Legacy-PPT-and-Encryption.md, E1). The
-# files come from DCCFBTests' writeFilesForOtherReaders (v3 and v4, mini and large streams, a DIFAT, 300 entries).
+# Checks that compound files CNCFB (CraftNativeKit) writes open in two independent readers, olefile and Apache POI, with every storage
+# and stream where CNCFB put it and every stream's bytes intact (Docs/plans/Legacy-PPT-and-Encryption.md, E1). The
+# files come from CNCFBTests' writeFilesForOtherReaders (v3 and v4, mini and large streams, a DIFAT, 300 entries).
 #
 #   Tools/legacy/check-cfb-writer.sh        prints one line per file; exit status = the number of failures
 set -uo pipefail
 root=${0:A:h:h:h}
+# The writing test is CraftNativeKit's (moved there 2026-11-01): its checkout beside this repo.
+kit=${CRAFTNATIVEKIT:-${root:h}/CraftNativeKit}
 tools=${LEGACY_TOOLS:-$HOME/Library/Caches/DeckCraftNative/legacy-tools}
 java=${JAVA:-/opt/homebrew/opt/openjdk/bin/java}
 py=$tools/venv/bin/python
 out=$(mktemp -d -t dccfb-written)
-(cd "$root" && swift build --build-tests --scratch-path .build-gate >/dev/null 2>&1) || { print -u2 "check-cfb-writer: build failed"; exit 99 }
-(cd "$root" && DCCFB_WRITE_DIR=$out swift test --skip-build --scratch-path .build-gate --filter "CompoundFileTests/writeFilesForOtherReaders" >/dev/null 2>&1) \
+(cd "$kit" && swift build --build-tests --scratch-path .build-gate >/dev/null 2>&1) || { print -u2 "check-cfb-writer: build failed"; exit 99 }
+(cd "$kit" && CNCFB_WRITE_DIR=$out swift test --skip-build --scratch-path .build-gate --filter "CompoundFileTests/writeFilesForOtherReaders" >/dev/null 2>&1) \
   || { print -u2 "check-cfb-writer: the writing test failed"; exit 99 }
 
 compare='

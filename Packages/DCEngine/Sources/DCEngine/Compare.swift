@@ -3,7 +3,7 @@
 // Port of deckcraft crates/engine/src/compare.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors). The data types were declared by the core (`DocState` holds a `Compare`); the diff,
 // `ChangeKey.of`, accept and reject follow them (the text agent, Wave 4).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

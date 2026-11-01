@@ -2,7 +2,7 @@
 // oracle (`Tools/oracle/oracle.sh build`) and against the oracle corpus. Tests that need the oracle skip
 // when it isn't built; those that need the corpus or the engine vectors skip without them.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCRender
 import DCTestSupport

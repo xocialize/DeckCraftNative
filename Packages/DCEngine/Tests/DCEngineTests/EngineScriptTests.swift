@@ -9,7 +9,7 @@
 // - The sample deck (`run --sample --save`): the corpus's `decks/sample.deckcraft`.
 //
 // A script that uses a command no module registers yet is skipped, naming the commands it waits for.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCModel

@@ -2,7 +2,7 @@
 // `Backend`. Port of deckcraft crates/mcp/src/tools.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors). The definitions are deckcraft's JSON values, so `tools/list` answers what
 // deckcraft's server answers, byte for byte.
-import DCCore
+import CNCore
 import DCEngine
 
 /// The result of `tools/call`: MCP content blocks plus the `isError` flag.

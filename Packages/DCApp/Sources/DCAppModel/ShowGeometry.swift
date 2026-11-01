@@ -3,7 +3,7 @@
 // the show's flipped views lay out). Port of the layout helpers of deckcraft `crates/ui-egui/src/show.rs`
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import CoreGraphics
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

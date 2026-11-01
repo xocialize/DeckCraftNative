@@ -3,7 +3,7 @@
 // `canvas::pointer` do, and then the app refreshes and hands on the engine's UI requests as `AppModel.run`
 // would. Behaviour from deckcraft `crates/ui-egui/src/lib.rs` (`keyboard`) and `canvas.rs` (`pointer`,
 // `trackpad_twist`) (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

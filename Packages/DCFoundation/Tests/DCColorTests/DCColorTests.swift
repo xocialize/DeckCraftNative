@@ -1,6 +1,6 @@
 // Ported from deckcraft crates/color/src/lib.rs tests (MIT OR Apache-2.0), plus JSON shape checks.
 import DCColor
-import DCCore
+import CNCore
 import Testing
 
 @Suite struct ColorTests {

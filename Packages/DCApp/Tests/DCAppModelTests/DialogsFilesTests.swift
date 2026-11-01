@@ -2,7 +2,7 @@
 // palette, without a window. Ported from deckcraft `crates/ui-egui/src/reuse_picker_tests.rs`,
 // `inbox_tests.rs`, `browsetheme_tests.rs`, `compare_tests.rs`, `backstage_tests.rs`, `settings.rs`,
 // `toast.rs` and `dialogs.rs` (MIT OR Apache-2.0); each test names its source.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

@@ -8,7 +8,7 @@
 // `rotated_tables_hit_the_cell_under_the_pointer`, `tables_with_a_file_defined_style_edit_and_resize`) are
 // whole, pointer steps included.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

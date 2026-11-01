@@ -2,7 +2,7 @@
 // for installed Symbol faces that map real Unicode, and the Unicode look-alikes bullets fall back to. Port
 // of deckcraft crates/text/src/lib.rs (`symbol_*`, `map_symbol_bullet`; MIT OR Apache-2.0, © ArtCraft
 // Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 
 /// Is `family` a symbol font (characters at U+F000 + code)?
 func isSymbolFont(_ family: String) -> Bool {

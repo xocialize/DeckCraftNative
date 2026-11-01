@@ -10,7 +10,7 @@
 // title only where its command's label doesn't name it (`app.dialog`, `view.pane`, a menu). The menus it opens are
 // `CommandMenus` where the toolbar has the same one; the ribbon's own menus list the commands they run in `also`,
 // and R1 builds them. `RibbonMap` (where each group lives in the Mac layout) is derived from this table.
-import DCCore
+import CNCore
 import Foundation
 
 /// The sizes a control or group takes as the ribbon narrows (§5).

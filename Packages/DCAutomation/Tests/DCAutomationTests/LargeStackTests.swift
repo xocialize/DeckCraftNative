@@ -3,7 +3,7 @@
 // the shape-tree walks, the renderer and the saved file's coder recurse once per level. The MCP server
 // and the control channel run the engine on an `EngineThread` (32 MiB), so these calls, made from Swift
 // Testing's concurrency threads, would crash without it.
-import DCCore
+import CNCore
 @testable import DCAutomation
 import DCEngine
 import Foundation

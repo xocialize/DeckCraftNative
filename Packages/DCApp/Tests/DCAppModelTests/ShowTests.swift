@@ -6,7 +6,7 @@
 import CoreGraphics
 import DCAnim
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

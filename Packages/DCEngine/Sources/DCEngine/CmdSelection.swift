@@ -3,7 +3,7 @@
 // `arrange.bringForward` / `arrange.sendBackward` (arrows) and `arrange.reorder` (drag and drop).
 // Port of deckcraft crates/engine/src/cmd/selection.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum SelectionCommands {

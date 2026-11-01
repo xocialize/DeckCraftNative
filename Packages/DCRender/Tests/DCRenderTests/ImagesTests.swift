@@ -3,7 +3,7 @@
 // test pictures are encoded with ImageIO here (the `image` crate there).
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 @testable import DCRender
 import Foundation

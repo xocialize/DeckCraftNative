@@ -2,7 +2,7 @@
 // MCP. Port of deckcraft crates/mcp/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors): every test, through `MCPServer.handleLine`, the path a stdio line takes (the SDK server
 // and the engine thread included).
-import DCCore
+import CNCore
 @testable import DCAutomation
 import DCEngine
 import Foundation

@@ -8,7 +8,7 @@
 //   dccli app --port 4242 --method intents.result '{"token":1}'
 import AppIntents
 import DCAutomation
-import DCCore
+import CNCore
 import DCIntentsKit
 import Foundation
 

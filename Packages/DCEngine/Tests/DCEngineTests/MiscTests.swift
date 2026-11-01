@@ -3,7 +3,7 @@
 // Ports the tests of deckcraft crates/engine/src/media_refs.rs, sounds.rs, keys.rs, tests_keys.rs,
 // cmd/selection_tests.rs and the sample and connector tests of tests.rs (MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

@@ -12,7 +12,7 @@
 // photos) becomes that JPEG, and any other goes to `PPTHooks.pict` (the engine draws it with AppKit, as PNG). Every
 // length comes from the file: each is checked against what's there, and inflating stops at `maxBytes`.
 import DCModel
-import DCZip
+import CNZip
 
 /// What a `.ppt` import needs from outside DCPPT, which has no drawing code of its own.
 public struct PPTHooks: Sendable {

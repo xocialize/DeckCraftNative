@@ -7,7 +7,7 @@
 // the input half of `ui` in `show.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import CoreGraphics
 import DCAnim
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCMedia

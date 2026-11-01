@@ -4,7 +4,7 @@
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors); the egui-harness parts are checked at
 // the level the Swift app exposes them.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

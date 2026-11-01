@@ -4,7 +4,7 @@
 // session. Nothing here touches the app's session, its windows or AppKit, so it runs in the App Intents
 // extension (`Apps/DeckCraftNative/Extensions/Intents`), in the app, and in tests alike.
 import AppIntents
-import DCCore
+import CNCore
 import DCEngine
 import DCExtensionKit
 import Foundation

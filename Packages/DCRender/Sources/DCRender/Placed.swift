@@ -2,7 +2,7 @@
 // text layer and links, for text extraction and for the slide show's click targets. Port of deckcraft
 // crates/render/src/placed.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

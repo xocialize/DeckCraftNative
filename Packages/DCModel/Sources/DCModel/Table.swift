@@ -2,7 +2,7 @@
 // table styles. Port of deckcraft crates/model/src/table.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 
 /// `a + b` saturating at `Int.max`, as Rust's `usize::saturating_add`.
 private func satAdd(_ a: Int, _ b: Int) -> Int {

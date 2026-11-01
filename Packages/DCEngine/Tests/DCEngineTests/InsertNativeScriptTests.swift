@@ -4,10 +4,10 @@
 // except the pictures' bytes: answers are compared with the byte counts of images (`bytes` of an image item,
 // `before` and `after` of `picture.compress`) left out, and each picture in the saved deck by its pixel size.
 import CoreGraphics
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import ImageIO
 import Testing

@@ -1,11 +1,11 @@
 // DCEngine — the File menu: new, open, save, export, close, properties, AutoRecover.
 // Port of deckcraft crates/engine/src/cmd/file.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCFormat
 import DCGeometry
 import DCModel
-import DCOffCrypto
+import CNOffCrypto
 import DCPPT
 import DCPPTX
 import DCRender
@@ -277,7 +277,7 @@ public enum FileCommands {
             return (p, lost)
         }
         if PPTX.isEncrypted(bytes) {
-            // deckcraft's sniffer sees encryption streams that DCCFB couldn't follow: a damaged protected file.
+            // deckcraft's sniffer sees encryption streams that CNCFB couldn't follow: a damaged protected file.
             throw EngineError.other("\(name) is password-protected, but the file is damaged and can't be opened.")
         }
         let lower = rustASCIILowercase(name)

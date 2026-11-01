@@ -1,11 +1,11 @@
 // DCEngine — password-protected presentations (Docs/plans/Legacy-PPT-and-Encryption.md §3–4): a password to open
-// (the file is encrypted, DCOffCrypto) and a password to modify (a verifier in `ppt/presentation.xml`; without the
+// (the file is encrypted, CNOffCrypto) and a password to modify (a verifier in `ppt/presentation.xml`; without the
 // password, the file opens read-only). Both are kept with the open document (`DocState.protection`), in memory
 // only, and applied when it is saved as `.pptx`, `.potx` or `.ppsx`; a format that can't hold them (`.deckcraft`,
 // an outline) saves without them, and the document then has none. Not a port: deckcraft has neither.
-import DCOffCrypto
+import CNOffCrypto
 import DCPPTX
-import DCZip
+import CNZip
 
 /// A presentation's passwords, kept with its open document.
 public struct DocProtection: Sendable, Equatable {

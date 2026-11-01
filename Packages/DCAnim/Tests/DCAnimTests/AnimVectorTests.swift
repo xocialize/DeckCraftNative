@@ -2,7 +2,7 @@
 // `DeckCraftNative-Fixtures/anim/` (easing, motion paths, transition layers and meshes, timelines, the show
 // state machine, Morph frames, morphXfrm and morphCrop) is replayed here and compared. The tests skip when
 // the fixtures aren't there (`Tools/oracle/anim-vectors/run.sh` writes them).
-import DCCore
+import CNCore
 import DCFormat
 import DCGeometry
 import DCModel

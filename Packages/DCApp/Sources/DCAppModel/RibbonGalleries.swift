@@ -4,7 +4,7 @@
 // animations,table,picture_format,smartart}.rs` and `galleries.rs` (`quick_styles`, `smartart_gallery`; MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors). DCApp's `RibbonGalleryView` draws the tiles: a
 // theme is the start window's tile for it, so both show the same picture.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

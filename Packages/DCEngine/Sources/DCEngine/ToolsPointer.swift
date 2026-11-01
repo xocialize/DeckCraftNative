@@ -5,7 +5,7 @@
 // one undo step. The UI, the control channel and MCP all come through here. Port of deckcraft
 // crates/engine/src/tools.rs (`Session::pointer` and the gesture handlers; MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

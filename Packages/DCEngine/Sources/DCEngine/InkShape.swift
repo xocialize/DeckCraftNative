@@ -5,7 +5,7 @@
 // Pure geometry so it is unit-tested with synthetic strokes. A stroke is closed when its ends meet; a
 // closed stroke is classified by how much of its bounding box it covers (rectangle ≈ 1, ellipse ≈ π/4,
 // triangle ≈ ½) and, for ellipses, by how evenly it keeps its distance from the centre.
-import DCCore
+import CNCore
 import Foundation
 
 public enum InkShape {

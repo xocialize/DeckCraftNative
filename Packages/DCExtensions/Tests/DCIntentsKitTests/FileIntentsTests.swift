@@ -4,7 +4,7 @@
 // the intents (they run in the App Intents extension now).
 import AppIntents
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCTestSupport
 import Foundation

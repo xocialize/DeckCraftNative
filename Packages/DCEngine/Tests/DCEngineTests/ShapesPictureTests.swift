@@ -3,7 +3,7 @@
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors). Merge Shapes runs on CoreGraphics' path
 // booleans, so its tests measure areas, as deckcraft's do.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

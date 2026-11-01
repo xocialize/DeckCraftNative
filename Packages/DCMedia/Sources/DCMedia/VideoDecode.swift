@@ -18,7 +18,7 @@ import AudioToolbox
 import CoreGraphics
 import CoreMedia
 import CoreVideo
-import DCCore
+import CNCore
 import Foundation
 import ImageIO
 import MediaImport

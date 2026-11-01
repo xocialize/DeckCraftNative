@@ -6,7 +6,7 @@
 // Directions follow the file format's option: for Push, Wipe, Cover, Uncover, Pan, Vortex, Cube… `dir` is
 // where things move (`l`: toward the left); for Glitter it is the side the effect starts from; Ripple's
 // corner is where the wave heads.
-import DCCore
+import CNCore
 import DCModel
 import Darwin
 

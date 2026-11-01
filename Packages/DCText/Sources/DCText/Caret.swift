@@ -2,7 +2,7 @@
 // testing, logical and visual movement, line navigation, selection as the union of visual boxes, and IME
 // composition underlines. Port of deckcraft crates/text/src/lib.rs (`impl LineInfo`, `impl TextLayout`;
 // MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 
 extension LineInfo {

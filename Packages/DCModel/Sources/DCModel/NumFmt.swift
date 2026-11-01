@@ -2,7 +2,7 @@
 // axes and data labels show them, in the chart's language (digit grouping and decimal mark). Port of
 // deckcraft crates/model/src/numfmt.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors), plus the Rust float semantics the chart, trendline and table ports share.
-import DCCore
+import CNCore
 import Foundation
 
 // MARK: - Rust semantics shared by Chart, Trendline, NumFmt and Table

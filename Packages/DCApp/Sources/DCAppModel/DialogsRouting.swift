@@ -4,7 +4,7 @@
 // purposes of deckcraft `crates/ui-egui/src/lib.rs`, the page table and `format_bytes` of `backstage.rs`,
 // `palette` of `menus.rs`, and `settings.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

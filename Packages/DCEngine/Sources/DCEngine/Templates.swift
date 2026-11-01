@@ -4,7 +4,7 @@
 //
 // Each deck is a few slides of our own text on one of our themes. Nothing here is copied from another
 // product's templates.
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

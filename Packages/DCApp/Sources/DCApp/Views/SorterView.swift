@@ -7,7 +7,7 @@
 // view, so a 1,000-slide deck draws a screenful of thumbnails.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DesignScaffold

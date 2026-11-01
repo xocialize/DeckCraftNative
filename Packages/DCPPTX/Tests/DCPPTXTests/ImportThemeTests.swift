@@ -4,7 +4,7 @@
 import DCColor
 import DCModel
 @testable import DCPPTX
-import DCZip
+import CNZip
 import Testing
 
 @Suite struct ImportThemeTests {

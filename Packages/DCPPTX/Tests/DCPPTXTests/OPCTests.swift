@@ -1,7 +1,7 @@
 // The tests of deckcraft crates/pptx/src/opc.rs, cfb.rs and png.rs (MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors).
 @testable import DCPPTX
-import DCZip
+import CNZip
 import Testing
 
 @Suite struct OPCTests {

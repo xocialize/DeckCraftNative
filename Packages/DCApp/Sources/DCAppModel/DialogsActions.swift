@@ -3,7 +3,7 @@
 // `restore_preferences`, `SlideApp::export_as` and `reuse_slides` in `lib.rs` (MIT OR Apache-2.0, © ArtCraft
 // Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

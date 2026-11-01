@@ -1,7 +1,7 @@
 // DCPPTX — table styles: our style ids ↔ table style GUIDs, and `tableStyles.xml` definitions for the
 // styles we write (generated from theme accents, matching how DeckCraft draws them). Port of deckcraft
 // crates/pptx/src/tables.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 /// The `tables` module.

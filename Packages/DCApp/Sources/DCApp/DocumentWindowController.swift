@@ -8,7 +8,7 @@
 // DeckCraft contributors); Reading View is the Show area's.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DesignScaffold
 import SwiftUI

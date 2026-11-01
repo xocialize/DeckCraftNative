@@ -1,7 +1,7 @@
 // DCAutomationTests — the loopback control server. Port of the tests in deckcraft
 // apps/deckcraft/src/control_server.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors), every one, plus its replies byte for byte and an end-to-end run through `Remote`.
-import DCCore
+import CNCore
 import DCEngine
 @testable import DCAutomation
 import Darwin

@@ -2,7 +2,7 @@
 // (`ThesaurusData.swift`, its `data/thesaurus.txt` verbatim), looked up offline.
 // Port of deckcraft crates/engine/src/thesaurus.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum Thesaurus {

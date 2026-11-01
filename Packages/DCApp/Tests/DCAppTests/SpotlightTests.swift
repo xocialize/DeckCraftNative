@@ -2,7 +2,7 @@
 // macOS doesn't call the import extension for them.
 import AppKit
 import CoreSpotlight
-import DCCore
+import CNCore
 import DCAppModel
 import DCEngine
 import Foundation

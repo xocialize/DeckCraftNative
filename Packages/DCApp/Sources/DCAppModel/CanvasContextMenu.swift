@@ -3,7 +3,7 @@
 // misspelt word's suggestions, Cut/Copy/Paste, the text, object or slide items), and what each item does.
 // The canvas turns it into an `NSMenu`; tests read it directly. (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors.)
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 

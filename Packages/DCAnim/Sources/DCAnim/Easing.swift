@@ -1,6 +1,6 @@
 // DCAnim — time easing: acceleration / deceleration fractions and bounce. Port of deckcraft
 // crates/anim/src/easing.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import Darwin
 
 /// Map linear progress `p` (0...1) through PowerPoint-style easing: `accel` and `decel` are the fractions of

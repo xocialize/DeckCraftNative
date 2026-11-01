@@ -14,7 +14,7 @@
 //   view that has the keyboard (the notes, the outline, an inspector field) instead of the slide.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

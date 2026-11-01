@@ -3,7 +3,7 @@
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors), on ImageIO. The pixels are the
 // same; the compressed streams are ImageIO's, so the bytes differ from deckcraft's.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCRender
 import Foundation
 import ImageIO

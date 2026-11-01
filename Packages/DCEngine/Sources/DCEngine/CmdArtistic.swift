@@ -11,7 +11,7 @@
 // The processed pixels are stored in the document, so the pixel algorithm is a port, not Core Image: the
 // same picture gives the same pixels as deckcraft. Only the PNG's compressed stream differs.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCModel
 import DCRender
 import Foundation

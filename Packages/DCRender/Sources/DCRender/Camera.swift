@@ -10,7 +10,7 @@
 // The presets' turns were fitted by deckcraft to PowerPoint's exports (black-box): points relative to the
 // shape's centre are turned `p = Rz(-rev) · Rx(lat) · Ry(lon) · (x, y, 0)` and, for perspective cameras,
 // scaled by `D / (D - p.z)` with `D = dist · max(w, h)`.
-import DCCore
+import CNCore
 import DCGeometry
 import Darwin
 

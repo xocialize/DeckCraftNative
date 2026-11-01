@@ -12,7 +12,7 @@
 // Pure logic: no rendering, no UI toolkit. Every function accepts hostile numbers (NaN, huge or negative
 // times) and never traps.
 import DCColor
-import DCCore
+import CNCore
 
 /// Animation state of one shape (or one paragraph of a shape's text) at one moment of the show.
 ///

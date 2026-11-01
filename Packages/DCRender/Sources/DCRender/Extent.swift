@@ -2,7 +2,7 @@
 // box. Port of deckcraft crates/render/src/extent.rs (`spill`, `slide_extent`, `layout_extent`; MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The editor's pasteboard regions come with
 // the app (Wave 5).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

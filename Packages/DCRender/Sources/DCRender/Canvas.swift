@@ -10,7 +10,7 @@
 import Accelerate
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 /// A rendered image: premultiplied RGBA8, rows top to bottom (deckcraft-render `Image`).

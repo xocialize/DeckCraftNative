@@ -6,7 +6,7 @@
 // output pixels per pattern pixel), so the marks, their density and their phase match it. Bit 7 of each
 // row is the leftmost cell; a set bit is the foreground colour.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 public enum Pattern {

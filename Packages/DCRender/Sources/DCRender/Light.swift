@@ -6,7 +6,7 @@
 // `c · (0.453 + 0.731 · max(0, n · L)) + 14.7` with the key light from the upper left. The other rigs and
 // materials are modelled on it, not measured.
 import DCColor
-import DCCore
+import CNCore
 import Darwin
 
 /// A light rig and material: what lights a 3-D surface.

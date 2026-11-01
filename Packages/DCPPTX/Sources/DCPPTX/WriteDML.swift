@@ -1,7 +1,7 @@
 // DCPPTX — DrawingML writing: colours, fills, lines, effects, transforms and text. Port of deckcraft
 // crates/pptx/src/write/dml.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

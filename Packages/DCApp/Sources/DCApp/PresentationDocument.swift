@@ -5,7 +5,7 @@
 // bytes are the ones `dccli` and the engine scripts write.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import UniformTypeIdentifiers

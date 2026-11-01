@@ -1,6 +1,6 @@
 // DCMedia — trim, fade and volume: the playback range of a clip and its gain over time. Port of deckcraft
 // crates/media/src/clip.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 
 /// How a clip plays (PowerPoint's Playback tab). Times in seconds.
 public struct ClipParams: Sendable, Equatable {

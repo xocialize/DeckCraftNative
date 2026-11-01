@@ -2,7 +2,7 @@
 // lowercase = relative) in slide-fraction units, relative to the shape's start position. Positions are
 // evaluated by arc length. Port of deckcraft crates/anim/src/path.rs (MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Darwin

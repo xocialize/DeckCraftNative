@@ -1,10 +1,10 @@
 // DCExtensionsTests — what Spotlight indexes, over the oracle corpus and damaged files.
 import CoreSpotlight
-import DCCore
+import CNCore
 @testable import DCExtensionKit
 import DCModel
 @testable import DCSpotlight
-import DCZip
+import CNZip
 import Foundation
 import Testing
 import UniformTypeIdentifiers

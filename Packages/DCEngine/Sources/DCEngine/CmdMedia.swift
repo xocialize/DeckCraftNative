@@ -3,7 +3,7 @@
 // host reports back through `Session.mediaStatus`, which `media.info` returns with the probe.
 // Port of deckcraft crates/engine/src/cmd/media.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCMedia
 import DCModel
 import DCRender

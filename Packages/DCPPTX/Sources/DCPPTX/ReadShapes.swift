@@ -2,7 +2,7 @@
 // OLE and other objects) and `p:contentPart` (3-D models). Port of deckcraft crates/pptx/src/read/shapes.rs
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

@@ -4,7 +4,7 @@
 // deckcraft `crates/ui-egui/src/ribbon.rs` (`contextual`, `fmt_state`, `enabled`) and the per-control parameters of
 // `ribbon/{home,transitions,animations,slide_show,view,shape_format,picture_format,table,smartart,playback,masters,
 // arrange}.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). DCApp's `RibbonView` draws what this answers.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

@@ -6,7 +6,7 @@
 // One frame per slide, drawn by the slide renderer and shown for `secondsPerSlide`. All parameters are
 // hostile: sizes, delays and slide lists are checked against fixed bounds, and the total number of pixels
 // encoded is capped.
-import DCCore
+import CNCore
 import DCModel
 import DCRender
 

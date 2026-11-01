@@ -1,7 +1,7 @@
 // DCAppModel — the dialogs' pure helpers: parsing and formatting fields, seeding from the selection, and
 // building command parameters. Port of the free functions of deckcraft `crates/ui-egui/src/dialogs.rs`
 // and `widgets::fmt_num` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

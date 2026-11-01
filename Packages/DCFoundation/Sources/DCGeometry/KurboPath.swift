@@ -2,7 +2,7 @@
 // flattening, signed area and exact bounding boxes. Ported from kurbo 0.13.1 (bezpath.rs, arc.rs,
 // line.rs, quadbez.rs, cubicbez.rs, common.rs, param_curve.rs; MIT OR Apache-2.0, © the kurbo
 // authors) with its formulas and operand order unchanged, so outlines match deckcraft's bit for bit.
-import DCCore
+import CNCore
 import Darwin
 
 // MARK: - Path elements

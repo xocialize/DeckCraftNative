@@ -3,7 +3,7 @@
 // `crates/ui-egui/src/animtimeline.rs` and the logic of `animation` in `panes.rs` (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors).
 import DCAnim
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 

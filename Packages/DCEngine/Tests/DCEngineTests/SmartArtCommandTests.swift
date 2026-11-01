@@ -2,13 +2,13 @@
 // Ports deckcraft crates/engine/src/cmd/smartart.rs's tests and the SmartArt tests of
 // crates/engine/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCGeometry
 import DCModel
 import DCPPTX
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

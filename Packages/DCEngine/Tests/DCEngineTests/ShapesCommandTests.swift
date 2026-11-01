@@ -4,7 +4,7 @@
 // tests of src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). A test that needs
 // a command of another group's module (`shape.insert`, `insert.picture`…) runs once that module registers it.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCGeometry

@@ -5,7 +5,7 @@
 // (`QLPreviewReply` with PDF data) rather than a view of its own. A file that can't be read gets a page that
 // says why. Not a port: deckcraft has no Quick Look extension.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCExtensionKit
 import DCModel

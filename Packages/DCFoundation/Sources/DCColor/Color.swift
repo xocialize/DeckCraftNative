@@ -2,7 +2,7 @@
 // luminance modulation/offset, alpha…), so theme-relative colours resolve the way presentation files
 // expect. Port of deckcraft crates/color/src/lib.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 import Darwin
 
 /// An sRGB colour with straight alpha, components 0–255.

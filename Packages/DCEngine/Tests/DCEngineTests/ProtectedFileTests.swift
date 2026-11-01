@@ -2,7 +2,7 @@
 // `file.openBytes` take a password; without one, or with a wrong one, the error says which; the password stays
 // with the open document only (not in the journal, AutoRecover or a reply); saving as .pptx keeps it, and a password
 // to modify opens the file read-only without it (E3).
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCTestSupport
 import Foundation

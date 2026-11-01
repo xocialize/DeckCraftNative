@@ -3,7 +3,7 @@
 // transition test of tests.rs, and the command-only checks of it/roundtrip.rs's transition-sound tests (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

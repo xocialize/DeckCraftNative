@@ -9,7 +9,7 @@
 //   deckcraft flags flagged too (the system checker may find more, and suggests its own corrections).
 //
 // The final deck is the oracle's in both runs: spelling changes name their words.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCModel
 import DCTestSupport

@@ -4,7 +4,7 @@
 // deckcraft's crates/render/tests/fixtures/colr-squares.ttf (contributor-original, CC0-1.0), embedded
 // below. Pixel positions and tolerances are the Rust ones unless a comment says otherwise.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

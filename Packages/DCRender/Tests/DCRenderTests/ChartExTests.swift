@@ -2,7 +2,7 @@
 // tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). Tolerances are the Rust
 // ones.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

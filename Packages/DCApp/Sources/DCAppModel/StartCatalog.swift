@@ -4,7 +4,7 @@
 // cached. Ports `new_tiles`, `template_tiles`, `split_path` and `recent_list`'s rows of deckcraft
 // `crates/ui-egui/src/backstage/files.rs`, and `recent_exists` of `app/files.rs` (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors). Docs/plans/Ribbon-and-StartScreen.md §7.
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

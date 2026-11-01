@@ -13,10 +13,10 @@
 //      hash of these atoms (HashCode10Atom, 2.8.3); when PowerPoint 97 or 2000 changed them after a newer version
 //      saved the tree, the hash no longer matches and the atoms win, as in PowerPoint.
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 import DCPPTX
-import DCZip
+import CNZip
 
 enum SlideShow {
     /// Most time nodes read from one slide, and how deep they nest.

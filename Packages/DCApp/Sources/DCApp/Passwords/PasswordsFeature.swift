@@ -7,7 +7,7 @@
 // `{password?: string|null, modifyPassword?: string|null}`, where a missing key leaves that password as it is and null
 // or "" removes it.
 import AppKit
-import DCCore
+import CNCore
 import DCAppModel
 import DCEngine
 

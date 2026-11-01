@@ -5,7 +5,7 @@
 // Morph frames (`render_blend`) and transitions are in Transition.swift, MorphPath.swift and MorphText.swift; the
 // renderer's part of an outline morph (`paths`, `morphs`, the per-sub-path fades) is here, as in the Rust.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

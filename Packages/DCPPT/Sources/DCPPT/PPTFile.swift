@@ -1,16 +1,16 @@
 // DCPPT — the legacy binary PowerPoint format ([MS-PPT] v2026-02), read: the container (P1 of
-// Docs/plans/Legacy-PPT-and-Encryption.md). A `.ppt` is a compound file (DCCFB) whose `Current User` stream points at
+// Docs/plans/Legacy-PPT-and-Encryption.md). A `.ppt` is a compound file (CNCFB) whose `Current User` stream points at
 // the newest UserEditAtom in the `PowerPoint Document` stream. Each edit (a save; PowerPoint appends one on every
 // incremental save) has a persist directory mapping persist object ids to stream offsets; the directories are merged
 // oldest first, so a newer save's objects replace older ones, and records no directory reaches are dead and ignored.
-// An encrypted file (RC4 CryptoAPI, DCOffCrypto) has a CryptSession10Container: every persist object but that one is
+// An encrypted file (RC4 CryptoAPI, CNOffCrypto) has a CryptSession10Container: every persist object but that one is
 // decrypted with its persist id as the block number, its record header included. Written from the specification;
 // deckcraft has no `.ppt` reader. ppt2pptx (MIT) was consulted as prior art.
 //
 // Every offset, length and id comes from the file: each is range-checked before use, the edit chain must move
 // backwards (and is bounded), and records nest no deeper than `maxDepth`. Nothing here traps.
-import DCCFB
-import DCOffCrypto
+import CNCFB
+import CNOffCrypto
 
 /// A `.ppt` file's container: its persist objects, decrypted when the file is encrypted.
 public struct PPTFile: Sendable {

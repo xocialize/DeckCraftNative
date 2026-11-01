@@ -5,7 +5,7 @@
 // routing, and its `ui.inspect` keys.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 
 @MainActor

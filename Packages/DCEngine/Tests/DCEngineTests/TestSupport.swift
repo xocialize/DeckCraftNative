@@ -1,11 +1,11 @@
 // DCEngineTests — helpers the engine tests share: JSON from text, the commands a test needs, and the
 // `presentation` member of a saved deck, as the oracle tests compare it.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCModel
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

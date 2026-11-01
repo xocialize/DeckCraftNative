@@ -2,7 +2,7 @@
 // `Tools/oracle/pointer-sessions/<name>.jsonl` (JSON-RPC lines: a presentation, pointer events of every tool
 // and drag kind, snapping on and off, modifiers, then a save) is run as the oracle ran it for
 // `$DECKCRAFT_FIXTURES/pointer/` (`Tools/oracle/oracle.sh pointer-vectors`).
-import DCCore
+import CNCore
 import DCTestSupport
 import Foundation
 import Testing
@@ -29,7 +29,7 @@ struct PointerSession: Sendable, CustomStringConvertible {
 
 @Suite("Pointer sessions through dccli mcp", .enabled(if: Binaries.haveDccli, "dccli isn't built"))
 struct PointerParityTests {
-    /// A saved deck's size is DCZip's deflate, not deckcraft's (the presentation inside is compared on its own).
+    /// A saved deck's size is CNZip's deflate, not deckcraft's (the presentation inside is compared on its own).
     static func masked(_ line: String) -> String {
         line.replacingOccurrences(of: #"\\"bytes\\": \d+"#, with: "<bytes>", options: .regularExpression)
     }

@@ -2,7 +2,7 @@
 // the UI, the control channel and MCP so a key does the same thing everywhere.
 // Port of deckcraft crates/engine/src/keys.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum Keys {

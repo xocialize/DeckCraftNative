@@ -2,7 +2,7 @@
 // the DeckCraft contributors). Series-level data labels: `c:dLbls/c:showVal` on a series overrides the
 // chart-wide setting, and a bare `<c:showVal/>` (no `val` attribute) means true, as the schema's default
 // (#868).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Testing

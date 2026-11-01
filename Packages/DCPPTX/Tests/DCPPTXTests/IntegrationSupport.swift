@@ -3,16 +3,16 @@
 // of these (`png`, `entries`, `rezip`, `round`…); here they're shared.
 //
 // - The `image` crate's PNGs come from ImageIO. Only their pixels and size matter to the tests.
-// - The `zip` crate's reader and writer are DCZip's. `SimpleFileOptions::default()` deflates, as
+// - The `zip` crate's reader and writer are CNZip's. `SimpleFileOptions::default()` deflates, as
 //   `ZipWriter.add(_:_:compress: true)` does.
 // - Strings are searched, sliced and replaced byte-wise, as Rust's `str` methods are.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCFormat
 import DCGeometry
 import DCModel
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import ImageIO
 import Testing

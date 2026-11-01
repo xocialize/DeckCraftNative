@@ -5,7 +5,7 @@
 // A diagram's data part holds its points (`dgm:pt`: the document, one per node, and the transitions
 // PowerPoint pairs with each link) and its links (`dgm:cxn` of type `parOf`, parent → child, ordered by
 // `srcOrd`). The outline is that tree flattened depth first.
-import DCCore
+import CNCore
 import DCModel
 
 /// The `dgm` module.

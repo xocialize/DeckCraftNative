@@ -1,7 +1,7 @@
 // Ported from deckcraft crates/anim/src/tests.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors): timelines, effects, motion paths, easing, transitions, Morph and the show's navigation.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

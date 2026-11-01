@@ -6,7 +6,7 @@
 // without its pictures (`DeckReader.readText`), so the cost follows the text, not the file. Not a port:
 // deckcraft has no Spotlight importer.
 import CoreSpotlight
-import DCCore
+import CNCore
 import DCExtensionKit
 import DCModel
 import Foundation

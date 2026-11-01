@@ -8,7 +8,7 @@
 // so the diagram keeps its size and place. Text typed straight into a diagram shape is read back into the
 // nodes before each regeneration.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import Foundation

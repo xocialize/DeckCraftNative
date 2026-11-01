@@ -8,7 +8,7 @@
 // scripted runs (`DECKCRAFT_NO_PREFS`) don't. Not a port: deckcraft has no Spotlight support.
 import AppKit
 import CoreSpotlight
-import DCCore
+import CNCore
 import DCEngine
 import DCSpotlight
 import os

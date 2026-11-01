@@ -5,7 +5,7 @@
 // Font fixtures are read from the deckcraft checkout beside this repository; tests that need them return
 // early without it.
 import CoreText
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 import Synchronization

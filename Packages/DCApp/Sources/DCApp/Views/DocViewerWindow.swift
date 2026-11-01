@@ -5,7 +5,7 @@
 // closes it, and closing it leaves the presentation open.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

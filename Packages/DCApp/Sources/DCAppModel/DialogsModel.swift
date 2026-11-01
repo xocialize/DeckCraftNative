@@ -8,7 +8,7 @@
 // through `set`, and buttons through `press`. Nothing below needs a window, so the dialogs are tested
 // and driven by the control channel (`ui.dialog.*`) exactly as the window drives them.
 import CoreText
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Observation

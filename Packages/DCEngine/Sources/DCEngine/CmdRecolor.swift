@@ -8,7 +8,7 @@
 // document (`clearColor`), so it decodes the picture as deckcraft does (DCRender's `Images.decode`, which
 // keeps a PNG's stored values exactly).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

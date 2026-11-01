@@ -6,7 +6,7 @@
 // Rust's `crate::cmd::*` free functions are `Cmd.*` here; the `cmd!` macro's three kinds are
 // `CommandSpec.cmd` (journaled, undoable), `.query` (neither) and `.noundo` (journaled only).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

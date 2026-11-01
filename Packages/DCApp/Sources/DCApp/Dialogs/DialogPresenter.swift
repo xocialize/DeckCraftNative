@@ -5,7 +5,7 @@
 // pickers of `apps/deckcraft/src/main.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DesignScaffold
 import SwiftUI

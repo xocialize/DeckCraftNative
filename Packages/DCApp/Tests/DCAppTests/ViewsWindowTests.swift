@@ -3,7 +3,7 @@
 // pane's saving (`status.rs` notes_pane), New Window (`doc_window.rs`), printing and the pasteboard
 // (`apps/deckcraft/src/pasteboard.rs`, `lib.rs`). Each test names its source, Rust names in camelCase.
 import AppKit
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

@@ -8,7 +8,7 @@
 // Chapters, Tags and Attachments (their elements are still walked and charged against the metadata
 // budget), CRC checking (off by default) and the packet-streaming `Demuxer`.
 
-import DCCore
+import CNCore
 
 private enum EBMLID {
     static let ebml: UInt32 = 0x1A45_DFA3

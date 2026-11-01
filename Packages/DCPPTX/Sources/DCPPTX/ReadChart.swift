@@ -2,7 +2,7 @@
 // deckcraft crates/pptx/src/read/chart.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 
 extension PPTXRead {

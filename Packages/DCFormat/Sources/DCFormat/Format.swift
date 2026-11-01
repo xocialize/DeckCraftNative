@@ -4,13 +4,13 @@
 // crates/format/src/lib.rs and finite.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
 //
-// `presentation.json` is written byte for byte as deckcraft writes it (DCCore's serde_json-compatible
+// `presentation.json` is written byte for byte as deckcraft writes it (CNCore's serde_json-compatible
 // writer; non-finite floats as `0.0`, as `finite::Finite` does). The zip around it is ours: the entries
 // and their contents match, the deflate streams and timestamps don't.
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
-import DCZip
+import CNZip
 
 public enum DeckFormat {
     public static let mimetype = "application/vnd.storyteller.deckcraft+zip"
@@ -122,7 +122,7 @@ extension DeckFormat {
     }
 
     /// The member named `name`. With duplicate names the last one wins, as in the Rust `zip` crate
-    /// deckcraft reads with (DCZip's own lookup keeps the first).
+    /// deckcraft reads with (CNZip's own lookup keeps the first).
     static func entry(_ z: ZipReader, _ name: String) -> ZipEntry? {
         z.entries.last { $0.name == name }
     }

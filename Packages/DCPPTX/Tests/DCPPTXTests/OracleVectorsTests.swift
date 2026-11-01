@@ -2,7 +2,7 @@
 // cfb, png, maps, custgeom, tables and dgm modules into a tool, runs them over the oracle corpus and over
 // generated inputs, and writes what they return to `DECKCRAFT_FIXTURES/pptx/`. Every line here is one
 // call, its inputs and deckcraft's result; the Swift port must give the same result, byte for byte.
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCPPTX

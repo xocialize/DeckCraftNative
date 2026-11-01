@@ -1,10 +1,10 @@
 // The oracle check for Wave 1: every `.deckcraft` the pinned Rust deckcraft-cli wrote opens here, and
 // saving it again writes the same `presentation.json` bytes; and the Rust app opens what this port writes.
-import DCCore
+import CNCore
 import DCFormat
 import DCModel
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

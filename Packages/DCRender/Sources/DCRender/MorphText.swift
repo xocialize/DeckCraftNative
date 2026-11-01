@@ -3,7 +3,7 @@
 // text fades out and the rest of the new one fades in, both riding the moving box. Port of deckcraft
 // crates/render/src/morph_text.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCText

@@ -3,7 +3,7 @@
 // © ArtCraft Team and the DeckCraft contributors). The Selection pane's ordering tests are in MiscTests.
 // guides_tests.rs' `drag_a_guide_drop_it_off_the_slide_and_snap_shapes_to_it` drives the pointer, so it is in
 // PointerTests.swift.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCFormat
 import DCGeometry

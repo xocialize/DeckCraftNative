@@ -7,12 +7,12 @@
 //   the XML or JSON, never the pictures, media, embedded files or fonts — into a new archive in memory and
 //   opens that. Missing media is something the engine already tolerates (it reports it as damage), so the
 //   slides, their text, notes and comments read the same, at a cost proportional to the text.
-import DCCore
+import CNCore
 import DCEngine
 import DCFormat
 import DCModel
 import DCPPTX
-import DCZip
+import CNZip
 import Foundation
 
 /// Why a file couldn't be read.

@@ -4,7 +4,7 @@
 // `shapes_gallery`, `table_grid_picker`, `chart_menu_types`, `photo_album_button`, the Draw pens) and
 // `split_button_tests.rs`' rule that every split item has a main command and a menu. MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors. No AppKit: DCApp turns the entries into NSMenus.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

@@ -2,7 +2,7 @@
 // dropped on the canvas becomes, and the keys the canvas hands the engine. Ports deckcraft
 // `crates/ui-egui/src/eyedropper.rs`, `infer_command` / `is_presentation_name` and `key_name` in
 // `crates/ui-egui/src/lib.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

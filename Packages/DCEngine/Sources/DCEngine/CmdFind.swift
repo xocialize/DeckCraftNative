@@ -2,7 +2,7 @@
 // and speaker notes.
 // Port of deckcraft crates/engine/src/cmd/find.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum FindCommands {

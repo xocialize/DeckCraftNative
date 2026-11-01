@@ -13,7 +13,7 @@
 // (false)`, malformed ones skipped), and how entity and character references resolve and attribute
 // values are normalised (XML 1.0 §3.3.3). Foundation's `XMLParser` is stricter than quick-xml and would
 // refuse parts deckcraft reads, so it isn't used.
-import DCCore
+import CNCore
 
 // MARK: - DOM
 

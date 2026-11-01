@@ -5,7 +5,7 @@
 // from_present` from `src/tests.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors) where they
 // apply; each names its source. Docs/plans/Ribbon-and-StartScreen.md §7, milestone S1.
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

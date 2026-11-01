@@ -9,7 +9,7 @@
 // backgrounds), OLE objects as their pictures, movies and sounds (Objects.swift), and comments. P5 brings the slide
 // show (SlideShow.swift): transitions, hidden slides and animations. The import report lists what isn't brought over,
 // and each object that became a picture.
-import DCCFB
+import CNCFB
 import DCColor
 import DCGeometry
 import DCModel

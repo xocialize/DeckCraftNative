@@ -2,7 +2,7 @@
 // keeps the embedded workbook and the other parts it points at. Port of deckcraft
 // crates/pptx/src/write/chart.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 
 extension PPTXWrite {

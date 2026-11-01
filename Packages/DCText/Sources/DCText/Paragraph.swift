@@ -9,7 +9,7 @@
 // of the paragraph as context, and CoreText's per-character string indices are merged into HarfRust's
 // monotone grapheme clusters here.
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 

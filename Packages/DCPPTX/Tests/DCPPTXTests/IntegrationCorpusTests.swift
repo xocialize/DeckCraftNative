@@ -5,7 +5,7 @@
 //
 // Each package is built here (nothing from another product). The check compares the text in the package
 // and the content parts. A second save must come out the same as the first.
-import DCCore
+import CNCore
 import DCModel
 import Testing
 @testable import DCPPTX

@@ -4,7 +4,7 @@
 // PowerPoint 97 edit from a current timing tree is PowerPoint's; and hostile timing records never trap.
 import DCModel
 import DCPPTX
-import DCZip
+import CNZip
 import Foundation
 import Testing
 @testable import DCPPT

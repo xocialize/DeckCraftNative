@@ -5,7 +5,7 @@ import DCTestSupport
 @testable import DCExtensionKit
 import DCModel
 @testable import DCQuickLook
-import DCZip
+import CNZip
 import Foundation
 import ImageIO
 import PDFKit

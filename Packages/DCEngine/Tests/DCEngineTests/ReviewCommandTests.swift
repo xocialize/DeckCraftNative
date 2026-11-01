@@ -10,7 +10,7 @@
 // commands use them once registered (`shape.insert`, `insert.textBox`, `insert.table`); until then the
 // same shape is added directly (`insertShape`, `insertTextBox`, `insertTable` below), so they run today.
 import DCColor
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

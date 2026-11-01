@@ -2,7 +2,7 @@
 // of deckcraft crates/format/src/chart_parts.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
 import DCModel
-import DCZip
+import CNZip
 
 enum ChartParts {
     static let prefix = "chart-parts/"

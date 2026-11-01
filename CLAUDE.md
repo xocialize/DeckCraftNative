@@ -18,13 +18,15 @@ deckcraft (Rust) converted to a native macOS 26+ Swift app. [PLAN.md](PLAN.md) i
 
 ## Porting a crate
 
-Rust semantics live in DCCore, so use them rather than the Swift look-alikes:
+Rust semantics live in CNCore ([CraftNativeKit](https://github.com/xocialize/CraftNativeKit), shared with Marquee
+Documents since 2026-11-01, along with CNZip, CNCFB, CNOffCrypto and CNMetafile; a change there is a new kit
+version, tested in both apps), so use them rather than the Swift look-alikes:
 
 - **Casts.** `init(rustCast:)`, not `UInt8(x)`, which traps.
 - **Floats.** `clamped`, `rem`, `rustMin`/`rustMax`.
 - **Strings.** `rustTrim`, `rustLines`, `rustLowercase`, `rustEqual` (Swift's `==` equates canonically
   equivalent strings), `rustFixed` for `{:.N}`, and `String.charCount` for `chars().count()`.
-- **JSON.** serde-derived types are *generated*. `Tools/port/generate.sh` runs `Tools/port/serde2swift.py`
+- **JSON.** serde-derived types are *generated*. `Tools/port/generate.sh` runs CraftNativeKit's `Tools/port/serde2swift.py`
   over the crate's sources. Never hand-write or hand-edit a `Types.generated.swift`. The behaviour goes in
   hand-written files beside it, and the compiler lists what the generated code expects you to provide.
 

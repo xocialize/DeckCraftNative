@@ -2,7 +2,7 @@
 // clocks, clip lookup per slide, carry-over, the media bar and the GIF button, and the "can't play" state. Ported
 // from the tests of deckcraft `crates/ui-egui/src/media.rs` and the media tests of `show.rs` (names in camelCase).
 import CoreGraphics
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCMedia

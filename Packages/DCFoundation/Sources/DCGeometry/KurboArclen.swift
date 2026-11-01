@@ -4,7 +4,7 @@
 // (`offset::offset_cubic`), `Affine::svd` and `Ellipse`. Ported from kurbo 0.13.1 (MIT OR Apache-2.0,
 // © the kurbo authors: common.rs, line.rs, quadbez.rs, cubicbez.rs, bezpath.rs, offset.rs, affine.rs,
 // ellipse.rs, arc.rs), keeping its formulas and operand order.
-import DCCore
+import CNCore
 import Darwin
 
 // MARK: - Gauss–Legendre tables (kurbo common.rs)

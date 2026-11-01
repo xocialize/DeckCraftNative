@@ -7,7 +7,7 @@
 // material, and the sides are drawn farthest first. Without a turned camera an extrusion points at the
 // viewer and nothing of it shows.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

@@ -4,7 +4,7 @@
 // deckcraft-cli's (`dccli` speaks as `deckcraft-cli`, whose behaviour it is).
 import DCAnim
 import DCAutomation
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

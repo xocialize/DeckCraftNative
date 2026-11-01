@@ -4,7 +4,7 @@
 // swipes (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). Each test names its source, Rust
 // names in camelCase; the triage of all 62 is in PORT-NOTES.md ("lib.rs tests").
 import DCAnim
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

@@ -3,7 +3,7 @@
 // path morphs) (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). Pixel positions and
 // tolerances are the Rust ones.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

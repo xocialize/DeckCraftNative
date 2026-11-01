@@ -2,7 +2,7 @@
 // the tests in deckcraft crates/ui-egui/src/control.rs (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors); `screenshot_reply_is_path_only_or_explicitly_inline` belongs with the window's
 // capture (Wave 5).
-import DCCore
+import CNCore
 @testable import DCAutomation
 import DCEngine
 import Foundation

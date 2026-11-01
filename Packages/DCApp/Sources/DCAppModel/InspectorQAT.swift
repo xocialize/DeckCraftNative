@@ -2,7 +2,7 @@
 // `crates/ui-egui/src/qat.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors). On the Mac
 // the title bar's Quick Access Toolbar becomes the window toolbar's customisable items: these buttons are
 // toolbar items, and `app.qat` adds and removes them.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 

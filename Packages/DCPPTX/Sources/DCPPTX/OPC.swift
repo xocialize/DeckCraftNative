@@ -2,15 +2,15 @@
 // Port of deckcraft crates/pptx/src/opc.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
 //
-// The archive is read with DCZip's `ZipReader` and each entry is inflated here, so the budgets charge
+// The archive is read with CNZip's `ZipReader` and each entry is inflated here, so the budgets charge
 // what deckcraft's `zip` crate (3.0.0) reading charges: an entry is read through `take(cap + 1)` and
 // its CRC is checked only when it was read to its end. Entries with the same name collapse as the zip
 // crate's `IndexMap` collapses them: the first one's place, the last one's data. The archive written
 // by `PackageOut` matches deckcraft's entry for entry (names, order, contents, store or deflate); its
 // DEFLATE streams and timestamps don't.
 import Compression
-import DCCore
-import DCZip
+import CNCore
+import CNZip
 import Synchronization
 
 /// The `opc` module's free functions and constants.

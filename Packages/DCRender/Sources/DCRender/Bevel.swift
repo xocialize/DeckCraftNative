@@ -6,7 +6,7 @@
 // Fitted by deckcraft to PowerPoint's export of bevel presets on a solid-filled shape with the default
 // three-point light rig and matte material (Light.swift), within about 15 grey levels RMS across the band.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 
 /// A top bevel: its width and height in points and its preset.

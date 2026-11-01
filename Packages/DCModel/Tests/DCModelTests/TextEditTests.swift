@@ -1,6 +1,6 @@
 // Ported from deckcraft crates/model/src/{words,edit,bidi,anim}.rs tests (MIT OR Apache-2.0, © ArtCraft
 // Team and the DeckCraft contributors). The word-stop traces are PowerPoint's, as deckcraft observed them.
-import DCCore
+import CNCore
 @testable import DCModel
 import Testing
 

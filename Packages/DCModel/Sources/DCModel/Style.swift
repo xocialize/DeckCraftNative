@@ -1,7 +1,7 @@
 // DCModel — colours, fills, lines and effects. Port of deckcraft crates/model/src/style.rs (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 
 extension ColorRef {
     public static func rgb(_ c: Rgba) -> ColorRef { ColorRef(base: .rgb(rgb: c), mods: []) }

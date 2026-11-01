@@ -4,7 +4,7 @@
 // the Thesaurus, and the Quick Access Toolbar. Ports the state `SlideApp` keeps for the panes and the ribbon
 // in deckcraft `crates/ui-egui/src/lib.rs`, `ribbon.rs` and `panes.rs` (MIT OR Apache-2.0, © ArtCraft Team
 // and the DeckCraft contributors). Every action runs a registry command through `AppModel.run`.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

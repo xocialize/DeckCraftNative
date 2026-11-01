@@ -2,7 +2,7 @@
 // accessibility, Compare) and the Slide Show requests.
 // Port of deckcraft crates/engine/src/cmd/review.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 import Foundation
 

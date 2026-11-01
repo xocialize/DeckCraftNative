@@ -7,7 +7,7 @@
 // thumbnails come from `Thumbnails` (drawn off the main thread), so a 1,000-slide deck stays responsive.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

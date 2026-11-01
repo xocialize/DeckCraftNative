@@ -8,7 +8,7 @@
 // grayscale. `{path}` prints to a PDF file without the panel (scripts and tests).
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import DCRender

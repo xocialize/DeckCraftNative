@@ -4,7 +4,7 @@
 // needs a `chartStyle` and a `chartColorStyle` relationship to parts that follow the cs: schema; it also takes
 // its default formatting from them, so empty ones open but draw unfilled bars. Built from the cs:chartStyle
 // and cs:colorStyle structure (MS-ODRAWXML) and DrawingML's style references.
-import DCCore
+import CNCore
 
 extension PPTXWrite {
     static let nsCS = "http://schemas.microsoft.com/office/drawing/2012/chartStyle"

@@ -6,7 +6,7 @@ import CryptoKit
 import DCEngine
 import DCModel
 import DCPPTX
-import DCZip
+import CNZip
 import Foundation
 import Testing
 @testable import DCPPT

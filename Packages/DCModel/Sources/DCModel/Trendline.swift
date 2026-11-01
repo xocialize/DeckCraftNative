@@ -1,7 +1,7 @@
 // DCModel — least-squares trendlines: linear, exponential, logarithmic, polynomial, power, and a moving
 // average. The fit is what the chart drawer plots and what the axis grows to include. Port of deckcraft
 // crates/model/src/trendline.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import Foundation
 
 /// A fitted trendline. `y` is nil where the model is undefined (a log of a non-positive x, an

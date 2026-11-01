@@ -1,7 +1,7 @@
 // DCAppModel — the dialogs deckcraft has, their titles and buttons. Port of `title` and the `buttons` each
 // body draws in deckcraft `crates/ui-egui/src/dialogs.rs` (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 
 public enum DialogCatalog {

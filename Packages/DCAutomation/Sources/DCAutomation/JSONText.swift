@@ -2,7 +2,7 @@
 // `JSON.display`) and `to_string_pretty` (serde_json 1.0.154's `PrettyFormatter`, MIT OR Apache-2.0: two
 // spaces, `": "`, `[]` and `{}` for empty containers), both over the value as a serde_json `Value` holds it
 // (keys sorted, `f32` widened).
-import DCCore
+import CNCore
 import DCEngine
 
 extension JSON {

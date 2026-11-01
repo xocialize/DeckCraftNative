@@ -3,13 +3,13 @@
 // Ports deckcraft crates/engine/tests/it/show_clicks.rs, tests/it/chart_native.rs and
 // tests/show_paragraph_builds.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
 import DCAnim
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel
 import DCPPTX
 import DCRender
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

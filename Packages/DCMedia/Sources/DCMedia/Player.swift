@@ -10,7 +10,7 @@
 // Audio is decoded once per media item, on a worker thread, and cached with its source bytes; a cached entry
 // is reused only for the same `mediaKey` *and* the same bytes. A voice whose audio is still decoding holds at
 // its start (`.loading`); one whose audio can't be decoded runs silently and reports why.
-import DCCore
+import CNCore
 import Foundation
 import Synchronization
 

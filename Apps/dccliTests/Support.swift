@@ -4,11 +4,11 @@
 // match.
 import CoreGraphics
 import Darwin
-import DCCore
+import CNCore
 import DCEngine
 import DCRender
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import ImageIO
 import Testing

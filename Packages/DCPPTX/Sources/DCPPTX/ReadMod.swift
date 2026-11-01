@@ -6,7 +6,7 @@
 // `PPTXRead`; `Imp` (import state shared by every part) is a class, as Rust passes it `&mut` everywhere.
 // Maps that Rust keys by `String` are keyed by `ByteKey` here, so part names compare byte for byte.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 

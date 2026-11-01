@@ -6,7 +6,7 @@
 // contributors). Pictures are decoded and the PNG written with ImageIO instead of the `image` crate: the
 // matte's pixels are the same, the PNG's compressed bytes are not.
 import CoreGraphics
-import DCCore
+import CNCore
 import DCModel
 import DCRender
 import Foundation

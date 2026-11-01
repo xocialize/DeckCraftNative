@@ -2,7 +2,7 @@
 // tests; `capture.rs`' tests check egui's screenshot budget and settle passes, which AppKit and
 // ScreenCaptureKit do differently (see Packages/DCApp/PORT-NOTES.md, Automation).
 import AppKit
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import Testing

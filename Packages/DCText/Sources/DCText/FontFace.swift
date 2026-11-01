@@ -3,7 +3,7 @@
 // as skrifa reads them (`SFNT.info`); glyph mapping, advances and ligature carets from CoreText at the em
 // size, so every value is in font units.
 import CoreText
-import DCCore
+import CNCore
 import Foundation
 import Synchronization
 

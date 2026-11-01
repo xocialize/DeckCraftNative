@@ -5,7 +5,7 @@
 // deckcraft hands plain audio files (WAV, AIFF, CAF, FLAC, MP3, ADTS, Ogg Vorbis/FLAC) to symphonia's
 // probe. symphonia is MPL-2.0, so it is not ported: `PlainAudio` reads those headers from their
 // specifications, and the oracle (Tools/oracle/media-vectors) checks it gives the same answers.
-import DCCore
+import CNCore
 
 enum Probe {
     static func ms(_ secs: Double) -> UInt64 {

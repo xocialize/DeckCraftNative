@@ -5,7 +5,7 @@
 // with DesignScaffold's tokens.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCModel
 import DesignScaffold
 import SwiftUI

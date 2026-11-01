@@ -4,7 +4,7 @@
 // `box_handles`, `wordart_handles`, `hit_shape`, `text_member_at`, `member_at`, `shape_in_front`,
 // `edited_box`, `edit_zone`, `in_table_cell`, `guide_at`, `text_pos`, `table_rows`; MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 import DCRender

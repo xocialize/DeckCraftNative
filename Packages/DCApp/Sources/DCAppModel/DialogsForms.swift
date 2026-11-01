@@ -5,7 +5,7 @@
 // deckcraft seeds a field the first frame it draws it (`d.get(key, default)`); here every field is seeded
 // when the dialog opens, so the form is a pure function of the fields.
 import DCColor
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

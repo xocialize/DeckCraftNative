@@ -6,7 +6,7 @@
 // connector ends following them. Links to another reused slide follow its copy.
 // Port of deckcraft crates/engine/src/cmd/reuse.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft
 // contributors).
-import DCCore
+import CNCore
 import DCModel
 
 public enum ReuseCommands {

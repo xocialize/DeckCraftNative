@@ -1,7 +1,7 @@
 // The tests of deckcraft crates/pptx/src/write/dml.rs, shapes.rs and chart.rs (MIT OR Apache-2.0,
 // © ArtCraft Team and the DeckCraft contributors).
 import DCColor
-import DCCore
+import CNCore
 import DCModel
 @testable import DCPPTX
 import Testing

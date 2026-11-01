@@ -2,7 +2,7 @@
 // POI reads; encrypted ones open with their password (and PowerPoint's default one without asking); PowerPoint's own
 // files (local only) open; hand-built streams exercise incremental saves, which no generated file has; and damaged
 // input never traps or hangs.
-import DCCFB
+import CNCFB
 import DCGeometry
 import DCModel
 import DCTestSupport

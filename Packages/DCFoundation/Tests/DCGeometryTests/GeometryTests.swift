@@ -1,6 +1,6 @@
 // Ported from deckcraft crates/geom/src/lib.rs `mod tests` (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors).
-import DCCore
+import CNCore
 @testable import DCGeometry
 import Testing
 

@@ -7,7 +7,7 @@
 // `apply_ime_event`) and `canvas.rs` (`ime_area`, `text_marks`) (MIT OR Apache-2.0, © ArtCraft Team and the
 // DeckCraft contributors). deckcraft feeds egui's IME events (preedit, commit, delete-surrounding) to the
 // engine; AppKit's equivalents are `setMarkedText`, `insertText` and replacement ranges.
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

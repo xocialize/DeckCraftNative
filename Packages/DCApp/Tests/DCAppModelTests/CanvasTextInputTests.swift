@@ -5,7 +5,7 @@
 // behaviour each checks, through AppKit's calls instead of egui's IME events. The tests of egui's own IME
 // plumbing (reset fences, descriptors, tombstones, viewports) have no AppKit counterpart: the input context
 // keeps that state itself (see PORT-NOTES).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

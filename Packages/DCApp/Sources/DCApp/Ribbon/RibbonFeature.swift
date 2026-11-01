@@ -5,7 +5,7 @@
 // keeps the window, so the document, the selection and the undo stack are untouched. Also `ui.inspect`'s `ribbon`.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import Observation
 import SwiftUI

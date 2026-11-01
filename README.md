@@ -66,11 +66,10 @@ wave and crate by crate, is in [PORT-STATUS.md](PORT-STATUS.md).
 
 | Package | What | Replaces / ports |
 |---|---|---|
-| `DCCore`, `DCZip` | serde-compatible JSON, Rust semantics; ZIP | — |
+| [CraftNativeKit](https://github.com/xocialize/CraftNativeKit) (`CNCore`, `CNZip`, `CNCFB`, `CNOffCrypto`, `CNMetafile`) | serde-compatible JSON, Rust semantics; ZIP; compound files; Office encryption; EMF, EMF+, WMF. Shared with Marquee Documents | `metafile` |
 | `DCFoundation` (`DCGeometry`, `DCColor`) | units, transforms, preset shapes, warps; DrawingML colour | `geom`, `color` |
 | `DCModel`, `DCFormat` | the presentation model; `.deckcraft` | `model`, `format` |
 | `DCText` | CoreText under deckcraft's layout policy; craft-fonts | `text`, `fonts` |
-| `DCMetafile` | EMF, EMF+, WMF | `metafile` |
 | `DCRender` | the CoreGraphics renderer, vector PDF, transitions | `render`, `pdf` |
 | `DCPPTX` | PPTX read and write | `pptx` |
 | `DCAnim`, `DCMedia` | timeline, show, transitions, Morph; media on AVFoundation | `anim`, `media` and the codecs |

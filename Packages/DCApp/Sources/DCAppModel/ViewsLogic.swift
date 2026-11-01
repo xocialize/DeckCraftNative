@@ -4,7 +4,7 @@
 // arithmetic of `thumbs.rs`, `command`/`shift`/`window_title` (`doc_window.rs`), the status bar's texts
 // (`status.rs`, `selected_language` in `dialogs.rs`) and `outline_estimate`/`outline_slide` (`sorter.rs`)
 // (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCModel
 import Foundation

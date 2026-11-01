@@ -1,6 +1,6 @@
 // DCPPTX — slide transitions (`p:transition`) and animations (`p:timing`). Port of deckcraft
 // crates/pptx/src/read/timing.rs (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCModel
 
 extension PPTXRead {

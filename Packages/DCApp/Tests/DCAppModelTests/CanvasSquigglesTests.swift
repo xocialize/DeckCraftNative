@@ -1,7 +1,7 @@
 // DCAppModelTests — spelling squiggles and the Eyedropper without a window. Ported from deckcraft
 // `crates/ui-egui/src/spelling_tests.rs` and `eyedropper_tests.rs` (MIT OR Apache-2.0, © ArtCraft Team and
 // the DeckCraft contributors).
-import DCCore
+import CNCore
 import DCEngine
 import DCGeometry
 import DCModel

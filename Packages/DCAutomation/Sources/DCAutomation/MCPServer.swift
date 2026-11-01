@@ -5,7 +5,7 @@
 // How the work is split:
 //
 // - `MCPServer` (an actor) is deckcraft's `Server::handle_line` / `handle`: it parses each line with
-//   serde_json's rules (DCCore), answers what isn't a request (parse errors, batches, invalid messages,
+//   serde_json's rules (CNCore), answers what isn't a request (parse errors, batches, invalid messages,
 //   notifications, responses), and hands each request to an SDK `Server` through an in-memory transport
 //   pair, one at a time and in order, as deckcraft's single-threaded loop runs them.
 // - The SDK server routes the request to its handler (`initialize`, `ping`, `tools/*`, `resources/*`),
@@ -18,7 +18,7 @@
 //   SDK alone (no exchange) the handlers still work, on its decoded values.
 //
 // A request's id goes to the SDK as a sequence number and comes back as the client's own id.
-import DCCore
+import CNCore
 import DCEngine
 import Foundation
 import MCP
@@ -371,7 +371,7 @@ public actor MCPServer {
     }
 }
 
-// MARK: - DCCore JSON and the SDK's Value
+// MARK: - CNCore JSON and the SDK's Value
 
 extension JSON {
     /// The SDK's value as JSON (a whole double stays a float).

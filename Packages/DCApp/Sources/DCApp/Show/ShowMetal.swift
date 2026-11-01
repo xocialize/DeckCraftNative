@@ -6,7 +6,7 @@
 // package needs no Metal resource step.
 import DCAnim
 import DCAppModel
-import DCCore
+import CNCore
 import DCMedia
 import DCRender
 import Metal

@@ -4,7 +4,7 @@
 // commands (`ribbon.rs`) and the pattern gallery (`pattern_fill_tests.rs`) against the engine.
 import AppKit
 import DCAppModel
-import DCCore
+import CNCore
 import DCEngine
 import DCRender
 import SwiftUI

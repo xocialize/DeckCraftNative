@@ -3,7 +3,7 @@
 // Ports the table tests of deckcraft crates/engine/src/tests.rs that drive `Session::pointer` (MIT OR
 // Apache-2.0, © ArtCraft Team and the DeckCraft contributors). The table tests that also click or drag among
 // the command tests (TableCommandTests) are whole there.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

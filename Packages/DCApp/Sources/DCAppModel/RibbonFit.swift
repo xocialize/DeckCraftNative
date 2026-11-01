@@ -4,7 +4,7 @@
 // and asks. deckcraft doesn't fold (its ribbon scrolls behind ‹ › chevrons, `ribbon.rs:191-262`, which is our last
 // resort); the order follows what PowerPoint for Mac does as its window narrows, written into `RibbonLayout`'s
 // `foldOrder`. Not a port.
-import DCCore
+import CNCore
 import Foundation
 
 /// The sizes a group steps down through as the ribbon narrows, largest first.

@@ -1,8 +1,8 @@
 // DCExtensionsTests — the corpus decks and the damaged files the extension tests read.
-import DCCore
+import CNCore
 import DCEngine
 import DCTestSupport
-import DCZip
+import CNZip
 import Foundation
 import Testing
 

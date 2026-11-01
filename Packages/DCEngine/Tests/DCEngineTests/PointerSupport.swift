@@ -1,6 +1,6 @@
 // DCEngineTests — what the pointer tests share: events as deckcraft's tests build them, `s.pointer(…)
 // .unwrap()`, and commands with JSON parameters.
-import DCCore
+import CNCore
 @testable import DCEngine
 import DCGeometry
 import DCModel

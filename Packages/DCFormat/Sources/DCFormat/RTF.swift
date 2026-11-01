@@ -6,7 +6,7 @@
 // paragraph (outline level = indent + 1, indented), keeping bold, italic and underline. The import reads
 // paragraphs and their `\outlinelevel` (or, failing that, `\li` indent) into the tab-indented outline
 // `outlineToSlides` understands.
-import DCCore
+import CNCore
 import DCModel
 
 public enum RTF {

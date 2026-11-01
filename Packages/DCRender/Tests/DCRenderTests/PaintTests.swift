@@ -4,7 +4,7 @@
 // positions, so they check the paint code apart from the renderer core.
 import CoreGraphics
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender

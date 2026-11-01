@@ -4,7 +4,7 @@
 // ImagesTests, PatternTests, TableTests and ThreeDTests already port are not repeated here. Pixel
 // positions and tolerances are the Rust ones unless a comment says otherwise.
 import DCColor
-import DCCore
+import CNCore
 import DCGeometry
 import DCModel
 @testable import DCRender
