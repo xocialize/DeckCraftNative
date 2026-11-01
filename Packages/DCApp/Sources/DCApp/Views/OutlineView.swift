@@ -208,6 +208,8 @@ final class OutlineRowView: NSTableCellView, NSTextFieldDelegate, NSTextViewDele
         title.placeholderString = String(localized: "Slide title", bundle: .module)
         title.lineBreakMode = .byWordWrapping
         title.cell?.wraps = true
+        // An editable field's cell scrolls, and a scrolling cell draws one line whatever its height.
+        title.cell?.isScrollable = false
         title.delegate = self
         title.setAccessibilityLabel(String(localized: "Slide title", bundle: .module))
         for v in [number, mark, title] { addSubview(v) }
