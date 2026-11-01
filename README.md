@@ -30,8 +30,9 @@ What isn't native yet, and why, is in [EVALUATION.md](EVALUATION.md).
 
 The interface is in English. **French, Italian, German and Spanish are previews**: AI-drafted from the English text
 and PowerPoint's own terms in each language, and not yet reviewed by native speakers. macOS shows them when one of
-those is your preferred language; anything not translated shows in English. Reviewers are welcome: the review
-sheets and how to use them are in [Docs/localization](Docs/localization/README.md).
+those is your preferred language; anything not translated shows in English. Reviewers are welcome: see
+[issue #1](https://github.com/xocialize/DeckCraftNative/issues/1), and the review sheets and how to use them in
+[Docs/localization](Docs/localization/README.md).
 
 ## How it was ported
 

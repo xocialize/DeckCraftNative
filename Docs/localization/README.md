@@ -14,7 +14,7 @@ until someone reviews it, and any string with no translation shows in English.
 | Spanish | `es` | preview, needs review | [review/es.csv](review/es.csv) |
 
 Volunteers are welcome. The tracking issue is
-[Review the French, Italian, German and Spanish translations](https://github.com/xocialize/DeckCraftNative/issues?q=is%3Aissue+label%3Atranslation).
+[#1, Review the French, Italian, German and Spanish translations](https://github.com/xocialize/DeckCraftNative/issues/1).
 
 ## Reviewing a language (no Xcode needed)
 
