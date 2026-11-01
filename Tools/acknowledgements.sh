@@ -40,7 +40,8 @@ tmp=$(mktemp)
     print "------------------------------------------------------------------------------------------------------------"
     print "${dir:t} (Swift package)"
     print "------------------------------------------------------------------------------------------------------------"
-    lic=$(ls "$dir" | grep -iE '^(LICENSE|LICENCE|COPYING)(\.(txt|md))?$' | head -1 || true)
+    # A dual-licensed package (CraftNativeKit: MIT or Apache-2.0) ships LICENSE-MIT; the Apache text ends this file.
+    lic=$(ls "$dir" | grep -iE '^(LICENSE|LICENCE|COPYING)(-MIT)?(\.(txt|md))?$' | head -1 || true)
     [[ -n $lic ]] && cat "$dir/$lic" || print "(no licence file in the package)"
     note=$(ls "$dir" | grep -iE '^NOTICE(\.(txt|md))?$' | head -1 || true)
     [[ -n $note ]] && { print; cat "$dir/$note"; }
