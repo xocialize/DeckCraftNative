@@ -13,7 +13,7 @@ Wave 6. Sources: each package's `PORT-NOTES.md`, `PORT-STATUS.md`, `WAVE5-PLAN.m
 | Tests | **2,144** across the packages, every one green and warning-free; deckcraft's 2,081 `#[test]`s ported where they test behaviour the Mac app has (the rest are egui internals, listed per area) |
 | Parity with deckcraft | `.deckcraft` and `.pptx` byte-identical both ways over the oracle corpus (apart from the chart fix below); slides render at SSIMULACRA2 ≥ 89 to deckcraft's PNGs; transitions ≥ 89; the Metal show ≥ 91 to the CPU compositor; MCP, `dccli` and the pointer byte-identical |
 | The alpha gate | deckcraft's six core workflows run end to end in the app through the control channel: **16 of 16** checks |
-| Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`), published on GitHub, latest [v0.1.11](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.11); Quick Look, Spotlight, App Intents; String Catalogs |
+| Shipping | a Developer ID–signed, notarized and stapled DMG (`Tools/release.sh`), published on GitHub, latest [v0.1.12](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.12); Quick Look, Spotlight, App Intents; String Catalogs |
 
 ## What became native
 
@@ -48,7 +48,7 @@ container probes whose results are stored in documents (ISOBMFF, Matroska, Ogg).
 
 | Item | Native path | Notes |
 |---|---|---|
-| **Translations** | String Catalogs are in place; every UI string is extracted (about 1,900 entries) and a pseudo-localisation run checked layout | No languages yet (user's decision for Wave 6). Some keys share one English word with different meanings ("Normal", "Center", "Zoom") and may need splitting for translators |
+| **Translations** | String Catalogs hold every UI string (2,778 entries); French, Italian, German and Spanish ship as previews since 0.1.12 ([Docs/localization](Docs/localization/README.md)); a pseudo-localisation run and a ribbon width check in each language checked layout | The four languages are AI-drafted and await native review ([#1](https://github.com/xocialize/DeckCraftNative/issues/1)). The engine's own text (placeholder prompts, default names, errors) stays English for DeckCraft parity. Some keys share one English word with different meanings ("Normal", "Center", "Zoom") and may need splitting for translators |
 | **AV1 on M1/M2** | none: VideoToolbox decodes AV1 on M3 and later only | Shows a clear "can't be played on this Mac" state. VP8 and VP9 play through libvpx (vpx-swift) since 2026-10-27 |
 | **Versions and autosave in place** | NSDocument `autosavesInPlace` | Off: the engine's AutoRecover keeps deckcraft's crash recovery. Moving to NSDocument autosave means reconciling the two |
 | **The sandbox / Mac App Store** | App Sandbox | Not sandboxed: the loopback control server and AutoRecover beside documents need decisions first (the extensions are sandboxed) |

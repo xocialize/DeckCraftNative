@@ -622,7 +622,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - Built from `d367c3e`, notarized, and accepted by Gatekeeper; the downloaded DMG is identical to the build. The
     installed 0.1.10 finds 0.1.11 through Check for Updates; 0.1.11 is now installed in `/Applications`, where it
     reports itself up to date.
-- **After 0.1.11 (unreleased): preview translations.** French, Italian, German and Spanish, AI-drafted for every
+- **Released as [v0.1.12](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.12) (2026-11-01): preview translations.** French, Italian, German and Spanish, AI-drafted for every
   String Catalog entry (2,778 per language).
   - **Terminology:** a glossary of Microsoft PowerPoint's own terms in each language (`Tools/l10n/glossary.json`).
   - **State:** every entry is marked `needs_review` until native speakers review it through the sheets in
@@ -632,6 +632,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     - `Tools/app/ribbon-widths.sh languages` lays every ribbon tab out at four widths in each language (336 PASS).
   - **Still English:** the engine's text stays English, to keep DeckCraft parity.
   - **Tooling:** `sync.sh` now keeps the Info.plist catalog's translations.
+  - **Quick Look:** the Quick Look and Thumbnail extensions declare the five languages (`CFBundleLocalizations`); without
+    it their resource bundle stayed English.
+  - **Release:** built from `18abd66` and notarized; the downloaded DMG is identical to the build. The installed 0.1.11
+    finds 0.1.12 through Check for Updates; 0.1.12 is now installed in `/Applications`.
 
 ## Pin moves
 
