@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Merged with the generated Info.plist. Thumbnails of DeckCraft's and Open XML presentations: the types are the app's (Support/Info.plist). CFBundleLocalizations: the extension's own bundle has no .lproj, and DCQuickLook's resources follow the language it picks. -->
 <plist version="1.0">
 <dict>
 	<key>CFBundleLocalizations</key>
