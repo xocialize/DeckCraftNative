@@ -107,7 +107,7 @@ func ok(_ json: String, _ headers: [String: String] = [:]) -> StubProtocol.Answe
 
     // version.rs: ordering by precedence, build metadata ignored
     @Test func ordersByPrecedence() throws {
-        let ordered = ["1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0", "1.0.1", "1.1.0", "2.0.0"]
+        let ordered = ["1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0", "1.0.1", "1.0.9", "1.0.10", "1.1.0", "2.0.0"]
         let vs = try ordered.map { try #require(UpdateVersion.parse($0)) }
         for (a, b) in zip(vs, vs.dropFirst()) {
             #expect(b.isNewer(than: a), "\(b) > \(a)")
