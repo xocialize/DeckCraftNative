@@ -176,7 +176,7 @@ public struct DisplayList: Sendable {
         let x0 = (region.minX * scale).rounded(.down) / scale, y0 = (region.minY * scale).rounded(.down) / scale
         let x1 = (region.maxX * scale).rounded(.up) / scale, y1 = (region.maxY * scale).rounded(.up) / scale
         let r = CGRect(x: x0, y: y0, width: x1 - x0, height: y1 - y0)
-        guard let img = raster(ops, view: view, region: r, scale: scale) else { return }
+        guard let img = raster(ops, view: view, region: r, scale: scale).map(EdgeBleed.apply) else { return }
         ctx.saveGState()
         ctx.translateBy(x: r.minX, y: r.maxY)
         ctx.scaleBy(x: 1, y: -1)

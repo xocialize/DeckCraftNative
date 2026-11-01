@@ -280,8 +280,11 @@ Doesn't apply:
   slide, a backdrop and the slide's content over it. The content raster's transparent pixels were RGB 0, so a
   viewer that smooths images showed a grey hairline at their edges. The fix copies the backdrop's colour into
   those pixels. The PDF here is vector: shapes are paths, and there is no content raster over a backdrop raster.
-  - **A remaining edge case, not fixed.** Images can still be drawn with an alpha channel: a layer drawn as a
-    raster because it blurs or has a compose mode inside it, and a picture with transparency. CGPDFContext
-    writes such an image as RGB 0 under an SMask with `/Interpolate true`, without `/Matte` (checked
-    2026-10-31). A smoothing viewer could therefore show a dark fringe where such an image has a hard edge.
-    Blurred and soft-edged layers fade out, so they are unlikely to show one.
+  - **The same fringe on our images, fixed after 0.1.9.** Images can still be drawn with an alpha channel: a
+    layer drawn as a raster because it blurs or has a compose mode inside it, and a picture with transparency.
+    CGPDFContext writes such an image as its colour under an SMask with `/Interpolate true`, without `/Matte`,
+    and that colour was RGB 0 under the transparent pixels, so a smoothing viewer showed a dark fringe along a
+    hard edge. `EdgeBleed` now hands a vector context these images as straight RGBA with the ink's colour
+    carried two pixels out under the transparent ones (only the edge pixels are visited; the sample deck's PDF
+    takes 15.4 s instead of 12.7 s in Debug). Raster drawing is unchanged. Test:
+    `DisplayListTests.transparentImagesCarryTheirEdgeColour`, which reads the images back out of the PDF.

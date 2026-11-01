@@ -485,7 +485,8 @@ public final class Canvas {
             ctx.concatenate(Self.cg(paintTransform))
             ctx.setAlpha(alpha.clamped(0, 1))
             ctx.interpolationQuality = quality == .low ? .none : quality == .medium ? .medium : .high
-            drawImage(ctx, img, xe, ye, magnify: raster && quality != .low)
+            // A vector context gets the picture with its edge colour carried under its transparent pixels.
+            drawImage(ctx, raster ? img : EdgeBleed.apply(img), xe, ye, magnify: raster && quality != .low)
         }
     }
 
