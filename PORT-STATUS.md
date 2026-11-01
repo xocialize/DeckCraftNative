@@ -600,6 +600,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     its `.sha256` and its ticket is stapled.
   - The installed 0.1.8 finds 0.1.9 through Check for Updates (`ui.updates`); 0.1.9 is now installed in
     `/Applications`, where it reports itself up to date.
+- **After 0.1.9 (unreleased).** PDF export carries an image's edge colour under its transparent pixels, so a viewer that
+  smooths images shows no dark fringe along hard edges (`3425a74`, DCRender `EdgeBleed`). Format ▸ Effects draws its
+  Shadow, Glow and Soft Edges presets as tiles (DCApp `EffectPresetTiles`).
 
 ## Pin moves
 

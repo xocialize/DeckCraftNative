@@ -7,6 +7,7 @@ import DCAppModel
 import DCCore
 import DCEngine
 import DCRender
+import SwiftUI
 import Testing
 @testable import DCApp
 
@@ -93,6 +94,31 @@ import Testing
     }
 
     // ribbon.rs: every group of the ribbon has a place on the Mac, and its commands are the registry's.
+    /// deckcraft 9ad147b3: Format ▸ Effects draws each Shadow, Glow and Soft Edges preset as a tile. Every tile of a
+    /// row draws, and no two of a row look alike (a 1 pt soft edge apart from none, each glow apart from the next).
+    @Test func effectPresetTilesDrawEachPresetApart() throws {
+        let rows: [[EffectPreset]] = [
+            InspectorShape.shadowPresets.map { .shadow($0) },
+            InspectorShape.glowPresets.map { .glow($0) },
+            InspectorShape.softEdgePresets.map { .softEdge($0) },
+        ]
+        for row in rows {
+            let tiles = try row.map { preset in
+                let view = Canvas { ctx, size in EffectPresetTiles.draw(preset, in: &ctx, size: size) }
+                    .frame(width: EffectPresetTiles.tile.width, height: EffectPresetTiles.tile.height)
+                    .background(Color.white)
+                let renderer = ImageRenderer(content: view)
+                renderer.scale = 2
+                let image = try #require(renderer.cgImage, "\(preset)")
+                let bytes = try #require(image.dataProvider?.data as Data?, "\(preset)")
+                return (preset, bytes)
+            }
+            for (i, a) in tiles.enumerated() {
+                for b in tiles[(i + 1)...] { #expect(a.1 != b.1, "\(a.0) and \(b.0) look alike") }
+            }
+        }
+    }
+
     @Test func everyRibbonGroupMapsToKnownCommands() {
         let tabs = Set(RibbonMap.groups.map(\.tab))
         for t in ["Home", "Insert", "Draw", "Design", "Transitions", "Animations", "Slide Show", "Record", "Review", "View",

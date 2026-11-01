@@ -335,9 +335,10 @@ struct EffectsView: View {
         let scheme = InspectorColors.scheme(ctl.session)
         let fx = sh.effects ?? Effects()
         Section(String(localized: "Shadow", bundle: .module)) {
-            // The preset the shadow came from is the one shown (`shadow_preset_id`); choosing one applies it.
-            Picker(String(localized: "Presets", bundle: .module), selection: Binding(get: { InspectorShape.shadowPresetId(fx) }, set: { ctl.run("shape.effects", ["shadow": .string($0)]) })) {
-                ForEach(Self.shadows, id: \.1) { Text($0.0).tag($0.1) }
+            // The preset the shadow came from is the one marked (`shadow_preset_id`); choosing one applies it.
+            EffectPresetTiles(label: String(localized: "Presets", bundle: .module), presets: Self.shadows.map { (.shadow($0.1), $0.0) },
+                              current: .shadow(InspectorShape.shadowPresetId(fx))) { p in
+                if case .shadow(let id) = p { ctl.run("shape.effects", ["shadow": .string(id)]) }
             }
             if let sw = InspectorShape.detailShadow(fx) {
                 ColorButton(label: String(localized: "Color", bundle: .module), color: sw.color.resolve(scheme, nil), scheme: scheme) { c in
@@ -367,7 +368,9 @@ struct EffectsView: View {
             }
         }
         Section(String(localized: "Glow", bundle: .module)) {
-            presets(fx.glow?.radius ?? 0, InspectorShape.glowPresets, none: String(localized: "No glow", bundle: .module)) { ctl.run("shape.effects", InspectorShape.glowPresetParams($0)) }
+            presets(InspectorShape.glowPresets, none: String(localized: "No glow", bundle: .module), current: .glow(fx.glow?.radius ?? 0)) { p in
+                if case .glow(let r) = p { ctl.run("shape.effects", InspectorShape.glowPresetParams(r)) }
+            }
             fxSlider(String(localized: "Size", bundle: .module), fx.glow?.radius ?? 0, 0 ... 150, " pt", "glowProps", "radius", 1)
             if let g = fx.glow {
                 ColorButton(label: String(localized: "Color", bundle: .module), color: g.color.resolve(scheme, nil), scheme: scheme) { c in
@@ -377,7 +380,9 @@ struct EffectsView: View {
             }
         }
         Section(String(localized: "Soft Edges", bundle: .module)) {
-            presets(fx.softEdge ?? 0, InspectorShape.softEdgePresets, none: String(localized: "No soft edges", bundle: .module)) { ctl.run("shape.effects", ["softEdges": .num($0)]) }
+            presets(InspectorShape.softEdgePresets, none: String(localized: "No soft edges", bundle: .module), current: .softEdge(fx.softEdge ?? 0)) { p in
+                if case .softEdge(let r) = p { ctl.run("shape.effects", ["softEdges": .num(r)]) }
+            }
             CommitSlider(label: String(localized: "Size", bundle: .module), value: fx.softEdge ?? 0, range: 0 ... 50, suffix: " pt") { ctl.run("shape.effects", ["softEdges": .num($0)]) }
         }
         ThreeDSection(ctl: ctl, raw: fx.raw3d)
@@ -392,15 +397,14 @@ struct EffectsView: View {
         (String(localized: "Inner", bundle: .module, comment: "A shadow preset"), "inner"), (String(localized: "Perspective", bundle: .module, comment: "A shadow preset"), "perspective"),
     ]
 
-    /// Glow's and Soft Edges' preset sizes (`glow_row`, `soft_edge_row`): the current size is the one shown, or
-    /// itself when no preset has it; choosing one applies it.
-    private func presets(_ current: Double, _ values: [Double], none: String, apply: @escaping (Double) -> Void) -> some View {
-        Picker(String(localized: "Presets", bundle: .module), selection: Binding(get: { current }, set: { apply($0) })) {
-            if !values.contains(current) { Text(verbatim: "\(DialogMath.fmtNum(current)) pt").tag(current) }
-            ForEach(values, id: \.self) { v in
-                if v == 0 { Text(none).tag(v) } else { Text(String(localized: "\(DialogMath.fmtNum(v)) pt", bundle: .module, comment: "A glow or soft-edges size preset")).tag(v) }
-            }
-        }
+    /// Glow's and Soft Edges' preset sizes (`glow_row`, `soft_edge_row`) as tiles: the current size's tile is marked,
+    /// none when no preset has it (the Size slider shows it); choosing one applies it.
+    private func presets(_ values: [Double], none: String, current: EffectPreset, apply: @escaping (EffectPreset) -> Void) -> some View {
+        let glow: Bool = if case .glow = current { true } else { false }
+        return EffectPresetTiles(label: String(localized: "Presets", bundle: .module), presets: values.map { v in
+            let label = v == 0 ? none : String(localized: "\(DialogMath.fmtNum(v)) pt", bundle: .module, comment: "A glow or soft-edges size preset")
+            return (glow ? .glow(v) : .softEdge(v), label)
+        }, current: current, pick: apply)
     }
 
     /// `fx_slider`: one property of an effect, committed as `{key: {prop: shown × scale}}`.

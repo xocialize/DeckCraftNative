@@ -1538,7 +1538,7 @@ port of the egui UI) needs. Tests are in DCAppModelTests (`InspectorEffectsAndSi
   picker shows the preset the shadow came from (`InspectorShape.shadowPresetId`) instead of "Choose…"; Glow and
   Soft Edges gain a Presets picker with the ribbon's sizes (`glowPresets`, `softEdgePresets`); a glow preset runs
   `glowProps {radius}`, so the glow keeps its colour and transparency; the detail controls read the inner shadow
-  first (`detailShadow`). deckcraft draws each preset as a tile; here they are pickers (see "Left").
+  first (`detailShadow`). Each preset is a drawn tile (below).
 - **Format ▸ Size: Scale Height, Scale Width and Position ▸ From** (6fa873dc, d8c88cea): Scale is measured from
   the size the pane first showed for that shape and runs `shape.sizePosition` (with Lock aspect ratio); From
   switches Horizontal and Vertical between the top-left corner and the centre. Both need a single selected shape.
@@ -1591,6 +1591,11 @@ Tests in `ViewsModelTests`, `InspectorFillTests`, `InspectorEffectsAndSizeTests`
 **b082f12f (`slide.actions`, engine only)** reached the app as a new registry command: it gains its Commands
 catalog entry and a palette description (`CommandHelp`).
 
-**Left: the operator's call.** 9ad147b3's drawn preset tiles (a card with each shadow, glow or soft edge drawn on
-it). The pickers give the same choices; drawn tiles, as in PowerPoint's Presets galleries, are a medium SwiftUI
-piece (about 150 lines) for the inspector and the ribbon's effect menus together.
+**Drawn preset tiles, after 0.1.9** (9ad147b3's `effect_presets.rs`): Format ▸ Effects shows the Shadow, Glow and
+Soft Edges presets as tiles (`EffectPresetTiles`), each a card with the effect drawn on it by SwiftUI's blur and
+shadow filters where egui stacks translucent rectangles. The current preset's tile is marked; a size no preset has
+marks none, and the Size slider shows it. Differences from deckcraft: the tiles are drawn on a slide's light paper
+(dimmed in Dark Mode), since a shadow can't be seen on a dark field; a soft edge's fade grows with the square root
+of its size, so 1 pt and 2.5 pt look apart from none; and "No soft edges" is struck through like the other "none"
+tiles. The ribbon's Shape Effects menus keep their text items, as deckcraft's do. Test:
+`InspectorToolbarTests.effectPresetTilesDrawEachPresetApart`.
