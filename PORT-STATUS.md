@@ -593,6 +593,13 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     `.sha256` and its ticket is stapled. The exported app opened the masters deck's `.ppt` with its template.
   - The installed 0.1.7 finds 0.1.8 through Check for Updates (`ui.updates`); 0.1.8 is now installed in
     `/Applications`.
+- **Released as [v0.1.9](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.9) (2026-11-01).** The pin
+  move to deckcraft `a3fbf029` (below), the slow `.ppt` renders (`86df54c`: five Govdocs1 decks from 42–94 s to
+  1.1–6.2 s in Release) and long Outline titles wrapping (`cce8e12`). Notes in `Docs/releases/0.1.9.md`.
+  - Built from `73cdddf`, notarized, and accepted by Gatekeeper; the downloaded DMG is identical to the build, matches
+    its `.sha256` and its ticket is stapled.
+  - The installed 0.1.8 finds 0.1.9 through Check for Updates (`ui.updates`); 0.1.9 is now installed in
+    `/Applications`, where it reports itself up to date.
 
 ## Pin moves
 
@@ -634,7 +641,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     (our PDF is vector; a related dark-fringe risk on transparent rasters is noted in DCRender's PORT-NOTES), the
     egui print preview, updater and media bar.
 - **The oracle at the new pin.** `deckcraft-cli` 0.13.1 built from `a3fbf029`; the corpus and every vector set
-  regenerated (fixtures `3426eba`, local). The 88c2ceff corpus is kept beside it until this move is released.
+  regenerated (fixtures `3426eba`, local). The 88c2ceff corpus was removed once 0.1.9 shipped.
 - **Tests.** The full suite passes, apart from two cases. `aDenseShapeGradientRendersPromptly` timed out under the
   load of the full run and passes alone, as before. `outlineRowsFollowTheScrollerStyle` failed the same way on `86df54c`. It only passed
   on a Mac that started with legacy scroll bars; `cce8e12` makes it independent of that. Checking the Outline in the

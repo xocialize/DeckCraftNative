@@ -12,7 +12,8 @@
 set -euo pipefail
 repo=${0:A:h:h:h}
 app=$HOME/Applications/DeckCraftNative.app
-deck=$repo/../DeckCraftNative-Fixtures/oracle/88c2ceff/decks/sample.deckcraft
+source "$repo/Tools/oracle/pin.env"
+deck=${DECKCRAFT_FIXTURES:-$repo/../DeckCraftNative-Fixtures}/oracle/${DECKCRAFT_COMMIT[1,8]}/decks/sample.deckcraft
 out=${TMPDIR:-/tmp}/deckcraft-shortcuts-e2e
 shortcut="DeckCraft Export Test"
 lsr=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
