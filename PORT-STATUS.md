@@ -609,7 +609,7 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     number (`UpdatesTests.ordersByPrecedence` now has 1.0.9 < 1.0.10).
   - The installed 0.1.9 finds 0.1.10 through Check for Updates (`ui.updates`); 0.1.10 is now installed in
     `/Applications`, where it reports itself up to date.
-- **After 0.1.10 (unreleased): the Accessibility Inspector audit.** Run over every main view in both layouts, with
+- **Released as [v0.1.11](https://github.com/xocialize/DeckCraftNative/releases/tag/v0.1.11) (2026-11-01): the Accessibility Inspector audit.** Run over every main view in both layouts, with
   the target picked by the operator.
   - **Fixed:**
     - the ribbon, inspector, status bar, start window and dialogs are named regions;
@@ -619,6 +619,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Left with reasons:** the remaining warnings come from SwiftUI and AppKit, or from where the audit measures
     (rows out of view, scroll-edge fades, sheets).
   - Details are in DCApp PORT-NOTES, "Accessibility Inspector audit".
+  - Built from `d367c3e`, notarized, and accepted by Gatekeeper; the downloaded DMG is identical to the build. The
+    installed 0.1.10 finds 0.1.11 through Check for Updates; 0.1.11 is now installed in `/Applications`, where it
+    reports itself up to date.
 
 ## Pin moves
 
