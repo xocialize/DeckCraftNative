@@ -91,7 +91,7 @@ public enum CommandSymbols {
         "tableLayout.alignLeft": "text.alignleft", "tableLayout.alignCenter": "text.aligncenter", "tableLayout.alignRight": "text.alignright",
         "tableLayout.alignTop": "align.vertical.top", "tableLayout.alignMiddle": "align.vertical.center", "tableLayout.alignBottom": "align.vertical.bottom",
         "tableLayout.margins": "rectangle.inset.filled",
-        "chartDesign.changeType": "chart.bar.xaxis", "chartDesign.editData": "tablecells",
+        "chartDesign.changeType": "chart.bar.xaxis", "chartDesign.editData": "tablecells", "chartDesign.addElement": "plus.rectangle.on.rectangle",
         "smartArtDesign.textPane": "list.bullet.rectangle", "smartArtDesign.addShape": "plus.rectangle", "smartArtDesign.promote": "arrow.left",
         "smartArtDesign.demote": "arrow.right", "smartArtDesign.insertPicture": "photo", "smartArtDesign.layouts": "rectangle.3.group",
         "smartArtDesign.convert": "arrow.triangle.2.circlepath", "smartArtDesign.colors": "paintpalette", "smartArtDesign.gallery": "cube",

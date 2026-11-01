@@ -325,6 +325,42 @@
         }
       }
     },
+    "ribbon.control.chartDesign.addElement" : {
+      "comment" : "A control in the Chart Design tab's Chart Layouts group (runs chart.options)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diagrammelement hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Chart Element"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Agregar elemento de gráfico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajouter un élément de graphique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aggiungi elemento grafico"
+          }
+        }
+      }
+    },
     "ribbon.control.chartDesign.align" : {
       "comment" : "A control in the Chart Design tab's Arrange group (runs arrange.align)",
       "extractionState" : "manual",
@@ -6441,6 +6477,42 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Dati"
+          }
+        }
+      }
+    },
+    "ribbon.group.chartDesign.layouts" : {
+      "comment" : "A group of the Chart Design ribbon tab: VoiceOver's name for it, and its button when it folds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diagrammlayouts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Layouts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diseños de gráfico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dispositions du graphique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Layout grafici"
           }
         }
       }

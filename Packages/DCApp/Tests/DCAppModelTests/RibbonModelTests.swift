@@ -292,4 +292,36 @@ final class AcceptingHost: AppHost {
         #expect(RibbonMenus.entries("home.layout", none).isEmpty && RibbonMenus.entries("animations.effectOptions", none).isEmpty)
         #expect(RibbonNumber.number(10.5) == "10.5" && RibbonNumber.number(12) == "12" && RibbonNumber.number(2.25) == "2.25")
     }
+
+    // Chart Design › Add Chart Element: each item is one `chart.options` change to the selected chart.
+    @Test func addChartElementChangesTheChart() throws {
+        let f = Fixture()
+        #expect(RibbonMenus.entries("chartDesign.addElement", f.model).isEmpty, "no chart selected")
+        _ = f.model.run("insert.chart", ["type": "Column"])
+        let menu = RibbonMenus.entries("chartDesign.addElement", f.model)
+        #expect(menu.count == 4)
+        let items = Self.items(menu)
+        #expect(items.count == 2 + 5 + 2 + 2 && items.allSatisfy { $0.id == "chart.options" })
+        func chart() throws -> Chart { try #require(ChartElements.selected(f.model.session.activeDoc)).1 }
+        func pick(_ key: String, _ value: JSON) throws {
+            let ref = try #require(items.first { $0.params[key] == value }, "\(key) \(value)")
+            #expect(throws: Never.self) { try f.model.run(ref.id, ref.params).get() }
+        }
+        try pick("title", .null)
+        #expect(try chart().title == nil)
+        try pick("title", .string(ChartElements.defaultTitle))
+        #expect(try chart().title == ChartElements.defaultTitle)
+        try pick("legend", "l")
+        #expect(try chart().legend == "l")
+        try pick("legend", .null)
+        #expect(try chart().legend == nil)
+        try pick("dataLabels", true)
+        #expect(try chart().dataLabels)
+        try pick("gridlines", false)
+        #expect(try !chart().gridlines)
+        // A title the chart already has is kept when it's turned on again.
+        _ = f.model.run("chart.options", ["title": "Sales"])
+        let keep = Self.items(RibbonMenus.entries("chartDesign.addElement", f.model)).compactMap { $0.params["title"]?.asStr }
+        #expect(keep == ["Sales"])
+    }
 }

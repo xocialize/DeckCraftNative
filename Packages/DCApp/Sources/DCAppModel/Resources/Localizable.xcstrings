@@ -1444,6 +1444,41 @@
         }
       }
     },
+    "Above Chart" : {
+      "comment" : "Where the chart title is",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Über Diagramm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Above Chart"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Encima del gráfico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Au-dessus du graphique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sopra il grafico"
+          }
+        }
+      }
+    },
     "Accent 1" : {
       "comment" : "A theme colour slot",
       "localizations" : {
@@ -4550,7 +4585,7 @@
       }
     },
     "Bottom" : {
-      "comment" : "A shadow\ntext box inset\ntile alignment\nvertical text alignment",
+      "comment" : "A shadow\nWhere a chart's legend is\ntext box inset\ntile alignment\nvertical text alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5638,6 +5673,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Dati grafico"
+          }
+        }
+      }
+    },
+    "Chart Title" : {
+      "comment" : "Add Chart Element › Chart Title\nThe text a new chart title starts with",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Diagrammtitel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chart Title"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Título del gráfico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titre du graphique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titolo del grafico"
           }
         }
       }
@@ -7862,6 +7932,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Trattini"
+          }
+        }
+      }
+    },
+    "Data Labels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datenbeschriftungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Labels"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Etiquetas de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étiquettes de données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Etichette dati"
           }
         }
       }
@@ -12093,6 +12197,40 @@
         }
       }
     },
+    "Gridlines" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gitternetzlinien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gridlines"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Líneas de cuadrícula"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Quadrillage"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Griglia"
+          }
+        }
+      }
+    },
     "Group" : {
       "localizations" : {
         "de" : {
@@ -14671,7 +14809,7 @@
       }
     },
     "Left" : {
-      "comment" : "text box inset\ntile alignment",
+      "comment" : "Where a chart's legend is\ntext box inset\ntile alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14735,6 +14873,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bordo sinistro"
+          }
+        }
+      }
+    },
+    "Legend" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Legende"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Leyenda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Légende"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Legenda"
           }
         }
       }
@@ -15805,6 +15977,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Basso"
+          }
+        }
+      }
+    },
+    "Major Gridlines" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hauptgitternetz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Major Gridlines"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Líneas de cuadrícula principales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Quadrillage principal"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Griglia principale"
           }
         }
       }
@@ -17347,7 +17553,7 @@
       }
     },
     "None" : {
-      "comment" : "No arrowheads\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
+      "comment" : "No arrowheads\nNo chart title\nNo data labels on the chart\nNo gridlines on the chart\nNo legend on the chart\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -21471,7 +21677,7 @@
       }
     },
     "Right" : {
-      "comment" : "text box inset\ntile alignment",
+      "comment" : "Where a chart's legend is\ntext box inset\ntile alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23040,6 +23246,7 @@
       }
     },
     "Show" : {
+      "comment" : "Show the chart's data labels",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -27613,7 +27820,7 @@
       }
     },
     "Top" : {
-      "comment" : "text box inset\ntile alignment\nvertical text alignment",
+      "comment" : "Where a chart's legend is\ntext box inset\ntile alignment\nvertical text alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {

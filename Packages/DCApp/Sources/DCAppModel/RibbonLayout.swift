@@ -533,6 +533,10 @@ public enum RibbonLayout {
     ])
 
     static let chartDesign = RibbonTab(id: "chartDesign", title: "Chart Design", contextual: "Chart Design", groups: [
+        // PowerPoint's Chart Layouts (deckcraft's ribbon has none): the title, legend, data labels and gridlines.
+        g("chartDesign.layouts", "Chart Layouts", fold: 2, [
+            c("chartDesign.addElement", "chart.options", .emptyObject, .menu(nil), title: "Add Chart Element"),
+        ]),
         g("chartDesign.type", "Type", fold: 2, [
             c("chartDesign.changeType", "chart.type", .emptyObject, .menu(nil), title: "Change Chart Type"),
         ]),

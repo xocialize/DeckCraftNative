@@ -160,6 +160,48 @@ struct ChartFormatView: View {
             }
             Button(String(localized: "Edit Data…", bundle: .module)) { ctl.run("app.dialog", ["id": "chartData"]) }
         }
+        if let (id, c) = chart {
+            // Chart Design › Add Chart Element's choices (`ChartElements`), each one `chart.options` step.
+            let options = { (key: String, value: JSON) in ctl.run("chart.options", ["id": .integer(id.rawValue), key: value]) }
+            Section(String(localized: "Chart Elements", bundle: .module)) {
+                Toggle(String(localized: "Chart Title", bundle: .module), isOn: Binding(get: { c.title != nil }, set: {
+                    options("title", $0 ? .string(ChartElements.defaultTitle) : .null)
+                }))
+                if let title = c.title {
+                    ChartTitleField(text: title) { options("title", $0.isEmpty ? .null : .string($0)) }
+                }
+                Picker(String(localized: "Legend", bundle: .module), selection: Binding(get: { c.legend ?? "" }, set: {
+                    options("legend", $0.isEmpty ? .null : .string($0))
+                })) {
+                    ForEach(ChartElements.legends, id: \.label) { Text($0.label).tag($0.code ?? "") }
+                }
+                Toggle(String(localized: "Data Labels", bundle: .module), isOn: Binding(get: { c.dataLabels }, set: { options("dataLabels", .bool($0)) }))
+                Toggle(String(localized: "Gridlines", bundle: .module), isOn: Binding(get: { c.gridlines }, set: { options("gridlines", .bool($0)) }))
+            }
+        }
+    }
+}
+
+/// The chart title's text: commits on Return or when it loses focus, as `AltTextField` does. Emptying it removes
+/// the title, as deleting PowerPoint's title box does.
+struct ChartTitleField: View {
+    let text: String
+    let commit: (String) -> Void
+    @State private var draft: (base: String, text: String)?
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        TextField(String(localized: "Title", bundle: .module), text: Binding(get: { InspectorText.draft(draft, text) }, set: { draft = (text, $0) }))
+            .textFieldStyle(.roundedBorder)
+            .focused($focused)
+            .onSubmit(save)
+            .onChange(of: focused) { _, now in if !now { save() } }
+    }
+
+    private func save() {
+        guard let d = draft else { return }
+        draft = nil
+        if d.base == text && d.text != text { commit(d.text) }
     }
 }
 
