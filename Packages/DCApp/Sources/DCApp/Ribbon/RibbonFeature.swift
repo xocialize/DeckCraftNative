@@ -45,6 +45,7 @@ final class RibbonContainerController: NSViewController {
     init(split: NSSplitViewController, model: AppModel) {
         self.split = split
         host = NSHostingView(rootView: RibbonView(model: model, state: state))
+        host.setAccessibilityLabel(String(localized: "Ribbon", bundle: .module, comment: "Accessibility label of the ribbon (its tabs and their controls)"))
         super.init(nibName: nil, bundle: nil)
         state.host = host
         state.onPeek = { [weak self] in self?.setPeek($0) }

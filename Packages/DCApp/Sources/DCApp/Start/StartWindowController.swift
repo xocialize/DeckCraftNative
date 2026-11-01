@@ -26,6 +26,7 @@ final class StartWindowController: NSWindowController, NSWindowDelegate {
         window.tabbingMode = .disallowed
         window.collectionBehavior.insert(.fullScreenNone)
         let hosting = NSHostingController(rootView: StartView(model: model, art: art))
+        hosting.view.setAccessibilityLabel(window.title)
         hosting.sceneBridgingOptions = [.toolbars, .title]
         window.contentViewController = hosting
         window.setContentSize(NSSize(width: 1080, height: 720))

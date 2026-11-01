@@ -2771,6 +2771,17 @@
         }
       }
     },
+    "Format Painter options" : {
+      "comment" : "The menu beside the Format Painter button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Painter options"
+          }
+        }
+      }
+    },
     "Frame slides" : {
       "comment" : "Print panel option",
       "localizations" : {
@@ -5452,6 +5463,17 @@
         }
       }
     },
+    "Ribbon" : {
+      "comment" : "Accessibility label of the ribbon (its tabs and their controls)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ribbon"
+          }
+        }
+      }
+    },
     "Ribbon tabs" : {
       "localizations" : {
         "en" : {
@@ -6347,6 +6369,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start Automatically"
+          }
+        }
+      }
+    },
+    "Status bar" : {
+      "comment" : "Accessibility label of the document window's status bar",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status bar"
           }
         }
       }

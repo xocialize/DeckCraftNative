@@ -45,6 +45,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSTo
         sidebar = SidebarController()
         editor = EditorAreaController(link: link, canvas: canvas)
         inspector = NSHostingController(rootView: InspectorView(document: DocumentRef(document)))
+        inspector.view.setAccessibilityLabel(String(localized: "Inspector", bundle: .module))
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1320, height: 840),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -239,6 +240,7 @@ final class EditorAreaController: NSViewController, NSSplitViewDelegate {
         canvasNotes.setHoldingPriority(.defaultLow, forSubviewAt: 0)
         canvasNotes.setHoldingPriority(.defaultHigh, forSubviewAt: 1)
         let bar = NSHostingView(rootView: StatusBarView(link: link, spelling: SpellingState()))
+        bar.setAccessibilityLabel(String(localized: "Status bar", bundle: .module, comment: "Accessibility label of the document window's status bar"))
         status = bar
         // The status bar never holds the editing area wide: what doesn't fit is clipped.
         bar.sizingOptions = [.intrinsicContentSize]

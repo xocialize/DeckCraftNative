@@ -609,6 +609,16 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     number (`UpdatesTests.ordersByPrecedence` now has 1.0.9 < 1.0.10).
   - The installed 0.1.9 finds 0.1.10 through Check for Updates (`ui.updates`); 0.1.10 is now installed in
     `/Applications`, where it reports itself up to date.
+- **After 0.1.10 (unreleased): the Accessibility Inspector audit.** Run over every main view in both layouts, with
+  the target picked by the operator.
+  - **Fixed:**
+    - the ribbon, inspector, status bar, start window and dialogs are named regions;
+    - the Slide Sorter's slides and section bars take VoiceOver's press;
+    - the Format Painter row's split control is now a button and a named menu;
+    - the section counts and the Outline's numbers have enough contrast.
+  - **Left with reasons:** the remaining warnings come from SwiftUI and AppKit, or from where the audit measures
+    (rows out of view, scroll-edge fades, sheets).
+  - Details are in DCApp PORT-NOTES, "Accessibility Inspector audit".
 
 ## Pin moves
 

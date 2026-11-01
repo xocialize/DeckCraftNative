@@ -1066,7 +1066,7 @@ there is no "Show group titles" setting (§12).
     - It found the steppers named twice ("Duration, Duration"); `NumberField` no longer labels its stepper again.
     - SwiftUI builds this tree only when an assistive client asks, so it can't be read from inside a test.
   - **The Accessibility Inspector audit was not run.** Its target pop-up can't be opened without taking over the
-    screen, so the AX walk above stands in for it. Running the audit against the ribbon is still to do.
+    screen, so the AX walk above stands in for it. Run after 0.1.10: "Accessibility Inspector audit" below.
   - **Full Keyboard Access is off on this Mac**, and it is a system setting, so it was left alone. The arrow-key walk
     is verified in the model: `RibbonFitTests` reaches every control and split half of every tab, at every fold size,
     from the first place. F6 and the arrow keys have not been driven in the app with Full Keyboard Access on.
@@ -1225,7 +1225,7 @@ walk found five bugs, all in 0.1.4 and all fixed here.
   - **Test:** `ViewsWindowTests.navigatorRowsFollowTheScrollerStyle` switches the style and retiles as AppKit does. It
     fails without the observer.
   - The Outline view also lays out at `contentSize.width` and may do the same. Not yet checked.
-- **Still to do:** the Accessibility Inspector audit.
+- **Still to do:** the Accessibility Inspector audit (run after 0.1.10: "Accessibility Inspector audit" below).
 
 ### After 0.1.5 (2026-10-29)
 
@@ -1599,3 +1599,56 @@ marks none, and the Size slider shows it. Differences from deckcraft: the tiles 
 of its size, so 1 pt and 2.5 pt look apart from none; and "No soft edges" is struck through like the other "none"
 tiles. The ribbon's Shape Effects menus keep their text items, as deckcraft's do. Test:
 `InspectorToolbarTests.effectPresetTilesDrawEachPresetApart`.
+
+## Accessibility Inspector audit (after 0.1.10, 2026-11-01)
+
+Accessibility Inspector's audit (Xcode 27), run against the signed app with the sample deck in Dark Mode at 1440 × 900.
+The operator picked the target in its pop-up, which neither the background nor the full-screen tools could open.
+Each view was set up through the control channel (`ui.set`, `selection.select`, `view.pane`, `app.home`,
+`app.dialog`), and the audit was run from the Inspection menu.
+
+- **Views audited:**
+  - Normal view in the ribbon layout, with nothing selected and with a shape selected and Format ▸ Effects open;
+  - every ribbon tab, and Shape Format;
+  - the Slide Sorter, the Outline and the notes page;
+  - the Mac layout;
+  - the start window;
+  - a dialog (Set Up Slide Show).
+- **Fixed** (re-audited with a test build):
+  - **Regions had no name.** The ribbon, the inspector, the status bar, the start window's content and every
+    dialog's content are SwiftUI host views with no name, so VoiceOver announced an unnamed group on entering them.
+    They are now named "Ribbon", "Inspector", "Status bar", the window's title and the dialog's title.
+  - **The Slide Sorter's slides and section bars** (`SorterCell`, `SorterHeader`) were buttons with no press
+    action, so VoiceOver could read them but not use them. A slide's press now selects it, as a click does, and a
+    bar's press folds or unfolds its section, as its chevron does. The sorter went from 16 warnings to 1.
+  - **The Format Painter row's split control** was SwiftUI's split `Menu`: one segmented control whose arrow
+    segment had no name and no press. It is now a button and a menu named "Format Painter options", as the ribbon's
+    splits are.
+  - **Small grey text.**
+    - The section counts in the navigator and the sorter, and the slide numbers in the Outline, were 11 pt
+      `secondaryLabelColor`.
+    - Over the sidebar's material it drew at 4.08:1, measured from a capture; 11 pt text needs 4.5:1.
+    - They are now `labelColor`. The Outline's numbers on screen pass.
+  - Tests: `ViewsWindowTests.sorterSlidesAndSectionsTakeVoiceOversPress`,
+    `RibbonWindowTests.documentWindowRegionsAreNamed`.
+- **Left as they are: these come from the frameworks or from where the audit measures.**
+  - **"Action is missing" on SwiftUI menus and pickers.** These are the ribbon's pop-up menus (12 on Home, a few on
+    other tabs) and the inspector's pickers. SwiftUI draws them through AppKit's pop-up adaptor. That adaptor offers
+    VoiceOver Show Menu rather than Press, and our code can't add a press that opens the menu.
+  - **"Element has no description" on slider knobs.** SwiftUI gives a `Slider`'s knob a node of its own. The slider
+    itself is labelled: Zoom, Thumbnail size, and every `CommitSlider`.
+  - **Parent/child mismatch.** `CommitSlider` hides its value text from VoiceOver, because the slider already speaks
+    the value. SwiftUI still keeps a node for the hidden text.
+  - **"Element has no description" on toolbar menu buttons.** In the Mac layout, the split toolbar items are
+    `NSMenuToolbarItem`s. AppKit's internal pull-down cell has no description, although each item's image and label
+    are named.
+  - **"Element has no description" in the start window's split view.** These are SwiftUI's
+    `NavigationSplitView` column hosts.
+  - **Contrast measured on content that isn't fully shown.**
+    - Rows out of view measure exactly 1.00:1: the Outline's later numbers, and a section count scrolled out of the
+      navigator.
+    - Labels under a scroll view's edge fade measure low: the inspector's last "Size" and "Top bevel".
+    - So does everything behind a sheet, and the title of an inactive window.
+    - The start window's sidebar selection uses the system's accent styling, at 4.42:1.
+- **Not audited:** the slide show and presenter view (full-screen windows), and the dialogs other than Set Up Slide
+  Show.

@@ -43,6 +43,7 @@ final class DialogPresenter: NSObject, NSWindowDelegate, DialogServices {
         if let s = shown, s.generation == controller.generation { return }
         dismiss()
         let host = NSHostingController(rootView: DialogView(controller: controller))
+        host.view.setAccessibilityLabel(controller.title)
         host.sizingOptions = [.preferredContentSize]
         // The window follows SwiftUI's size; safe-area insets that change with the window's frame would feed back
         // into that size and AppKit aborts the update-constraints loop (seen while dialog widths were in flux).

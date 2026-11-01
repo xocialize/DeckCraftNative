@@ -179,6 +179,7 @@ final class SorterViewController: NSViewController, NSCollectionViewDataSource, 
         let scale = view.window?.backingScaleFactor ?? 2
         let image = Thumbnails.shared.image(st.doc, uid: st.uid, index: i, width: Int((size.width * scale).rounded()), kind: .sorter)
         let transition = s.transition.flatMap { $0.kind == "none" ? nil : $0.kind }
+        item.cell.press = { [weak self] in self?.click(slide: i, shift: false, command: false) }
         item.cell.configure(SorterCell.Content(
             number: "\(i + 1)", image: image, imageSize: size, selected: NavigatorLogic.isSelected(st, i), hidden: s.hidden,
             transition: transition, label: String(localized: "Slide \(i + 1)", bundle: .module)
@@ -464,6 +465,8 @@ final class SorterCell: NSView {
     }
 
     private(set) var content: Content?
+    /// What VoiceOver's press does: selects the slide, as a click does.
+    var press: (() -> Void)?
     override var isFlipped: Bool { true }
 
     override init(frame: NSRect) {
@@ -481,6 +484,12 @@ final class SorterCell: NSView {
         setAccessibilityLabel(c.label)
         setAccessibilitySelected(c.selected)
         needsDisplay = true
+    }
+
+    override func accessibilityPerformPress() -> Bool {
+        guard let press else { return false }
+        press()
+        return true
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -545,7 +554,7 @@ final class SorterHeader: NSView, NSCollectionViewElement {
         name.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
         name.lineBreakMode = .byTruncatingTail
         count.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-        count.textColor = .secondaryLabelColor
+        count.textColor = .labelColor
         for v in [chevron, name, count] {
             v.translatesAutoresizingMaskIntoConstraints = false
             addSubview(v)
@@ -596,6 +605,13 @@ final class SorterHeader: NSView, NSCollectionViewElement {
     }
 
     @objc private func fold() { controller?.toggleFold(section: section) }
+
+    /// VoiceOver's press folds or unfolds the section, as its chevron does.
+    override func accessibilityPerformPress() -> Bool {
+        guard chevron.isEnabled else { return false }
+        fold()
+        return true
+    }
 
     override func mouseDown(with event: NSEvent) {
         if event.clickCount == 2 {

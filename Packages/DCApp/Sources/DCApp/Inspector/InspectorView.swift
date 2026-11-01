@@ -129,23 +129,30 @@ struct FormatPainterRow: View {
 
     var body: some View {
         let on = ctl.session.painter != nil
-        HStack {
-            Menu {
-                Button(String(localized: "Keep Format Painter On", bundle: .module)) { ctl.run("format.painter", ["sticky": true]) }
-                Button(String(localized: "Paste Formatting", bundle: .module)) { ctl.run("format.painterApply") }.disabled(!on)
-            } label: {
-                Label(on ? String(localized: "Format Painter (on)", bundle: .module) : String(localized: "Format Painter", bundle: .module), systemImage: on ? "paintbrush.fill" : "paintbrush")
-            } primaryAction: {
+        // A button and its menu side by side, as the ribbon's splits are: SwiftUI's split Menu is one segmented
+        // control whose arrow segment VoiceOver can neither name nor press.
+        HStack(spacing: Tokens.Space.xs) {
+            Button {
                 if on {
                     ctl.session.painter = nil
                     ctl.model.changed()
                 } else {
                     ctl.run("format.painter")
                 }
+            } label: {
+                Label(on ? String(localized: "Format Painter (on)", bundle: .module) : String(localized: "Format Painter", bundle: .module), systemImage: on ? "paintbrush.fill" : "paintbrush")
             }
-            .fixedSize()
             .disabled(!on && !ctl.enabled("format.painter"))
             .help(String(localized: "Format Painter (⇧⌘C): copy this formatting to the next object you click", bundle: .module))
+            Menu {
+                Button(String(localized: "Keep Format Painter On", bundle: .module)) { ctl.run("format.painter", ["sticky": true]) }
+                Button(String(localized: "Paste Formatting", bundle: .module)) { ctl.run("format.painterApply") }.disabled(!on)
+            } label: {
+                Image(systemName: "chevron.down")
+            }
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityLabel(String(localized: "Format Painter options", bundle: .module, comment: "The menu beside the Format Painter button"))
         }
     }
 }

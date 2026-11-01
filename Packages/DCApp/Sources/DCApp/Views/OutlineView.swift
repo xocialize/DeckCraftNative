@@ -196,7 +196,7 @@ final class OutlineRowView: NSTableCellView, NSTextFieldDelegate, NSTextViewDele
     init() {
         super.init(frame: .zero)
         number.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-        number.textColor = .secondaryLabelColor
+        number.textColor = .labelColor
         number.alignment = .right
         mark.wantsLayer = true
         mark.layer?.borderWidth = Tokens.Layout.hairline

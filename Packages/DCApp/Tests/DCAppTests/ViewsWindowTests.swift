@@ -211,6 +211,26 @@ import Testing
         #expect(sorter.groups.map(\.slides) == [[0, 1], [2, 3]])
     }
 
+    // After 0.1.10 (the Accessibility Inspector audit): the sorter's slides and section bars are buttons with no press
+    // action, so VoiceOver could announce them but not act on them. A slide's press selects it and a bar's folds it.
+    @Test func sorterSlidesAndSectionsTakeVoiceOversPress() throws {
+        let (_, link) = try model(4, sections: true)
+        let sorter = SorterViewController(link: link)
+        let w = window(sorter)
+        defer { w.close() }
+        sorter.refresh()
+        sorter.collection.layoutSubtreeIfNeeded()
+        let item = try #require(sorter.collection.item(at: IndexPath(item: 1, section: 1)) as? SorterItem)
+        #expect(item.cell.accessibilityRole() == .button)
+        #expect(item.cell.accessibilityPerformPress())
+        #expect(link.state?.selection.slide == 3)
+        let bar = try #require(sorter.collection.supplementaryView(forElementKind: NSCollectionView.elementKindSectionHeader, at: IndexPath(item: 0, section: 1)) as? SorterHeader)
+        #expect(bar.accessibilityRole() == .button)
+        #expect(bar.accessibilityPerformPress())
+        sorter.refresh()
+        #expect(sorter.groups.map(\.slides) == [[0, 1], []])
+    }
+
     // sorter_tests.rs: double_click_renames_and_switching_documents_drops_the_draft
     @Test func renamingAndSwitchingDocumentsDropsTheDraft() throws {
         let (m, link) = try model(4, sections: true)

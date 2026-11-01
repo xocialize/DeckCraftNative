@@ -598,8 +598,9 @@ final class SectionBarCell: NSTableCellView {
         name.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
         name.lineBreakMode = .byTruncatingTail
         name.cell?.usesSingleLineMode = true
+        // Small text: the secondary colour drew at about 4:1 over the sidebar's material, under the 4.5:1 it needs.
         count.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-        count.textColor = .secondaryLabelColor
+        count.textColor = .labelColor
         for v in [chevron, name, count] {
             v.translatesAutoresizingMaskIntoConstraints = false
             addSubview(v)

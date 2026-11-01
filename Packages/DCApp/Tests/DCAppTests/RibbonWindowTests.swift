@@ -236,6 +236,32 @@ import Testing
         #expect(key(97) == nil && key(49) == nil, "F6 is the menu's; Space is the button's")
     }
 
+    // After 0.1.10 (the Accessibility Inspector audit): the SwiftUI regions of the document window had no name, so
+    // VoiceOver announced an unnamed group on entering the ribbon, the inspector or the status bar.
+    @Test func documentWindowRegionsAreNamed() throws {
+        _ = NSApplication.shared
+        let app = AppController()
+        app.syncSuspended += 1
+        app.model.ui = UiState()
+        app.model.run("file.new")
+        app.model.run("view.ribbon", ["on": .bool(true)])
+        let doc = PresentationDocument(adopting: app.model.session.activeDoc?.uid ?? 0)
+        let wc = DocumentWindowController(document: doc)
+        let window = try #require(wc.window)
+        window.isReleasedWhenClosed = false
+        defer { window.close() }
+        var names: [String: String] = [:]
+        func walk(_ v: NSView) {
+            let type = String(describing: Swift.type(of: v))
+            for region in ["RibbonView", "InspectorView", "StatusBarView"] where type.contains("NSHostingView<\(region)>") {
+                names[region] = v.accessibilityLabel()
+            }
+            v.subviews.forEach(walk)
+        }
+        window.contentView.map(walk)
+        #expect(names == ["RibbonView": "Ribbon", "InspectorView": "Inspector", "StatusBarView": "Status bar"])
+    }
+
     // A window opened in the ribbon layout put the titlebar's blur (AppKit's scroll pocket) inside the split view,
     // 52 points over the top of the slide (0.1.4). The ribbon layout's sidebar and inspector aren't full height, so the
     // blur stays in the titlebar; the Mac layout gets its full-height sidebar back.
