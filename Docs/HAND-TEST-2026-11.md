@@ -54,11 +54,11 @@ ribbon, dialogs and inspector. Riskiest first.
 
 - [x] **Insert › New Slide** (the ribbon button, the menu, ⇧⌘N). A slide is added after the current one ("Slide 2 of 9"). Undo takes it away, Redo puts it back.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: the ribbon button, the menu and ⇧⌘N each added one after the current slide; Undo and Redo moved the count. Undo's name: Results 1.*
-- [ ] **Insert › Table…** (menu) asks for columns and rows (0.1.14). Insert adds that table, and the **Table Design** and **Layout** tabs appear. The ribbon's **Table** button adds a 3 × 3 table at once; its arrow offers a grid.
+- [x] **Insert › Table…** (menu) asks for columns and rows (0.1.14). Insert adds that table, and the **Table Design** and **Layout** tabs appear. The ribbon's **Table** button adds a 3 × 3 table at once; its arrow offers a grid.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: the dialog, a 3 × 4 table (Table Design and Layout tabs), Undo, and the ribbon's Table adding one at once. The ribbon's grid, and the table's shape on the slide, weren't checked.*
 - [x] **Chart** adds a chart, and the **Chart Design** tab appears.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: the Chart Design tab appears. The chart itself is a person's check (section 2's last row).*
-- [ ] **Format › Chart › Chart Elements** in the inspector (0.1.15): the Chart Title switch and its text, the Legend position, Data Labels and Gridlines. Each change shows on the chart and is one undo step.
+- [x] **Format › Chart › Chart Elements** in the inspector (0.1.15): the Chart Title switch and its text, the Legend position, Data Labels and Gridlines. Each change shows on the chart and is one undo step.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: the switches read on/off/on; Data Labels on, Legend Right; one Undo took back only the legend, the next Data Labels. Whether each change shows on the chart wasn't checked (the canvas).*
 - [x] **Chart Design › Add Chart Element** (0.1.15): Chart Title (None, Above Chart), Legend (None, Right, Top, Left, Bottom), Data Labels (None, Show), Gridlines (None, Major Gridlines).
   *AppProbe 2026-11-04, on this Mac and in a clean VM: all four items and their choices; Legend › Left set the inspector's Legend to Left.*
@@ -74,7 +74,7 @@ ribbon, dialogs and inspector. Riskiest first.
 
 ## 3. Slide Show and Reading View
 
-- [ ] **Slide Show** (the status bar's button, ⌘Enter): it fills the screen. → and Space step through each slide's animations, then the slides; **Esc** ends it, and the editor shows the slide you stopped on.
+- [x] **Slide Show** (the status bar's button, ⌘Enter): it fills the screen. → and Space step through each slide's animations, then the slides; **Esc** ends it, and the editor shows the slide you stopped on.
   *AppProbe 2026-11-04, in a clean VM: → and Space, Esc, and the editor on slide 2 afterwards. What the show draws and its transitions weren't checked.*
 - [ ] Transitions play, and going **back** plays a slide's transition in reverse (0.1.9). Morph on slide 5 of the sample.
 - [ ] **Presenter view** on a second display, with the Next slide preview; the show doesn't slow down (0.1.9).
@@ -125,7 +125,7 @@ loopback control channel (see the scenario's note for the methods).
 
 ## 7. Everyday flows (lower risk)
 
-- [ ] A launch with nothing to open shows the **Start** window: Home, New and Open, the theme tiles and recent files. A tile makes a presentation.
+- [x] A launch with nothing to open shows the **Start** window: Home, New and Open, the theme tiles and recent files. A tile makes a presentation.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: the Start window, its theme and template tiles, and a new presentation from File › New Presentation. A tile's press does make one, but over accessibility it answers "not supported" as the window closes, so the run doesn't use it; the recent list wasn't read.*
 - [x] **Slide Sorter** and **Normal** views from the status bar; sections fold and unfold.
   *AppProbe 2026-11-04, on this Mac and in a clean VM: Science folds and unfolds; Slide Sorter then Normal (notes back). The sorter was screenshotted, not judged.*

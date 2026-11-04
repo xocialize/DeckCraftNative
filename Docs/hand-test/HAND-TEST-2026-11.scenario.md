@@ -49,8 +49,8 @@ fresh: true
   until find("role=statictext name='Slide 1 of 8' exact=true").count == 1  # the status bar
   expect find("role=cell name='Slide 8' exact=true").count == 1  # 8 slides in the navigator
   expect find("role=cell name=Introduction exact=true").count == 1  # the three sections
-  expect find("role=cell name=Science exact=true").count == 1
-  expect find("role=cell name='In the Field' exact=true").count == 1
+  expect find("role=cell name=Science exact=true").count == 1  # the Science section
+  expect find("role=cell name='In the Field' exact=true").count == 1  # the In the Field section
   expect find("role=textarea name=Notes").0.value contains "Welcome everyone"  # slide 1's notes
   ```
 - [ ] Add a slide to `save-roundtrip.deckcraft` and **File › Save** (⌘S). It saves in place with no dialog; close it, reopen it, and the slide is there.
@@ -112,8 +112,8 @@ fresh: true
   until windows.count == 3 timeout=15000  # three presentation windows
   pause 2000
   expect windows.count == 3  # still running, and nothing closed
-  expect windows.*.title contains ["sample.deckcraft"]
-  expect windows.*.title contains ["sample.pptx"]
+  expect windows.*.title contains ["sample.deckcraft"]  # sample.deckcraft's window is still open
+  expect windows.*.title contains ["sample.pptx"]  # and sample.pptx's
   set newTitle = windows.0.title
   note "The new presentation's window is titled ${newTitle}."
   ```
@@ -140,7 +140,7 @@ fresh: true
   act surface=app role=textfield name=Password exact=true action=set_value value="Tëst-pässwörd" commit=none
   act surface=app role=button name=Open exact=true action=press
   until windows.*.title contains ["protected-accents.pptx"] timeout=20000  # the accented password opened it
-  expect find("surface=app role=statictext text='password is incorrect'").count == 0
+  expect find("surface=app role=statictext text='password is incorrect'").count == 0  # no wrong-password message
   ```
 - [ ] **Cancel** at the password prompt. Nothing opens and no error appears.
   ```steps
@@ -180,7 +180,7 @@ fresh: true
   open ${fixtures}/protected-default.ppt
   until windows.0.title == "protected-default" timeout=30000  # opened, as a converted copy
   expect find("surface=app role=textfield name=Password exact=true").count == 0  # no password asked
-  expect find("role=statictext name='Slide 1 of 8' exact=true").count == 1
+  expect find("role=statictext name='Slide 1 of 8' exact=true").count == 1  # its 8 slides
   ```
 - [ ] Open `damaged.ppt` (the sample's `.ppt` cut off after 5,463 bytes). An error says it can't be opened, and the app keeps running.
   ```steps
@@ -192,7 +192,7 @@ fresh: true
   act surface=app role=button name=OK exact=true action=press
   pause 1000
   expect windows.count >= 1  # the app keeps running
-  expect windows.*.title !contains ["damaged"]
+  expect windows.*.title !contains ["damaged"]  # no window for the damaged file
   ```
 
 ## 2. The ribbon's Insert tab
@@ -231,7 +231,7 @@ fresh: true
   act role=radiobutton name=Insert exact=true action=press
   act role=button name=Table exact=true action=press  # the ribbon's Table button: a 3 × 3 table at once
   until find("role=radiobutton name='Table Design, contextual' exact=true").count == 1
-  expect find("surface=app role=sheet").count == 0
+  expect find("surface=app role=sheet").count == 0  # the ribbon's Table asked nothing
   ```
 - [ ] **Chart** adds a chart, and the **Chart Design** tab appears.
   ```steps
@@ -281,12 +281,12 @@ fresh: true
   until find("role=button name='Add Chart Element' exact=true").count == 1
   act role=button name="Add Chart Element" exact=true action=press
   until find("surface=app role=menuitem name='Chart Title' exact=true").count == 1  # the menu, with its four items
-  expect find("surface=app role=menuitem name=Legend exact=true").0.ref matches "^A/0/"
-  expect find("surface=app role=menuitem name='Data Labels' exact=true").0.ref matches "^A/0/"
+  expect find("surface=app role=menuitem name=Legend exact=true").0.ref matches "^A/0/"  # Add Chart Element › Legend
+  expect find("surface=app role=menuitem name='Data Labels' exact=true").0.ref matches "^A/0/"  # Add Chart Element › Data Labels
   expect find("surface=app role=menuitem name=Gridlines exact=true").0.ref matches "^A/0/"  # (the View menu has a Gridlines too; this one is in the window's menu)
   expect find("surface=app role=menuitem name='Above Chart' exact=true").0.ref matches "^A/0/"  # Chart Title › None, Above Chart
   expect find("surface=app role=menuitem name=Top exact=true").0.ref matches "^A/0/"  # Legend › None, Right, Top, Left, Bottom
-  expect find("surface=app role=menuitem name=Bottom exact=true").0.ref matches "^A/0/"
+  expect find("surface=app role=menuitem name=Bottom exact=true").0.ref matches "^A/0/"  # Legend › Bottom
   expect find("surface=app role=menuitem name=Show exact=true").0.ref matches "^A/0/"  # Data Labels › None, Show
   expect find("surface=app role=menuitem name='Major Gridlines' exact=true").0.ref matches "^A/0/"  # Gridlines › None, Major Gridlines
   # Menu items are matched in the window's menu (refs under A/0/): Top, Bottom, Show and Left are in the menu bar too.
@@ -371,7 +371,7 @@ fresh: true
   until find("role=statictext name='Slide 1 of 8' exact=true").count == 1
   menu "Slide Show › Set Up Slide Show…" press
   until find("surface=app role=sheet").count == 1  # its dialog
-  expect find("surface=app role=checkbox text='Keep mouse cursor visible'").count == 1
+  expect find("surface=app role=checkbox text='Keep mouse cursor visible'").count == 1  # the Keep mouse cursor visible option
   shot "Set Up Slide Show"
   act surface=app role=button name=Cancel exact=true action=press
   ```
@@ -504,7 +504,7 @@ fresh: true
   act role=button name="Title 1" exact=true action=press
   act role=radiobutton name=Format exact=true action=press
   until find("role=button name='Format Painter' exact=true").count == 1
-  expect find("role=menubutton name='Format Painter options' exact=true").count == 1
+  expect find("role=menubutton name='Format Painter options' exact=true").count == 1  # and its separate options menu
   ```
 
 - [ ] Every inspector control has a name VoiceOver reads, Chart Elements included (0.1.11).
@@ -521,12 +521,12 @@ fresh: true
   act role=radiobutton name=Format exact=true action=press
   act role=radiobutton name=Chart exact=true action=press  # Format's Chart tab (a new install opens Fill & Line)
   until find("role=heading name='Chart Elements' exact=true").count == 1
-  expect find("role=switch").count == 3
+  expect find("role=switch").count == 3  # three switches: Chart Title, Data Labels, Gridlines
   expect find("role=statictext name='Chart Title' exact=true").count == 1  # each control's label
-  expect find("role=statictext name='Data Labels' exact=true").count == 1
-  expect find("role=statictext name=Gridlines exact=true").count == 1
-  expect find("role=statictext name=Legend exact=true").count == 1
-  expect find("role=statictext name=Title exact=true").count == 1
+  expect find("role=statictext name='Data Labels' exact=true").count == 1  # the Data Labels label
+  expect find("role=statictext name=Gridlines exact=true").count == 1  # the Gridlines label
+  expect find("role=statictext name=Legend exact=true").count == 1  # the Legend label
+  expect find("role=statictext name=Title exact=true").count == 1  # the Title field's label
   ```
 - [ ] The SmartArt dialog's graphic pop-up has a name VoiceOver reads, not its form key.
   ```steps
@@ -537,7 +537,7 @@ fresh: true
   act role=radiobutton name=Insert exact=true action=press
   act role=button name=SmartArt exact=true action=press
   until find("role=statictext name='Choose a SmartArt Graphic' exact=true").count == 1
-  expect find("role=popupbutton value='Basic Process'").count == 1
+  expect find("role=popupbutton value='Basic Process'").count == 1  # the graphic pop-up, on Basic Process
   expect find("role=popupbutton name=kind exact=true").count == 0  # not "kind"
   act role=button name=Cancel exact=true action=press
   ```
@@ -589,7 +589,7 @@ fresh: true
   until find("role=statictext text='of 9'").count == 1  # Redo repeats them in order
   menu "Edit › Redo*" press
   pause 500
-  expect menu("Edit › Redo*").enabled == false
+  expect menu("Edit › Redo*").enabled == false  # nothing left to redo
   ```
 
 ## 6. On the slide canvas
@@ -614,10 +614,10 @@ fresh: true
   partial: a tile's press (made through File › New Presentation instead), the tiles' pictures, and the recent list (it shows this Mac's files, so the run neither reads nor screenshots it)
   until windows.0.title == "Start"  # a launch with nothing to open
   expect find("window=Start role=button name='Blank Presentation' exact=true").count == 1  # the theme tiles
-  expect find("window=Start role=button name=Harbor exact=true").count == 1
-  expect find("window=Start role=button name='Sample deck: Northern Lights' exact=true").count == 1
+  expect find("window=Start role=button name=Harbor exact=true").count == 1  # a theme tile
+  expect find("window=Start role=button name='Sample deck: Northern Lights' exact=true").count == 1  # the sample deck's tile
   expect find("window=Start role=button name=Briefing exact=true").count == 1  # the templates
-  expect find("window=Start role=button name='Evening Talk' exact=true").count == 1
+  expect find("window=Start role=button name='Evening Talk' exact=true").count == 1  # another template
   # A tile's AXPress does make the presentation, but answers "not supported" because the Start window closes during
   # it, which fails the step: the run makes one through the menu instead.
   menu "File › New Presentation" press
