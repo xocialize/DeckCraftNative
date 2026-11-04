@@ -14,3 +14,6 @@ DeckCraftNative-Fixtures/
 
 # Tools/release.sh output (archives, DMGs, notarization logs)
 /build/
+
+# The hand-test scenario's fixtures, copied in by Docs/hand-test/make-fixtures.sh
+/Docs/hand-test/fixtures/

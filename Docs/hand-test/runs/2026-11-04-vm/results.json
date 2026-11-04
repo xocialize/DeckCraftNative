@@ -1,0 +1,2578 @@
+{
+  "checklist" : "/Users/admin/appprobe/scenario/checklist.md",
+  "rows" : [
+    {
+      "checklist_line" : 21,
+      "checks" : [
+        {
+          "actual" : "\"sample.deckcraft\"",
+          "check" : "windows.0.title == \"sample.deckcraft\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=cell name='Slide 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=cell name=Introduction exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=cell name=Science exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=cell name='In the Field' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Welcome everyone. This deck was made in DeckCraft.\"",
+          "check" : "find(\"role=textarea name=Notes\").0.value contains \"Welcome everyone\"",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 725, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161034Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 725",
+        "47: until windows.0.title == \"sample.deckcraft\" → ok (1189 ms)",
+        "48: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (175 ms)",
+        "49: expect find(\"role=cell name='Slide 8' exact=true\").count == 1 → ok (132 ms)",
+        "50: expect find(\"role=cell name=Introduction exact=true\").count == 1 → ok (75 ms)",
+        "51: expect find(\"role=cell name=Science exact=true\").count == 1 → ok (52 ms)",
+        "52: expect find(\"role=cell name='In the Field' exact=true\").count == 1 → ok (53 ms)",
+        "53: expect find(\"role=textarea name=Notes\").0.value contains \"Welcome everyone\" → ok (56 ms)"
+      ],
+      "message" : null,
+      "ms" : 3394,
+      "notes" : [
+
+      ],
+      "row" : 1,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `sample.deckcraft`. It shows 8 slides in three sections (Introduction, Science, In the Field), the status bar reads **\"Slide 1 of 8\"**, and the window is titled with the file's name.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 22,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=sheet\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "[]",
+          "check" : "windows.*.title !contains [\"save-roundtrip.deckcraft\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "\"save-roundtrip.deckcraft\"",
+          "check" : "windows.0.title == \"save-roundtrip.deckcraft\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 8'\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 779, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161040Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/save-roundtrip.deckcraft in pid 779",
+        "58: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1189 ms)",
+        "59: menu \"Insert › New Slide\" press → pressed Insert › New Slide (198 ms)",
+        "60: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (199 ms)",
+        "61: menu \"File › Save\" press → pressed File › Save (146 ms)",
+        "63: expect find(\"surface=app role=sheet\").count == 0 → ok (90 ms)",
+        "64: menu \"File › Close\" press → pressed File › Close (150 ms)",
+        "65: until windows.*.title !contains [\"save-roundtrip.deckcraft\"] → ok (74 ms)",
+        "opened /Users/admin/appprobe/scenario/fixtures/save-roundtrip.deckcraft in pid 779",
+        "67: until windows.0.title == \"save-roundtrip.deckcraft\" → ok (546 ms)",
+        "68: until find(\"role=statictext name='Slide 1 of 9' exact=true\").count == 1 → ok (98 ms)",
+        "70: menu \"Edit › Delete Slide\" press → pressed Edit › Delete Slide (172 ms)",
+        "71: until find(\"role=statictext text='of 8'\").count == 1 → ok (108 ms)",
+        "72: menu \"File › Save\" press → pressed File › Save (133 ms)"
+      ],
+      "message" : null,
+      "ms" : 8973,
+      "notes" : [
+
+      ],
+      "row" : 2,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Add a slide to `save-roundtrip.deckcraft` and **File › Save** (⌘S). It saves in place with no dialog; close it, reopen it, and the slide is there.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 23,
+      "checks" : [
+        {
+          "actual" : "\"save-roundtrip.pptx\"",
+          "check" : "windows.0.title == \"save-roundtrip.pptx\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=sheet\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "[]",
+          "check" : "windows.*.title !contains [\"save-roundtrip.pptx\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "\"save-roundtrip.pptx\"",
+          "check" : "windows.0.title == \"save-roundtrip.pptx\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 8'\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 812, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161049Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/save-roundtrip.pptx in pid 812",
+        "78: until windows.0.title == \"save-roundtrip.pptx\" → ok (1193 ms)",
+        "79: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (124 ms)",
+        "80: menu \"Insert › New Slide\" press → pressed Insert › New Slide (520 ms)",
+        "81: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (98 ms)",
+        "82: menu \"File › Save\" press → pressed File › Save (142 ms)",
+        "84: expect find(\"surface=app role=sheet\").count == 0 → ok (117 ms)",
+        "85: menu \"File › Close\" press → pressed File › Close (145 ms)",
+        "86: until windows.*.title !contains [\"save-roundtrip.pptx\"] → ok (64 ms)",
+        "opened /Users/admin/appprobe/scenario/fixtures/save-roundtrip.pptx in pid 812",
+        "88: until windows.0.title == \"save-roundtrip.pptx\" → ok (422 ms)",
+        "89: until find(\"role=statictext name='Slide 1 of 9' exact=true\").count == 1 → ok (88 ms)",
+        "91: menu \"Edit › Delete Slide\" press → pressed Edit › Delete Slide (155 ms)",
+        "92: until find(\"role=statictext text='of 8'\").count == 1 → ok (113 ms)",
+        "93: menu \"File › Save\" press → pressed File › Save (140 ms)"
+      ],
+      "message" : null,
+      "ms" : 11129,
+      "notes" : [
+
+      ],
+      "row" : 3,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `save-roundtrip.pptx` (written by deckcraft, not PowerPoint), add a slide and **File › Save**. It saves back as `.pptx` in place; reopened, the slide is there.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 24,
+      "checks" : [
+
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+
+      ],
+      "message" : "Save As goes through the system save panel, which AppProbe can't point at a folder (keys don't reach it)",
+      "ms" : 0,
+      "notes" : [
+
+      ],
+      "row" : 4,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "skipped",
+      "text" : "**File › Save As…** to the other format, `.pptx` ↔ `.deckcraft`. The save panel offers both; the new file opens and matches.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 25,
+      "checks" : [
+
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+
+      ],
+      "message" : "needs PowerPoint, the black-box oracle (Tools/pptx/powerpoint-sweep.sh), on the operator's Mac",
+      "ms" : 0,
+      "notes" : [
+
+      ],
+      "row" : 5,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "skipped",
+      "text" : "Save a deck with a chart as `.pptx` and open it in PowerPoint. It opens with **no repair prompt** (the Wave 5 finding, fixed after Wave 6).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 26,
+      "checks" : [
+        {
+          "actual" : "[\"sample.deckcraft\"]",
+          "check" : "windows.*.title contains [\"sample.deckcraft\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"sample.pptx\",\"sample.deckcraft\"]",
+          "check" : "windows.*.title contains [\"sample.pptx\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "3",
+          "check" : "windows.count == 3",
+          "ok" : true
+        },
+        {
+          "actual" : "3",
+          "check" : "windows.count == 3",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"Untitled\",\"sample.pptx\",\"sample.deckcraft\"]",
+          "check" : "windows.*.title contains [\"sample.deckcraft\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"Untitled\",\"sample.pptx\",\"sample.deckcraft\"]",
+          "check" : "windows.*.title contains [\"sample.pptx\"]",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 838, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161101Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 838",
+        "107: until windows.*.title contains [\"sample.deckcraft\"] → ok (766 ms)",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.pptx in pid 838",
+        "109: until windows.*.title contains [\"sample.pptx\"] → ok (512 ms)",
+        "110: menu \"File › New Presentation\" press → pressed File › New Presentation (170 ms)",
+        "111: until windows.count == 3 timeout=15000 → ok (459 ms)",
+        "113: expect windows.count == 3 → ok (0 ms)",
+        "114: expect windows.*.title contains [\"sample.deckcraft\"] → ok (0 ms)",
+        "115: expect windows.*.title contains [\"sample.pptx\"] → ok (0 ms)",
+        "116: set newTitle = windows.0.title → \"Untitled\" (0 ms)"
+      ],
+      "message" : null,
+      "ms" : 8142,
+      "notes" : [
+        "The new presentation's window is titled Untitled."
+      ],
+      "row" : 6,
+      "section" : "`.deckcraft` and `.pptx`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Two presentations side by side** (0.1.13's crash): open `sample.deckcraft` and `sample.pptx`, then **File › New Presentation** (⌘N). Three windows, no crash.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 29,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=textfield name=Password exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=statictext text=protected-ascii.pptx\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=statictext text='The password is incorrect. Passwords are case-sensitive.'\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"protected-ascii.pptx\"]",
+          "check" : "windows.*.title contains [\"protected-ascii.pptx\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 5' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 854, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161109Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/protected-ascii.pptx in pid 854",
+        "125: until find(\"surface=app role=textfield name=Password exact=true\").count == 1 → ok (545 ms)",
+        "126: expect find(\"surface=app role=statictext text=protected-ascii.pptx\").count == 1 → ok (58 ms)",
+        "127: act surface=app role=textfield name=Password exact=true action=set_value value=wrong commit=none → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":262,\"x\":829,\"y\":421},\"name\":\"Password\",\"ref\":\"A/0/3@bc2e\",\"role\":\"textfield\",\"states (457 ms)",
+        "128: act surface=app role=button name=Open exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":30,\"w\":112,\"x\":963,\"y\":459},\"id\":\"action-button-1\",\"name\":\"Open\",\"ref\":\"A/0/5@5c82\",\"role\":\"but (42 ms)",
+        "129: until find(\"surface=app role=statictext text='The password is incorrect. Passwords are case-sensitive.'\").count == 1 → ok (132 ms)",
+        "130: act surface=app role=textfield name=Password exact=true action=set_value value=Password1 commit=none → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":262,\"x\":829,\"y\":421},\"name\":\"Password\",\"ref\":\"A/0/3@bc2e\",\"role\":\"textfield\",\"states (409 ms)",
+        "131: act surface=app role=button name=Open exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":30,\"w\":112,\"x\":963,\"y\":459},\"id\":\"action-button-1\",\"name\":\"Open\",\"ref\":\"A/0/5@5c82\",\"role\":\"but (35 ms)",
+        "132: until windows.*.title contains [\"protected-ascii.pptx\"] timeout=20000 → ok (767 ms)",
+        "133: until find(\"role=statictext name='Slide 1 of 5' exact=true\").count == 1 → ok (102 ms)"
+      ],
+      "message" : null,
+      "ms" : 6723,
+      "notes" : [
+
+      ],
+      "row" : 7,
+      "section" : "Password protection",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `protected-ascii.pptx`. It asks for the password. A wrong one says **\"The password is incorrect. Passwords are case-sensitive.\"** and asks again; `Password1` opens its 5 slides.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 30,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=textfield name=Password exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"protected-accents.pptx\"]",
+          "check" : "windows.*.title contains [\"protected-accents.pptx\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=statictext text='password is incorrect'\").count == 0",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 869, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161115Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/protected-accents.pptx in pid 869",
+        "138: until find(\"surface=app role=textfield name=Password exact=true\").count == 1 → ok (576 ms)",
+        "139: act surface=app role=textfield name=Password exact=true action=set_value value=\"Tëst-pässwörd\" commit=none → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":262,\"x\":829,\"y\":421},\"name\":\"Password\",\"ref\":\"A/0/3@bc2e\",\"role\":\"textfield\",\"states (408 ms)",
+        "140: act surface=app role=button name=Open exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":30,\"w\":112,\"x\":963,\"y\":459},\"id\":\"action-button-1\",\"name\":\"Open\",\"ref\":\"A/0/5@5c82\",\"role\":\"but (40 ms)",
+        "141: until windows.*.title contains [\"protected-accents.pptx\"] timeout=20000 → ok (679 ms)",
+        "142: expect find(\"surface=app role=statictext text='password is incorrect'\").count == 0 → ok (133 ms)"
+      ],
+      "message" : null,
+      "ms" : 6443,
+      "notes" : [
+
+      ],
+      "row" : 8,
+      "section" : "Password protection",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `protected-accents.pptx` with `Tëst-pässwörd` (accented letters typed into the prompt). It opens.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 31,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=textfield name=Password exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"Start\"]",
+          "check" : "windows.*.title !contains [\"protected-ascii.pptx\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=textfield name=Password exact=true\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=dialog\").count == 0",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 917, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161122Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/protected-ascii.pptx in pid 917",
+        "147: until find(\"surface=app role=textfield name=Password exact=true\").count == 1 → ok (579 ms)",
+        "148: act window=0 role=button name=Cancel exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":30,\"w\":112,\"x\":845,\"y\":459},\"id\":\"action-button-2\",\"name\":\"Cancel\",\"ref\":\"W:_NS:87/4@dd08\",\"rol (21 ms)",
+        "150: expect windows.*.title !contains [\"protected-ascii.pptx\"] → ok (0 ms)",
+        "151: expect find(\"surface=app role=textfield name=Password exact=true\").count == 0 → ok (62 ms)",
+        "152: expect find(\"surface=app role=dialog\").count == 0 → ok (56 ms)"
+      ],
+      "message" : null,
+      "ms" : 6479,
+      "notes" : [
+
+      ],
+      "row" : 9,
+      "section" : "Password protection",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Cancel** at the password prompt. Nothing opens and no error appears.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 32,
+      "checks" : [
+        {
+          "actual" : "\"sample.pptx\"",
+          "check" : "windows.0.title == \"sample.pptx\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=sheet\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 927, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161128Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.pptx in pid 927",
+        "159: until windows.0.title == \"sample.pptx\" → ok (1073 ms)",
+        "160: menu \"File › Passwords…\" press → pressed File › Passwords… (173 ms)",
+        "161: until find(\"surface=app role=sheet\").count == 1 → ok (604 ms)",
+        "162: shot \"File › Passwords…\" (193 ms)"
+      ],
+      "message" : null,
+      "ms" : 6216,
+      "notes" : [
+        "shot 1: File › Passwords…",
+        "Check the sheet asks for each password twice, then save as .pptx through Save As and reopen it."
+      ],
+      "row" : 10,
+      "section" : "Password protection",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r10-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "needs-you",
+      "text" : "**File › Passwords…** sets a password to open (typed twice) and one to modify.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 36,
+      "checks" : [
+        {
+          "actual" : "\"corpus-sample\"",
+          "check" : "windows.0.title == \"corpus-sample\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=statictext text='was converted and opened as a copy'\").count > 0",
+          "ok" : false
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 939, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161135Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/corpus-sample.ppt in pid 939",
+        "171: until windows.0.title == \"corpus-sample\" timeout=30000 → ok (1319 ms)",
+        "172: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (147 ms)",
+        "175: expect find(\"surface=app role=statictext text='was converted and opened as a copy'\").count > 0 → got 0 (165 ms)"
+      ],
+      "message" : "the status line says what was converted: not so (`find(\"surface=app role=statictext text='was converted and opened as a copy'\").count > 0` read 0)",
+      "ms" : 6549,
+      "notes" : [
+        "shot 1: end"
+      ],
+      "row" : 11,
+      "section" : "PowerPoint 97–2003 `.ppt`",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r11-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "failed",
+      "text" : "Open `corpus-sample.ppt`. It opens as an untitled converted copy (\"corpus-sample\", 8 slides), and the **status line says what was converted** (picture bullets, one embedded object as a picture). The original isn't changed; Save asks for a name.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 37,
+      "checks" : [
+        {
+          "actual" : "\"protected-default\"",
+          "check" : "windows.0.title == \"protected-default\"",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=textfield name=Password exact=true\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 953, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161141Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/protected-default.ppt in pid 953",
+        "180: until windows.0.title == \"protected-default\" timeout=30000 → ok (932 ms)",
+        "181: expect find(\"surface=app role=textfield name=Password exact=true\").count == 0 → ok (247 ms)",
+        "182: expect find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (55 ms)"
+      ],
+      "message" : null,
+      "ms" : 5302,
+      "notes" : [
+
+      ],
+      "row" : 12,
+      "section" : "PowerPoint 97–2003 `.ppt`",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `protected-default.ppt` (PowerPoint's default password). It opens **without asking**.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 38,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=dialog\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "windows.count >= 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"Start\"]",
+          "check" : "windows.*.title !contains [\"damaged\"]",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 962, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161146Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/damaged.ppt in pid 962",
+        "187: until find(\"surface=app role=dialog\").count == 1 timeout=30000 → ok (555 ms)",
+        "188: set message = find(\"surface=app role=dialog role=statictext\").*.name → [\"The document “damaged.ppt” could not be opened. \",null,\"Home\",\"New\",\"Open\",\"Start\"] (46 ms)",
+        "190: shot \"the error for damaged.ppt\" (97 ms)",
+        "191: act surface=app role=button name=OK exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":30,\"w\":230,\"x\":845,\"y\":399},\"id\":\"_NS:8\",\"name\":\"OK\",\"ref\":\"A/0/3@3c85\",\"role\":\"button\"},\"note\" (50 ms)",
+        "193: expect windows.count >= 1 → ok (0 ms)",
+        "194: expect windows.*.title !contains [\"damaged\"] → ok (0 ms)"
+      ],
+      "message" : null,
+      "ms" : 5922,
+      "notes" : [
+        "\"The error reads: [\"The document “damaged.ppt” could not be opened. ,null,\"Home\",\"New\",\"Open\",\"Start\"]",
+        "shot 1: the error for damaged.ppt"
+      ],
+      "row" : 13,
+      "section" : "PowerPoint 97–2003 `.ppt`",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r13-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Open `damaged.ppt` (the sample's `.ppt` cut off after 5,463 bytes). An error says it can't be opened, and the app keeps running.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 44,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 3 of 10' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 4 of 11' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 10'\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 11'\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 969, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161152Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 969",
+        "202: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1671 ms)",
+        "203: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (346 ms)",
+        "204: act role=button name=\"New Slide\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":25,\"x\":34,\"y\":357},\"help\":\"Add a slide after the current one.\",\"name\":\"New Slide\",\"ref\": (117 ms)",
+        "205: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (66 ms)",
+        "206: menu \"Insert › New Slide\" press → pressed Insert › New Slide (177 ms)",
+        "207: until find(\"role=statictext name='Slide 3 of 10' exact=true\").count == 1 → ok (68 ms)",
+        "208: keys cmd+shift+n → {\"sent\":true} (108 ms)",
+        "209: until find(\"role=statictext name='Slide 4 of 11' exact=true\").count == 1 → ok (57 ms)",
+        "210: menu \"Edit › Undo*\" press → pressed Edit › Undo* (173 ms)",
+        "211: until find(\"role=statictext text='of 10'\").count == 1 → ok (67 ms)",
+        "212: menu \"Edit › Redo*\" press → pressed Edit › Redo* (156 ms)",
+        "213: until find(\"role=statictext text='of 11'\").count == 1 → ok (68 ms)"
+      ],
+      "message" : null,
+      "ms" : 7161,
+      "notes" : [
+
+      ],
+      "row" : 14,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Insert › New Slide** (the ribbon button, the menu, ⇧⌘N). A slide is added after the current one (\"Slide 2 of 9\"). Undo takes it away, Redo puts it back.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 45,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=textfield name='Number of columns:' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Layout, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"surface=app role=sheet\").count == 0",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 978, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161200Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 978",
+        "219: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1143 ms)",
+        "220: menu \"Insert › Table…\" press → pressed Insert › Table… (181 ms)",
+        "221: until find(\"role=textfield name='Number of columns:' exact=true\").count == 1 → ok (411 ms)",
+        "222: act role=textfield name=\"Number of columns:\" exact=true action=set_value value=3 → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":339,\"x\":432,\"y\":608},\"name\":\"Number of columns:\",\"ref\":\"W:sample.deckcraft/6/0/1/1@8 (477 ms)",
+        "223: act role=textfield name=\"Number of rows:\" exact=true action=set_value value=4 → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":339,\"x\":432,\"y\":640},\"name\":\"Number of rows:\",\"ref\":\"W:sample.deckcraft/6/0/1/3@95f4 (476 ms)",
+        "224: set insert = find(\"role=button name=Insert exact=true\").last.ref → \"W:sample.deckcraft/6/0/3@bbb8\" (38 ms)",
+        "225: act ref=W:sample.deckcraft/6/0/3@bbb8 action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":59,\"x\":720,\"y\":676},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/6/0/3@bbb8\",\"role\":\"button (307 ms)",
+        "226: until find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1 → ok (105 ms)",
+        "227: expect find(\"role=radiobutton name='Layout, contextual' exact=true\").count == 1 → ok (40 ms)",
+        "228: menu \"Edit › Undo*\" press → pressed Edit › Undo* (164 ms)",
+        "229: until find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 0 → ok (137 ms)",
+        "230: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (158 ms)",
+        "231: act role=button name=Table exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":24,\"x\":102,\"y\":358},\"help\":\"Add a table of rows and columns.\",\"name\":\"Table\",\"ref\":\"W:sa (72 ms)",
+        "232: until find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1 → ok (195 ms)",
+        "233: expect find(\"surface=app role=sheet\").count == 0 → ok (69 ms)"
+      ],
+      "message" : null,
+      "ms" : 7880,
+      "notes" : [
+
+      ],
+      "row" : 15,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Insert › Table…** (menu) asks for columns and rows (0.1.14). Insert adds that table, and the **Table Design** and **Layout** tabs appear.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 46,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 993, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161207Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 993",
+        "238: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1034 ms)",
+        "239: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (166 ms)",
+        "240: act role=button name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":19,\"w\":25,\"x\":458,\"y\":358},\"help\":\"Add a chart drawn from data you can edit.\",\"name\":\"Chart\",\"r (71 ms)",
+        "241: until find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1 → ok (237 ms)"
+      ],
+      "message" : null,
+      "ms" : 5394,
+      "notes" : [
+
+      ],
+      "row" : 16,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Chart** adds a chart, and the **Chart Design** tab appears.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 47,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Chart Elements' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"1\",\"0\",\"1\"]",
+          "check" : "find(\"role=switch\").*.value == [\"1\", \"0\", \"1\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "\"1\"",
+          "check" : "find(\"role=switch\").1.value == \"1\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=popupbutton value=Right\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=popupbutton value=Bottom\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"1\"",
+          "check" : "find(\"role=switch\").1.value == \"1\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"0\"",
+          "check" : "find(\"role=switch\").1.value == \"0\"",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1003, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161213Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1003",
+        "247: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1034 ms)",
+        "248: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (177 ms)",
+        "249: act role=button name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":19,\"w\":25,\"x\":458,\"y\":358},\"help\":\"Add a chart drawn from data you can edit.\",\"name\":\"Chart\",\"r (74 ms)",
+        "250: until find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1 → ok (208 ms)",
+        "251: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":88,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (97 ms)",
+        "252: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (99 ms)",
+        "253: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (995 ms)",
+        "254: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (308 ms)",
+        "255: act role=radiobutton name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":938,\"y\":568},\"help\":\"Chart\",\"id\":\"chart.bar\",\"name\":\"Chart\",\"ref\":\"W:sample.deckc (189 ms)",
+        "256: until find(\"role=heading name='Chart Elements' exact=true\").count == 1 → ok (60 ms)",
+        "259: expect find(\"role=switch\").*.value == [\"1\", \"0\", \"1\"] → ok (47 ms)",
+        "260: set dataLabels = find(\"role=switch\").1.ref → \"W:sample.deckcraft/0/5/2/4/7@b9a2\" (46 ms)",
+        "261: act ref=W:sample.deckcraft/0/5/2/4/7@b9a2 action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":44,\"x\":1016,\"y\":941},\"ref\":\"W:sample.deckcraft/0/5/2/4/7@b9a2\",\"role\":\"switch\",\"value\":\" (3 ms)",
+        "262: until find(\"role=switch\").1.value == \"1\" → ok (92 ms)",
+        "263: set legend = find(\"role=popupbutton value=Bottom\").0.ref → \"W:sample.deckcraft/0/5/2/4/5@62d8\" (56 ms)",
+        "264: act ref=W:sample.deckcraft/0/5/2/4/5@62d8 action=pick value=Right → {\"action\":\"pick\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":79,\"x\":981,\"y\":904},\"ref\":\"W:sample.deckcraft/0/5/2/4/5@62d8\",\"role\":\"popupbutton\",\"value (262 ms)",
+        "265: until find(\"role=popupbutton value=Right\").count == 1 → ok (385 ms)",
+        "266: menu \"Edit › Undo*\" press → pressed Edit › Undo* (157 ms)",
+        "267: until find(\"role=popupbutton value=Bottom\").count == 1 → ok (111 ms)",
+        "268: expect find(\"role=switch\").1.value == \"1\" → ok (50 ms)",
+        "269: menu \"Edit › Undo*\" press → pressed Edit › Undo* (152 ms)",
+        "270: until find(\"role=switch\").1.value == \"0\" → ok (104 ms)"
+      ],
+      "message" : null,
+      "ms" : 8482,
+      "notes" : [
+
+      ],
+      "row" : 17,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Format › Chart › Chart Elements** in the inspector (0.1.15): the Chart Title switch and its text, the Legend position, Data Labels and Gridlines. Each change shows on the chart and is one undo step.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 48,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=button name='Add Chart Element' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=menuitem name='Chart Title' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/1@740f\"",
+          "check" : "find(\"surface=app role=menuitem name=Legend exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/2@8ef1\"",
+          "check" : "find(\"surface=app role=menuitem name='Data Labels' exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/3@c4ac\"",
+          "check" : "find(\"surface=app role=menuitem name=Gridlines exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/0/0/1@0eff\"",
+          "check" : "find(\"surface=app role=menuitem name='Above Chart' exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/1/0/2@66b5\"",
+          "check" : "find(\"surface=app role=menuitem name=Top exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/1/0/4@bc07\"",
+          "check" : "find(\"surface=app role=menuitem name=Bottom exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/2/0/1@573c\"",
+          "check" : "find(\"surface=app role=menuitem name=Show exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"A/0/1/5/3/0/1@7aae\"",
+          "check" : "find(\"surface=app role=menuitem name='Major Gridlines' exact=true\").0.ref matches \"^A/0/\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=popupbutton value=Left\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1018, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161221Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1018",
+        "275: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1013 ms)",
+        "276: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (162 ms)",
+        "277: act role=button name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":19,\"w\":25,\"x\":458,\"y\":358},\"help\":\"Add a chart drawn from data you can edit.\",\"name\":\"Chart\",\"r (74 ms)",
+        "278: until find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1 → ok (192 ms)",
+        "279: act role=radiobutton name=\"Chart Design, contextual\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":88,\"x\":976,\"y\":327},\"name\":\"Chart Design, contextual\",\"ref\":\"W:sample.deckcraft/1/0/10@4 (92 ms)",
+        "280: until find(\"role=button name='Add Chart Element' exact=true\").count == 1 → ok (53 ms)",
+        "281: act role=button name=\"Add Chart Element\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":51,\"w\":63,\"x\":25,\"y\":357},\"help\":\"Show or hide the chart's title, legend, data labels and gridl (1530 ms)",
+        "282: until find(\"surface=app role=menuitem name='Chart Title' exact=true\").count == 1 → ok (103 ms)",
+        "283: expect find(\"surface=app role=menuitem name=Legend exact=true\").0.ref matches \"^A/0/\" → ok (65 ms)",
+        "284: expect find(\"surface=app role=menuitem name='Data Labels' exact=true\").0.ref matches \"^A/0/\" → ok (53 ms)",
+        "285: expect find(\"surface=app role=menuitem name=Gridlines exact=true\").0.ref matches \"^A/0/\" → ok (53 ms)",
+        "286: expect find(\"surface=app role=menuitem name='Above Chart' exact=true\").0.ref matches \"^A/0/\" → ok (50 ms)",
+        "287: expect find(\"surface=app role=menuitem name=Top exact=true\").0.ref matches \"^A/0/\" → ok (48 ms)",
+        "288: expect find(\"surface=app role=menuitem name=Bottom exact=true\").0.ref matches \"^A/0/\" → ok (49 ms)",
+        "289: expect find(\"surface=app role=menuitem name=Show exact=true\").0.ref matches \"^A/0/\" → ok (57 ms)",
+        "290: expect find(\"surface=app role=menuitem name='Major Gridlines' exact=true\").0.ref matches \"^A/0/\" → ok (59 ms)",
+        "293: set left = find(\"surface=app role=menuitem name=Left exact=true\").0.ref → \"A/0/1/5/1/0/3@1f6e\" (56 ms)",
+        "294: act ref=A/0/1/5/1/0/3@1f6e action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":0,\"w\":0,\"x\":0,\"y\":1200},\"id\":\"run:\",\"name\":\"Left\",\"ref\":\"A/0/1/5/1/0/3@1f6e\",\"role\":\"menuitem\"} (1 ms)",
+        "295: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":88,\"x\":12,\"y\":327},\"id\":\"\",\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"r (114 ms)",
+        "296: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (102 ms)",
+        "297: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (873 ms)",
+        "298: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (311 ms)",
+        "299: act role=radiobutton name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":938,\"y\":568},\"help\":\"Chart\",\"id\":\"chart.bar\",\"name\":\"Chart\",\"ref\":\"W:sample.deckc (177 ms)",
+        "300: until find(\"role=popupbutton value=Left\").count == 1 → ok (70 ms)"
+      ],
+      "message" : null,
+      "ms" : 9256,
+      "notes" : [
+
+      ],
+      "row" : 18,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Chart Design › Add Chart Element** (0.1.15): Chart Title (None, Above Chart), Legend (None, Right, Top, Left, Bottom), Data Labels (None, Show), Gridlines (None, Major Gridlines).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 49,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Choose a SmartArt Graphic' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Plan\\nBuild\\nLaunch\"",
+          "check" : "find(\"role=textfield text='SmartArt items'\").0.value contains \"Plan\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='SmartArt Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1070, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161230Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1070",
+        "305: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1107 ms)",
+        "306: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (182 ms)",
+        "307: act role=button name=SmartArt exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":37,\"w\":44,\"x\":400,\"y\":358},\"help\":\"Add a diagram that lays out a list, a process or a hierarchy (378 ms)",
+        "308: until find(\"role=statictext name='Choose a SmartArt Graphic' exact=true\").count == 1 → ok (69 ms)",
+        "309: expect find(\"role=textfield text='SmartArt items'\").0.value contains \"Plan\" → ok (33 ms)",
+        "310: set insert = find(\"role=button name=Insert exact=true\").last.ref → \"W:sample.deckcraft/6/0/3@bbb8\" (37 ms)",
+        "311: act ref=W:sample.deckcraft/6/0/3@bbb8 action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":59,\"x\":720,\"y\":718},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/6/0/3@bbb8\",\"role\":\"button (292 ms)",
+        "312: until find(\"role=radiobutton name='SmartArt Design, contextual' exact=true\").count == 1 → ok (325 ms)"
+      ],
+      "message" : null,
+      "ms" : 6350,
+      "notes" : [
+
+      ],
+      "row" : 19,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**SmartArt** asks for a graphic and its items (\"Choose a SmartArt Graphic\"). Insert adds it, and the **SmartArt Design** tab appears.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 50,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Shape Format, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='New Comment' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"text='Check this number'\").count > 0",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1084, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161237Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1084",
+        "317: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1287 ms)",
+        "318: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (246 ms)",
+        "319: act role=button name=\"Text Box\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":9,\"w\":14,\"x\":731,\"y\":388},\"help\":\"Add a box you can type text in.\",\"name\":\"Text Box\",\"ref\":\"W:s (92 ms)",
+        "320: until find(\"role=radiobutton name='Shape Format, contextual' exact=true\").count == 1 → ok (258 ms)",
+        "321: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":89,\"x\":108,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (51 ms)",
+        "322: act role=button name=Comment exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":38,\"w\":47,\"x\":666,\"y\":357},\"help\":\"Leave a note on the slide for yourself or others.\",\"name\":\"C (376 ms)",
+        "323: until find(\"role=statictext name='New Comment' exact=true\").count == 1 → ok (123 ms)",
+        "324: act role=textfield name=\"Comment, Comment\" exact=true action=set_value value=\"Check this number\" commit=none → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":72,\"w\":470,\"x\":301,\"y\":600},\"name\":\"Comment, Comment\",\"ref\":\"W:sample.deckcraft/6/0/1/0@274 (504 ms)",
+        "325: act role=button name=Post exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":51,\"x\":728,\"y\":684},\"name\":\"Post\",\"ref\":\"W:sample.deckcraft/6/0/3@e3fc\",\"role\":\"button\"} (334 ms)",
+        "326: until find(\"text='Check this number'\").count > 0 → ok (555 ms)"
+      ],
+      "message" : null,
+      "ms" : 7824,
+      "notes" : [
+
+      ],
+      "row" : 20,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Text Box** and **Comment** (the comment sheet's Post shows it in the Comments pane).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 53,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+        {
+          "answer" : "Yes, there is a column chart on the slide in the middle of the window, and it has selection handles around it.",
+          "expect" : "yes",
+          "image" : "/Users/admin/appprobe/run/shots/r21-2.png",
+          "judge" : "lfm3",
+          "ms" : 452,
+          "question" : "Is there a bar or column chart on the slide in the middle of the window, with selection handles around it?",
+          "verdict" : "yes"
+        }
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1094, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161245Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1094",
+        "332: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1310 ms)",
+        "333: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (196 ms)",
+        "334: act role=button name=\"New Slide\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":25,\"x\":34,\"y\":357},\"help\":\"Add a slide after the current one.\",\"name\":\"New Slide\",\"ref\": (105 ms)",
+        "335: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (66 ms)",
+        "336: act role=button name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":19,\"w\":25,\"x\":458,\"y\":358},\"help\":\"Add a chart drawn from data you can edit.\",\"name\":\"Chart\",\"r (64 ms)",
+        "337: until find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1 → ok (343 ms)",
+        "338: resize width=1600 height=1000 → {\"focused\":true,\"frame\":{\"h\":839,\"w\":1600,\"x\":0,\"y\":270},\"index\":0,\"key\":\"sample.deckcraft\",\"main\":true,\"subrole\":\"AXStandardWindow\",\"title\":\"sample.deckcraft\"} (79 ms)",
+        "339: act role=button name=\"Fit slide to current window\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":11,\"w\":11,\"x\":1576,\"y\":1090},\"help\":\"Fit slide to current window\",\"id\":\"arrow.up.left.and.down. (185 ms)",
+        "341: shot \"a chart inserted on a new slide\" (116 ms)",
+        "342: judge \"Is there a bar or column chart on the slide in the middle of the window, with selection handles around it?\" expect=yes → lfm3: yes (3426 ms)"
+      ],
+      "message" : null,
+      "ms" : 10295,
+      "notes" : [
+        "shot 1: a chart inserted on a new slide",
+        "shot 2: judged: Is there a bar or column chart on the slide in the middle of the window, with selection handles around it?",
+        "judge lfm3 (452 ms): Yes, there is a column chart on the slide in the middle of the window, and it has selection handles around it.",
+        "The canvas is Metal: nothing on it is in the accessibility tree. ui.render / slide.inspect would check it (see the end)."
+      ],
+      "row" : 21,
+      "section" : "2. The ribbon's Insert tab",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r21-1.png",
+        "/Users/admin/appprobe/run/shots/r21-2.png"
+      ],
+      "stall_ms" : null,
+      "status" : "needs-you",
+      "text" : "What each insert draws on the slide is right: position, size, text, and the selection handles around it.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 59,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "2",
+          "check" : "windows.count == 2",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "windows.count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 8' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1110, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161255Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1110",
+        "354: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1275 ms)",
+        "355: act role=button name=\"Slide Show\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":24,\"x\":820,\"y\":986},\"help\":\"Slide Show\",\"id\":\"play.rectangle\",\"name\":\"Slide Show\",\"ref\": (122 ms)",
+        "356: until windows.count == 2 → ok (67 ms)",
+        "358: keys right → {\"sent\":true} (118 ms)",
+        "360: keys space → {\"sent\":true} (116 ms)",
+        "362: keys escape → {\"sent\":true} (140 ms)",
+        "363: until windows.count == 1 → ok (1480 ms)",
+        "365: until find(\"role=statictext name='Slide 2 of 8' exact=true\").count == 1 → ok (65 ms)"
+      ],
+      "message" : null,
+      "ms" : 12216,
+      "notes" : [
+
+      ],
+      "row" : 22,
+      "section" : "3. Slide Show and Reading View",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Slide Show** (the status bar's button, ⌘Enter): it fills the screen. → and Space step through each slide's animations, then the slides; **Esc** ends it, and the editor shows the slide you stopped on.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 62,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=sheet\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"surface=app role=checkbox text='Keep mouse cursor visible'\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1131, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161307Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1131",
+        "370: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1360 ms)",
+        "371: menu \"Slide Show › Set Up Slide Show…\" press → pressed Slide Show › Set Up Slide Show… (189 ms)",
+        "372: until find(\"surface=app role=sheet\").count == 1 → ok (571 ms)",
+        "373: expect find(\"surface=app role=checkbox text='Keep mouse cursor visible'\").count == 1 → ok (131 ms)",
+        "374: shot \"Set Up Slide Show\" (120 ms)",
+        "375: act surface=app role=button name=Cancel exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":66,\"x\":662,\"y\":747},\"name\":\"Cancel\",\"ref\":\"A/0/6/0/2@dd08\",\"role\":\"button\"},\"note\":\"Read (375 ms)"
+      ],
+      "message" : null,
+      "ms" : 6854,
+      "notes" : [
+        "shot 1: Set Up Slide Show"
+      ],
+      "row" : 23,
+      "section" : "3. Slide Show and Reading View",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r23-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Slide Show › Set Up Slide Show…** opens its dialog (0.1.14), with **Keep mouse cursor visible** (0.1.9).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 63,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Reading View\"",
+          "check" : "windows.0.title == \"Reading View\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window='Reading View' role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window='Reading View' role=statictext name='Slide 3 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "[\"sample.deckcraft\"]",
+          "check" : "windows.*.title !contains [\"Reading View\"]",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 8' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1140, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161314Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1140",
+        "380: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1065 ms)",
+        "381: act role=button name=\"Reading View\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":24,\"x\":788,\"y\":986},\"help\":\"Reading View\",\"id\":\"book\",\"name\":\"Reading View\",\"ref\":\"W:sam (72 ms)",
+        "382: until windows.0.title == \"Reading View\" → ok (53 ms)",
+        "383: until find(\"window='Reading View' role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (4 ms)",
+        "384: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (5 ms)",
+        "385: until find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1 → ok (488 ms)",
+        "387: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (7 ms)",
+        "389: expect find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1 → ok (2 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (5 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (9 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (3 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (3 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (3 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (3 ms)",
+        "390: act window=\"Reading View\" role=button name=Forward exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1501,\"y\":921},\"help\":\"Next\",\"id\":\"chevron.right\",\"name\":\"Forward\",\"ref\":\"W:Readin (5 ms)",
+        "390: until find(\"window='Reading View' role=statictext name='Slide 3 of 8' exact=true\").count == 1 do act window=\"Reading View\" role=button name=Forward exact=true action=press tries=16 → ok after 7 (1896 ms)",
+        "391: act window=\"Reading View\" role=button name=Back exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":29,\"x\":1464,\"y\":921},\"help\":\"Previous\",\"id\":\"chevron.left\",\"name\":\"Back\",\"ref\":\"W:Readin (7 ms)",
+        "392: until find(\"window='Reading View' role=statictext name='Slide 2 of 8' exact=true\").count == 1 → ok (268 ms)",
+        "393: act window=\"Reading View\" role=button name=Close exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":50,\"x\":1538,\"y\":920},\"name\":\"Close\",\"ref\":\"W:Reading View/0/3@741f\",\"role\":\"button\"},\"no (11 ms)",
+        "394: until windows.*.title !contains [\"Reading View\"] → ok (554 ms)",
+        "395: until find(\"role=statictext name='Slide 2 of 8' exact=true\").count == 1 → ok (52 ms)"
+      ],
+      "message" : null,
+      "ms" : 9232,
+      "notes" : [
+
+      ],
+      "row" : 24,
+      "section" : "3. Slide Show and Reading View",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Reading View** (status bar): a window reading \"Slide N of M\". **Forward** plays the animations, then moves on; **Back** goes back; **Close** returns to the editor on that slide.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 69,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "3",
+          "check" : "$shapes == 3",
+          "ok" : true
+        },
+        {
+          "actual" : "false",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == false",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Shape Format, contextual' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1172, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161323Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1172",
+        "403: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1027 ms)",
+        "404: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (65 ms)",
+        "405: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (72 ms)",
+        "406: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (892 ms)",
+        "407: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (155 ms)",
+        "408: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (49 ms)",
+        "409: set shapes = find(\"role=button text='Lock '\").count → 3 (46 ms)",
+        "410: expect $shapes == 3 → ok (0 ms)",
+        "411: expect find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == false → ok (43 ms)",
+        "412: set first = find(\"role=button text='Lock '\").*.name → [\"Lock Aurora Band\",\"Lock Subtitle 2\",\"Lock Title 1\"] (46 ms)",
+        "414: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (169 ms)",
+        "415: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (160 ms)",
+        "416: expect find(\"role=radiobutton name='Shape Format, contextual' exact=true\").count == 1 → ok (68 ms)"
+      ],
+      "message" : null,
+      "ms" : 6724,
+      "notes" : [
+        "\"Slide 1's shapes, top first: [\"Lock Aurora Band\",\"Lock Subtitle 2\",\"Lock Title 1\"]\""
+      ],
+      "row" : 25,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Arrange › Selection Pane** lists the slide's shapes; choosing one selects it, and its contextual tab (**Shape Format**) appears.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 70,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        },
+        {
+          "actual" : "\"90°\"",
+          "check" : "find(\"role=textfield name='Rotation, Rotation value' exact=true\").0.value == \"90°\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"0°\"",
+          "check" : "find(\"role=textfield name='Rotation, Rotation value' exact=true\").0.value == \"0°\"",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1183, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161330Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1183",
+        "421: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1008 ms)",
+        "422: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (64 ms)",
+        "423: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (81 ms)",
+        "424: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (908 ms)",
+        "425: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (156 ms)",
+        "426: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (45 ms)",
+        "427: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (168 ms)",
+        "428: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (161 ms)",
+        "429: act role=checkbox name=\"Rotate Right 90°\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":31,\"x\":877,\"y\":878},\"help\":\"Rotate Right 90°\",\"id\":\"rotate.right\",\"name\":\"Rotate Right 9 (88 ms)",
+        "430: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (362 ms)",
+        "431: act role=radiobutton name=Size exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":892,\"y\":568},\"help\":\"Size\",\"id\":\"ruler\",\"name\":\"Size\",\"ref\":\"W:sample.deckcraft/0 (206 ms)",
+        "432: until find(\"role=textfield name='Rotation, Rotation value' exact=true\").0.value == \"90°\" → ok (61 ms)",
+        "433: menu \"Edit › Undo*\" press → pressed Edit › Undo* (150 ms)",
+        "434: until find(\"role=textfield name='Rotation, Rotation value' exact=true\").0.value == \"0°\" → ok (108 ms)"
+      ],
+      "message" : null,
+      "ms" : 7392,
+      "notes" : [
+
+      ],
+      "row" : 26,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Arrange › Rotate Right 90°** turns it: **Format › Size** reads Rotation 90°, and Undo brings it back to 0°.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 71,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=textfield name='Width, Width value' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"5\\\"\"",
+          "check" : "find(\"role=textfield name='Width, Width value' exact=true\").0.value matches \"^5\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"50%\"",
+          "check" : "find(\"role=textfield name='Scale Width, Scale Width value' exact=true\").0.value != \"100%\"",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1198, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161337Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1198",
+        "439: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1009 ms)",
+        "440: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (91 ms)",
+        "441: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (76 ms)",
+        "442: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (532 ms)",
+        "443: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (163 ms)",
+        "444: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (77 ms)",
+        "445: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (260 ms)",
+        "446: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (155 ms)",
+        "447: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (309 ms)",
+        "448: act role=radiobutton name=Size exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":892,\"y\":568},\"help\":\"Size\",\"id\":\"ruler\",\"name\":\"Size\",\"ref\":\"W:sample.deckcraft/0 (208 ms)",
+        "449: until find(\"role=textfield name='Width, Width value' exact=true\").count == 1 → ok (66 ms)",
+        "450: set before = find(\"role=textfield name='Width, Width value' exact=true\").0.value → \"10\\\"\" (60 ms)",
+        "451: act role=textfield name=\"Width, Width value\" exact=true action=set_value value=5 → {\"action\":\"set_value\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":13,\"w\":97,\"x\":942,\"y\":760},\"name\":\"Width, Width value\",\"ref\":\"W:sample.deckcraft/0/5/2/2/4@ (496 ms)",
+        "452: until find(\"role=textfield name='Width, Width value' exact=true\").0.value matches \"^5\" → ok (55 ms)",
+        "453: expect find(\"role=textfield name='Scale Width, Scale Width value' exact=true\").0.value != \"100%\" → ok (53 ms)",
+        "454: set scale = find(\"role=textfield name='Scale Width, Scale Width value' exact=true\").0.value → \"50%\" (49 ms)"
+      ],
+      "message" : null,
+      "ms" : 7480,
+      "notes" : [
+        "Width 10 → 5\\\", Scale Width 50%.\""
+      ],
+      "row" : 27,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Format › Size**: typing a Width changes it, and Scale Width follows.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 72,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1210, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161345Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1210",
+        "461: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1008 ms)",
+        "462: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (68 ms)",
+        "463: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (73 ms)",
+        "464: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (861 ms)",
+        "465: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (152 ms)",
+        "466: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (53 ms)",
+        "467: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (181 ms)",
+        "468: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (158 ms)",
+        "469: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (311 ms)",
+        "470: resize width=1600 height=1000 → {\"focused\":true,\"frame\":{\"h\":839,\"w\":1600,\"x\":0,\"y\":270},\"index\":0,\"key\":\"sample.deckcraft\",\"main\":true,\"subrole\":\"AXStandardWindow\",\"title\":\"sample.deckcraft\"} (73 ms)",
+        "471: act role=button name=\"Fit slide to current window\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":11,\"w\":11,\"x\":1321,\"y\":1090},\"help\":\"Fit slide to current window\",\"id\":\"arrow.up.left.and.down. (66 ms)",
+        "472: act role=radiobutton name=Effects exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":1389,\"y\":568},\"help\":\"Effects\",\"id\":\"sparkles.rectangle.stack\",\"name\":\"Effects\",\" (370 ms)",
+        "474: shot \"Format › Effects for the title\" (48 ms)"
+      ],
+      "message" : null,
+      "ms" : 8162,
+      "notes" : [
+        "shot 1: Format › Effects for the title",
+        "Check each preset is drawn as a tile, the one in use is marked, and a click on another applies it."
+      ],
+      "row" : 28,
+      "section" : "4. The inspector",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r28-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "needs-you",
+      "text" : "**Format › Effects** (0.1.10) shows Shadow, Glow and Soft Edges presets as drawn tiles, the one in use marked; choosing one applies it.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 73,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Slide background fill' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"1\"",
+          "check" : "find(\"role=radiobutton name='Slide background fill' exact=true\").0.value == \"1\"",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1227, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161353Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1227",
+        "480: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1012 ms)",
+        "481: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (63 ms)",
+        "482: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (69 ms)",
+        "483: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (877 ms)",
+        "484: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (154 ms)",
+        "485: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (44 ms)",
+        "486: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (172 ms)",
+        "487: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (159 ms)",
+        "488: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (314 ms)",
+        "489: act role=radiobutton name=\"Fill & Line\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":23,\"x\":845,\"y\":568},\"help\":\"Fill & Line\",\"id\":\"paintbrush.pointed\",\"name\":\"Fill & Line\", (164 ms)",
+        "490: until find(\"role=radiobutton name='Slide background fill' exact=true\").count == 1 → ok (58 ms)",
+        "491: act role=radiobutton name=\"Slide background fill\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":125,\"x\":845,\"y\":841},\"name\":\"Slide background fill\",\"ref\":\"W:sample.deckcraft/0/5/2/2/0/ (77 ms)",
+        "492: until find(\"role=radiobutton name='Slide background fill' exact=true\").0.value == \"1\" → ok (88 ms)"
+      ],
+      "message" : null,
+      "ms" : 7139,
+      "notes" : [
+
+      ],
+      "row" : 29,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Format › Fill** (0.1.9) offers **Slide background fill**.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 74,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=button name='Format Painter' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=menubutton name='Format Painter options' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1253, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161400Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1253",
+        "497: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1630 ms)",
+        "498: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (97 ms)",
+        "499: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (99 ms)",
+        "500: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (1012 ms)",
+        "501: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (150 ms)",
+        "502: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (55 ms)",
+        "503: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (185 ms)",
+        "504: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (325 ms)",
+        "505: until find(\"role=button name='Format Painter' exact=true\").count == 1 → ok (198 ms)",
+        "506: expect find(\"role=menubutton name='Format Painter options' exact=true\").count == 1 → ok (69 ms)"
+      ],
+      "message" : null,
+      "ms" : 8159,
+      "notes" : [
+
+      ],
+      "row" : 30,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Format Painter** (0.1.11) is a button with a separate \"Format Painter options\" menu.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 75,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Chart Elements' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "3",
+          "check" : "find(\"role=switch\").count == 3",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Chart Title' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Data Labels' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name=Gridlines exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name=Legend exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name=Title exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1267, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161408Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1267",
+        "513: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1765 ms)",
+        "514: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (605 ms)",
+        "515: act role=button name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":19,\"w\":25,\"x\":458,\"y\":358},\"help\":\"Add a chart drawn from data you can edit.\",\"name\":\"Chart\",\"r (330 ms)",
+        "516: until find(\"role=radiobutton name='Chart Design, contextual' exact=true\").count == 1 → ok (620 ms)",
+        "517: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":88,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (255 ms)",
+        "518: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (266 ms)",
+        "519: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (1173 ms)",
+        "520: act role=radiobutton name=Format exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":29,\"x\":880,\"y\":495},\"help\":\"Format\",\"id\":\"paintbrush\",\"name\":\"Format\",\"ref\":\"W:sample.de (898 ms)",
+        "521: act role=radiobutton name=Chart exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":22,\"x\":938,\"y\":568},\"help\":\"Chart\",\"id\":\"chart.bar\",\"name\":\"Chart\",\"ref\":\"W:sample.deckc (481 ms)",
+        "522: until find(\"role=heading name='Chart Elements' exact=true\").count == 1 → ok (167 ms)",
+        "523: expect find(\"role=switch\").count == 3 → ok (152 ms)",
+        "524: expect find(\"role=statictext name='Chart Title' exact=true\").count == 1 → ok (144 ms)",
+        "525: expect find(\"role=statictext name='Data Labels' exact=true\").count == 1 → ok (119 ms)",
+        "526: expect find(\"role=statictext name=Gridlines exact=true\").count == 1 → ok (145 ms)",
+        "527: expect find(\"role=statictext name=Legend exact=true\").count == 1 → ok (125 ms)",
+        "528: expect find(\"role=statictext name=Title exact=true\").count == 1 → ok (156 ms)"
+      ],
+      "message" : null,
+      "ms" : 11982,
+      "notes" : [
+
+      ],
+      "row" : 31,
+      "section" : "4. The inspector",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Every inspector control has a name VoiceOver reads, Chart Elements included (0.1.11).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : null,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Choose a SmartArt Graphic' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=popupbutton value='Basic Process'\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=popupbutton name=kind exact=true\").count == 0",
+          "ok" : false
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1389, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161420Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1389",
+        "535: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1641 ms)",
+        "536: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (265 ms)",
+        "537: act role=button name=SmartArt exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":37,\"w\":44,\"x\":400,\"y\":358},\"help\":\"Add a diagram that lays out a list, a process or a hierarchy (412 ms)",
+        "538: until find(\"role=statictext name='Choose a SmartArt Graphic' exact=true\").count == 1 → ok (100 ms)",
+        "539: expect find(\"role=popupbutton value='Basic Process'\").count == 1 → ok (45 ms)",
+        "540: expect find(\"role=popupbutton name=kind exact=true\").count == 0 → got 1 (55 ms)"
+      ],
+      "message" : "not \"kind\": not so (`find(\"role=popupbutton name=kind exact=true\").count == 0` read 1)",
+      "ms" : 6885,
+      "notes" : [
+        "open sheet: Choose a SmartArt Graphic · Pick a graphic; type one item per line.",
+        "shot 1: end"
+      ],
+      "row" : 32,
+      "section" : "4. The inspector",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r32-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "failed",
+      "text" : "The SmartArt dialog's graphic pop-up has a name VoiceOver reads, not its form key.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 81,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "false",
+          "check" : "menu(\"Edit › Undo*\").enabled == false",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Undo\"",
+          "check" : "menu(\"Edit › Undo*\").name == \"Undo New Slide\"",
+          "ok" : false
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1402, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161427Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1402",
+        "551: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1705 ms)",
+        "552: expect menu(\"Edit › Undo*\").enabled == false → ok (223 ms)",
+        "553: menu \"Insert › New Slide\" press → pressed Insert › New Slide (175 ms)",
+        "554: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (172 ms)",
+        "555: set undoName = menu(\"Edit › Undo*\").name → \"Undo\" (158 ms)",
+        "557: expect menu(\"Edit › Undo*\").name == \"Undo New Slide\" → got \"Undo\" (145 ms)"
+      ],
+      "message" : "Undo names the action: not so (`menu(\"Edit › Undo*\").name == \"Undo New Slide\"` read \"Undo\")",
+      "ms" : 7298,
+      "notes" : [
+        "After Insert › New Slide, Edit's first item reads: Undo",
+        "shot 1: end"
+      ],
+      "row" : 33,
+      "section" : "5. Undo",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r33-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "failed",
+      "text" : "**Edit › Undo and Redo name the action**, as macOS apps and PowerPoint do: \"Undo New Slide\", \"Redo New Slide\" (PLAN.md §3: `NSUndoManager` shows the menu titles).",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 82,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name=Arrange exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=heading name='Selection Pane' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "true",
+          "check" : "find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 8'\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "false",
+          "check" : "menu(\"Edit › Undo*\").enabled == false",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext text='of 9'\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "false",
+          "check" : "menu(\"Edit › Redo*\").enabled == false",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1420, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161435Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1420",
+        "565: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (2030 ms)",
+        "566: act role=radiobutton name=Home exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":12,\"y\":327},\"name\":\"Home\",\"ref\":\"W:sample.deckcraft/1/0/0@15ae\",\"role\":\"radiobutt (101 ms)",
+        "567: act role=button name=\"Selection Pane\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":15,\"w\":97,\"x\":855,\"y\":403},\"help\":\"List every object on the slide to select, hide or reorder th (92 ms)",
+        "568: until find(\"role=radiobutton name=Arrange exact=true\").count == 1 → ok (2040 ms)",
+        "569: act role=radiobutton name=Arrange exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":24,\"w\":28,\"x\":910,\"y\":495},\"help\":\"Arrange\",\"id\":\"square.3.layers.3d\",\"name\":\"Arrange\",\"ref\":\"W (194 ms)",
+        "570: until find(\"role=heading name='Selection Pane' exact=true\").count == 1 → ok (94 ms)",
+        "571: act role=button name=\"Title 1\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":14,\"w\":155,\"x\":862,\"y\":1029},\"name\":\"Title 1\",\"ref\":\"W:sample.deckcraft/0/5/2/7/6/0@1e95\",\"role (282 ms)",
+        "572: until find(\"role=checkbox name='Rotate Right 90°' exact=true\").0.enabled == true → ok (299 ms)",
+        "573: act role=checkbox name=\"Rotate Right 90°\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":31,\"x\":877,\"y\":878},\"help\":\"Rotate Right 90°\",\"id\":\"rotate.right\",\"name\":\"Rotate Right 9 (242 ms)",
+        "574: menu \"Insert › New Slide\" press → pressed Insert › New Slide (236 ms)",
+        "575: until find(\"role=statictext name='Slide 2 of 9' exact=true\").count == 1 → ok (319 ms)",
+        "576: act role=radiobutton name=Insert exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":28,\"w\":98,\"x\":118,\"y\":327},\"name\":\"Insert\",\"ref\":\"W:sample.deckcraft/1/0/1@37b0\",\"role\":\"radiob (283 ms)",
+        "577: act role=button name=Table exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":18,\"w\":24,\"x\":102,\"y\":358},\"help\":\"Add a table of rows and columns.\",\"name\":\"Table\",\"ref\":\"W:sa (120 ms)",
+        "578: until find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 1 → ok (304 ms)",
+        "579: menu \"Edit › Undo*\" press → pressed Edit › Undo* (177 ms)",
+        "580: until find(\"role=radiobutton name='Table Design, contextual' exact=true\").count == 0 → ok (215 ms)",
+        "581: menu \"Edit › Undo*\" press → pressed Edit › Undo* (153 ms)",
+        "582: until find(\"role=statictext text='of 8'\").count == 1 → ok (376 ms)",
+        "583: menu \"Edit › Undo*\" press → pressed Edit › Undo* (164 ms)",
+        "585: expect menu(\"Edit › Undo*\").enabled == false → ok (175 ms)",
+        "586: menu \"Edit › Redo*\" press → pressed Edit › Redo* (177 ms)",
+        "587: menu \"Edit › Redo*\" press → pressed Edit › Redo* (220 ms)",
+        "588: until find(\"role=statictext text='of 9'\").count == 1 → ok (220 ms)",
+        "589: menu \"Edit › Redo*\" press → pressed Edit › Redo* (162 ms)",
+        "591: expect menu(\"Edit › Redo*\").enabled == false → ok (162 ms)"
+      ],
+      "message" : null,
+      "ms" : 14117,
+      "notes" : [
+
+      ],
+      "row" : 34,
+      "section" : "5. Undo",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "Undo and Redo through a longer session (a slide, a table, a rotation): each step comes back in order, and Redo repeats them.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 90,
+      "checks" : [
+
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+
+      ],
+      "message" : "the canvas is a Metal view with no accessibility elements; it needs the control-channel step (below)",
+      "ms" : 0,
+      "notes" : [
+
+      ],
+      "row" : 35,
+      "section" : "6. On the slide canvas",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "skipped",
+      "text" : "Click a shape to select it; drag it (smart guides appear); resize it by a handle; rotate it by its handle. Undo names each.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 91,
+      "checks" : [
+
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+
+      ],
+      "message" : "in-place text editing is on the canvas; it needs the control-channel step (below)",
+      "ms" : 0,
+      "notes" : [
+
+      ],
+      "row" : 36,
+      "section" : "6. On the slide canvas",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "skipped",
+      "text" : "Double-click a text box and type, including an accented letter and dictation; the text wraps and autofits.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 92,
+      "checks" : [
+
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+
+      ],
+      "message" : "drawing is a drag on the canvas; it needs the control-channel step (below)",
+      "ms" : 0,
+      "notes" : [
+
+      ],
+      "row" : 37,
+      "section" : "6. On the slide canvas",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "skipped",
+      "text" : "Draw a shape from the Shapes gallery by dragging on the slide.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 99,
+      "checks" : [
+        {
+          "actual" : "\"Start\"",
+          "check" : "windows.0.title == \"Start\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window=Start role=button name='Blank Presentation' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window=Start role=button name=Harbor exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window=Start role=button name='Sample deck: Northern Lights' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window=Start role=button name=Briefing exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"window=Start role=button name='Evening Talk' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Untitled\"",
+          "check" : "windows.0.title != \"Start\"",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 1' exact=true\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1439, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161449Z.log",
+        "614: until windows.0.title == \"Start\" → ok (0 ms)",
+        "615: expect find(\"window=Start role=button name='Blank Presentation' exact=true\").count == 1 → ok (39 ms)",
+        "616: expect find(\"window=Start role=button name=Harbor exact=true\").count == 1 → ok (66 ms)",
+        "617: expect find(\"window=Start role=button name='Sample deck: Northern Lights' exact=true\").count == 1 → ok (37 ms)",
+        "618: expect find(\"window=Start role=button name=Briefing exact=true\").count == 1 → ok (45 ms)",
+        "619: expect find(\"window=Start role=button name='Evening Talk' exact=true\").count == 1 → ok (39 ms)",
+        "622: menu \"File › New Presentation\" press → pressed File › New Presentation (241 ms)",
+        "623: until windows.0.title != \"Start\" → ok (1421 ms)",
+        "624: until find(\"role=statictext name='Slide 1 of 1' exact=true\").count == 1 → ok (116 ms)"
+      ],
+      "message" : null,
+      "ms" : 6272,
+      "notes" : [
+
+      ],
+      "row" : 38,
+      "section" : "7. Everyday flows",
+      "shots" : [
+
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "A launch with nothing to open shows the **Start** window: Home, New and Open, the theme tiles and recent files. A tile makes a presentation.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : null,
+      "checks" : [
+        {
+          "actual" : "\"Start\"",
+          "check" : "windows.0.title == \"Start\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Untitled\"",
+          "check" : "windows.0.title != \"Start\"",
+          "ok" : true
+        },
+        {
+          "actual" : "\"Untitled\"",
+          "check" : "windows.0.title == \"Presentation1\"",
+          "ok" : false
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1448, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161455Z.log",
+        "630: until windows.0.title == \"Start\" → ok (0 ms)",
+        "631: menu \"File › New Presentation\" press → pressed File › New Presentation (181 ms)",
+        "632: until windows.0.title != \"Start\" → ok (1317 ms)",
+        "633: set title = windows.0.title → \"Untitled\" (0 ms)",
+        "635: expect windows.0.title == \"Presentation1\" → got \"Untitled\" (0 ms)"
+      ],
+      "message" : "PowerPoint's name, as the Start tile gives: not so (`windows.0.title == \"Presentation1\"` read \"Untitled\")",
+      "ms" : 5938,
+      "notes" : [
+        "File › New Presentation made a window titled Untitled.",
+        "shot 1: end"
+      ],
+      "row" : 39,
+      "section" : "7. Everyday flows",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r39-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "failed",
+      "text" : "A new presentation is named as PowerPoint names it, \"Presentation1\", whichever way it's made.",
+      "undo" : null
+    },
+    {
+      "checklist_line" : 100,
+      "checks" : [
+        {
+          "actual" : "1",
+          "check" : "find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "0",
+          "check" : "find(\"role=cell name='Slide 3' exact=true\").count == 0",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=cell name='Slide 3' exact=true\").count == 1",
+          "ok" : true
+        },
+        {
+          "actual" : "1",
+          "check" : "find(\"role=textarea name=Notes\").count == 1",
+          "ok" : true
+        }
+      ],
+      "events" : [
+
+      ],
+      "judgments" : [
+
+      ],
+      "log" : [
+        "launched DeckCraftNative pid 1458, log /Users/admin/Library/Caches/AppProbe/logs/DeckCraftNative-2026-11-04T161501Z.log",
+        "opened /Users/admin/appprobe/scenario/fixtures/sample.deckcraft in pid 1458",
+        "640: until find(\"role=statictext name='Slide 1 of 8' exact=true\").count == 1 → ok (1893 ms)",
+        "641: act role=button name=\"Collapse Science\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":11,\"w\":22,\"x\":11,\"y\":705},\"name\":\"Collapse Science\",\"ref\":\"W:sample.deckcraft/0/0/0/3/0/0@e23a\" (318 ms)",
+        "642: until find(\"role=cell name='Slide 3' exact=true\").count == 0 → ok (55 ms)",
+        "643: act role=button name=\"Expand Science\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":11,\"w\":22,\"x\":11,\"y\":705},\"name\":\"Expand Science\",\"ref\":\"W:sample.deckcraft/0/0/0/3/0/0@2d48\",\" (174 ms)",
+        "644: until find(\"role=cell name='Slide 3' exact=true\").count == 1 → ok (65 ms)",
+        "645: act role=button name=\"Slide Sorter\" exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":24,\"x\":756,\"y\":986},\"help\":\"Slide Sorter\",\"id\":\"square.grid.2x2\",\"name\":\"Slide Sorter\",\" (102 ms)",
+        "647: shot \"Slide Sorter\" (75 ms)",
+        "648: act role=button name=Normal exact=true action=press → {\"action\":\"press\",\"delivery\":\"delivered\",\"element\":{\"frame\":{\"h\":20,\"w\":24,\"x\":794,\"y\":986},\"help\":\"Normal\",\"id\":\"rectangle.split.2x1\",\"name\":\"Normal\",\"ref\":\"W: (200 ms)",
+        "649: until find(\"role=textarea name=Notes\").count == 1 → ok (81 ms)"
+      ],
+      "message" : null,
+      "ms" : 8344,
+      "notes" : [
+        "shot 1: Slide Sorter"
+      ],
+      "row" : 40,
+      "section" : "7. Everyday flows",
+      "shots" : [
+        "/Users/admin/appprobe/run/shots/r40-1.png"
+      ],
+      "stall_ms" : null,
+      "status" : "passed",
+      "text" : "**Slide Sorter** and **Normal** views from the status bar; sections fold and unfold.",
+      "undo" : null
+    }
+  ],
+  "scenario" : "/Users/admin/appprobe/scenario/HAND-TEST-2026-11.scenario.md",
+  "summary" : "40 rows: 28 passed, 4 failed, 3 need you, 5 skipped; 10 checklist rows have no steps",
+  "uncovered" : [
+    {
+      "line" : 33,
+      "text" : "A presentation with a **password to modify** offers **Read Only**, which opens a copy you can save under another name."
+    },
+    {
+      "line" : 51,
+      "text" : "**Shapes**, **Icons**, **WordArt**, **Equation**, **Symbol**, **Zoom**, **Header & Footer**: each adds what it says, drawn as its gallery tile shows."
+    },
+    {
+      "line" : 52,
+      "text" : "**Pictures**, **Video** and **Audio** (the open panel): the file is placed, a video gets a poster, VP9/WebM plays."
+    },
+    {
+      "line" : 60,
+      "text" : "Transitions play, and going **back** plays a slide's transition in reverse (0.1.9). Morph on slide 5 of the sample."
+    },
+    {
+      "line" : 61,
+      "text" : "**Presenter view** on a second display, with the Next slide preview; the show doesn't slow down (0.1.9)."
+    },
+    {
+      "line" : 93,
+      "text" : "Slide Sorter: select several slides and drag them together (0.1.9)."
+    },
+    {
+      "line" : 101,
+      "text" : "Export to PDF, pictures and `.pptx` (File › Export…); print to PDF."
+    },
+    {
+      "line" : 102,
+      "text" : "Spelling in the status bar; Find and Replace."
+    },
+    {
+      "line" : 103,
+      "text" : "A preview language (System Settings › Language & Region › Applications): menus, ribbon and inspector read naturally."
+    },
+    {
+      "line" : 104,
+      "text" : "**Help › Check for Updates…** reports 0.1.15 up to date."
+    }
+  ]
+}
