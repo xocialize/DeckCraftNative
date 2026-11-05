@@ -1,9 +1,12 @@
-// DCApp — what one frame of the slide show draws: the slide's texture (rendered once per step, or every frame
+// DCShow — what one frame of the slide show draws: the slide's texture (rendered once per step, or every frame
 // while something animates, over its kept backdrop), the transition's layers or the Morph frame, playing video
 // frames with the shapes stacked above them, and the pictures presenter view and See All Slides show. Port of the
 // drawing half of `ui` in deckcraft `crates/ui-egui/src/show.rs`, `part_textures`, `render_thumb` and the media
 // frame drawing of `media.rs` (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors).
-import AppKit
+//
+// `ShowRenderer` was DCApp's `ShowStage` until 2026-11-04. It is public so a program other than the app's show
+// window can draw a running show into its own texture: `frame(pixels:now:)`, then `encode(_:into:commandBuffer:)`.
+import CoreGraphics
 import DCAnim
 import DCAppModel
 import CNCore
@@ -19,17 +22,29 @@ final class ShowTransitionCache {
     var morph: MTLTexture?
 }
 
-/// A media shape's place in this frame, for the overlay (its bar, GIF button, "can't play" badge).
-struct ShowMediaPlace {
-    var id: ShapeId
-    var rect: CGRect
-    var unplayable: Bool
+/// A media shape's place in this frame, for the overlay (its bar, GIF button, "can't play" badge), in the
+/// frame's bounds' coordinates.
+public struct ShowMediaPlace: Sendable {
+    public var id: ShapeId
+    public var rect: CGRect
+    public var unplayable: Bool
 }
 
+/// One frame of the show, ready to encode: what `ShowRenderer.frame` made.
+public struct ShowFrame {
+    let draws: [ShowDraw]
+    /// The picture changes by itself (an animation, a transition, a playing video or GIF): draw every display frame.
+    public let animating: Bool
+    /// Nothing to draw (no show, or the show has ended): a client shows its clear colour.
+    public var isEmpty: Bool { draws.isEmpty }
+}
+
+/// Draws a running show (`ShowCoordinator`) through a compositor (`ShowMetal`), keeping the slide, transition,
+/// video and overlay textures of the show between frames. One per show client; main thread, like the coordinator.
 @MainActor
-final class ShowStage {
-    let coord: ShowCoordinator
-    let metal: ShowMetal
+public final class ShowRenderer {
+    public let coord: ShowCoordinator
+    public let metal: ShowMetal
     private var prefetch: ShowPrefetch?
     private let backdrop = ShowBackdrop()
     /// The shapes stacked above the playing videos (#1005): key, skipped shapes, texture.
@@ -43,14 +58,41 @@ final class ShowStage {
     private var nextPreview = ShowNextPreview()
     private var nextThumb: (doc: DocRef, index: Int, image: CGImage)?
     /// The GIFs and media shapes of the last frame (the overlay draws their controls).
-    private(set) var gifs: [ShowGif] = []
-    private(set) var mediaPlaces: [ShowMediaPlace] = []
+    public private(set) var gifs: [ShowGif] = []
+    public private(set) var mediaPlaces: [ShowMediaPlace] = []
     /// The document `doc` identity the textures were made from.
     private var docRef: DocRef?
 
-    init(coord: ShowCoordinator, metal: ShowMetal) {
+    public init(coord: ShowCoordinator, metal: ShowMetal) {
         self.coord = coord
         self.metal = metal
+    }
+
+    /// The frame at `now` for bounds `full` in points at `scale` pixels per point (a window: its bounds and
+    /// backing scale). The slide is fitted to `full` as `ShowGeometry.slideRect` fits it, letterboxed.
+    public func frame(bounds full: CGRect, scale: Double, now: Double) -> ShowFrame {
+        let (d, a) = draws(full: full, scale: scale, now: now)
+        return ShowFrame(draws: d, animating: a)
+    }
+
+    /// The frame at `now` for a target of `size` pixels. A target of the slide's aspect
+    /// (`ShowGeometry.slideAspect`) has no letterbox.
+    public func frame(pixels size: CGSize, now: Double) -> ShowFrame {
+        frame(bounds: CGRect(origin: .zero, size: size), scale: 1, now: now)
+    }
+
+    /// Encode `frame` into the whole of `target` on `commandBuffer`, over `clear`; the caller commits (and
+    /// presents). `target` must be a `.bgra8Unorm` or `.rgba8Unorm` render target of `metal.device`, the size the
+    /// frame was made for; false, and nothing encoded, otherwise.
+    @discardableResult
+    public func encode(_ frame: ShowFrame, into target: MTLTexture, commandBuffer: MTLCommandBuffer,
+                       clear: MTLClearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)) -> Bool {
+        metal.encode(frame.draws, into: target, commandBuffer: commandBuffer, clear: clear)
+    }
+
+    /// `frame` drawn over black into a new premultiplied RGBA8 image (tests, screenshots); waits for the GPU.
+    public func renderOffscreen(_ frame: ShowFrame, width: Int, height: Int) -> RenderImage? {
+        metal.renderOffscreen(frame.draws, width: width, height: height)
     }
 
     /// The draws of the frame at `now` for a window of `full` points at `scale` pixels per point, and whether
@@ -214,7 +256,7 @@ final class ShowStage {
     }
 
     /// The picture on screen as a CGImage (presenter view's current slide).
-    func currentImage() -> CGImage? {
+    public func currentImage() -> CGImage? {
         guard let c = current else { return nil }
         if let cg = currentCG, cg.key == c.key { return cg.image }
         guard let img = c.image.cgImage() else { return nil }
@@ -224,7 +266,7 @@ final class ShowStage {
 
     /// Slide `i`'s thumbnail (See All Slides), rendered once (`render_thumb`); nil past the cap or when `budget`
     /// is spent.
-    func thumb(_ i: Int, budget: inout Int) -> CGImage? {
+    public func thumb(_ i: Int, budget: inout Int) -> CGImage? {
         if let t = thumbs[i] { return t }
         guard budget > 0, thumbs.count < ShowGeometry.gridCap, let doc = coord.showState?.doc else { return nil }
         budget -= 1
@@ -234,7 +276,7 @@ final class ShowStage {
     }
 
     /// Presenter view's Next preview of slide `n` (480 pixels wide); nil while it is being rendered on another thread.
-    func nextImage(_ n: Int) -> CGImage? {
+    public func nextImage(_ n: Int) -> CGImage? {
         guard let ref = coord.showState?.docRef else { return nil }
         if let t = nextThumb, t.doc === ref, t.index == n { return t.image }
         guard let img = nextPreview.image(ref, n, width: 480)?.cgImage() else { return nil }

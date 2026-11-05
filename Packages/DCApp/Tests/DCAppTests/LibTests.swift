@@ -8,6 +8,7 @@ import DCAutomation
 import CNCore
 import DCEngine
 import DCModel
+import DCShow
 import Foundation
 import Testing
 @testable import DCApp

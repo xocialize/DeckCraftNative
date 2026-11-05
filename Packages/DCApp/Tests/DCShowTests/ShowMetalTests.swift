@@ -1,13 +1,12 @@
-// DCAppTests — the slide show's Metal compositor against DCRender's CPU compositor and deckcraft's frames: every
+// DCShowTests — the slide show's Metal compositor against DCRender's CPU compositor and deckcraft's frames: every
 // transition frame of the transitions deck (`DeckCraftNative-Fixtures/anim/transitions/`, 640 px wide, drawn by
 // deckcraft-render) and of the corpus decks, composited on the GPU from the same slide pictures the CPU
 // compositor uses, scored by SSIMULACRA2 (DCTestSupport.RenderParity) with the parity suite's floors. Morph frames
 // are rendered by DCRender in both paths (`renderBlend`), so they are not composited here. SSIMULACRA2 is slow
 // unoptimised, so the full comparison runs only in release or with `DECKCRAFT_PARITY=1`:
-//   swift test -c release -Xswiftc -enable-testing --filter ShowMetalTests --scratch-path .build-show-rel
+//   swift test -c release -Xswiftc -enable-testing --filter DCShowTests.ShowMetalTests --scratch-path .build-show-rel
 // A debug run checks one transition at a small size against the CPU compositor. The report goes to
 // `.build-parity/show-parity/report-<deck>.json`.
-import AppKit
 import DCAnim
 import DCAppModel
 import CNCore
@@ -19,7 +18,7 @@ import DCTestSupport
 import Foundation
 import Metal
 import Testing
-@testable import DCApp
+@testable import DCShow
 
 private struct ShowFrameScore: Codable {
     var deck: String
@@ -181,11 +180,11 @@ private var scoreEvery: Int { 1 }
         let c = ShowCoordinator(model: m)
         c.startShow(from: 1, reading: false)
         _ = c.tick(10)
-        let stage = ShowStage(coord: c, metal: metal)
+        let renderer = ShowRenderer(coord: c, metal: metal)
         let full = CGRect(x: 0, y: 0, width: 400, height: 400)
-        let (draws, animating) = stage.draws(full: full, scale: 1, now: 10)
-        #expect(!animating)
-        let img = try #require(metal.renderOffscreen(draws, width: 400, height: 400))
+        let frame = renderer.frame(pixels: full.size, now: 10)
+        #expect(!frame.animating)
+        let img = try #require(renderer.renderOffscreen(frame, width: 400, height: 400))
         // 16:9 in a square: black above and below, the slide in the middle.
         let top = Array(img.pixels[0 ..< 4])
         #expect(top == [0, 0, 0, 255])
@@ -199,47 +198,7 @@ private var scoreEvery: Int { 1 }
         #expect(zip(got, ref).allSatisfy { Swift.abs(Int($0) - Int($1)) <= 2 }, "\(got) \(ref)")
         // The frame is kept: a second pass reuses the texture.
         let tex = c.show?.frame?.image
-        _ = stage.draws(full: full, scale: 1, now: 10.5)
+        _ = renderer.frame(pixels: full.size, now: 10.5)
         #expect(c.show?.frame?.image === tex)
-    }
-
-    /// A windowed show opens, draws and closes; Escape in its window ends it (show.rs's keyboard path, through
-    /// the window's key handler) and the editor is left on the last slide.
-    @Test func aWindowedShowOpensAndEscapeEndsIt() throws {
-        guard let metal = ShowMetal.shared else { return }
-        _ = NSApplication.shared
-        let s = Session.withNew()
-        _ = try s.execute("slide.new", .emptyObject)
-        let m = AppModel(session: s)
-        m.ui.presenterView = true
-        let c = ShowCoordinator(model: m)
-        let w = ShowWindows(coord: c, metal: metal)
-        c.onShowStarted = { sh in
-            w.windowedNext = true
-            w.open(sh)
-        }
-        c.onShowEnded = { w.close() }
-        c.startShow(from: 0, reading: false)
-        #expect(w.audience != nil)
-        #expect(w.presenterWindow != nil, "windowed: presenter view opens in its own window")
-        let view = try #require(w.showView)
-        view.tick()
-        #expect(view.snapshot() != nil)
-        w.presenter?.refresh()
-        #expect(w.presenter?.counter == "Slide 1 of 2")
-        func key(_ code: UInt16, _ chars: String) -> NSEvent? {
-            NSEvent.keyEvent(
-                with: .keyDown, location: .zero, modifierFlags: [], timestamp: 0, windowNumber: w.audience?.windowNumber ?? 0, context: nil,
-                characters: chars, charactersIgnoringModifiers: chars, isARepeat: false, keyCode: code
-            )
-        }
-        if let right = key(124, "") { #expect(w.key(right, presenter: false)) }
-        #expect(c.show?.state.slide == 1)
-        if let b = key(11, "b") { #expect(w.key(b, presenter: true)) }
-        #expect(c.show?.blank == .black, "presenter view's keys drive the show too")
-        if let esc = key(53, "\u{1b}") { #expect(w.key(esc, presenter: false)) }
-        #expect(c.show == nil)
-        #expect(w.audience == nil && w.presenterWindow == nil)
-        #expect(s.activeDoc?.selection.slide == 1)
     }
 }

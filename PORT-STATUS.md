@@ -702,6 +702,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     fails as it should. PowerPoint opened 36 of the edited files without a repair prompt
     (`Tools/pptx/powerpoint-check.sh`). The oracle corpus is unchanged.
   - **Next:** `chart.data` (the cached values and the `c:f` ranges), the task's second half.
+- **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
+  show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
+  consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs
+  to draw a running show into a texture it owns.
+  - **Now:** `DCShow` has `ShowMetal` (public, `init?(device:queue:)` to draw on a host's device and in its queue's
+    order), `ShowRenderer` (was `ShowStage`: `frame(bounds:scale:now:)`, `frame(pixels:now:)`,
+    `encode(_:into:commandBuffer:clear:)` into a `.bgra8Unorm`/`.rgba8Unorm` render target, `renderOffscreen`, and
+    presenter view's pictures) and `ShowFramePacer` (when to draw: `ShowView.tick`'s rule, moved). Metal and Core
+    Graphics only. `ShowView` is its first client. Nothing the show draws changed.
+  - **Tests:** `ShowGoldenTests` wrote 168 frames of the four corpus decks (rest and mid-transition) before the move
+    and found them byte-identical after it. `ShowRendererTests` (6): a show drawn into a caller's BGRA texture on the
+    caller's device and queue equals the offscreen frame pixel for pixel; non-render-target and sRGB targets are
+    refused; the pacer; an ended show's empty frame; DCShow imports no UI framework. DCApp and DCAppModel suites:
+    507 tests green.
+  - **Not yet in it:** the blank screens, the end screen, ink and the laser are still drawn by AppKit over the Metal
+    view (`ShowOverlayView`), so a client of the renderer alone doesn't see them. That is the next step (Marquee
+    Presentation's P0 spike, A3).
 
 ## CraftNativeKit (2026-11-01)
 

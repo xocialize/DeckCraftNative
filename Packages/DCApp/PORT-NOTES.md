@@ -346,7 +346,7 @@ Alpha-gate workflow 3, "Present". Window-free logic in DCAppModel (`Show*.swift`
 | `media.rs` `MediaHost`, `Owner`, `Gif`, `find_clip`, `clip_on`, `carries_over`, `slide_media`, `clock`, `gif_key` | `DCAppModel/ShowMedia.swift` (`MediaHost`, `MediaOwner`, `ShowGif`) |
 | `notes.rs` `bullets` and `format` as `presenter_notes` uses them | `DCAppModel/ShowNotes.swift` |
 | — (gap #9) | `DCAppModel/ShowDisplays.swift`: which display plays the show and where presenter view goes |
-| `show.rs` drawing half of `ui`, `quad_mesh`, `part_textures`, `render_thumb`; `media.rs` `paint_frame` | `DCApp/Show/ShowStage.swift`, `ShowMetal.swift` |
+| `show.rs` drawing half of `ui`, `quad_mesh`, `part_textures`, `render_thumb`; `media.rs` `paint_frame` | `DCShow/ShowRenderer.swift` (DCApp's `ShowStage` until 2026-11-04), `DCShow/ShowMetal.swift` |
 | `show.rs` overlay painting, toolbar, reading bar, `paint_grid`; `media.rs` `control_bar`, `paint_gif_button` | `DCApp/Show/ShowView.swift` |
 | `show.rs` `presenter_window`, `presenter_notes` | `DCApp/Show/PresenterView.swift` |
 | the egui viewports (fullscreen command, presenter viewport) | `DCApp/Show/ShowWindows.swift` |
@@ -354,7 +354,7 @@ Alpha-gate workflow 3, "Present". Window-free logic in DCAppModel (`Show*.swift`
 | `control.rs` `show.start`, `show.end`, `ui.key` while showing, `showing`/`animPreview` in `ui.inspect` | `DCApp/Show/ShowFeature.swift` |
 | `apps/deckcraft/src/audio.rs` (cpal) | DCMedia's `AudioEngineOutput` |
 | `apps/deckcraft/src/display.rs` (X11/Wayland), `graphics.rs` (Direct3D) | not applicable on the Mac |
-| `textures.rs` (egui texture cache) | Metal textures in `ShowStage`; the canvas's part is the Canvas area's |
+| `textures.rs` (egui texture cache) | Metal textures in `ShowRenderer`; the canvas's part is the Canvas area's |
 
 ### How it draws
 
@@ -372,7 +372,14 @@ Alpha-gate workflow 3, "Present". Window-free logic in DCAppModel (`Show*.swift`
   makes it unnecessary in the app).
 - **The shaders** are compiled from source at first use (`ShowMetal.source`), so the package needs no Metal
   resource step.
-- **Overlays** (ink, laser, See All Slides, GIF buttons, media bars, the "can't play" badge, labels) are Core
+- **DCShow** (since 2026-11-04) holds the drawing: `ShowMetal` (the compositor) and `ShowRenderer` (one frame's
+  draws and the textures kept between frames), both public, with `ShowFramePacer`, the rule for when to draw that
+  was `ShowView.tick`'s. Metal and Core Graphics only, no AppKit or SwiftUI (`dcShowImportsNoUIFramework`). The
+  show window is its first client: `ShowView` asks the pacer, then encodes `renderer.frame(bounds:scale:now:)` into
+  its drawable. Any other program can draw a running show into its own texture: `ShowMetal(device:queue:)` on its
+  device and queue, `renderer.frame(pixels:now:)`, `encode(_:into:commandBuffer:)` into a `.bgra8Unorm` or
+  `.rgba8Unorm` render target (anything else is refused). Overlays still drawn by AppKit (below) are not in it yet.
+- **Overlays** (blank screens, the end screen, ink, laser, See All Slides, GIF buttons, media bars, the "can't play" badge, labels) are Core
   Graphics in a view above the `MTKView`; the toolbar and Reading View's bar are SwiftUI with DesignScaffold
   tokens; presenter view is SwiftUI (dark appearance) with the tokens.
 
@@ -454,8 +461,11 @@ window even on one display: the test mode.
   per side, as DCRender's renders are).
 - **New**: the show commands and their validation, custom shows and Play from Start, rehearsed timings, keys by
   name, tool keys, display choice, the canvas preview, auto-play and transition sounds, editor media requests;
-  in DCAppTests the Metal parity above, the stage's letterboxed frame, and a windowed show with presenter view
-  driven by key events through to Escape.
+  in DCShowTests the Metal parity above, the renderer's letterboxed frame, a show drawn into a caller's BGRA
+  texture on the caller's device and queue (equal to the offscreen frame), refused targets, the pacer, and DCShow's
+  imports; `ShowGoldenTests` (with `DECKCRAFT_SHOW_GOLDEN=write`, then `=check`) holds 168 frames of the corpus
+  decks byte for byte across a refactor (DCShow's move was checked with it); in DCAppTests a windowed show with
+  presenter view driven by key events through to Escape (`ShowWindowsTests`).
 - **Not applicable**: `display.rs` (2) and `graphics.rs` (4) test Linux and Windows start-up; `audio.rs` (2) tests
   cpal's error slot (DCMedia's `AudioEngineOutput` has its own tests).
 

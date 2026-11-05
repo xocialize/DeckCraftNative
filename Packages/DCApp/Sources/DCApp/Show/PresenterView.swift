@@ -7,6 +7,7 @@ import AppKit
 import DCAppModel
 import CNCore
 import DCModel
+import DCShow
 import DesignScaffold
 import SwiftUI
 
@@ -63,7 +64,7 @@ final class PresenterModel {
         set(\.aspect, ShowGeometry.slideAspect(doc))
         set(\.hiddenSlides, Set(doc.slides.indices.filter { doc.slides[$0].hidden }))
         set(\.notesPx, s.notesPx)
-        if let stage = windows?.showView?.stage {
+        if let stage = windows?.showView?.renderer {
             let img = stage.currentImage()
             if img !== current { current = img }
             let n = s.ended ? nil : s.state.peekNext(doc)
@@ -134,7 +135,7 @@ final class PresenterModel {
 
     func thumb(_ i: Int) -> CGImage? {
         var budget = 1
-        let t = windows?.showView?.stage.thumb(i, budget: &budget)
+        let t = windows?.showView?.renderer.thumb(i, budget: &budget)
         if t == nil { DispatchQueue.main.async { [weak self] in self?.thumbsRevision += 1 } }
         return t
     }

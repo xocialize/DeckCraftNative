@@ -11,6 +11,7 @@ import CNCore
 import DCEngine
 import DCMedia
 import DCModel
+import DCShow
 
 @MainActor
 enum ShowFeature {

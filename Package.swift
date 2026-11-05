@@ -47,6 +47,9 @@ let package = Package(
         .executable(name: "dccli", targets: ["dccli"]),
         // L7: the app. DCAppModel is its window-free state and UI commands; DCApp is AppKit and SwiftUI.
         .library(name: "DCAppModel", targets: ["DCAppModel"]),
+        // L7: the slide show's renderer, Metal only: what the show window draws, and what any other program can draw
+        // a running show into (its own texture, on its own device).
+        .library(name: "DCShow", targets: ["DCShow"]),
         .library(name: "DCApp", targets: ["DCApp"]),
         .executable(name: "DeckCraftDev", targets: ["DeckCraftDev"]),
         // L7: the app's Quick Look and Spotlight extensions (the appex targets in Apps/DeckCraftNative link these).
@@ -199,12 +202,27 @@ let package = Package(
             path: tests("DCApp", "DCAppModelTests")
         ),
 
+        // MARK: DCShow — the slide show's renderer (until 2026-11-04 DCApp's ShowStage and ShowMetal): one frame's draw
+        // list — the slide, its transition or Morph, playing video and the shapes above it — and the Metal compositor
+        // that draws it into any 8-bit unorm render target, a window's drawable or a texture another program owns,
+        // and when to draw (ShowFramePacer). Metal and Core Graphics only: no AppKit or SwiftUI (DCShowTests checks).
+        .target(
+            name: "DCShow",
+            dependencies: ["DCAppModel", "DCEngine", "DCRender", "DCAnim", "DCMedia", "DCModel", .product(name: "CNCore", package: "CraftNativeKit")],
+            path: sources("DCApp", "DCShow")
+        ),
+        .testTarget(
+            name: "DCShowTests",
+            dependencies: ["DCShow", "DCAppModel", "DCEngine", "DCRender", "DCAnim", "DCFormat", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport"],
+            path: tests("DCApp", "DCShowTests")
+        ),
+
         // MARK: DCApp — the Mac app: NSDocument windows, the canvas, navigator and inspector, menus and toolbar,
         // the slide show, the control server's host (ui-egui, apps/deckcraft). Wave 5.
         .target(
             name: "DCApp",
             dependencies: [
-                "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", .product(name: "CNCore", package: "CraftNativeKit"), "DCText",
+                "DCAppModel", "DCShow", "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCGeometry", .product(name: "CNCore", package: "CraftNativeKit"), "DCText",
                 "DCIntentsKit", "DCSpotlight",
                 .product(name: "DesignScaffold", package: "DesignScaffold"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
@@ -215,7 +233,7 @@ let package = Package(
         ),
         .testTarget(
             name: "DCAppTests",
-            dependencies: ["DCApp", "DCAppModel", "DCEngine", "DCAutomation", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport", "DCIntentsKit", "DCSpotlight"],
+            dependencies: ["DCApp", "DCAppModel", "DCShow", "DCEngine", "DCAutomation", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), "DCTestSupport", "DCIntentsKit", "DCSpotlight"],
             path: tests("DCApp", "DCAppTests")
         ),
         // The app run from SwiftPM, without a bundle: what agents and tests launch (`swift run DeckCraftDev

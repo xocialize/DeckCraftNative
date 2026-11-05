@@ -6,6 +6,7 @@
 import AppKit
 import DCAppModel
 import DCModel
+import DCShow
 import SwiftUI
 
 /// A window the show owns: it can become key without a title bar and sends keys to the show first.

@@ -8,6 +8,7 @@ import DCAppModel
 import CNCore
 import DCMedia
 import DCModel
+import DCShow
 import DesignScaffold
 import MetalKit
 import SwiftUI
@@ -32,7 +33,7 @@ final class ShowMTKView: MTKView {
 @MainActor
 final class ShowView: NSView, MTKViewDelegate {
     let coord: ShowCoordinator
-    let stage: ShowStage
+    let renderer: ShowRenderer
     let mtk: ShowMTKView
     let overlay: ShowOverlayView
     let chrome = ShowChromeModel()
@@ -41,9 +42,8 @@ final class ShowView: NSView, MTKViewDelegate {
     private var link: CADisplayLink?
     private var fallback: Timer?
     private(set) var lastTick = 0.0
-    private var lastDraw = 0.0
-    private var needsFrame = true
-    private var animating = false
+    /// When to draw (DCShow's rule, shared with every client of the renderer).
+    private var pacer = ShowFramePacer()
     /// Scrolls since the last frame, summed as egui sums a frame's wheel events: (dx, dy) points, zoom lines.
     private var scrollFlick = (0.0, 0.0)
     private var scrollZoom: Double?
@@ -57,7 +57,7 @@ final class ShowView: NSView, MTKViewDelegate {
 
     init(coord: ShowCoordinator, metal: ShowMetal) {
         self.coord = coord
-        stage = ShowStage(coord: coord, metal: metal)
+        renderer = ShowRenderer(coord: coord, metal: metal)
         mtk = ShowMTKView(frame: .zero, device: metal.device)
         overlay = ShowOverlayView()
         super.init(frame: .zero)
@@ -99,7 +99,7 @@ final class ShowView: NSView, MTKViewDelegate {
         readingHost?.isHidden = !reading
         readingHost?.frame = CGRect(x: 0, y: bounds.height - ShowGeometry.readingBarHeight, width: bounds.width, height: ShowGeometry.readingBarHeight)
         toolbarHost?.frame = ShowGeometry.toolBarRect(bounds)
-        needsFrame = true
+        pacer.invalidate()
     }
 
     override func updateTrackingAreas() {
@@ -151,10 +151,9 @@ final class ShowView: NSView, MTKViewDelegate {
             scrollFlick = (0, 0)
             if !handle(out) { return }
         }
-        if coord.media.syncVideoFrames() { needsFrame = true }
-        if animating || needsFrame || s.trans != nil || now - lastDraw > 0.25 {
-            needsFrame = false
-            lastDraw = now
+        if coord.media.syncVideoFrames() { pacer.invalidate() }
+        if pacer.shouldDraw(now: now, transitioning: s.trans != nil) {
+            pacer.willDraw(now: now)
             mtk.draw()
         }
         refreshChrome(now)
@@ -166,7 +165,7 @@ final class ShowView: NSView, MTKViewDelegate {
     /// Carry out an input's outcome; false when the show ended.
     @discardableResult
     func handle(_ out: ShowOutcome) -> Bool {
-        needsFrame = true
+        pacer.invalidate()
         if let u = out.openURL, let url = URL(string: u) { NSWorkspace.shared.open(url) }
         if !out.keep {
             coord.endShow()
@@ -186,12 +185,10 @@ final class ShowView: NSView, MTKViewDelegate {
 
     private func drawFrame() {
         let scale = Double(window?.backingScaleFactor ?? 2)
-        let (draws, anim) = stage.draws(full: bounds, scale: scale, now: ShowCoordinator.now())
-        animating = anim
-        guard let metal = ShowMetal.shared, let rp = mtk.currentRenderPassDescriptor, let drawable = mtk.currentDrawable,
-              let cb = metal.queue.makeCommandBuffer(), let enc = cb.makeRenderCommandEncoder(descriptor: rp) else { return }
-        metal.encode(enc, draws, size: mtk.drawableSize, format: mtk.colorPixelFormat)
-        enc.endEncoding()
+        let frame = renderer.frame(bounds: bounds, scale: scale, now: ShowCoordinator.now())
+        pacer.drew(frame)
+        guard let drawable = mtk.currentDrawable, let cb = renderer.metal.queue.makeCommandBuffer(),
+              renderer.encode(frame, into: drawable.texture, commandBuffer: cb) else { return }
         cb.present(drawable)
         cb.commit()
     }
@@ -200,9 +197,8 @@ final class ShowView: NSView, MTKViewDelegate {
     func snapshot() -> CGImage? {
         let scale = Double(window?.backingScaleFactor ?? 2)
         let (w, h) = (Int((bounds.width * scale).rounded()), Int((bounds.height * scale).rounded()))
-        guard let metal = ShowMetal.shared else { return nil }
-        let (draws, _) = stage.draws(full: bounds, scale: scale, now: ShowCoordinator.now())
-        guard let img = metal.renderOffscreen(draws, width: w, height: h), let base = img.cgImage() else { return nil }
+        let frame = renderer.frame(bounds: bounds, scale: scale, now: ShowCoordinator.now())
+        guard let img = renderer.renderOffscreen(frame, width: w, height: h), let base = img.cgImage() else { return nil }
         let space = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
         guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0, space: space,
                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
@@ -255,7 +251,7 @@ final class ShowView: NSView, MTKViewDelegate {
             coord.endShow()
             return
         }
-        needsFrame = true
+        pacer.invalidate()
         overlay.needsDisplay = true
     }
 
@@ -384,12 +380,12 @@ final class ShowOverlayView: NSView {
         ]
         if s.rehearse { parts.append("\(Int((now - s.slideStart) * 10))") }
         if v.coord.showState?.doc.show.showMediaControls ?? false {
-            for m in v.stage.mediaPlaces {
+            for m in v.renderer.mediaPlaces {
                 let st = v.coord.media.status(m.id)
                 parts.append("\(m.id.rawValue):\(String(describing: st?.state)):\(Int((st?.position ?? 0) * 4))")
             }
         }
-        for m in v.stage.mediaPlaces where m.unplayable { parts.append("x\(m.id.rawValue)") }
+        for m in v.renderer.mediaPlaces where m.unplayable { parts.append("x\(m.id.rawValue)") }
         let sig = parts.joined(separator: "|")
         if sig != signature {
             signature = sig
@@ -423,7 +419,7 @@ final class ShowOverlayView: NSView {
         let awake = s.pointerAwake(now)
         if !s.ended && s.trans == nil {
             // A video whose codec this Mac can't decode: say so on its box rather than show nothing.
-            for m in v.stage.mediaPlaces where m.unplayable && v.coord.media.status(m.id) != nil {
+            for m in v.renderer.mediaPlaces where m.unplayable && v.coord.media.status(m.id) != nil {
                 ctx.setFillColor(NSColor.black.withAlphaComponent(0.72).cgColor)
                 ctx.fill(m.rect)
                 drawCentered(text(String(localized: "This video can't be played on this Mac", bundle: .module), size: 13, color: .white), CGPoint(x: m.rect.midX, y: m.rect.midY))
@@ -432,7 +428,7 @@ final class ShowOverlayView: NSView {
             if doc.show.showMediaControls && !s.zoomArm && s.zoom == nil {
                 let k = srect.width / Swift.max(doc.slideSize.width, 1)
                 if let p = v.pointer, !s.pen, !s.laser, awake {
-                    for g in v.stage.gifs {
+                    for g in v.renderer.gifs {
                         let r = ShowGeometry.onScreen(srect, k, g.rect)
                         if ShowGeometry.contains(r, p) { drawGifButton(ctx, ShowGeometry.gifButtonRect(r), paused: g.paused) }
                     }
@@ -510,7 +506,7 @@ final class ShowOverlayView: NSView {
         for (i, rect) in zip(slides, cells) {
             ctx.setFillColor(NSColor(white: 32 / 255, alpha: 1).cgColor)
             ctx.fill(rect)
-            if let img = v.stage.thumb(i, budget: &budget) {
+            if let img = v.renderer.thumb(i, budget: &budget) {
                 ctx.saveGState()
                 ctx.translateBy(x: rect.minX, y: rect.maxY)
                 ctx.scaleBy(x: 1, y: -1)

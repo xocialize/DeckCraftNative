@@ -1,9 +1,10 @@
-// DCApp — the slide show's GPU compositor (PLAN.md §5.1): every slide is rendered once by DCRender into an
+// DCShow — the slide show's GPU compositor (PLAN.md §5.1): every slide is rendered once by DCRender into an
 // `MTLTexture`; a transition frame is DCAnim's `transitionFrame` layers drawn as `layerMesh` triangles,
 // premultiplied and blended source-over on black, with DCRender's CPU `compositeTransition` coverage, sampling and
 // arithmetic (`ShowExact`; deckcraft's egui meshes in `show.rs` `quad_mesh`). Video frames, the shapes above a playing video and
 // solid fills are quads through the same pipeline. The shaders are compiled from source at first use, so the
-// package needs no Metal resource step.
+// package needs no Metal resource step. It draws into any `.bgra8Unorm` or `.rgba8Unorm` target: the show window's
+// drawable, an offscreen texture, or a texture another program owns, on the device that program hands it.
 import DCAnim
 import DCAppModel
 import CNCore
@@ -98,11 +99,12 @@ struct ShowTransitionTextures {
 }
 
 @MainActor
-final class ShowMetal {
-    static let shared: ShowMetal? = ShowMetal()
+public final class ShowMetal {
+    /// The app's compositor, on the system's default device with its own queue (nil without Metal).
+    public static let shared: ShowMetal? = ShowMetal()
 
-    let device: MTLDevice
-    let queue: MTLCommandQueue
+    public let device: MTLDevice
+    public let queue: MTLCommandQueue
     private let library: MTLLibrary
     private var pipelines: [MTLPixelFormat.RawValue: MTLRenderPipelineState] = [:]
     private var exactPipelines: [MTLPixelFormat.RawValue: MTLRenderPipelineState] = [:]
@@ -182,8 +184,13 @@ final class ShowMetal {
     }
     """
 
-    init?() {
-        guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else { return nil }
+    /// A compositor on `device` (the system default when nil), committing to `queue` (a new queue on the device
+    /// when nil). Pass a host's device and queue to draw into its textures in its command order; a queue of
+    /// another device is not used. nil without Metal or when the shaders don't compile.
+    public init?(device: MTLDevice? = nil, queue: MTLCommandQueue? = nil) {
+        guard let device = device ?? MTLCreateSystemDefaultDevice() else { return nil }
+        let given = queue.flatMap { $0.device === device ? $0 : nil }
+        guard let queue = given ?? device.makeCommandQueue() else { return nil }
         guard let library = try? device.makeLibrary(source: Self.source, options: nil) else { return nil }
         let sd = MTLSamplerDescriptor()
         sd.minFilter = .linear
@@ -309,6 +316,30 @@ final class ShowMetal {
         return out
     }
 
+    /// Whether `target` can be drawn into: this compositor's device, a render target, a format the pipelines take.
+    func canDraw(into target: MTLTexture) -> Bool {
+        target.device === device && target.usage.contains(.renderTarget) && Self.formats.contains(target.pixelFormat)
+            && target.textureType == .type2D && target.width > 0 && target.height > 0
+    }
+
+    /// The target formats: 8-bit unorm, blended as the CPU compositor blends (sRGB formats would blend in linear light).
+    static let formats: [MTLPixelFormat] = [.bgra8Unorm, .rgba8Unorm]
+
+    /// Encode `draws` into the whole of `target` on `commandBuffer`, over `clear`: one render pass, not committed.
+    /// false when `target` can't be drawn into (another device, not a render target, another format).
+    func encode(_ draws: [ShowDraw], into target: MTLTexture, commandBuffer: MTLCommandBuffer, clear: MTLClearColor) -> Bool {
+        guard canDraw(into: target) else { return false }
+        let rp = MTLRenderPassDescriptor()
+        rp.colorAttachments[0].texture = target
+        rp.colorAttachments[0].loadAction = .clear
+        rp.colorAttachments[0].storeAction = .store
+        rp.colorAttachments[0].clearColor = clear
+        guard let enc = commandBuffer.makeRenderCommandEncoder(descriptor: rp) else { return false }
+        encode(enc, draws, size: CGSize(width: target.width, height: target.height), format: target.pixelFormat)
+        enc.endEncoding()
+        return true
+    }
+
     /// Render `draws` over black into a new RGBA8 image of `width`×`height` (tests and `ui.screenshot`).
     func renderOffscreen(_ draws: [ShowDraw], width: Int, height: Int, clear: SIMD4<Double> = SIMD4(0, 0, 0, 1)) -> RenderImage? {
         guard width > 0, height > 0, width <= 16384, height <= 16384 else { return nil }
@@ -316,14 +347,8 @@ final class ShowMetal {
         td.usage = [.renderTarget, .shaderRead]
         td.storageMode = .shared
         guard let target = device.makeTexture(descriptor: td), let cb = queue.makeCommandBuffer() else { return nil }
-        let rp = MTLRenderPassDescriptor()
-        rp.colorAttachments[0].texture = target
-        rp.colorAttachments[0].loadAction = .clear
-        rp.colorAttachments[0].storeAction = .store
-        rp.colorAttachments[0].clearColor = MTLClearColor(red: clear.x, green: clear.y, blue: clear.z, alpha: clear.w)
-        guard let enc = cb.makeRenderCommandEncoder(descriptor: rp) else { return nil }
-        encode(enc, draws, size: CGSize(width: width, height: height), format: .rgba8Unorm)
-        enc.endEncoding()
+        let color = MTLClearColor(red: clear.x, green: clear.y, blue: clear.z, alpha: clear.w)
+        guard encode(draws, into: target, commandBuffer: cb, clear: color) else { return nil }
         cb.commit()
         cb.waitUntilCompleted()
         var px = [UInt8](repeating: 0, count: width * height * 4)
