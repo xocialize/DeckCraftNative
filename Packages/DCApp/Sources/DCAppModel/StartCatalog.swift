@@ -167,7 +167,7 @@ public enum StartTileArt {
     /// `~/Library/Caches/DeckCraftNative/StartTiles/<version>`.
     public static func cacheDirectory(version: String = DCAppVersion.current) -> URL? {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
-            .appending(path: "DeckCraftNative/StartTiles/\(fileSafe(version))")
+            .appending(path: "\(AppIdentity.current.supportFolder)/StartTiles/\(fileSafe(version))")
     }
 
     /// `id` with everything but ASCII letters and digits replaced, for a file name.

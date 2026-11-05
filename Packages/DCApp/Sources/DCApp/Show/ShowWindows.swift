@@ -119,7 +119,7 @@ final class ShowWindows {
             w = ShowWindow(contentRect: frame, styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
         }
         w.setFrame(frame, display: false)
-        w.title = String(localized: "Presenter View — DeckCraftNative", bundle: .module, comment: "The presenter view window's title")
+        w.title = String(localized: "Presenter View — DeckCraftNative", bundle: .module, comment: "The presenter view window's title").branded
         w.appearance = NSAppearance(named: .darkAqua)
         w.isReleasedWhenClosed = false
         w.contentView = host

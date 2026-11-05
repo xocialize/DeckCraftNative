@@ -22,7 +22,8 @@ public struct UpdateChecker: Sendable {
     /// Offer pre-releases too (off: deckcraft's desktop app never offers them).
     public var allowPrerelease = false
 
-    public init(source: UpdateSource = .github(), currentVersion: String = DCAppVersion.shown(), session: URLSession = .shared) {
+    public init(source: UpdateSource = AppIdentity.current.updateSource ?? .github(), currentVersion: String = AppIdentity.current.shownVersion,
+                session: URLSession = .shared) {
         self.source = source
         self.currentVersion = currentVersion
         self.session = session
@@ -33,7 +34,7 @@ public struct UpdateChecker: Sendable {
         var r = URLRequest(url: source.feed, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30)
         r.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         r.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
-        r.setValue("DeckCraftNative/\(currentVersion)", forHTTPHeaderField: "User-Agent")
+        r.setValue("\(AppIdentity.current.name.replacingOccurrences(of: " ", with: ""))/\(currentVersion)", forHTTPHeaderField: "User-Agent")
         return r
     }
 

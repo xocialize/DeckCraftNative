@@ -20,19 +20,35 @@ public struct UpdateSource: Sendable, Equatable {
     public var downloadPrefix: String
     /// The releases page: the fallback link, and the prefix a release's own page must have.
     public var releasesPage: String
+    /// What this product's release tags start with before the version (`AppIdentity.releaseTagPrefix`): "v" takes
+    /// any tag that parses as a version, as before; another prefix takes only tags that start with it.
+    public var tagPrefix: String = "v"
+    /// The installer's name before `-<version>.dmg`.
+    public var installerName: String = "DeckCraftNative"
 
-    public init(feed: URL, downloadPrefix: String, releasesPage: String) {
+    public init(feed: URL, downloadPrefix: String, releasesPage: String, tagPrefix: String = "v", installerName: String = "DeckCraftNative") {
         self.feed = feed
         self.downloadPrefix = downloadPrefix
         self.releasesPage = releasesPage
+        self.tagPrefix = tagPrefix
+        self.installerName = installerName
     }
 
-    /// GitHub, for `repo`.
-    public static func github(_ repo: String = releasesRepo) -> UpdateSource {
-        UpdateSource(
-            feed: URL(string: "https://api.github.com/repos/\(repo)/releases?per_page=10") ?? URL(filePath: "/"),
+    /// GitHub, for `repo`. A repo several products share lists more releases, so the feed asks for more of them.
+    public static func github(_ repo: String = releasesRepo, tagPrefix: String = "v", installerName: String = "DeckCraftNative") -> UpdateSource {
+        let perPage = tagPrefix.lowercased() == "v" ? 10 : 50
+        return UpdateSource(
+            feed: URL(string: "https://api.github.com/repos/\(repo)/releases?per_page=\(perPage)") ?? URL(filePath: "/"),
             downloadPrefix: "https://github.com/\(repo)/releases/download/",
-            releasesPage: "https://github.com/\(repo)/releases")
+            releasesPage: "https://github.com/\(repo)/releases",
+            tagPrefix: tagPrefix, installerName: installerName)
+    }
+
+    /// The version a tag names for this product: nil for another product's tag.
+    public func version(ofTag tag: String) -> UpdateVersion? {
+        if tagPrefix.lowercased() == "v" { return UpdateVersion.parse(tag) }
+        guard tag.lowercased().hasPrefix(tagPrefix.lowercased()) else { return nil }
+        return UpdateVersion.parse(String(tag.dropFirst(tagPrefix.count)))
     }
 
     /// A stand-in feed for trying the flow against a local server (debug builds only, `DECKCRAFT_UPDATES_FEED`):
@@ -167,7 +183,12 @@ public struct UpdateRelease: Sendable, Equatable {
     public var prerelease: Bool
     public var assets: [UpdateAsset]
 
-    public init(tag: String, version: UpdateVersion?, name: String, publishedAt: Date?, page: URL, notes: String, prerelease: Bool, assets: [UpdateAsset]) {
+    /// The installer's name before `-<version>.dmg` (`UpdateSource.installerName`).
+    public var installerName = "DeckCraftNative"
+
+    public init(tag: String, version: UpdateVersion?, name: String, installerName: String = "DeckCraftNative", publishedAt: Date?, page: URL, notes: String,
+                prerelease: Bool, assets: [UpdateAsset]) {
+        self.installerName = installerName
         self.tag = tag
         self.version = version
         self.name = name
@@ -188,7 +209,7 @@ public struct UpdateRelease: Sendable, Equatable {
             let n = a.name.lowercased()
             return n.hasSuffix(".dmg") && !n.contains("unnotarized")
         }
-        let expected = "DeckCraftNative-\(versionLabel).dmg".lowercased()
+        let expected = "\(installerName)-\(versionLabel).dmg".lowercased()
         return dmgs.first { $0.name.lowercased() == expected } ?? dmgs.first
     }
 }
@@ -281,7 +302,7 @@ public enum UpdateFeed {
         }
         let name = (v["name"] as? String).map { truncate($0, 120) }.flatMap { $0.isEmpty ? nil : $0 } ?? tag
         return UpdateRelease(
-            tag: tag, version: UpdateVersion.parse(tag), name: name,
+            tag: tag, version: source.version(ofTag: tag), name: name, installerName: source.installerName,
             publishedAt: (v["published_at"] as? String).flatMap { try? Date($0, strategy: .iso8601) },
             page: page, notes: (v["body"] as? String).map { truncate($0, maxNotes) } ?? "",
             prerelease: v["prerelease"] as? Bool ?? false, assets: assets)

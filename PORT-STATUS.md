@@ -726,6 +726,13 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     every case (slide, black, white, ink over black, end screen, end screen with ink), ink within 1 level on 0.008 %
     of channels. `ShowRendererTests` +4 (blank, ink and end screen from the renderer alone; the pacer's observe).
     519 tests green; alpha gate 24/24 in both layouts.
+  - **Then (2026-11-04): `AppIdentity`, so a product built on DeckCraftNative ships under its own name.** A host that
+    links DCApp sets `AppIdentity.current` before `DeckCraftApp.main()`: name, version, releases repo and tag prefix,
+    installer name, support folder, an About line. Text that names DeckCraftNative keeps its catalog keys and
+    translations and is branded after localizing (`String.branded`: the name is never translated). The update feed
+    takes only the product's own tag prefix, so products can share a releases repo (`presentation-v0.1.0` beside
+    `windows-v1.2.0`). DeckCraftNative's own identity, feed and text are unchanged. `AppIdentityTests` (3); 529 app
+    tests green. Its first user is MVS's Marquee Presentation.
   - **Then (2026-11-04): `ShowTextureSource`.** A running show as one BGRA texture a host composites: the host's display
     loop calls `tick(now:)`, and the source draws only when the picture changed, moving `generation` (one texture is
     enough on the host's own queue). It starts and ends its show, takes keys as the show window does, and resizes.

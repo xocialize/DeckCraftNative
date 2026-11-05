@@ -549,7 +549,8 @@ extension DialogController {
             return [
                 // Wave 6 (Release): the fork's About — plain-text attribution, no ArtCraft marks or community links
                 // (deckcraft docs/brand/LICENSE-brand.txt, "Forks and modified versions").
-                .heading("DeckCraftNative"), .note(DialogBackstage.versionLine()),
+                .heading("DeckCraftNative".branded), .note(DialogBackstage.versionLine()),
+            ] + (AppIdentity.current.builtOn.map { [.note($0)] } ?? []) + [
                 .note(L10n.text("DeckCraftNative, based on DeckCraft by the ArtCraft team.")),
                 .note(L10n.text("Presentations and slide shows, ported to native macOS from DeckCraft.")),
                 .note(L10n.text("An open-source, clean-room project. Not affiliated with Microsoft.")),
@@ -564,7 +565,7 @@ extension DialogController {
                 .choice(label: L10n.text("Appearance:"), key: "appearance", options: [FormOption("system", L10n.text("System")), FormOption("light", L10n.text("Light")), FormOption("dark", L10n.text("Dark"))]),
                 .choice(label: L10n.text("Window layout:"), key: "layout", options: [FormOption("mac", L10n.text("Toolbar and inspector")), FormOption("ribbon", L10n.text("Ribbon"))]),
                 .radio(label: L10n.text("Measurement units:"), key: "units", options: [FormOption("inches", L10n.text("Inches")), FormOption("centimeters", L10n.text("Centimeters"))]),
-                .check(label: L10n.text("Show the start screen when DeckCraftNative opens"), key: "startScreen"),
+                .check(label: L10n.text("Show the start screen when DeckCraftNative opens").branded, key: "startScreen"),
                 .heading(L10n.text("Editing")),
                 .check(label: L10n.text("Show smart guides"), key: "smartGuides"), .check(label: L10n.text("Snap objects to grid"), key: "snapToGrid"),
                 .check(label: L10n.text("Replace straight quotes with smart quotes"), key: "smartQuotes"),

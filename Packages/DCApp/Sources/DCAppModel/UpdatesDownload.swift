@@ -24,7 +24,7 @@ public enum UpdateDownloader {
         completion: @escaping @Sendable (Result<URL, UpdateError>) -> Void
     ) -> URLSessionDownloadTask {
         var request = URLRequest(url: asset.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60)
-        request.setValue("DeckCraftNative/\(DCAppVersion.current)", forHTTPHeaderField: "User-Agent")
+        request.setValue(AppIdentity.current.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
         let task = session.downloadTask(with: request) { location, response, error in
             // `location` is deleted when this returns: everything happens here.
@@ -82,7 +82,7 @@ public enum UpdateDownloader {
     /// Move `file` into `directory` as `name` (`name (2).dmg` when taken), quarantined.
     static func place(_ file: URL, named name: String, in directory: URL) -> Result<URL, UpdateError> {
         let fm = FileManager.default
-        let safe = UpdateFeed.validFileName(name) ? name : "DeckCraftNative-update.dmg"
+        let safe = UpdateFeed.validFileName(name) ? name : "\(AppIdentity.current.installerName)-update.dmg"
         do {
             try fm.createDirectory(at: directory, withIntermediateDirectories: true)
             let dest = uniqueURL(for: safe, in: directory)
@@ -111,7 +111,7 @@ public enum UpdateDownloader {
     static func quarantine(_ file: URL) {
         var values = URLResourceValues()
         values.quarantineProperties = [
-            "LSQuarantineAgentName": "DeckCraftNative",
+            "LSQuarantineAgentName": AppIdentity.current.name,
             "LSQuarantineType": "LSQuarantineTypeWebDownload",
         ]
         var url = file

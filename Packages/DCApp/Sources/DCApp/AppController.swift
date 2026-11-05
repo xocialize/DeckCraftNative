@@ -75,7 +75,7 @@ public final class AppController: NSObject, AppHost {
     public init(model: AppModel = AppModel()) {
         self.model = model
         supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
-            .appending(path: "DeckCraftNative") ?? URL(filePath: NSTemporaryDirectory())
+            .appending(path: AppIdentity.current.supportFolder) ?? URL(filePath: NSTemporaryDirectory())
         super.init()
         model.host = self
         Self.shared = self

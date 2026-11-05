@@ -35,7 +35,7 @@ public enum DialogCatalog {
         case "paragraph": L10n.text("Paragraph")
         case "tabs": L10n.text("Tabs")
         case "font": L10n.text("Font")
-        case "about": L10n.text("About DeckCraftNative")
+        case "about": L10n.text("About DeckCraftNative").branded
         case "preferences": L10n.text("Settings")
         case "autocorrect": L10n.text("AutoCorrect")
         case "gridOptions": L10n.text("Grid Options")
@@ -61,7 +61,7 @@ public enum DialogCatalog {
         case "themeFonts": L10n.text("Create New Theme Fonts")
         case "info": L10n.text("Properties")
         case "new": L10n.text("New Presentation")
-        default: "DeckCraftNative"  // the app's name, not translated
+        default: AppIdentity.current.name  // the app's name, not translated
         }
     }
 

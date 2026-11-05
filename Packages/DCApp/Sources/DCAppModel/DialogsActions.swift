@@ -547,7 +547,7 @@ extension DialogController {
             "rtf": ("rtf", "rtf", false), "deckcraft": ("deckcraft", "deckcraft", false), "gif": ("gif", "gif", false),
         ]
         guard let (ext, format, all) = table[fmt] else {
-            status(L10n.text("DeckCraftNative can't export “\(fmt)”"))
+            status(L10n.text("DeckCraftNative can't export “\(fmt)”").branded)
             return false
         }
         guard let services else {
@@ -770,7 +770,7 @@ extension DialogController {
                 d.fields["status"] = L10n.text("Replaced \(v["replaced"]?.asU64 ?? 0) occurrence(s).")
                 model.changed()
             } else {
-                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.")
+                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.").branded
             }
             d.fields["cur"] = nil
             return false
@@ -779,7 +779,7 @@ extension DialogController {
         if findNext {
             let list = query("text.find", q)?.asArray ?? []
             if list.isEmpty {
-                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.")
+                d.fields["status"] = L10n.text("DeckCraftNative can't find “\(text)”.").branded
                 d.fields["cur"] = nil
             } else {
                 let n = Int((UInt(d.value("next")) ?? 0) % UInt(list.count))

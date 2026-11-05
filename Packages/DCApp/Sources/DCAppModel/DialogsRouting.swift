@@ -318,7 +318,7 @@ public enum DialogBackstage {
 
     /// `version_line`: the bundle's version, and the build when there is one.
     public static func versionLine(_ info: [String: Any]? = Bundle.main.infoDictionary) -> String {
-        let v = info?["CFBundleShortVersionString"] as? String ?? DCAppVersion.current
+        let v = info?["CFBundleShortVersionString"] as? String ?? AppIdentity.current.version ?? DCAppVersion.current
         let b = info?["CFBundleVersion"] as? String
         return b.map { String(localized: "Version \(v) (\($0))", bundle: .module, comment: "About: the version, then the build") } ?? L10n.text("Version \(v)")
     }

@@ -776,7 +776,7 @@ final class CanvasView: NSView {
             case .open?:
                 any = true
             case nil:
-                model.status = String(localized: "\(name): DeckCraftNative can't open this kind of file", bundle: .module, comment: "Status after a drop: the file's name, then the problem")
+                model.status = String(localized: "\(name): DeckCraftNative can't open this kind of file", bundle: .module, comment: "Status after a drop: the file's name, then the problem").branded
             }
         }
         return any

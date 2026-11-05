@@ -287,7 +287,7 @@ final class PrintAccessory: NSViewController, NSPrintPanelAccessorizing {
     init(_ pages: PrintPagesView) {
         self.pages = pages
         super.init(nibName: nil, bundle: nil)
-        title = "DeckCraftNative"  // the print panel's tab for these options: the app's name, not translated
+        title = AppIdentity.current.name  // the print panel's tab for these options: the app's name, not translated
     }
 
     @available(*, unavailable)

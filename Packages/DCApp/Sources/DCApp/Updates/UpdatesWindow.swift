@@ -80,9 +80,9 @@ struct UpdatesView: View {
         case .idle, .checking: String(localized: "Checking for updates…", bundle: .module)
         case .upToDate: String(localized: "You're up to date", bundle: .module)
         case .failed: String(localized: "Couldn't check for updates", bundle: .module)
-        case .available(let r): String(localized: "DeckCraftNative \(r.versionLabel) is available", bundle: .module)
-        case .downloading(let r): String(localized: "Downloading DeckCraftNative \(r.versionLabel)…", bundle: .module)
-        case .downloaded(let r, _): String(localized: "DeckCraftNative \(r.versionLabel) is ready", bundle: .module)
+        case .available(let r): String(localized: "DeckCraftNative \(r.versionLabel) is available", bundle: .module).branded
+        case .downloading(let r): String(localized: "Downloading DeckCraftNative \(r.versionLabel)…", bundle: .module).branded
+        case .downloaded(let r, _): String(localized: "DeckCraftNative \(r.versionLabel) is ready", bundle: .module).branded
         case .downloadFailed: String(localized: "The download didn't finish", bundle: .module)
         }
     }
@@ -92,7 +92,7 @@ struct UpdatesView: View {
         case .idle, .checking:
             nil
         case .upToDate(let v):
-            String(localized: "DeckCraftNative \(v) is the newest version.", bundle: .module)
+            String(localized: "DeckCraftNative \(v) is the newest version.", bundle: .module).branded
         case .failed(let e), .downloadFailed(_, let e):
             e.message
         case .available(let r):
@@ -102,7 +102,7 @@ struct UpdatesView: View {
         case .downloading:
             nil
         case .downloaded(_, let file):
-            String(localized: "\(file.lastPathComponent) is open in Finder. Quit DeckCraftNative, then drag the new version onto Applications to replace this one.", bundle: .module)
+            String(localized: "\(file.lastPathComponent) is open in Finder. Quit DeckCraftNative, then drag the new version onto Applications to replace this one.", bundle: .module).branded
         }
     }
 
