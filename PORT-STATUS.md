@@ -918,7 +918,9 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     another sign the metric doesn't measure this comparison.
   - **Tests:** `WriteChartDataTableTests` (3), `InsertCommandTests.chartOptionsSetADataTable`,
     `RibbonModelTests.dataTableSubmenuAddsAndRemovesTheTable` (and the Add Chart Element count),
-    `ChartDataTableRenderTests`. The oracle corpus is unchanged.
+    `ChartDataTableRenderTests`. The oracle corpus is unchanged. After the four chart tasks (AB-T-0440, 0437, 0438,
+    0439) the full suite passes on fd4dbfa: 2,386 tests in all 19 bundles in debug, with `RenderParityTests` and
+    `TransitionParityTests` run in release.
   - **Not yet:** PowerPoint lists a stacked area's series bottom-up in the table, we list them in order; the
     table's own fill, line and text formatting are kept but not drawn; no table under horizontal bars (not offered;
     whether PowerPoint offers one there wasn't checked).
