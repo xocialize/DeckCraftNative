@@ -378,8 +378,11 @@ Alpha-gate workflow 3, "Present". Window-free logic in DCAppModel (`Show*.swift`
   show window is its first client: `ShowView` asks the pacer, then encodes `renderer.frame(bounds:scale:now:)` into
   its drawable. Any other program can draw a running show into its own texture: `ShowMetal(device:queue:)` on its
   device and queue, `renderer.frame(pixels:now:)`, `encode(_:into:commandBuffer:)` into a `.bgra8Unorm` or
-  `.rgba8Unorm` render target (anything else is refused). Overlays still drawn by AppKit (below) are not in it yet.
-- **Overlays** (blank screens, the end screen, ink, laser, See All Slides, GIF buttons, media bars, the "can't play" badge, labels) are Core
+  `.rgba8Unorm` render target (anything else is refused). What the audience sees over the slide is the renderer's
+  too (`ShowOverlays.swift`): the end screen's line (the client's words: `endText`, which the window sets), the
+  blank screens and ink, in that order. The pacer's `observe(show)` notices changes made outside the client
+  (presenter view's B and W, ink, the control channel).
+- **Overlays** (laser, See All Slides, GIF buttons, media bars, the "can't play" badge, labels) are Core
   Graphics in a view above the `MTKView`; the toolbar and Reading View's bar are SwiftUI with DesignScaffold
   tokens; presenter view is SwiftUI (dark appearance) with the tokens.
 
@@ -464,7 +467,9 @@ window even on one display: the test mode.
   in DCShowTests the Metal parity above, the renderer's letterboxed frame, a show drawn into a caller's BGRA
   texture on the caller's device and queue (equal to the offscreen frame), refused targets, the pacer, and DCShow's
   imports; `ShowGoldenTests` (with `DECKCRAFT_SHOW_GOLDEN=write`, then `=check`) holds 168 frames of the corpus
-  decks byte for byte across a refactor (DCShow's move was checked with it); in DCAppTests a windowed show with
+  decks byte for byte across a refactor (DCShow's move was checked with it), and `ShowOverlayGoldenTests` the
+  window's whole picture (Metal and overlay) for the blank, ink and end-screen cases (moving them into DCShow left
+  every case identical, ink within 1 level on 0.008 % of channels); in DCAppTests a windowed show with
   presenter view driven by key events through to Escape (`ShowWindowsTests`).
 - **Not applicable**: `display.rs` (2) and `graphics.rs` (4) test Linux and Windows start-up; `audio.rs` (2) tests
   cpal's error slot (DCMedia's `AudioEngineOutput` has its own tests).

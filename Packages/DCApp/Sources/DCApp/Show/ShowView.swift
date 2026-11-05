@@ -58,6 +58,7 @@ final class ShowView: NSView, MTKViewDelegate {
     init(coord: ShowCoordinator, metal: ShowMetal) {
         self.coord = coord
         renderer = ShowRenderer(coord: coord, metal: metal)
+        renderer.endText = String(localized: "End of slide show, click to exit.", bundle: .module)
         mtk = ShowMTKView(frame: .zero, device: metal.device)
         overlay = ShowOverlayView()
         super.init(frame: .zero)
@@ -152,6 +153,7 @@ final class ShowView: NSView, MTKViewDelegate {
             if !handle(out) { return }
         }
         if coord.media.syncVideoFrames() { pacer.invalidate() }
+        pacer.observe(s)
         if pacer.shouldDraw(now: now, transitioning: s.trans != nil) {
             pacer.willDraw(now: now)
             mtk.draw()
@@ -417,7 +419,9 @@ final class ShowOverlayView: NSView {
         let srect = ShowGeometry.slideRect(full, reading: s.reading, doc)
         let uv = s.zoomUV
         let awake = s.pointerAwake(now)
-        if !s.ended && s.trans == nil {
+        // The end screen's line, the blank screens and ink are the renderer's (DCShow), under this overlay. A blank
+        // screen covers the media marks, as it did when it was drawn here.
+        if !s.ended && s.trans == nil && s.blank == nil {
             // A video whose codec this Mac can't decode: say so on its box rather than show nothing.
             for m in v.renderer.mediaPlaces where m.unplayable && v.coord.media.status(m.id) != nil {
                 ctx.setFillColor(NSColor.black.withAlphaComponent(0.72).cgColor)
@@ -438,13 +442,6 @@ final class ShowOverlayView: NSView {
                 }
             }
         }
-        if s.ended {
-            drawCentered(text(String(localized: "End of slide show, click to exit.", bundle: .module), size: 18, color: NSColor(white: 0.78, alpha: 1)), CGPoint(x: full.midX, y: full.minY + 40))
-        }
-        if let b = s.blank {
-            ctx.setFillColor(b == .black ? NSColor.black.cgColor : NSColor.white.cgColor)
-            ctx.fill(full)
-        }
         if !s.goto.isEmpty {
             let label = String(localized: "Go to slide \(s.goto)", bundle: .module, comment: "The slide number typed so far while the show waits for Enter")
             let w = Swift.min(Swift.max(28 + Double(label.count) * 10, 160), Swift.max(full.width - 32, 160))
@@ -453,17 +450,6 @@ final class ShowOverlayView: NSView {
             ctx.setFillColor(NSColor.black.withAlphaComponent(0.75).cgColor)
             ctx.fillPath()
             drawCentered(text(label, size: 18, color: .white), CGPoint(x: r.midX, y: r.midY))
-        }
-        // Ink.
-        let pen = NSColor(srgbRed: Double(doc.show.penColor.r) / 255, green: Double(doc.show.penColor.g) / 255, blue: Double(doc.show.penColor.b) / 255, alpha: 1)
-        ctx.setStrokeColor(pen.cgColor)
-        ctx.setLineWidth(3)
-        ctx.setLineCap(.round)
-        ctx.setLineJoin(.round)
-        for stroke in s.strokes where stroke.count > 1 {
-            let pts = stroke.map { ShowGeometry.slideToScreen(srect, uv, $0.x, $0.y) }
-            ctx.addLines(between: pts)
-            ctx.strokePath()
         }
         if s.laser, !s.ended, let p = v.pointer {
             let c = doc.show.laserColor

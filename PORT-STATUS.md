@@ -716,9 +716,16 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     caller's device and queue equals the offscreen frame pixel for pixel; non-render-target and sRGB targets are
     refused; the pacer; an ended show's empty frame; DCShow imports no UI framework. DCApp and DCAppModel suites:
     507 tests green.
-  - **Not yet in it:** the blank screens, the end screen, ink and the laser are still drawn by AppKit over the Metal
-    view (`ShowOverlayView`), so a client of the renderer alone doesn't see them. That is the next step (Marquee
-    Presentation's P0 spike, A3).
+  - **Then (2026-11-04): what the audience sees over the slide moved in too.** The end screen's line, the blank
+    screens (B, W) and ink are drawn by the renderer (`ShowOverlays.swift`), so a client of the renderer alone sees
+    them; the window's AppKit overlay keeps what follows the pointer or serves the presenter (the laser, media bars,
+    GIF buttons, Go to slide, the zoom prompt, See All Slides, the rehearsal HUD). The end line matches AppKit's
+    layout of it: set at 18 points under the scaled context (an 18 × scale font takes the system face's narrower
+    display design) with AppKit's whole-point line metrics. `ShowFramePacer.observe` notices show changes no one
+    reported (presenter view's B and W, ink). `ShowOverlayGoldenTests`: the window's whole picture identical in
+    every case (slide, black, white, ink over black, end screen, end screen with ink), ink within 1 level on 0.008 %
+    of channels. `ShowRendererTests` +4 (blank, ink and end screen from the renderer alone; the pacer's observe).
+    519 tests green; alpha gate 24/24 in both layouts.
 
 ## CraftNativeKit (2026-11-01)
 

@@ -1,6 +1,7 @@
 // DCShowTests — DCShow's public renderer: a running show drawn into a texture its caller owns, on the caller's
 // device and queue, exactly as the renderer's own offscreen path draws it; targets it can't draw into refused;
-// when to draw (ShowFramePacer, the show window's rule); and the target's import rule (no AppKit or SwiftUI).
+// what the audience sees over the slide (blank screens, ink, the end screen), drawn by the renderer alone; when to
+// draw (ShowFramePacer, the show window's rule, and what it notices in the show); and the target's import rule.
 import CNCore
 import DCAppModel
 import DCEngine
@@ -120,12 +121,89 @@ import Testing
         #expect(!nan.shouldDraw(now: 1_000, transitioning: false))
     }
 
-    /// An ended show has nothing to draw: the client shows its clear colour.
-    @Test func anEndedShowHasAnEmptyFrame() throws {
+    /// The frame at 320 × 180 through the renderer alone (no window, no AppKit overlay), as RGBA.
+    static func pixels(_ r: ShowRenderer, now: Double = 10) -> [UInt8]? {
+        let f = r.frame(pixels: CGSize(width: 320, height: 180), now: now)
+        return r.renderOffscreen(f, width: 320, height: 180)?.pixels
+    }
+
+    /// B and W are the renderer's: a client of the renderer alone shows a black or white screen, all of it.
+    @Test func blankScreensAreTheRenderers() throws {
+        guard let metal = ShowMetal.shared else { return }
+        let (c, renderer) = try Self.show(metal)
+        let s = try #require(c.show)
+        s.toggleBlank(.black)
+        let black = try #require(Self.pixels(renderer))
+        #expect(black.enumerated().allSatisfy { $0.offset % 4 == 3 ? $0.element == 255 : $0.element == 0 })
+        s.toggleBlank(.white)
+        let white = try #require(Self.pixels(renderer))
+        #expect(white.allSatisfy { $0 == 255 })
+        s.toggleBlank(.white)
+        let slide = try #require(Self.pixels(renderer))
+        #expect(slide != white && slide != black, "the slide again")
+    }
+
+    /// Ink is drawn over the slide in the pen colour (red by default) and goes when the strokes are cleared.
+    @Test func inkIsTheRenderers() throws {
+        guard let metal = ShowMetal.shared else { return }
+        let (c, renderer) = try Self.show(metal)
+        let s = try #require(c.show)
+        let before = try #require(Self.pixels(renderer))
+        s.strokes = [[CGPoint(x: 0.1, y: 0.5), CGPoint(x: 0.9, y: 0.5)]]
+        let inked = try #require(Self.pixels(renderer))
+        // The stroke runs across the middle row: red there, where the slide was white.
+        let mid = (90 * 320 + 160) * 4
+        #expect(Array(inked[mid ..< mid + 4]) == [255, 0, 0, 255], "\(Array(inked[mid ..< mid + 4]))")
+        #expect(Array(before[mid ..< mid + 3]) != [255, 0, 0])
+        s.strokes = []
+        #expect(try #require(Self.pixels(renderer)) == before)
+    }
+
+    /// The end screen: the client's line in grey near the top on black; without a line, nothing to draw.
+    @Test func theEndScreenIsTheRenderers() throws {
         guard let metal = ShowMetal.shared else { return }
         let (c, renderer) = try Self.show(metal)
         while c.navigate(true, now: 11), c.show?.ended == false {}
-        #expect(renderer.frame(pixels: CGSize(width: 64, height: 36), now: 12).isEmpty || c.show == nil)
+        let s = try #require(c.show, "past the last slide the show waits on its end screen")
+        #expect(s.ended)
+        #expect(renderer.frame(pixels: CGSize(width: 320, height: 180), now: 12).isEmpty, "no line set: nothing drawn")
+        renderer.endText = "End of slide show, click to exit."
+        let f = renderer.frame(pixels: CGSize(width: 320, height: 180), now: 12)
+        #expect(!f.isEmpty && !f.animating)
+        let px = try #require(renderer.renderOffscreen(f, width: 320, height: 180)?.pixels)
+        func lit(_ rows: Range<Int>) -> Int { rows.reduce(0) { n, y in n + (0 ..< 320).filter { px[(y * 320 + $0) * 4] > 60 }.count } }
+        #expect(lit(28 ..< 52) > 50, "the line, centred 40 points from the top")
+        #expect(lit(60 ..< 180) == 0, "black below it")
+    }
+
+    /// The pacer sees what changed in the show without being told: a blank screen toggled by presenter view, ink,
+    /// the slide; and nothing when nothing changed.
+    @Test func thePacerSeesChangesInTheShow() throws {
+        guard let metal = ShowMetal.shared else { return }
+        let (c, renderer) = try Self.show(metal)
+        let s = try #require(c.show)
+        var p = ShowFramePacer(keepAlive: nil)
+        p.observe(s)
+        p.willDraw(now: 10)
+        p.drew(renderer.frame(pixels: CGSize(width: 64, height: 36), now: 10))
+        p.observe(s)
+        #expect(!p.shouldDraw(now: 10.1, transitioning: false), "nothing changed")
+        s.toggleBlank(.black)
+        p.observe(s)
+        #expect(p.shouldDraw(now: 10.2, transitioning: false), "a blank screen")
+        p.willDraw(now: 10.2)
+        s.strokes = [[CGPoint(x: 0.1, y: 0.1)]]
+        p.observe(s)
+        #expect(p.shouldDraw(now: 10.3, transitioning: false), "a new stroke")
+        p.willDraw(now: 10.3)
+        s.strokes[0].append(CGPoint(x: 0.2, y: 0.2))
+        p.observe(s)
+        #expect(p.shouldDraw(now: 10.4, transitioning: false), "the stroke grows")
+        p.willDraw(now: 10.4)
+        p.observe(s)
+        #expect(!p.shouldDraw(now: 10.5, transitioning: false))
+        p.observe(nil)
+        #expect(p.shouldDraw(now: 10.6, transitioning: false), "the show went away")
     }
 
     /// DCShow is Metal and Core Graphics: none of its sources import AppKit, SwiftUI or Cocoa, so a program

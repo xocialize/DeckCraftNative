@@ -208,7 +208,7 @@ let package = Package(
         // and when to draw (ShowFramePacer). Metal and Core Graphics only: no AppKit or SwiftUI (DCShowTests checks).
         .target(
             name: "DCShow",
-            dependencies: ["DCAppModel", "DCEngine", "DCRender", "DCAnim", "DCMedia", "DCModel", .product(name: "CNCore", package: "CraftNativeKit")],
+            dependencies: ["DCAppModel", "DCEngine", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCColor", .product(name: "CNCore", package: "CraftNativeKit")],
             path: sources("DCApp", "DCShow")
         ),
         .testTarget(

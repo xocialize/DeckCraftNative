@@ -57,6 +57,11 @@ public final class ShowRenderer {
     /// Presenter view's Next preview, rendered on another thread (#964), and its picture.
     private var nextPreview = ShowNextPreview()
     private var nextThumb: (doc: DocRef, index: Int, image: CGImage)?
+    /// The end screen's line (the client's words, in its language); nil draws none. The show window sets
+    /// "End of slide show, click to exit."
+    public var endText: String?
+    let ink = ShowInkLayer()
+    let endLine = ShowTextLayer()
     /// The GIFs and media shapes of the last frame (the overlay draws their controls).
     public private(set) var gifs: [ShowGif] = []
     public private(set) var mediaPlaces: [ShowMediaPlace] = []
@@ -109,7 +114,7 @@ public final class ShowRenderer {
         let size = ShowRender.fitSize(Int(rustCast: (srect.width * scale).rounded()), Int(rustCast: (srect.height * scale).rounded()))
         gifs = []
         mediaPlaces = []
-        if s.ended { return ([], false) }
+        if s.ended { return (overlayDraws(s, doc, full: full, scale: scale, srect: srect), false) }
         let idx = s.state.slide
         let step = s.state.step
         let animating = s.animating
@@ -232,6 +237,7 @@ public final class ShowRenderer {
         }
         if animating { animatingOut = true }
         if gifs.contains(where: { !$0.paused }) { animatingOut = true }
+        out += overlayDraws(s, doc, full: full, scale: scale, srect: srect)
         return (out, animatingOut)
     }
 
