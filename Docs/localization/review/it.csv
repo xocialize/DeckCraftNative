@@ -29,6 +29,7 @@ DCAppModel|(none),,(none),(nessuno),needs_review,,,
 DCAppModel|+ Row,,+ Row,+ Riga,needs_review,,,
 DCAppModel|+ Series,,+ Series,+ Serie,needs_review,,,
 DCAppModel|1 Slide,,1 Slide,1 diapositiva,needs_review,,,
+DCAppModel|1 Spoke,,1 Spoke,1 raggio,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|1 picture,,1 picture,1 immagine,needs_review,,,
 DCAppModel|1 picture with title,,1 picture with title,1 immagine con titolo,needs_review,,,
 DCAppModel|1.5 lines,,1.5 lines,"1,5 righe",needs_review,,,
@@ -36,10 +37,14 @@ DCAppModel|100% Stacked Area,,100% Stacked Area,Aree in pila al 100%,needs_revie
 DCAppModel|100% Stacked Bar,,100% Stacked Bar,Barre in pila al 100%,needs_review,,,A chart type (horizontal bars)
 DCAppModel|100% Stacked Column,,100% Stacked Column,Istogramma in pila al 100%,needs_review,,,A chart type
 DCAppModel|100% Stacked Line,,100% Stacked Line,Linee in pila al 100%,needs_review,,,A chart type
+DCAppModel|2 Spokes,,2 Spokes,2 raggi,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|2 pictures,,2 pictures,2 immagini,needs_review,,,
 DCAppModel|2 pictures with title,,2 pictures with title,2 immagini con titolo,needs_review,,,
+DCAppModel|3 Spokes,,3 Spokes,3 raggi,needs_review,,,Animations › Effect Options of Wheel
+DCAppModel|4 Spokes,,4 Spokes,4 raggi,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|4 pictures,,4 pictures,4 immagini,needs_review,,,
 DCAppModel|4 pictures with title,,4 pictures with title,4 immagini con titolo,needs_review,,,
+DCAppModel|8 Spokes,,8 Spokes,8 raggi,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Un album foto può contenere al massimo 48 immagini o caselle di testo,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,TUTTE le immagini in bianco e nero,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,Informazioni su DeckCraftNative,needs_review,,,
@@ -215,6 +220,7 @@ DCAppModel|Copy Path,,Copy Path,Copia percorso,needs_review,,,
 DCAppModel|Corner Point,,Corner Point,Punto angolo,needs_review,,,
 DCAppModel|Correct TWo INitial CApitals,,Correct TWo INitial CApitals,Correggi DUe MAiuscole INiziali,needs_review,,,
 DCAppModel|Correct accidental use of cAPS LOCK key,,Correct accidental use of cAPS LOCK key,Correggi l'uso accidentale del tasto bLOC MAIUSC,needs_review,,,
+DCAppModel|Counterclockwise,,Counterclockwise,Senso antiorario,needs_review,,,Animations › Effect Options: the direction an object spins or wheels
 DCAppModel|Create,,Create,Crea,needs_review,,,
 DCAppModel|Create New Theme Colors,,Create New Theme Colors,Crea nuovi colori tema,needs_review,,,
 DCAppModel|Create New Theme Fonts,,Create New Theme Fonts,Crea nuovi caratteri tema,needs_review,,,
@@ -345,6 +351,8 @@ DCAppModel|Fit,,Fit,Adatta,needs_review,,,Zoom menu: fit the slide to the window
 DCAppModel|Fit to slide,,Fit to slide,Adatta alla diapositiva,needs_review,,,
 DCAppModel|Fixed date (empty = update automatically):,,Fixed date (empty = update automatically):,Data fissa (vuoto = aggiornamento automatico):,needs_review,,,
 DCAppModel|Flat,,Flat,Piatto,needs_review,,,line cap
+DCAppModel|Float Down,,Float Down,Fluttua verso il basso,needs_review,,,Animations › Effect Options of Float In or Float Out
+DCAppModel|Float Up,,Float Up,Fluttua verso l'alto,needs_review,,,Animations › Effect Options of Float In or Float Out
 DCAppModel|Follow Data,,Follow Data,Collegato all'origine,needs_review,,,An axis number format taken from the chart's data
 DCAppModel|Follow Path,,Follow Path,Segui percorso,needs_review,,,
 DCAppModel|Follow the layout,,Follow the layout,Segui il layout,needs_review,,,
@@ -363,9 +371,13 @@ DCAppModel|Format:,,Format:,Formato:,needs_review,,,
 DCAppModel|Frame shape,,Frame shape,Forma cornice,needs_review,,,
 DCAppModel|French (France),,French (France),Francese (Francia),needs_review,,,
 DCAppModel|From Bottom,,From Bottom,Dal basso,needs_review,,,
+DCAppModel|From Bottom-Left,,From Bottom-Left,Dal basso a sinistra,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Bottom-Right,,From Bottom-Right,Dal basso a destra,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From Left,,From Left,Da sinistra,needs_review,,,
 DCAppModel|From Right,,From Right,Da destra,needs_review,,,
 DCAppModel|From Top,,From Top,Dall'alto,needs_review,,,
+DCAppModel|From Top-Left,,From Top-Left,Dall'alto a sinistra,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Top-Right,,From Top-Right,Dall'alto a destra,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From bottom left,,From bottom left,Dal basso a sinistra,needs_review,,,
 DCAppModel|From bottom right,,From bottom right,Dal basso a destra,needs_review,,,
 DCAppModel|From center,,From center,Dal centro,needs_review,,,
@@ -419,6 +431,8 @@ DCAppModel|Histogram,,Histogram,Istogramma,needs_review,,,A chart type
 DCAppModel|Horizontal,,Horizontal,Orizzontale,needs_review,,,"picture fill mirror
 text direction"
 DCAppModel|Horizontal (in):,,Horizontal (in):,Orizzontale (in):,needs_review,,,
+DCAppModel|Horizontal In,,Horizontal In,Orizzontale interno,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Horizontal Out,,Horizontal Out,Orizzontale esterno,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Horizontal brick,,Horizontal brick,Mattoni orizzontali,needs_review,,,
 DCAppModel|How would you describe this object and its context to someone who is blind or has low vision?,,How would you describe this object and its context to someone who is blind or has low vision?,Come descriveresti questo oggetto e il suo contesto a una persona non vedente o ipovedente?,needs_review,,,
 DCAppModel|Hyperlink,,Hyperlink,Collegamento,needs_review,,,A theme colour slot
@@ -468,6 +482,8 @@ DCAppModel|Left,,Left,A sinistra,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Bordo sinistro,needs_review,,,
+DCAppModel|Left Down,,Left Down,A sinistra in basso,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Left Up,,Left Up,A sinistra in alto,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Legend,,Legend,Legenda,needs_review,,,
 DCAppModel|Less Brightness,,Less Brightness,Meno luminosità,needs_review,,,
 DCAppModel|Less Contrast,,Less Contrast,Meno contrasto,needs_review,,,
@@ -705,6 +721,8 @@ DCAppModel|Right,,Right,A destra,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Bordo destro,needs_review,,,
+DCAppModel|Right Down,,Right Down,A destra in basso,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Right Up,,Right Up,A destra in alto,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Rotate,,Rotate,Ruota,needs_review,,,
 DCAppModel|Rotate Left,,Rotate Left,Ruota a sinistra,needs_review,,,
 DCAppModel|Rotate Right,,Rotate Right,Ruota a destra,needs_review,,,
@@ -930,6 +948,8 @@ DCAppModel|Version %@,,Version %@,Versione %@,needs_review,,,
 DCAppModel|Version %@ (%@),,Version %1$@ (%2$@),Versione %1$@ (%2$@),needs_review,,,"About: the version, then the build"
 DCAppModel|Vertical,,Vertical,Verticale,needs_review,,,picture fill mirror
 DCAppModel|Vertical (in):,,Vertical (in):,Verticale (in):,needs_review,,,
+DCAppModel|Vertical In,,Vertical In,Verticale interno,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Vertical Out,,Vertical Out,Verticale esterno,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Very Loose,,Very Loose,Molto distanziato,needs_review,,,character spacing
 DCAppModel|Very Tight,,Very Tight,Molto stretto,needs_review,,,character spacing
 DCAppModel|Very loose,,Very loose,Molto distanziato,needs_review,,,

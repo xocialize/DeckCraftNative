@@ -69,7 +69,7 @@ struct AnimationsView: View {
                 if !rows.isEmpty {
                     Picker(String(localized: "Effect Options", bundle: .module), selection: Binding(get: { c.option }, set: { ctl.run("animation.options", ["option": .string($0)]) })) {
                         if !rows.contains(where: \.1) { Text(verbatim: "—").tag(c.option) }
-                        ForEach(rows, id: \.0) { Text(InspectorMotion.optionLabel($0.0)).tag($0.0) }
+                        ForEach(rows, id: \.0) { Text(InspectorMotion.animationOptionLabel(c.effect, $0.0)).tag($0.0) }
                     }
                 }
                 if let chart = InspectorMotion.chart(c, ctl.doc?.currentSlide) {

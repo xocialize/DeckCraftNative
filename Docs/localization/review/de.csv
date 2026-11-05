@@ -29,6 +29,7 @@ DCAppModel|(none),,(none),(keine),needs_review,,,
 DCAppModel|+ Row,,+ Row,+ Zeile,needs_review,,,
 DCAppModel|+ Series,,+ Series,+ Datenreihe,needs_review,,,
 DCAppModel|1 Slide,,1 Slide,1 Folie,needs_review,,,
+DCAppModel|1 Spoke,,1 Spoke,1 Speiche,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|1 picture,,1 picture,1 Bild,needs_review,,,
 DCAppModel|1 picture with title,,1 picture with title,1 Bild mit Titel,needs_review,,,
 DCAppModel|1.5 lines,,1.5 lines,"1,5 Zeilen",needs_review,,,
@@ -36,10 +37,14 @@ DCAppModel|100% Stacked Area,,100% Stacked Area,100 % gestapelte Fläche,needs_r
 DCAppModel|100% Stacked Bar,,100% Stacked Bar,100 % gestapelte Balken,needs_review,,,A chart type (horizontal bars)
 DCAppModel|100% Stacked Column,,100% Stacked Column,100 % gestapelte Säulen,needs_review,,,A chart type
 DCAppModel|100% Stacked Line,,100% Stacked Line,100 % gestapelte Linie,needs_review,,,A chart type
+DCAppModel|2 Spokes,,2 Spokes,2 Speichen,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|2 pictures,,2 pictures,2 Bilder,needs_review,,,
 DCAppModel|2 pictures with title,,2 pictures with title,2 Bilder mit Titel,needs_review,,,
+DCAppModel|3 Spokes,,3 Spokes,3 Speichen,needs_review,,,Animations › Effect Options of Wheel
+DCAppModel|4 Spokes,,4 Spokes,4 Speichen,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|4 pictures,,4 pictures,4 Bilder,needs_review,,,
 DCAppModel|4 pictures with title,,4 pictures with title,4 Bilder mit Titel,needs_review,,,
+DCAppModel|8 Spokes,,8 Spokes,8 Speichen,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Ein Fotoalbum enthält höchstens 48 Bilder oder Textfelder,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,ALLE Bilder schwarzweiß,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,Über DeckCraftNative,needs_review,,,
@@ -215,6 +220,7 @@ DCAppModel|Copy Path,,Copy Path,Pfad kopieren,needs_review,,,
 DCAppModel|Corner Point,,Corner Point,Eckpunkt,needs_review,,,
 DCAppModel|Correct TWo INitial CApitals,,Correct TWo INitial CApitals,ZWei GRoßbuchstaben am WOrtanfang korrigieren,needs_review,,,
 DCAppModel|Correct accidental use of cAPS LOCK key,,Correct accidental use of cAPS LOCK key,Unbeabsichtigtes Verwenden der fESTSTELLTASTE korrigieren,needs_review,,,
+DCAppModel|Counterclockwise,,Counterclockwise,Gegen den Uhrzeigersinn,needs_review,,,Animations › Effect Options: the direction an object spins or wheels
 DCAppModel|Create,,Create,Erstellen,needs_review,,,
 DCAppModel|Create New Theme Colors,,Create New Theme Colors,Neue Designfarben erstellen,needs_review,,,
 DCAppModel|Create New Theme Fonts,,Create New Theme Fonts,Neue Designschriftarten erstellen,needs_review,,,
@@ -345,6 +351,8 @@ DCAppModel|Fit,,Fit,Einpassen,needs_review,,,Zoom menu: fit the slide to the win
 DCAppModel|Fit to slide,,Fit to slide,An Folie anpassen,needs_review,,,
 DCAppModel|Fixed date (empty = update automatically):,,Fixed date (empty = update automatically):,Festes Datum (leer = automatisch aktualisieren):,needs_review,,,
 DCAppModel|Flat,,Flat,Flach,needs_review,,,line cap
+DCAppModel|Float Down,,Float Down,Nach unten schweben,needs_review,,,Animations › Effect Options of Float In or Float Out
+DCAppModel|Float Up,,Float Up,Nach oben schweben,needs_review,,,Animations › Effect Options of Float In or Float Out
 DCAppModel|Follow Data,,Follow Data,Mit Quelle verknüpft,needs_review,,,An axis number format taken from the chart's data
 DCAppModel|Follow Path,,Follow Path,Pfad folgen,needs_review,,,
 DCAppModel|Follow the layout,,Follow the layout,Wie im Layout,needs_review,,,
@@ -363,9 +371,13 @@ DCAppModel|Format:,,Format:,Format:,needs_review,,,
 DCAppModel|Frame shape,,Frame shape,Rahmenform,needs_review,,,
 DCAppModel|French (France),,French (France),Französisch (Frankreich),needs_review,,,
 DCAppModel|From Bottom,,From Bottom,Von unten,needs_review,,,
+DCAppModel|From Bottom-Left,,From Bottom-Left,Von links unten,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Bottom-Right,,From Bottom-Right,Von rechts unten,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From Left,,From Left,Von links,needs_review,,,
 DCAppModel|From Right,,From Right,Von rechts,needs_review,,,
 DCAppModel|From Top,,From Top,Von oben,needs_review,,,
+DCAppModel|From Top-Left,,From Top-Left,Von links oben,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Top-Right,,From Top-Right,Von rechts oben,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From bottom left,,From bottom left,Von unten links,needs_review,,,
 DCAppModel|From bottom right,,From bottom right,Von unten rechts,needs_review,,,
 DCAppModel|From center,,From center,Von der Mitte,needs_review,,,
@@ -419,6 +431,8 @@ DCAppModel|Histogram,,Histogram,Histogramm,needs_review,,,A chart type
 DCAppModel|Horizontal,,Horizontal,Horizontal,needs_review,,,"picture fill mirror
 text direction"
 DCAppModel|Horizontal (in):,,Horizontal (in):,Horizontal (Zoll):,needs_review,,,
+DCAppModel|Horizontal In,,Horizontal In,Horizontal nach innen,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Horizontal Out,,Horizontal Out,Horizontal nach außen,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Horizontal brick,,Horizontal brick,Horizontale Ziegel,needs_review,,,
 DCAppModel|How would you describe this object and its context to someone who is blind or has low vision?,,How would you describe this object and its context to someone who is blind or has low vision?,Wie würden Sie dieses Objekt und seinen Kontext einer blinden oder sehbehinderten Person beschreiben?,needs_review,,,
 DCAppModel|Hyperlink,,Hyperlink,Link,needs_review,,,A theme colour slot
@@ -468,6 +482,8 @@ DCAppModel|Left,,Left,Links,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Rahmenlinie links,needs_review,,,
+DCAppModel|Left Down,,Left Down,Nach links unten,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Left Up,,Left Up,Nach links oben,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Legend,,Legend,Legende,needs_review,,,
 DCAppModel|Less Brightness,,Less Brightness,Weniger Helligkeit,needs_review,,,
 DCAppModel|Less Contrast,,Less Contrast,Weniger Kontrast,needs_review,,,
@@ -705,6 +721,8 @@ DCAppModel|Right,,Right,Rechts,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Rahmenlinie rechts,needs_review,,,
+DCAppModel|Right Down,,Right Down,Nach rechts unten,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Right Up,,Right Up,Nach rechts oben,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Rotate,,Rotate,Drehen,needs_review,,,
 DCAppModel|Rotate Left,,Rotate Left,Links drehen,needs_review,,,
 DCAppModel|Rotate Right,,Rotate Right,Rechts drehen,needs_review,,,
@@ -930,6 +948,8 @@ DCAppModel|Version %@,,Version %@,Version %@,needs_review,,,
 DCAppModel|Version %@ (%@),,Version %1$@ (%2$@),Version %1$@ (%2$@),needs_review,,,"About: the version, then the build"
 DCAppModel|Vertical,,Vertical,Vertikal,needs_review,,,picture fill mirror
 DCAppModel|Vertical (in):,,Vertical (in):,Vertikal (Zoll):,needs_review,,,
+DCAppModel|Vertical In,,Vertical In,Vertikal nach innen,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Vertical Out,,Vertical Out,Vertikal nach außen,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Very Loose,,Very Loose,Sehr weit,needs_review,,,character spacing
 DCAppModel|Very Tight,,Very Tight,Sehr eng,needs_review,,,character spacing
 DCAppModel|Very loose,,Very loose,Sehr weit,needs_review,,,

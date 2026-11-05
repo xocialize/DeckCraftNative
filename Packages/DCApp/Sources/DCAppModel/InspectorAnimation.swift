@@ -249,6 +249,39 @@ public enum InspectorMotion {
         }
     }
 
+    /// An animation option's name as PowerPoint's Effect Options shows it. The codes are the file's
+    /// (`Anim.swift`'s `animations`): Fly's compass points ("b", "lb", "rt"), Float's "u"/"d", Wheel's spoke
+    /// counts, Strips' diagonals, Split's "horzIn". `optionLabel` names the transitions' codes and the rest;
+    /// deckcraft's `option_label` was written for transitions and spells these as "B" or "Horz In".
+    public static func animationOptionLabel(_ effect: String, _ o: String) -> String {
+        let float = effect == "float" || effect == "floatOut"
+        switch o {
+        case "u" where float: return String(localized: "Float Up", bundle: .module, comment: "Animations › Effect Options of Float In or Float Out")
+        case "d" where float: return String(localized: "Float Down", bundle: .module, comment: "Animations › Effect Options of Float In or Float Out")
+        case "b": return L10n.text("From Bottom")
+        case "t": return L10n.text("From Top")
+        case "lb": return String(localized: "From Bottom-Left", bundle: .module, comment: "Animations › Effect Options: the direction an object flies in from")
+        case "lt": return String(localized: "From Top-Left", bundle: .module, comment: "Animations › Effect Options: the direction an object flies in from")
+        case "rt": return String(localized: "From Top-Right", bundle: .module, comment: "Animations › Effect Options: the direction an object flies in from")
+        case "rb": return String(localized: "From Bottom-Right", bundle: .module, comment: "Animations › Effect Options: the direction an object flies in from")
+        case "lu": return String(localized: "Left Up", bundle: .module, comment: "Animations › Effect Options of Strips: the direction the strips move")
+        case "ru": return String(localized: "Right Up", bundle: .module, comment: "Animations › Effect Options of Strips: the direction the strips move")
+        case "ld": return String(localized: "Left Down", bundle: .module, comment: "Animations › Effect Options of Strips: the direction the strips move")
+        case "rd": return String(localized: "Right Down", bundle: .module, comment: "Animations › Effect Options of Strips: the direction the strips move")
+        case "1": return String(localized: "1 Spoke", bundle: .module, comment: "Animations › Effect Options of Wheel")
+        case "2": return String(localized: "2 Spokes", bundle: .module, comment: "Animations › Effect Options of Wheel")
+        case "3": return String(localized: "3 Spokes", bundle: .module, comment: "Animations › Effect Options of Wheel")
+        case "4": return String(localized: "4 Spokes", bundle: .module, comment: "Animations › Effect Options of Wheel")
+        case "8": return String(localized: "8 Spokes", bundle: .module, comment: "Animations › Effect Options of Wheel")
+        case "horzIn": return String(localized: "Horizontal In", bundle: .module, comment: "Animations › Effect Options of Split")
+        case "horzOut": return String(localized: "Horizontal Out", bundle: .module, comment: "Animations › Effect Options of Split")
+        case "vertIn": return String(localized: "Vertical In", bundle: .module, comment: "Animations › Effect Options of Split")
+        case "vertOut": return String(localized: "Vertical Out", bundle: .module, comment: "Animations › Effect Options of Split")
+        case "counterClockwise": return String(localized: "Counterclockwise", bundle: .module, comment: "Animations › Effect Options: the direction an object spins or wheels")
+        default: return optionLabel(o)
+        }
+    }
+
     public static func className(_ c: AnimClass) -> String {
         switch c {
         case .entrance: L10n.text("Entrance")

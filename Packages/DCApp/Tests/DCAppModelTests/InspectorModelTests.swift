@@ -608,6 +608,26 @@ final class RecordingHost: AppHost {
         #expect(InspectorMotion.ms(-3) == 0)
         #expect(InspectorMotion.ms(.nan) == 0)
     }
+
+    /// Effect Options names each animation option as PowerPoint does, never as its file code ("B", "Horz In").
+    @Test func everyAnimationOptionHasAName() {
+        let label = InspectorMotion.animationOptionLabel
+        #expect(DCModel.animations.first { $0.id == "fly" }?.options.map { label("fly", $0) } == [
+            "From Bottom", "From Bottom-Left", "From Left", "From Top-Left", "From Top", "From Top-Right", "From Right", "From Bottom-Right",
+        ])
+        #expect(label("float", "u") == "Float Up" && label("floatOut", "d") == "Float Down")
+        #expect(label("wheel", "1") == "1 Spoke" && label("wheel", "8") == "8 Spokes")
+        #expect(label("strips", "rd") == "Right Down" && label("split", "horzIn") == "Horizontal In")
+        #expect(label("spin", "counterClockwise") == "Counterclockwise")
+        for a in DCModel.animations {
+            for o in a.options {
+                let name = label(a.id, o)
+                // A code of one or two letters shown as itself is a code, unless it's a word ("In", "Up").
+                let asCode = o.count <= 2 && !["in", "up"].contains(o) && name == o.prefix(1).uppercased() + o.dropFirst()
+                #expect(!asCode && !name.hasPrefix("Horz") && !name.hasPrefix("Vert "), "\(a.id) \(o) → \(name)")
+            }
+        }
+    }
 }
 
 /// Format Shape ▸ Effects' presets and Size's Scale and From (`panels/effect_presets_tests.rs`,

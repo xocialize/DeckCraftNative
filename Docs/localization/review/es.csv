@@ -29,6 +29,7 @@ DCAppModel|(none),,(none),(ninguno),needs_review,,,
 DCAppModel|+ Row,,+ Row,+ Fila,needs_review,,,
 DCAppModel|+ Series,,+ Series,+ Serie,needs_review,,,
 DCAppModel|1 Slide,,1 Slide,1 diapositiva,needs_review,,,
+DCAppModel|1 Spoke,,1 Spoke,1 radio,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|1 picture,,1 picture,1 imagen,needs_review,,,
 DCAppModel|1 picture with title,,1 picture with title,1 imagen con título,needs_review,,,
 DCAppModel|1.5 lines,,1.5 lines,"1,5 líneas",needs_review,,,
@@ -36,10 +37,14 @@ DCAppModel|100% Stacked Area,,100% Stacked Area,Área 100% apilada,needs_review,
 DCAppModel|100% Stacked Bar,,100% Stacked Bar,Barra 100% apilada,needs_review,,,A chart type (horizontal bars)
 DCAppModel|100% Stacked Column,,100% Stacked Column,Columna 100% apilada,needs_review,,,A chart type
 DCAppModel|100% Stacked Line,,100% Stacked Line,Línea 100% apilada,needs_review,,,A chart type
+DCAppModel|2 Spokes,,2 Spokes,2 radios,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|2 pictures,,2 pictures,2 imágenes,needs_review,,,
 DCAppModel|2 pictures with title,,2 pictures with title,2 imágenes con título,needs_review,,,
+DCAppModel|3 Spokes,,3 Spokes,3 radios,needs_review,,,Animations › Effect Options of Wheel
+DCAppModel|4 Spokes,,4 Spokes,4 radios,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|4 pictures,,4 pictures,4 imágenes,needs_review,,,
 DCAppModel|4 pictures with title,,4 pictures with title,4 imágenes con título,needs_review,,,
+DCAppModel|8 Spokes,,8 Spokes,8 radios,needs_review,,,Animations › Effect Options of Wheel
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Un álbum de fotos admite como máximo 48 imágenes o cuadros de texto,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,TODAS las imágenes en blanco y negro,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,Acerca de DeckCraftNative,needs_review,,,
@@ -215,6 +220,7 @@ DCAppModel|Copy Path,,Copy Path,Copiar ruta,needs_review,,,
 DCAppModel|Corner Point,,Corner Point,Punto de esquina,needs_review,,,
 DCAppModel|Correct TWo INitial CApitals,,Correct TWo INitial CApitals,Corregir DOs MAyúsculas SEguidas,needs_review,,,
 DCAppModel|Correct accidental use of cAPS LOCK key,,Correct accidental use of cAPS LOCK key,Corregir el uso accidental de bLOQ mAYÚS,needs_review,,,
+DCAppModel|Counterclockwise,,Counterclockwise,En sentido contrario a las agujas del reloj,needs_review,,,Animations › Effect Options: the direction an object spins or wheels
 DCAppModel|Create,,Create,Crear,needs_review,,,
 DCAppModel|Create New Theme Colors,,Create New Theme Colors,Crear nuevos colores del tema,needs_review,,,
 DCAppModel|Create New Theme Fonts,,Create New Theme Fonts,Crear nuevas fuentes del tema,needs_review,,,
@@ -345,6 +351,8 @@ DCAppModel|Fit,,Fit,Ajustar,needs_review,,,Zoom menu: fit the slide to the windo
 DCAppModel|Fit to slide,,Fit to slide,Ajustar a la diapositiva,needs_review,,,
 DCAppModel|Fixed date (empty = update automatically):,,Fixed date (empty = update automatically):,Fecha fija (vacío = actualizar automáticamente):,needs_review,,,
 DCAppModel|Flat,,Flat,Plano,needs_review,,,line cap
+DCAppModel|Float Down,,Float Down,Flotar hacia abajo,needs_review,,,Animations › Effect Options of Float In or Float Out
+DCAppModel|Float Up,,Float Up,Flotar hacia arriba,needs_review,,,Animations › Effect Options of Float In or Float Out
 DCAppModel|Follow Data,,Follow Data,Vinculado al origen,needs_review,,,An axis number format taken from the chart's data
 DCAppModel|Follow Path,,Follow Path,Seguir trazado,needs_review,,,
 DCAppModel|Follow the layout,,Follow the layout,Seguir el diseño,needs_review,,,
@@ -363,9 +371,13 @@ DCAppModel|Format:,,Format:,Formato:,needs_review,,,
 DCAppModel|Frame shape,,Frame shape,Forma del marco,needs_review,,,
 DCAppModel|French (France),,French (France),Francés (Francia),needs_review,,,
 DCAppModel|From Bottom,,From Bottom,Desde abajo,needs_review,,,
+DCAppModel|From Bottom-Left,,From Bottom-Left,Desde abajo a la izquierda,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Bottom-Right,,From Bottom-Right,Desde abajo a la derecha,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From Left,,From Left,Desde la izquierda,needs_review,,,
 DCAppModel|From Right,,From Right,Desde la derecha,needs_review,,,
 DCAppModel|From Top,,From Top,Desde arriba,needs_review,,,
+DCAppModel|From Top-Left,,From Top-Left,Desde arriba a la izquierda,needs_review,,,Animations › Effect Options: the direction an object flies in from
+DCAppModel|From Top-Right,,From Top-Right,Desde arriba a la derecha,needs_review,,,Animations › Effect Options: the direction an object flies in from
 DCAppModel|From bottom left,,From bottom left,Desde abajo a la izquierda,needs_review,,,
 DCAppModel|From bottom right,,From bottom right,Desde abajo a la derecha,needs_review,,,
 DCAppModel|From center,,From center,Desde el centro,needs_review,,,
@@ -419,6 +431,8 @@ DCAppModel|Histogram,,Histogram,Histograma,needs_review,,,A chart type
 DCAppModel|Horizontal,,Horizontal,Horizontal,needs_review,,,"picture fill mirror
 text direction"
 DCAppModel|Horizontal (in):,,Horizontal (in):,Horizontal (pulg.):,needs_review,,,
+DCAppModel|Horizontal In,,Horizontal In,Horizontal hacia dentro,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Horizontal Out,,Horizontal Out,Horizontal hacia fuera,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Horizontal brick,,Horizontal brick,Ladrillo horizontal,needs_review,,,
 DCAppModel|How would you describe this object and its context to someone who is blind or has low vision?,,How would you describe this object and its context to someone who is blind or has low vision?,¿Cómo describiría este objeto y su contexto a una persona ciega o con baja visión?,needs_review,,,
 DCAppModel|Hyperlink,,Hyperlink,Vínculo,needs_review,,,A theme colour slot
@@ -468,6 +482,8 @@ DCAppModel|Left,,Left,Izquierda,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Borde izquierdo,needs_review,,,
+DCAppModel|Left Down,,Left Down,Izquierda y abajo,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Left Up,,Left Up,Izquierda y arriba,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Legend,,Legend,Leyenda,needs_review,,,
 DCAppModel|Less Brightness,,Less Brightness,Menos brillo,needs_review,,,
 DCAppModel|Less Contrast,,Less Contrast,Menos contraste,needs_review,,,
@@ -705,6 +721,8 @@ DCAppModel|Right,,Right,Derecha,needs_review,,,"Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Borde derecho,needs_review,,,
+DCAppModel|Right Down,,Right Down,Derecha y abajo,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
+DCAppModel|Right Up,,Right Up,Derecha y arriba,needs_review,,,Animations › Effect Options of Strips: the direction the strips move
 DCAppModel|Rotate,,Rotate,Girar,needs_review,,,
 DCAppModel|Rotate Left,,Rotate Left,Girar a la izquierda,needs_review,,,
 DCAppModel|Rotate Right,,Rotate Right,Girar a la derecha,needs_review,,,
@@ -930,6 +948,8 @@ DCAppModel|Version %@,,Version %@,Versión %@,needs_review,,,
 DCAppModel|Version %@ (%@),,Version %1$@ (%2$@),Versión %1$@ (%2$@),needs_review,,,"About: the version, then the build"
 DCAppModel|Vertical,,Vertical,Vertical,needs_review,,,picture fill mirror
 DCAppModel|Vertical (in):,,Vertical (in):,Vertical (pulg.):,needs_review,,,
+DCAppModel|Vertical In,,Vertical In,Vertical hacia dentro,needs_review,,,Animations › Effect Options of Split
+DCAppModel|Vertical Out,,Vertical Out,Vertical hacia fuera,needs_review,,,Animations › Effect Options of Split
 DCAppModel|Very Loose,,Very Loose,Muy expandido,needs_review,,,character spacing
 DCAppModel|Very Tight,,Very Tight,Muy comprimido,needs_review,,,character spacing
 DCAppModel|Very loose,,Very loose,Muy expandido,needs_review,,,
