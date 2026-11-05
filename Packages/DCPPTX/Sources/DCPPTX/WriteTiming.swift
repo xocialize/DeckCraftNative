@@ -113,6 +113,14 @@ extension PPTXWrite {
             var start: AnimStart
             var paragraph: UInt32?
             var grp: UInt32
+            /// The chart part a chart build's step animates (AB-T-0443).
+            var chart: ChartElement? = nil
+        }
+
+        /// One `p:bldLst` entry: a text shape's `p:bldP`, or a chart build's `p:bldGraphic` (AB-T-0443).
+        enum Bld {
+            case p(UInt32, UInt32, Bool)
+            case chart(UInt32, UInt32, ChartBuild, Bool)
         }
 
         struct Ids {
@@ -124,9 +132,16 @@ extension PPTXWrite {
             }
         }
 
-        static func tgt(_ w: inout W, _ spid: UInt32, _ para: UInt32?) {
+        static func tgt(_ w: inout W, _ spid: UInt32, _ para: UInt32?, _ chart: ChartElement? = nil) {
             w.open0("p:tgtEl")
-            if let p = para {
+            if let ch = chart, para == nil {
+                let (si, ci) = ch.fileIndices
+                w.open("p:spTgt", A.new().a("spid", spid))
+                w.open0("p:graphicEl")
+                w.empty("a:chart", A.new().a("seriesIdx", si).a("categoryIdx", ci).a("bldStep", ch.step.fileValue))
+                w.close("p:graphicEl")
+                w.close("p:spTgt")
+            } else if let p = para {
                 w.open("p:spTgt", A.new().a("spid", spid))
                 w.open0("p:txEl")
                 w.empty("p:pRg", A.new().a("st", p).a("end", p))
@@ -150,7 +165,7 @@ extension PPTXWrite {
             } else {
                 w.empty("p:cTn", a)
             }
-            tgt(&w, e.spid, e.paragraph)
+            tgt(&w, e.spid, e.paragraph, e.chart)
             if !attrs.isEmpty {
                 w.open0("p:attrNameLst")
                 for n in attrs {
@@ -333,7 +348,7 @@ extension PPTXWrite {
                         w.open("p:animClr", A.new().a("clrSpc", "rgb").a("dir", "cw"))
                         w.open("p:cBhvr", A.new().o("override", child ? "childStyle" : nil))
                         w.empty("p:cTn", A.new().a("id", ids.next()).a("dur", Swift.max(dur, 1)).a("autoRev", "1").a("fill", "remove"))
-                        tgt(&w, e.spid, e.paragraph)
+                        tgt(&w, e.spid, e.paragraph, e.chart)
                         w.open0("p:attrNameLst")
                         w.elt("p:attrName", attr)
                         w.close("p:attrNameLst")
@@ -540,9 +555,11 @@ extension PPTXWrite {
             var grpCount: [UInt32: UInt32] = [:]
             var main: [Eff] = []
             var triggered: [(UInt32, [Eff])] = []
-            var bld: [(UInt32, UInt32, Bool)] = []
+            var bld: [Bld] = []
             // The last paragraph effect written: (shape, class, trigger, grpId).
             var prevPara: (ShapeId, AnimClass, ShapeId?, UInt32)?
+            // The last chart part effect written: (shape, class, trigger, grpId, its `bld` entry).
+            var prevChart: (ShapeId, AnimClass, ShapeId?, UInt32, Int)?
             for a in anims.prefix(10_000) {
                 guard let spid = idmap.get(a.shape) else {
                     PPTXLog.warn("pptx: animation on missing shape \(a.shape) skipped")
@@ -560,8 +577,17 @@ extension PPTXWrite {
                 // the same way.
                 let paraEffect = !byPara && textSp && a.paragraph != nil
                 let joins = paraEffect && (prevPara.map { $0.0 == a.shape && $0.1 == a.class && $0.2 == a.trigger } ?? false)
+                // A chart build plays one effect per step, all in one `grpId` with a `bldGraphic`; a chart part
+                // effect read from a file joins the one before it the same way, as PowerPoint groups them
+                // (AB-T-0443).
+                let chart: Chart? = if case .chart(let ch) = shape.kind { ch } else { nil }
+                let chartSteps = chart.flatMap { ch in a.chartBuild.map { chartBuildSteps(ch, $0, background: !a.chartNoBackground) } } ?? []
+                let chartPart = chart != nil && chartSteps.isEmpty ? a.chartElement : nil
+                let chartJoins = chartPart != nil && (prevChart.map { $0.0 == a.shape && $0.1 == a.class && $0.2 == a.trigger } ?? false)
                 let grp: UInt32
                 if let p = prevPara, joins {
+                    grp = p.3
+                } else if let p = prevChart, chartJoins {
                     grp = p.3
                 } else {
                     let c = grpCount[spid] ?? 0
@@ -570,7 +596,27 @@ extension PPTXWrite {
                 }
                 prevPara = paraEffect ? (a.shape, a.class, a.trigger, grp) : nil
                 var effs: [Eff] = []
-                if byPara {
+                if let part = chartPart {
+                    // The group's build is its parts' kind; a background step alone counts as By Series.
+                    if let p = prevChart, chartJoins {
+                        if case .chart(let sp, let g, let b0, let bg)? = bld.at(p.4) {
+                            let b = part.step == .background ? b0 : (ChartBuild.of(part.step) ?? b0)
+                            bld[p.4] = .chart(sp, g, b, bg || part.step == .background)
+                        }
+                    } else {
+                        bld.append(.chart(spid, grp, ChartBuild.of(part.step) ?? .bySeries, part.step == .background))
+                    }
+                    prevChart = (a.shape, a.class, a.trigger, grp, prevChart.flatMap { chartJoins ? $0.4 : nil } ?? bld.count - 1)
+                    effs.append(Eff(a: a, spid: spid, start: a.start, paragraph: nil, grp: grp, chart: part))
+                } else if let cb = a.chartBuild, !chartSteps.isEmpty {
+                    prevChart = nil
+                    for (k, step) in chartSteps.enumerated() {
+                        let start: AnimStart = k == 0 ? a.start : a.start == .onClick ? .onClick : .afterPrevious
+                        effs.append(Eff(a: a, spid: spid, start: start, paragraph: nil, grp: grp, chart: step))
+                    }
+                    bld.append(.chart(spid, grp, cb, !a.chartNoBackground))
+                } else if byPara {
+                    prevChart = nil
                     // One effect per paragraph the build animates on its own, deeper ones with their
                     // parent; indices in the file count empty paragraphs too.
                     var tops = 0
@@ -595,10 +641,11 @@ extension PPTXWrite {
                         effs.append(Eff(a: a, spid: spid, start: start, paragraph: pi, grp: grp))
                     }
                 } else {
+                    prevChart = nil
                     effs.append(Eff(a: a, spid: spid, start: a.start, paragraph: a.paragraph, grp: grp))
                 }
                 if textSp && !joins {
-                    bld.append((spid, grp, byPara || paraEffect))
+                    bld.append(.p(spid, grp, byPara || paraEffect))
                 }
                 if let t = a.trigger.flatMap({ idmap.get($0) }) {
                     if let i = triggered.firstIndex(where: { $0.0 == t }) {
@@ -690,8 +737,17 @@ extension PPTXWrite {
             w.close("p:tnLst")
             if !bld.isEmpty {
                 w.open0("p:bldLst")
-                for (spid, grp, buildP) in bld {
-                    w.empty("p:bldP", A.new().a("spid", spid).a("grpId", grp).o("build", buildP ? "p" : nil).t("animBg", !buildP))
+                for b in bld {
+                    switch b {
+                    case .p(let spid, let grp, let buildP):
+                        w.empty("p:bldP", A.new().a("spid", spid).a("grpId", grp).o("build", buildP ? "p" : nil).t("animBg", !buildP))
+                    case .chart(let spid, let grp, let build, let background):
+                        w.open("p:bldGraphic", A.new().a("spid", spid).a("grpId", grp))
+                        w.open0("p:bldSub")
+                        w.empty("a:bldChart", A.new().a("bld", build.fileValue).o("animBg", background ? nil : "0"))
+                        w.close("p:bldSub")
+                        w.close("p:bldGraphic")
+                    }
                 }
                 w.close("p:bldLst")
             }

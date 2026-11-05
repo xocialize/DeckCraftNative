@@ -1,0 +1,77 @@
+--- a/crates/model/src/anim.rs
++++ b/crates/model/src/anim.rs
+@@ -246,8 +246,45 @@
+     ByParagraph,
+     ByWord,
+     ByLetter,
++}
++
++/// Chart build (Effect Options › Sequence): one step per series, per category, or per point taken
++/// series by series or category by category (`a:bldChart bld`). As one object is no build at all.
++/// DeckCraftNative's own (AB-T-0443).
++#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "camelCase")]
++pub enum ChartBuild {
++    BySeries,
++    ByCategory,
++    BySeriesElement,
++    ByCategoryElement,
++}
++
++/// What one step of a chart build animates (`a:chart bldStep`). DeckCraftNative's own (AB-T-0443).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "camelCase")]
++pub enum ChartStep {
++    /// The chart's background: axes, gridlines, legend and titles (`gridLegend`).
++    #[default]
++    Background,
++    Series,
++    Category,
++    /// One point, in a by-element-in-series build (`ptInSeries`).
++    SeriesPoint,
++    /// One point, in a by-element-in-category build (`ptInCategory`).
++    CategoryPoint,
+ }
+ 
++/// The part of a chart one effect animates (`p:graphicEl/a:chart`): a step, with the series and
++/// category it names (0 where the step names none). DeckCraftNative's own (AB-T-0443).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(default, rename_all = "camelCase")]
++pub struct ChartElement {
++    pub step: ChartStep,
++    pub series: u32,
++    pub category: u32,
++}
++
+ /// Most paragraphs a by-paragraph build animates separately; later ones follow the last of them.
+ pub const MAX_BUILD_PARAGRAPHS: usize = 1_000;
+ 
+@@ -324,6 +361,18 @@
+     pub smooth_end: f64,
+     pub bounce_end: f64,
+     pub auto_reverse: bool,
++    /// A chart animated in steps (`p:bldGraphic`); the writer and the timeline expand it into one effect
++    /// per step. DeckCraftNative's own (AB-T-0443).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub chart_build: Option<ChartBuild>,
++    /// A chart build without the background step: the axes, gridlines and legend show from the start
++    /// (`a:bldChart animBg="0"`). DeckCraftNative's own (AB-T-0443).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub chart_no_background: bool,
++    /// The chart part one effect animates, when a file's chart build steps don't play back as a build of
++    /// the first (as `paragraph` is for text). DeckCraftNative's own (AB-T-0443).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub chart_element: Option<ChartElement>,
+ }
+ 
+ impl Default for Animation {
+@@ -352,6 +401,9 @@
+             smooth_end: 0.0,
+             bounce_end: 0.0,
+             auto_reverse: false,
++            chart_build: None,
++            chart_no_background: false,
++            chart_element: None,
+         }
+     }
+ }

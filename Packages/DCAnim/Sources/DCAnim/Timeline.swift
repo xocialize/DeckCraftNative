@@ -26,6 +26,8 @@ public struct EffectTiming: Sendable, Equatable {
     /// Animated shape and paragraph (nil = the whole shape).
     public var shape: ShapeId
     public var paragraph: Int?
+    /// The chart part a chart build's step animates (nil = the whole shape). DeckCraftNative's own (AB-T-0443).
+    public var chart: ChartElement? = nil
     public var sequence: AnimSequence
     /// Click step within its sequence.
     public var step: Int
@@ -224,6 +226,16 @@ extension Timeline {
                 } else {
                     paras = [nil]
                 }
+                // Chart parts of this animation: a chart build's steps, or the one part an effect read from a file
+                // animates (AB-T-0443).
+                var parts: [ChartElement] = []
+                if a.paragraph == nil, case .chart(let ch)? = shape?.kind {
+                    if let b = a.chartBuild {
+                        parts = chartBuildSteps(ch, b, background: !a.chartNoBackground)
+                    } else if let e = a.chartElement {
+                        parts = [e]
+                    }
+                }
                 let xf0 = xfrmOf(a.shape) ?? shape?.xfrm ?? Xfrm(sw / 4.0, sh / 4.0, sw / 2.0, sh / 2.0)
                 let xf = sanitizeXfrm(xf0, sw, sh)
                 let spec = SharedSpec(buildSpec(a, xf, sw, sh, resolve))
@@ -239,8 +251,11 @@ extension Timeline {
                 case nil: .none_
                 }
                 var firstStart = 0.0
-                for (k, para) in paras.enumerated() {
-                    var mode: AnimStart = k == 0 ? a.start : (a.start == .onClick ? .onClick : .withPrevious)
+                // A chart build's later steps follow on click, or one after another (as PowerPoint writes them).
+                let targets: [(Int?, ChartElement?)] = parts.isEmpty ? paras.map { ($0, nil) } : parts.map { (nil, $0) }
+                for (k, (para, part)) in targets.enumerated() {
+                    var mode: AnimStart = k == 0 ? a.start
+                        : a.start == .onClick ? .onClick : part != nil ? .afterPrevious : .withPrevious
                     let firstOfSeq = steps.isEmpty
                     if firstOfSeq, case .trigger = seq { mode = .onClick }
                     switch mode {
@@ -254,7 +269,7 @@ extension Timeline {
                         if firstOfSeq { steps.append(StepInfo(auto: true, duration: 0.0)) }
                         groupBegin = maxEnd
                     }
-                    let start = k > 0 && a.start != .onClick ? firstStart + Double(k) * paragraphStagger : groupBegin + delay
+                    let start = k > 0 && a.start != .onClick && part == nil ? firstStart + Double(k) * paragraphStagger : groupBegin + delay
                     if k == 0 { firstStart = start }
                     let end = start + span
                     maxEnd = maxEnd.rustMax(end)
@@ -267,7 +282,7 @@ extension Timeline {
                     }
                     effectList.append(Effect(
                         timing: EffectTiming(
-                            anim: ai, shape: a.shape, paragraph: para, sequence: seq, step: step, start: start, duration: dur,
+                            anim: ai, shape: a.shape, paragraph: para, chart: part, sequence: seq, step: step, start: start, duration: dur,
                             iterations: iterations, untilNextClick: untilNextClick, autoReverse: a.autoReverse, rewind: a.rewind,
                             span: span, animClass: a.class
                         ),
@@ -365,6 +380,22 @@ extension Timeline {
         return out
     }
 
+    /// Chart parts of `shape` animated separately (chart builds), in step order without repeats.
+    public func chartTargets(_ shape: ShapeId) -> [ChartElement] {
+        var out: [ChartElement] = []
+        for e in effectList where e.timing.shape == shape {
+            if let c = e.timing.chart, !out.contains(c) { out.append(c) }
+        }
+        return out
+    }
+
+    /// State of one chart part of `shape`, relative to the shape's own state (compose them), as `stateOrdered`.
+    public func chartState(
+        _ shape: ShapeId, _ part: ChartElement, _ step: Int, _ t: Double, _ triggers: [TriggerPlay] = [], _ stamps: [StepStamp] = []
+    ) -> AnimState {
+        stateOf(shape, step, t, triggers, stamps) { $0.paragraph == nil && $0.chart == part }
+    }
+
     /// Shapes with any effect.
     public var animatedShapes: [ShapeId] {
         var v: [ShapeId] = []
@@ -392,10 +423,17 @@ extension Timeline {
         _ shape: ShapeId, _ para0: Int?, _ step: Int, _ t: Double, _ triggers: [TriggerPlay], _ stamps: [StepStamp]
     ) -> AnimState {
         let para = para0.map { p in groups.first { $0.0 == shape && $0.1 == p }?.2 ?? p }
+        return stateOf(shape, step, t, triggers, stamps) { $0.paragraph == para && $0.chart == nil }
+    }
+
+    /// The state the effects of `shape` that `which` picks leave it in (`stateOrdered`, `chartState`).
+    private func stateOf(
+        _ shape: ShapeId, _ step: Int, _ t: Double, _ triggers: [TriggerPlay], _ stamps: [StepStamp], _ which: (EffectTiming) -> Bool
+    ) -> AnimState {
         let baseColor = colors.first { $0.0 == shape }?.1 ?? Rgba.rgb(0x15, 0x60, 0x82)
         var st = AnimState()
         // Initial visibility comes from the first effect in the Animation Pane order.
-        var ordered = effectList.filter { $0.timing.shape == shape && $0.timing.paragraph == para }
+        var ordered = effectList.filter { $0.timing.shape == shape && which($0.timing) }
             .stableSorted { $0.timing.anim < $1.timing.anim }
         if let e0 = ordered.first, e0.timing.animClass == .entrance { st.visible = false }
         // Then play in time order: main sequence first, then triggered sequences as they were clicked.

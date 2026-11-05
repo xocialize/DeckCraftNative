@@ -500,6 +500,26 @@ The writer calls these reader functions, with Rust's parameter and return shapes
     types `insert.chart` makes and a deck of every 3-D, wireframe, of-pie and secondary-axis variant validate
     against the schemas (`validate.sh`), and PowerPoint 16.114 opened all twelve without a repair prompt.
 
+11. **Chart builds (2026-11-05, deliberate; AB-T-0443).** deckcraft reads `p:spTgt` without its
+   `p:graphicEl`, and writes no `p:bldGraphic`, so a PowerPoint chart built By Series came back as three whole
+   chart effects with no build. Now:
+   - **read** (`ReadTiming.animations`): each effect keeps the chart part it targets
+     (`p:graphicEl/a:chart` `seriesIdx`, `categoryIdx`, `bldStep` → `chartElement`), and each `p:bldGraphic`'s
+     `a:bldChart` (`bld`, `animBg`) is read. A run of one shape's part effects in one `grpId` with a
+     `bldGraphic` becomes one animation with `chartBuild` when that build plays them exactly
+     (`playsAsChartBuild`: one effect per step of `chartBuildSteps`, later steps on click, or after previous
+     when the build doesn't start on click, the same settings); otherwise the effects stay, each with its part;
+   - **write** (`WriteTiming.timing`): a build is one effect per step, all in one `grpId`, each targeting
+     `p:graphicEl/a:chart` with PowerPoint's indices (-3 for the background, -4 for the index a step doesn't
+     name), and a `p:bldGraphic` with `p:bldSub/a:bldChart` (`animBg="0"` when the background is left out). A
+     shape's consecutive part effects share a `grpId` and one `bldGraphic` named after their kind. The
+     `bldLst` entries keep animation order; PowerPoint sorts them by shape, which nothing depends on.
+
+   What PowerPoint writes was measured on decks PowerPoint 16.114 saved (2026-11-05): By Series, By Category,
+   By Element in Series and in Category, On Click and After Previous, two builds on one chart. Those decks
+   round-trip with every step, delay, group and build entry. A chart without a build, and every deck in the
+   oracle corpus, writes as before. Tests: `ChartBuildTimingTests`.
+
 ## Integration tests
 
 Port of `crates/pptx/tests/` (Wave 3, part 4): the 114 tests of `tests/it/*.rs` (27 modules) and the 5 of

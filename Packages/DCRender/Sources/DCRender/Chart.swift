@@ -226,6 +226,81 @@ public enum ChartRender {
     }
 
     /// Draws chart `chart` (`w` × `h` in its own space, which `m` maps to the output).
+    /// Which parts of a chart a drawing pass draws: the background, and data points by (series, category).
+    struct Parts {
+        var background: Bool
+        var points: Set<Int>
+        let stride: Int
+
+        func has(_ s: Int, _ c: Int) -> Bool { s >= 0 && c >= 0 && c < stride && points.contains(s &* stride &+ c) }
+    }
+
+    /// Can a chart be drawn part by part for a chart build? Kinds drawn by their own code (pie charts excepted)
+    /// animate as one object.
+    public static func drawsParts(_ chart: Chart) -> Bool {
+        switch chart.kind {
+        case .histogram, .pareto, .boxWhisker, .stock, .radar, .filledRadar, .funnel, .treemap, .sunburst, .regionMap, .waterfall: false
+        default: true
+        }
+    }
+
+    /// Draw a chart whose parts animate on their own (a chart build, AB-T-0443): each distinct state is a pass
+    /// over the parts in it, in a layer with that state's opacity and offset (shape-local points). The background's
+    /// pass is drawn first, then the points' passes in order of their first point. Within a pass the chart's own
+    /// drawing order holds, so once every part has played the chart draws exactly as it does without a build.
+    public static func drawParts(
+        _ c: Canvas, _ rctx: Resolve.Ctx, _ chart: Chart, _ m: Affine, _ w: Double, _ h: Double, _ parts: [(ChartElement, ParaState)]
+    ) {
+        guard drawsParts(chart), !parts.isEmpty else {
+            draw(c, rctx, chart, m, w, h)
+            return
+        }
+        func compose(_ states: [ParaState]) -> ParaState {
+            var o = ParaState()
+            for s in states {
+                o.visible = o.visible && s.visible
+                o.opacity *= s.opacity
+                o.offset = o.offset + s.offset
+            }
+            return o
+        }
+        let ns = chart.series.count
+        let stride = Swift.max(chart.buildPointCount, 1)
+        // Passes by state: (state, background, points), in order of first use.
+        var passes: [(ParaState, Bool, Set<Int>)] = []
+        func same(_ a: ParaState, _ b: ParaState) -> Bool {
+            a.visible == b.visible && Swift.abs(a.opacity - b.opacity) < 1e-6 && Swift.abs(a.offset.x - b.offset.x) < 1e-6
+                && Swift.abs(a.offset.y - b.offset.y) < 1e-6
+        }
+        // Parts in the same state share a pass, so a build that has played out draws as the chart does.
+        func add(_ st: ParaState, _ background: Bool, _ key: Int?) {
+            if let i = passes.firstIndex(where: { same($0.0, st) }) {
+                if let k = key { passes[i].2.insert(k) }
+                if background { passes[i].1 = true }
+            } else {
+                passes.append((st, background, key.map { [$0] } ?? []))
+            }
+        }
+        add(compose(parts.filter { $0.0.step == .background }.map(\.1)), true, nil)
+        let cap = Swift.min(ns.multipliedReportingOverflow(by: stride).overflow ? Int.max : ns * stride, 100_000)
+        var n = 0
+        outer: for s in 0 ..< ns {
+            for i in 0 ..< stride {
+                n += 1
+                if n > cap { break outer }
+                add(compose(parts.filter { $0.0.covers(series: s, category: i) }.map(\.1)), false, s * stride + i)
+            }
+        }
+        for (st, background, points) in passes {
+            if !st.visible || st.opacity <= 0.001 || (!background && points.isEmpty) { continue }
+            let layered = st.opacity < 0.999
+            if layered { c.pushLayer(opacity: st.opacity.clamped(0, 1)) }
+            let pm = m * Affine.translate(st.offset)
+            drawInner(c, rctx, chart, pm, w, h, nil, Parts(background: background, points: points, stride: stride))
+            if layered { c.popLayer() }
+        }
+    }
+
     public static func draw(_ c: Canvas, _ rctx: Resolve.Ctx, _ chart: Chart, _ m: Affine, _ w: Double, _ h: Double) {
         switch chart.kind {
         // Histograms and Pareto charts are drawn as the column (and line) chart of their bins.
@@ -243,13 +318,19 @@ public enum ChartRender {
         ColorRef.scheme(.tx1).with(.lumMod(65000)).with(.lumOff(35000))
     }
 
-    static func drawInner(_ ctx: Canvas, _ rctx: Resolve.Ctx, _ c: Chart, _ m: Affine, _ w: Double, _ h: Double, _ boxes: ChartEx.Boxes?) {
+    static func drawInner(
+        _ ctx: Canvas, _ rctx: Resolve.Ctx, _ c: Chart, _ m: Affine, _ w: Double, _ h: Double, _ boxes: ChartEx.Boxes?, _ only: Parts? = nil
+    ) {
+        // One pass of a chart build (AB-T-0443) draws only some parts: the background (titles, legend, axes,
+        // gridlines, labels) and some points. Without `only`, everything.
+        let bg = only?.background ?? true
+        func has(_ s: Int, _ i: Int) -> Bool { only?.has(s, i) ?? true }
         // Text without a colour of its own takes PowerPoint's default, the theme's text colour at lumMod
         // 65 % / lumOff 35 % (595959 on a light theme, light grey on a dark one), so a chart on a dark theme
         // is readable (a fixed grey used to vanish there).
         let textCol = rctx.color(c.textColor ?? defaultTextColor(), nil)
         let gridCol = Rgba.rgb(0xD9, 0xD9, 0xD9)
-        if let f = c.chartFill {
+        if bg, let f = c.chartFill {
             let all = Rect(0, 0, w, h)
             PaintFill.fillPath(ctx, rctx, f, nil, rectPath(all), all, m, .norm, 1, rctx.pres)
         }
@@ -259,7 +340,7 @@ public enum ChartRender {
         let titleSize = c.titleSize ?? base * 1.4
         var area = Rect(w * 0.04, h * 0.04, w * 0.96, h * 0.96)
         if let t = c.title {
-            label(ctx, rctx, m, t, Rect(0, area.y0, w, area.y0 + titleSize * 1.3), titleSize, .center, .top, textCol, false)
+            if bg { label(ctx, rctx, m, t, Rect(0, area.y0, w, area.y0 + titleSize * 1.3), titleSize, .center, .top, textCol, false) }
             area.y0 += titleSize * 1.7
         }
         let pie = c.kind == .pie || c.kind == .doughnut
@@ -301,6 +382,9 @@ public enum ChartRender {
             var (x, y) = (origin.x, origin.y)
             for (name, paint, outline) in legendItems {
                 let key = Rect(x, y + base * 0.3, x + base * 0.7, y + base)
+                let tw = Double(name.unicodeScalars.count) * base * 0.55 + base
+                defer { if vertical { y += base * 1.5 } else { x += tw + base * 0.6 } }
+                if !bg { continue }
                 fillWith(ctx, paint, key, m)
                 if let (oc, ow) = outline, ow > 0 {
                     ctx.setTransform(m)
@@ -308,9 +392,7 @@ public enum ChartRender {
                     ctx.setStroke(StrokeStyle(ow.rustMin(base * 0.2)))
                     ctx.strokePath(rectPath(key))
                 }
-                let tw = Double(name.unicodeScalars.count) * base * 0.55 + base
                 label(ctx, rctx, m, name, Rect(x + base, y, x + base + tw, y + base * 1.3), base, .left, .middle, textCol, false)
-                if vertical { y += base * 1.5 } else { x += tw + base * 0.6 }
             }
         }
         if pie {
@@ -323,6 +405,10 @@ public enum ChartRender {
             var a0 = -Double.pi / 2
             for (i, v) in vals.enumerated() {
                 let sweep = v / total * 2 * Double.pi
+                if !has(0, i) {
+                    a0 += sweep
+                    continue
+                }
                 var p = BezPath()
                 p.moveTo(cen)
                 p.lineTo(Point(cen.x + r * cos(a0), cen.y + r * sin(a0)))
@@ -347,7 +433,7 @@ public enum ChartRender {
                 }
                 a0 += sweep
             }
-            if c.kind == .doughnut {
+            if c.kind == .doughnut && vals.indices.contains(where: { has(0, $0) }) {
                 ctx.setTransform(m)
                 ctx.setPaint(.color(.white, 1))
                 ctx.fillPath(circlePath(cen, r * c.holeSize.clamped(0.1, 0.9)))
@@ -372,14 +458,14 @@ public enum ChartRender {
         let bandH = base * 1.6
         if let t = bottomTitle, !t.isEmpty {
             let r = Rect(area.x0, area.y1 - bandH, area.x1, area.y1)
-            label(ctx, rctx, m, t, r, base, .center, .bottom, textCol, true)
+            if bg { label(ctx, rctx, m, t, r, base, .center, .bottom, textCol, true) }
             area.y1 -= bandH + base * 0.3
         }
         if let t = leftTitle, !t.isEmpty {
             let (cx, cy) = (area.x0 + bandH / 2, (area.y0 + area.y1) / 2)
             let turned = m * Affine.translate(Vec2(cx, cy)) * Affine.rotate(-Double.pi / 2)
             let half = area.height / 2
-            label(ctx, rctx, turned, t, Rect(-half, -bandH / 2, half, bandH / 2), base, .center, .middle, textCol, true)
+            if bg { label(ctx, rctx, turned, t, Rect(-half, -bandH / 2, half, bandH / 2), base, .center, .middle, textCol, true) }
             area.x0 += bandH + base * 0.3
         }
         // As many major units as the value axis has room for labels (PowerPoint's automatic unit).
@@ -405,7 +491,7 @@ public enum ChartRender {
         let plot = horiz
             ? Rect(area.x0 + gutter, area.y0, area.x1, area.y1 - base * 1.6)
             : Rect(area.x0 + gutter, area.y0, area.x1 - gutterR, area.y1 - base * 1.8)
-        if let f = c.plotFill {
+        if bg, let f = c.plotFill {
             PaintFill.fillPath(ctx, rctx, f, nil, rectPath(plot), plot, m, .norm, 1, rctx.pres)
         }
         let span = positiveSpan(max - min)
@@ -423,7 +509,7 @@ public enum ChartRender {
             return toV(v)
         }
         // Minor gridlines, under the major ones: five to a major unit.
-        if c.minorGridlines {
+        if bg && c.minorGridlines {
             let minor = step / 5
             let n = minor > 0 ? Swift.min(Swift.max(Int64(rustCast: ((max - min) / minor).rounded()), 1), 500) : 1
             var g = BezPath()
@@ -445,7 +531,7 @@ public enum ChartRender {
             ctx.strokePath(g)
         }
         // Gridlines and value labels.
-        for v in primaryTicks {
+        for v in primaryTicks where bg {
             let pos = toV(v)
             let text = c.yHidden ? "" : c.axisLabel(false, v)
             var g = BezPath()
@@ -466,7 +552,7 @@ public enum ChartRender {
             }
         }
         // The secondary axis' labels, on the right, without gridlines of their own.
-        if let sc = second, !c.y2Hidden {
+        if bg, let sc = second, !c.y2Hidden {
             for v in axisTicks(sc) {
                 let pos = toAxis(true, v)
                 label(ctx, rctx, m, c.axisLabel(true, v), Rect(plot.x1 + base * 0.4, pos - base, area.x1, pos + base), base, .left, .middle, textCol, false)
@@ -487,7 +573,7 @@ public enum ChartRender {
         // tick labels in place of category names.
         let xscale = horiz ? nil : valueXScale(c, Int(rustCast: (plot.width / (base * 2.5)).rounded(.down).clamped(2, 12)))
         let toX = { (v: Double) -> Double? in xscale.map { plot.x0 + (v - $0.0) / positiveSpan($0.1 - $0.0) * plot.width } }
-        if let sc = xscale {
+        if bg, let sc = xscale {
             for v in axisTicks(sc) {
                 let pos = plot.x0 + (v - sc.0) / positiveSpan(sc.1 - sc.0) * plot.width
                 label(ctx, rctx, m, fmtNum(v), Rect(pos - 30, plot.y1 + 3, pos + 30, plot.y1 + base * 1.6), base, .center, .top, textCol, false)
@@ -495,7 +581,7 @@ public enum ChartRender {
         }
         // Category labels: wrapped onto two lines when they don't fit their band (long date ranges).
         let wraps = !horiz && c.categories.contains { Double($0.unicodeScalars.count) * base * 0.5 > band }
-        if xscale == nil {
+        if bg && xscale == nil {
             for (i, name) in c.categories.enumerated() {
                 let mid = horiz ? plot.y0 + band * (slot(i) + 0.5) : plot.x0 + band * (slot(i) + 0.5)
                 if horiz {
@@ -556,6 +642,7 @@ public enum ChartRender {
                     let r = (horiz
                         ? Rect(toV(a), plot.y0 + start, toV(b), plot.y0 + start + bar)
                         : Rect(plot.x0 + start, toAxis(sec, b), plot.x0 + start + bar, toAxis(sec, a))).abs
+                    if !has(si, i) { continue }
                     // A waterfall colours increases, decreases and totals, and joins each bar's end to the
                     // next bar's start.
                     let paint: BarPaint = waterfall
@@ -615,6 +702,8 @@ public enum ChartRender {
             let col = areaKind ? seriesFill(rctx, c, si, s) : seriesLine(rctx, c, si, s)
             let seriesStats = s.errorBars.map { _ in SeriesStats.of(s.values) }
             var pts: [Point] = []
+            // The category of each point, for a chart build's passes.
+            var cats: [Int] = []
             for i in 0 ..< ncat {
                 guard let raw = s.values.at(i) ?? nil else { continue }
                 let v0 = kind.percent ? raw / (totals.at(i) ?? 1) : raw
@@ -638,12 +727,46 @@ public enum ChartRender {
                 default:
                     x = plot.x0 + band * (slot(i) + 0.5)
                 }
-                if let e = s.errorBars, let st = seriesStats, let (lo, hi) = e.rangeIn(st, i, v) {
+                if has(si, i), let e = s.errorBars, let st = seriesStats, let (lo, hi) = e.rangeIn(st, i, v) {
                     errMarks.append((x, toAxis(sec, lo), toAxis(sec, hi), base * 0.4, e.endCap))
                 }
                 pts.append(Point(x, toAxis(sec, v)))
+                cats.append(i)
             }
             if pts.isEmpty { continue }
+            if only != nil && !cats.allSatisfy({ has(si, $0) }) {
+                // Part of the series in this pass: an area appears with its first point; a line segment with the
+                // point it runs to; a marker with its point.
+                ctx.setTransform(m)
+                if areaKind {
+                    if !cats.isEmpty && cats.allSatisfy({ !has(si, $0) }) { continue }
+                    if let f = cats.first, !has(si, f) { continue }
+                    var a = polyline(pts)
+                    if let l = pts.last, let f = pts.first {
+                        a.lineTo(Point(l.x, zero))
+                        a.lineTo(Point(f.x, zero))
+                        a.closePath()
+                    }
+                    ctx.setPaint(.color(col, 0.85))
+                    ctx.fillPath(a)
+                } else if kind != .scatter {
+                    let lw = (s.line?.width.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? 2.25).clamped(0.25, 20)
+                    var p = BezPath()
+                    for j in pts.indices.dropFirst() where has(si, cats[j]) {
+                        p.moveTo(pts[j - 1])
+                        p.lineTo(pts[j])
+                    }
+                    ctx.setPaint(.color(col, 1))
+                    ctx.setStroke(StrokeStyle(lw).withJoin(.round).withCaps(.round))
+                    ctx.strokePath(p)
+                }
+                if [.lineMarkers, .scatter, .bubble].contains(kind) {
+                    ctx.setPaint(.color(col, 1))
+                    for (j, q) in pts.enumerated() where has(si, cats[j]) { ctx.fillPath(circlePath(q, 3.5)) }
+                }
+                continue
+            }
+            if only != nil && !cats.contains(where: { has(si, $0) }) { continue }
             let p = s.smooth && !areaKind && pts.count > 2 ? smoothPath(pts) : polyline(pts)
             ctx.setTransform(m)
             if areaKind {
@@ -668,7 +791,12 @@ public enum ChartRender {
         }
         // A category position (0-based, fractional) as a slot, the way `slot` places the bars.
         let slotAt = { (x: Double) -> Double in backwards ? Double(ncat) - 1 - x + fwd : x + back }
-        drawTrendlines(ctx, rctx, c, m, plot, band, slotAt, xscale, ncat, horiz, base, textCol, toAxis)
+        // A trendline goes with its series' last point.
+        var tc = c
+        if only != nil {
+            for i in tc.series.indices where !has(i, ncat - 1) { tc.series[i].trendlines = [] }
+        }
+        drawTrendlines(ctx, rctx, tc, m, plot, band, slotAt, xscale, ncat, horiz, base, textCol, toAxis)
         if !errMarks.isEmpty {
             var p = BezPath()
             for (mid, a, b, cap, endCap) in errMarks {
@@ -689,6 +817,7 @@ public enum ChartRender {
             ctx.strokePath(p)
         }
         // Axis line.
+        if !bg { return }
         var ax = BezPath()
         if horiz {
             ax.moveTo(Point(zero, plot.y0))

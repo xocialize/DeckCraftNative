@@ -760,6 +760,30 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     lines' look) is lost when a part is regenerated. 3-D charts aren't drawn in 3-D (out of scope in the review) and
     the of-pie's second plot isn't drawn (decision 3: preserve now, draw it later). Stacked and 100 % areas fill each series down to the axis, so the
     last one covers the others (as before this change).
+- **After 0.1.15 (unreleased, 2026-11-05): chart builds — a chart animated by series, category or point
+  (AB-T-0443).** deckcraft animates a chart as one object; a PowerPoint deck whose chart was built By Series came
+  back as three Fly Ins of the whole chart, the build gone, without a warning (tested 2026-11-05).
+  - **Now:** the animation model has `chartBuild` (By Series, By Category, By Element in Series, By Element in
+    Category), `chartNoBackground` and `chartElement`, a patch over deckcraft's `anim.rs` like AB-T-0434's over
+    `chart.rs` (`Tools/port/divergence/model-anim.patch`; unset, they stay out of `presentation.json`). The reader
+    keeps each effect's chart part and the `bldGraphic` builds, folding a build's steps back into one animation
+    when it plays them exactly; the writer writes one effect per step with PowerPoint's `p:graphicEl/a:chart`
+    targets and a `p:bldGraphic`. The timeline plays each step on its part (later steps on click, or after
+    previous), and the renderer draws the chart in passes by part state, so the show reveals the series one click
+    at a time. Divergences: DCModel, DCPPTX (11), DCAnim and DCRender PORT-NOTES.
+  - **PowerPoint as the oracle:** PowerPoint 16.114 made the fixtures (By Series, By Category, By Element in Series
+    and in Category, On Click and After Previous, two builds on one chart). They round-trip with every step, delay,
+    group and build entry; PowerPoint opens the round-tripped files and a deck of every build written from scratch
+    without a repair prompt, and lists their effects as it lists its own ("Background", "Series 1", "Category 2
+    Point 3"…). All three validate against the ECMA schemas.
+  - **Tests:** `ChartBuildTests` (5), `ChartBuildTimingTests` (7), `ChartBuildTimelineTests` (4),
+    `ChartBuildRenderTests` (7) and `ChartBuildShowTests` (show frames: before the first click nothing, then the
+    background, then each series in turn; once played out, the frame equals the chart without a build).
+    The full suite passes on AB-T-0434's main: 2,349 tests in all 19 bundles (`aDenseShapeGradientRendersPromptly`
+    was again starved past its 20 s limit in the full run and passes alone).
+  - **Not yet:** choosing a build in the app (Animate › Effect Options has no Sequence for charts, and no engine
+    command sets one); radar, stock, box-and-whisker, histogram, Pareto, waterfall and Office 2016 charts play as
+    one object; a Wipe on one part reveals it whole, as for paragraphs.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

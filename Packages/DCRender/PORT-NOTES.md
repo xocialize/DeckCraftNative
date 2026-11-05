@@ -133,6 +133,18 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
   each value as its share of the category's total over those series, as the 100 % bars already do. 3-D charts
   are drawn flat and of-pie charts as one pie, as before.
 
+## Chart builds: a chart drawn part by part (AB-T-0443)
+
+DeckCraftNative's own. `ShapeState.chartParts` holds the state of each chart part a build animates (from the
+timeline's `chartState`), and `ChartRender.drawParts` draws the chart in passes: one per distinct state, each in
+a layer with that state's opacity and offset, the background's pass first. `drawInner` takes the pass's `Parts`:
+the background (titles, legend with its keys, axis titles, gridlines, axis labels, axis line) and the points it
+draws (bars, pie slices, markers, data labels, error bars; a line segment goes with the point it runs to, an area
+with its first point, a trendline with its series' last point). Parts in one state share a pass, so a build that
+has played out draws exactly as the chart does without one. Wipe-like clips apply to the whole shape only, as for
+paragraphs. Radar, stock, box-and-whisker, histogram, Pareto, waterfall and the Office 2016 charts drawn by their
+own code animate as one object (`drawsParts`). Tests: `ChartBuildRenderTests`.
+
 ## Render cost: metafile clip layers and dense strokes (2026-10-31)
 
 The full Govdocs1 `.ppt` crash run (`Packages/DCPPT/PORT-NOTES.md`, P6) found four decks that took 42–63 s to render

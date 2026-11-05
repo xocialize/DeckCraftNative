@@ -118,9 +118,9 @@ extension PPTXRead {
         }
     }
 
-    /// One effect read from the file: the animation, its file shape id, its group id, and whether it
-    /// is part of a paragraph build.
-    private typealias Effect = (anim: Animation, fileId: UInt32, grp: String, build: Bool)
+    /// One effect read from the file: the animation, its file shape id, its group id, whether it is part
+    /// of a paragraph build, and the chart build (`bldGraphic`) its chart part belongs to.
+    private typealias Effect = (anim: Animation, fileId: UInt32, grp: String, build: Bool, chart: (ChartBuild, Bool)?)
 
     /// Flatten the timing tree into the Animation Pane list.
     static func animations(_ ctx: IdCtx, _ timing: XMLEl, _ shapes: [Shape]) -> [Animation] {
@@ -133,6 +133,15 @@ extension PPTXRead {
                 p.u32("spid").map { ($0, p.attr("grpId") ?? "0") }
             }
         } ?? []
+        // Chart builds (`bldGraphic` with `a:bldChart`) by (spid, grpId): the build and whether it has a
+        // background step (`animBg`, on unless "0" or "false").
+        let byChart: [(UInt32, String, ChartBuild, Bool)] = timing.child("bldLst").map { b in
+            b.childrenNamed("bldGraphic").compactMap { g in
+                guard let spid = g.u32("spid"), let bc = g.path(["bldSub", "bldChart"]),
+                      let build = ChartBuild.fromFile(bc.attr("bld")) else { return nil }
+                return (spid, g.attr("grpId") ?? "0", build, bc.bool("animBg") ?? true)
+            }
+        } ?? []
         var out: [Effect] = []
         for f in found {
             let c = f.ctn
@@ -141,6 +150,9 @@ extension PPTXRead {
             let sub = c.u32("presetSubtype") ?? 0
             guard let tgt = c.find("spTgt"), let fileId = tgt.u32("spid"), let shape = ctx.lookup(fileId) else { continue }
             let paragraph = tgt.path(["txEl", "pRg"])?.u32("st")
+            let chartEl = tgt.path(["graphicEl", "chart"]).flatMap { e in
+                ChartElement.fromFile(step: e.attr("bldStep"), series: e.i64("seriesIdx"), category: e.i64("categoryIdx"))
+            }
             let base = Maps.effectForPreset(cls, preset) ?? Maps.fallbackEffect(cls)
             // PowerPoint writes Float Down as its own preset (47), not as Float with a direction.
             let effect: String, option: String
@@ -164,6 +176,7 @@ extension PPTXRead {
             a.durationMs = maxDur(c, 0) ?? 0
             a.delayMs = c.path(["stCondLst", "cond"]).flatMap { msAttr($0, "delay") } ?? 0
             a.paragraph = paragraph
+            a.chartElement = paragraph == nil ? chartEl : nil
             a.trigger = f.trigger.flatMap { ctx.lookup($0) }
             a.presetId = preset
             a.presetSubtype = sub
@@ -200,13 +213,15 @@ extension PPTXRead {
             }
             let grp = c.attr("grpId") ?? "0"
             let build = paragraph != nil && byPara.contains { $0.0 == fileId && bytesEqual($0.1, grp) }
-            out.append((a, fileId, grp, build))
+            let chart = a.chartElement == nil ? nil : byChart.first { $0.0 == fileId && bytesEqual($0.1, grp) }.map { ($0.2, $0.3) }
+            out.append((a, fileId, grp, build, chart))
         }
         // A paragraph build's effects, one per paragraph, become one by-paragraph animation only when
         // the timeline plays that back exactly: PowerPoint lets each paragraph keep its own start and
         // effect, and other shapes' effects can sit between them (#844).
         func sameBuild(_ x: Effect, _ y: Effect) -> Bool {
-            x.build && y.build && x.fileId == y.fileId && bytesEqual(x.grp, y.grp) && x.anim.trigger == y.anim.trigger
+            (x.build && y.build || x.chart != nil && y.chart != nil) && x.fileId == y.fileId && bytesEqual(x.grp, y.grp)
+                && x.anim.trigger == y.anim.trigger
         }
         var anims: [Animation] = []
         anims.reserveCapacity(out.count)
@@ -223,12 +238,41 @@ extension PPTXRead {
                 a.textBuild = .byParagraph
                 a.paragraph = nil
                 anims.append(a)
+            } else if let first = effects.first, let (cb, bg) = run.first?.chart, case .chart(let ch)? = findShape(shapes, first.shape)?.kind,
+                      playsAsChartBuild(effects, ch, cb, bg) {
+                // A chart build's steps, one effect per series, category or point, become one animation the
+                // same way (AB-T-0443).
+                var a = first
+                a.chartBuild = cb
+                a.chartNoBackground = !bg
+                a.chartElement = nil
+                anims.append(a)
             } else {
                 anims.append(contentsOf: effects)
             }
             i = j
         }
         return anims
+    }
+
+    /// Are `effects` (chart part effects of one shape, in file order) what `build` of the first one plays: one
+    /// effect per step of `chartBuildSteps`, in order, later steps on click (after previous when the build
+    /// doesn't start on click), all with the same settings?
+    static func playsAsChartBuild(_ effects: [Animation], _ chart: Chart, _ build: ChartBuild, _ background: Bool) -> Bool {
+        let steps = chartBuildSteps(chart, build, background: background)
+        guard let first = effects.first, !steps.isEmpty, steps.count == effects.count else { return false }
+        func settings(_ a: Animation) -> Animation {
+            var a = a
+            a.start = .onClick
+            a.chartElement = nil
+            return a
+        }
+        let base = settings(first)
+        let later: AnimStart = first.start == .onClick ? .onClick : .afterPrevious
+        for (k, (a, step)) in zip(effects, steps).enumerated() {
+            if a.chartElement != step || (k > 0 && a.start != later) || settings(a) != base { return false }
+        }
+        return true
     }
 
     /// Are `effects` (paragraph effects of one shape, in file order) what a by-paragraph build of the

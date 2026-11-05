@@ -25,6 +25,8 @@ public struct ShapeState: Sendable {
     public var tint: Rgba?
     /// Per-paragraph states of by-paragraph text builds (paragraph index, state).
     public var paras: [(Int, ParaState)] = []
+    /// Per-part states of chart builds (the part, its state relative to the shape). AB-T-0443.
+    public var chartParts: [(ChartElement, ParaState)] = []
 
     public init() {}
 }
@@ -474,7 +476,11 @@ final class Renderer {
             track(m, (cells ?? Rect(0, 0, x.w, x.h)).inflate(2, 2))
         case .chart(let ch):
             track(m, Rect(0, 0, x.w, x.h))
-            ChartRender.draw(c, rctx, ch, m, x.w, x.h)
+            if st.chartParts.isEmpty {
+                ChartRender.draw(c, rctx, ch, m, x.w, x.h)
+            } else {
+                ChartRender.drawParts(c, rctx, ch, m, x.w, x.h, st.chartParts)
+            }
         case .ink(let strokes):
             drawInk(c, strokes, parent, depth)
         default:

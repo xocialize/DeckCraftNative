@@ -20,9 +20,9 @@ tests: all 95 Rust `#[test]`s across the module's files, plus a check of the JSO
 
 ## Divergences: the port's own model fields
 
-The chart model has fields deckcraft doesn't (decision 1 of `research/DeckCraftNative-charts-gaps/review.md`:
-optional fields that serialise as before). They are a patch over deckcraft's `chart.rs`,
-`Tools/port/divergence/model-chart.patch`, which `Tools/port/generate.sh` applies to a copy of the pinned sources
+The chart and animation models have fields deckcraft doesn't (decision 1 of
+`research/DeckCraftNative-charts-gaps/review.md`: optional fields that serialise as before). They are patches over deckcraft's `chart.rs` and `anim.rs`,
+`Tools/port/divergence/model-*.patch`, which `Tools/port/generate.sh` applies to a copy of the pinned sources
 before generating, so `Types.generated.swift` stays generated and the pinned checkout is never changed. A pin
 move that touches the same lines stops the script until the patch is redone. The patched Rust is input to the
 generator only; it isn't built.
@@ -38,6 +38,26 @@ generator only; it isn't built.
 Each is skipped when unset (`None`, `false`), so every deck without them writes the same `presentation.json`;
 the corpus round trip is unchanged. A deck that uses them is one deckcraft reads with the fields ignored, and
 the two new types not at all. Their behaviour is in DCPPTX (divergence 10), DCEngine and DCRender.
+
+### Chart builds (AB-T-0443)
+
+deckcraft animates a chart as one object. PowerPoint can build it a series, a category or a point at a time
+(Effect Options › Sequence), and a deck that had a build lost it on a round trip. The animation model gains
+three fields (`Tools/port/divergence/model-anim.patch`):
+
+- **`Animation.chartBuild: ChartBuild?`**: `bySeries`, `byCategory`, `bySeriesElement`, `byCategoryElement`
+  (nil: as one object). One animation, which the writer and the timeline expand into one effect per step, as
+  `textBuild` is for paragraphs.
+- **`Animation.chartNoBackground`**: the build has no background step (`a:bldChart animBg="0"`).
+- **`Animation.chartElement: ChartElement?`**: the part one effect animates (`step`: `background`, `series`,
+  `category`, `seriesPoint`, `categoryPoint`, with its `series` and `category`), for a file's steps that don't
+  play back as a build of the first, as `paragraph` is for text.
+
+All three are skipped when unset, so every deck without a build writes the same `presentation.json`.
+`ChartBuild.swift` (hand-written) has the file values and `chartBuildSteps(chart, build, background:)`, the
+step list the reader, the writer and the timeline share: the background, then each series, category or point
+(points series by series, or category by category, PowerPoint's orders), at most `maxChartBuildSteps` (1,000).
+Their behaviour is in DCPPTX (divergence 11), DCAnim and DCRender.
 
 ## File map
 

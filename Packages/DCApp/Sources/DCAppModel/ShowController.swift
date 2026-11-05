@@ -902,7 +902,20 @@ public func showShapeState(_ tl: Timeline, _ id: ShapeId, _ step: Int, _ t: Doub
         ps.offset = Vec2(pa.offsetX, pa.offsetY)
         return (p, ps)
     }
+    s.chartParts = chartPartStates(tl, id) { tl.chartState(id, $0, step, t, plays, stamps) }
     return s
+}
+
+/// The states of a shape's chart parts (chart builds, AB-T-0443) for the renderer, from `state`.
+public func chartPartStates(_ tl: Timeline, _ id: ShapeId, _ state: (ChartElement) -> AnimState) -> [(ChartElement, ParaState)] {
+    tl.chartTargets(id).map { part in
+        let a = state(part)
+        var ps = ParaState()
+        ps.visible = a.visible
+        ps.opacity = a.opacity
+        ps.offset = Vec2(a.offsetX, a.offsetY)
+        return (part, ps)
+    }
 }
 
 /// The shapes of slide `idx` to leave out when drawing what is stacked above the lowest playing video (that

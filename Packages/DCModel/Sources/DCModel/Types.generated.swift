@@ -3770,6 +3770,68 @@ public enum TextBuild: String, JSONStringEnum, Sendable {
     public static var `default`: TextBuild { .asOne }
 }
 
+// MARK: ChartBuild (anim.rs)
+
+/// Chart build (Effect Options › Sequence): one step per series, per category, or per point taken
+/// series by series or category by category (`a:bldChart bld`). As one object is no build at all.
+/// DeckCraftNative's own (AB-T-0443).
+public enum ChartBuild: String, JSONStringEnum, Sendable {
+    case bySeries = "bySeries"
+    case byCategory = "byCategory"
+    case bySeriesElement = "bySeriesElement"
+    case byCategoryElement = "byCategoryElement"
+}
+
+// MARK: ChartStep (anim.rs)
+
+/// What one step of a chart build animates (`a:chart bldStep`). DeckCraftNative's own (AB-T-0443).
+public enum ChartStep: String, JSONStringEnum, Sendable {
+    /// The chart's background: axes, gridlines, legend and titles (`gridLegend`).
+    case background = "background"
+    case series = "series"
+    case category = "category"
+    /// One point, in a by-element-in-series build (`ptInSeries`).
+    case seriesPoint = "seriesPoint"
+    /// One point, in a by-element-in-category build (`ptInCategory`).
+    case categoryPoint = "categoryPoint"
+
+    public static var `default`: ChartStep { .background }
+}
+
+// MARK: ChartElement (anim.rs)
+
+/// The part of a chart one effect animates (`p:graphicEl/a:chart`): a step, with the series and
+/// category it names (0 where the step names none). DeckCraftNative's own (AB-T-0443).
+public struct ChartElement: Sendable, Equatable {
+    public var step: ChartStep
+    public var series: UInt32
+    public var category: UInt32
+
+    public init(step: ChartStep = ChartStep.default, series: UInt32 = 0, category: UInt32 = 0) {
+        self.step = step
+        self.series = series
+        self.category = category
+    }
+
+    public static var `default`: ChartElement { ChartElement() }
+}
+
+extension ChartElement: JSONCodable {
+    public func toJSON() -> JSON {
+        var o = JSONObject()
+        o.put("step", step)
+        o.put("series", series)
+        o.put("category", category)
+        return .object(o)
+    }
+
+    public init(fromJSON json: JSON) throws(JSONDecodeError) {
+        let f = try JSONFields(json, "ChartElement")
+        let d = ChartElement.default
+        self.init(step: try f.get("step", default: d.step), series: try f.get("series", default: d.series), category: try f.get("category", default: d.category))
+    }
+}
+
 // MARK: Animation (anim.rs)
 
 public struct Animation: Sendable, Equatable {
@@ -3806,8 +3868,17 @@ public struct Animation: Sendable, Equatable {
     public var smoothEnd: Double
     public var bounceEnd: Double
     public var autoReverse: Bool
+    /// A chart animated in steps (`p:bldGraphic`); the writer and the timeline expand it into one effect
+    /// per step. DeckCraftNative's own (AB-T-0443).
+    public var chartBuild: ChartBuild?
+    /// A chart build without the background step: the axes, gridlines and legend show from the start
+    /// (`a:bldChart animBg="0"`). DeckCraftNative's own (AB-T-0443).
+    public var chartNoBackground: Bool
+    /// The chart part one effect animates, when a file's chart build steps don't play back as a build of
+    /// the first (as `paragraph` is for text). DeckCraftNative's own (AB-T-0443).
+    public var chartElement: ChartElement?
 
-    public init(shape: ShapeId, `class`: AnimClass, effect: String, option: String, start: AnimStart, durationMs: UInt32, delayMs: UInt32, `repeat`: UInt32, rewind: Bool, textBuild: TextBuild, paragraph: UInt32? = nil, path: String? = nil, trigger: ShapeId? = nil, amount: Double? = nil, color: ColorRef? = nil, presetId: UInt32? = nil, presetSubtype: UInt32? = nil, after: String? = nil, sound: MediaId? = nil, smoothStart: Double, smoothEnd: Double, bounceEnd: Double, autoReverse: Bool) {
+    public init(shape: ShapeId, `class`: AnimClass, effect: String, option: String, start: AnimStart, durationMs: UInt32, delayMs: UInt32, `repeat`: UInt32, rewind: Bool, textBuild: TextBuild, paragraph: UInt32? = nil, path: String? = nil, trigger: ShapeId? = nil, amount: Double? = nil, color: ColorRef? = nil, presetId: UInt32? = nil, presetSubtype: UInt32? = nil, after: String? = nil, sound: MediaId? = nil, smoothStart: Double, smoothEnd: Double, bounceEnd: Double, autoReverse: Bool, chartBuild: ChartBuild? = nil, chartNoBackground: Bool, chartElement: ChartElement? = nil) {
         self.shape = shape
         self.class = `class`
         self.effect = effect
@@ -3831,6 +3902,9 @@ public struct Animation: Sendable, Equatable {
         self.smoothEnd = smoothEnd
         self.bounceEnd = bounceEnd
         self.autoReverse = autoReverse
+        self.chartBuild = chartBuild
+        self.chartNoBackground = chartNoBackground
+        self.chartElement = chartElement
     }
 }
 
@@ -3860,13 +3934,16 @@ extension Animation: JSONCodable {
         o.put("smoothEnd", smoothEnd)
         o.put("bounceEnd", bounceEnd)
         o.put("autoReverse", autoReverse)
+        o.putIfPresent("chartBuild", chartBuild)
+        o.put("chartNoBackground", chartNoBackground, skipIf: !chartNoBackground)
+        o.putIfPresent("chartElement", chartElement)
         return .object(o)
     }
 
     public init(fromJSON json: JSON) throws(JSONDecodeError) {
         let f = try JSONFields(json, "Animation")
         let d = Animation.default
-        self.init(shape: try f.get("shape", default: d.shape), class: try f.get("class", default: d.class), effect: try f.get("effect", default: d.effect), option: try f.get("option", default: d.option), start: try f.get("start", default: d.start), durationMs: try f.get("durationMs", default: d.durationMs), delayMs: try f.get("delayMs", default: d.delayMs), repeat: try f.get("repeat", default: d.repeat), rewind: try f.get("rewind", default: d.rewind), textBuild: try f.get("textBuild", default: d.textBuild), paragraph: try f.get("paragraph", default: d.paragraph), path: try f.get("path", default: d.path), trigger: try f.get("trigger", default: d.trigger), amount: try f.get("amount", default: d.amount), color: try f.get("color", default: d.color), presetId: try f.get("presetId", default: d.presetId), presetSubtype: try f.get("presetSubtype", default: d.presetSubtype), after: try f.get("after", default: d.after), sound: try f.get("sound", default: d.sound), smoothStart: try f.get("smoothStart", default: d.smoothStart), smoothEnd: try f.get("smoothEnd", default: d.smoothEnd), bounceEnd: try f.get("bounceEnd", default: d.bounceEnd), autoReverse: try f.get("autoReverse", default: d.autoReverse))
+        self.init(shape: try f.get("shape", default: d.shape), class: try f.get("class", default: d.class), effect: try f.get("effect", default: d.effect), option: try f.get("option", default: d.option), start: try f.get("start", default: d.start), durationMs: try f.get("durationMs", default: d.durationMs), delayMs: try f.get("delayMs", default: d.delayMs), repeat: try f.get("repeat", default: d.repeat), rewind: try f.get("rewind", default: d.rewind), textBuild: try f.get("textBuild", default: d.textBuild), paragraph: try f.get("paragraph", default: d.paragraph), path: try f.get("path", default: d.path), trigger: try f.get("trigger", default: d.trigger), amount: try f.get("amount", default: d.amount), color: try f.get("color", default: d.color), presetId: try f.get("presetId", default: d.presetId), presetSubtype: try f.get("presetSubtype", default: d.presetSubtype), after: try f.get("after", default: d.after), sound: try f.get("sound", default: d.sound), smoothStart: try f.get("smoothStart", default: d.smoothStart), smoothEnd: try f.get("smoothEnd", default: d.smoothEnd), bounceEnd: try f.get("bounceEnd", default: d.bounceEnd), autoReverse: try f.get("autoReverse", default: d.autoReverse), chartBuild: try f.get("chartBuild", default: d.chartBuild), chartNoBackground: try f.get("chartNoBackground", default: d.chartNoBackground), chartElement: try f.get("chartElement", default: d.chartElement))
     }
 }
 

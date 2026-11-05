@@ -69,6 +69,11 @@ What the engine, the renderer and the app call. Names follow the Rust in Swift's
 
 ## Divergences
 
+- **Chart builds (AB-T-0443, DeckCraftNative's own).** An animation with `chartBuild` plays one effect per step
+  of `chartBuildSteps` on the chart part it names (`EffectTiming.chart`), later steps on click, or after
+  previous when the build doesn't start on click (PowerPoint's chain; text builds stagger with previous); one
+  with `chartElement` plays on that part. `chartTargets(shape)` and `chartState(shape, part, …)` are new;
+  `stateOrdered` ignores part effects. Without a build nothing changes, and the parity vectors still match.
 - **Names.**
   - Rust's `Sequence` is `AnimSequence`, so it doesn't shadow Swift's `Sequence` protocol.
   - The `None` variants of `ShowAction`, `LinkJump` and `Click` are `none_`, as elsewhere in the port.

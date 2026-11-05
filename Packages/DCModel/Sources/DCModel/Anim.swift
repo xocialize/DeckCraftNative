@@ -222,7 +222,7 @@ extension Animation {
             shape: ShapeId(0), class: .entrance, effect: "fade", option: "", start: .onClick, durationMs: 500,
             delayMs: 0, repeat: 1, rewind: false, textBuild: .asOne, paragraph: nil, path: nil, trigger: nil,
             amount: nil, color: nil, presetId: nil, presetSubtype: nil, after: nil, sound: nil, smoothStart: 0.0,
-            smoothEnd: 0.0, bounceEnd: 0.0, autoReverse: false
+            smoothEnd: 0.0, bounceEnd: 0.0, autoReverse: false, chartBuild: nil, chartNoBackground: false, chartElement: nil
         )
     }
 }

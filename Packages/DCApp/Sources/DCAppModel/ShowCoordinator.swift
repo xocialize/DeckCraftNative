@@ -605,6 +605,7 @@ public final class ShowCoordinator {
             ps.offset = Vec2(pa.offsetX, pa.offsetY)
             return (i, ps)
         }
+        s.chartParts = chartPartStates(tl, id) { tl.chartState(id, $0, step, t) }
         return s
     }
 }
