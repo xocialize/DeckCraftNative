@@ -299,9 +299,11 @@ final class AcceptingHost: AppHost {
         #expect(RibbonMenus.entries("chartDesign.addElement", f.model).isEmpty, "no chart selected")
         _ = f.model.run("insert.chart", ["type": "Column"])
         let menu = RibbonMenus.entries("chartDesign.addElement", f.model)
-        #expect(menu.count == 4)
+        // Chart Title, Legend, Data Labels, Gridlines; Axis Titles, Error Bars, Trendline (AB-T-0436).
+        #expect(menu.count == 7)
         let items = Self.items(menu)
-        #expect(items.count == 2 + 5 + 2 + 2 && items.allSatisfy { $0.id == "chart.options" })
+        // Trendline: None, then four types each listing the three series.
+        #expect(items.count == 2 + 5 + 2 + 3 + 3 + 4 + (1 + 4 * 3) && items.allSatisfy { $0.id == "chart.options" })
         func chart() throws -> Chart { try #require(ChartElements.selected(f.model.session.activeDoc)).1 }
         func pick(_ key: String, _ value: JSON) throws {
             let ref = try #require(items.first { $0.params[key] == value }, "\(key) \(value)")
@@ -323,5 +325,150 @@ final class AcceptingHost: AppHost {
         _ = f.model.run("chart.options", ["title": "Sales"])
         let keep = Self.items(RibbonMenus.entries("chartDesign.addElement", f.model)).compactMap { $0.params["title"]?.asStr }
         #expect(keep == ["Sales"])
+    }
+
+    // MARK: - AB-T-0436: axis titles, minor gridlines, error bars, trendlines, up/down bars, the inspector's axis
+    // and series controls. Each item and control is one `chart.options` step: one undo step.
+
+    @MainActor private static func titled(_ entries: [CommandMenuEntry], _ path: String...) -> CommandMenuEntry? { titled(entries, path) }
+
+    @MainActor private static func titled(_ entries: [CommandMenuEntry], _ path: [String]) -> CommandMenuEntry? {
+        var level = entries
+        var found: CommandMenuEntry?
+        for name in path {
+            found = level.first { e in
+                switch e {
+                case .item(let t, _, _), .submenu(let t, _): t == name
+                case .separator: false
+                }
+            }
+            if case .submenu(_, let sub)? = found { level = sub }
+        }
+        return found
+    }
+
+    @MainActor private struct ChartFixture {
+        let f = Fixture()
+        init(_ type: String) { _ = f.model.run("insert.chart", ["type": .string(type)]) }
+        var chart: Chart? { ChartElements.selected(f.model.session.activeDoc)?.1 }
+        var undo: Int { f.model.session.activeDoc?.history.undo.count ?? 0 }
+        var menu: [CommandMenuEntry] { RibbonMenus.entries("chartDesign.addElement", f.model) }
+
+        /// Runs the menu item at `path`; true when it ran as one undo step.
+        func pick(_ path: String...) -> Bool {
+            guard case .item(_, let ref, _)? = path.isEmpty ? nil : RibbonModelTests.titled(menu, path) else { return false }
+            return run(ref.id, ref.params)
+        }
+
+        func run(_ id: String, _ params: JSON) -> Bool {
+            let before = undo
+            guard (try? f.model.run(id, params).get()) != nil else { return false }
+            return undo == before + 1
+        }
+    }
+
+    @Test func addChartElementSetsAxisTitlesAndMinorGridlines() throws {
+        let c = ChartFixture("Column")
+        #expect(c.pick("Axis Titles", "Primary Horizontal"))
+        #expect(c.chart?.axisTitles.a == ChartElements.defaultAxisTitle && c.chart?.axisTitles.b == nil, "horizontal is the category axis")
+        #expect(c.pick("Axis Titles", "Primary Vertical"))
+        #expect(c.chart?.axisTitles.b == ChartElements.defaultAxisTitle)
+        #expect(c.pick("Axis Titles", "None"))
+        #expect(c.chart?.axisTitles.a == nil && c.chart?.axisTitles.b == nil)
+        #expect(c.pick("Gridlines", "Primary Minor Horizontal"))
+        #expect(c.chart?.minorGridlines == true)
+        #expect(c.pick("Gridlines", "None"))
+        #expect(c.chart?.minorGridlines == false && c.chart?.gridlines == false)
+        #expect(c.pick("Gridlines", "Primary Major Horizontal"))
+        #expect(c.chart?.gridlines == true)
+        // On a bar chart the horizontal axis is the value axis, and its gridlines are vertical.
+        let bar = ChartFixture("Bar")
+        #expect(bar.pick("Axis Titles", "Primary Horizontal"))
+        #expect(bar.chart?.axisTitles.b == ChartElements.defaultAxisTitle && bar.chart?.axisTitles.a == nil)
+        #expect(bar.pick("Gridlines", "Primary Minor Vertical"))
+        // A pie has no axes: no axis titles, trendline or error bars, and its gridlines' None sets no minor ones.
+        let pie = ChartFixture("Pie")
+        #expect(Self.titled(pie.menu, "Axis Titles") == nil && Self.titled(pie.menu, "Trendline") == nil && Self.titled(pie.menu, "Error Bars") == nil)
+        #expect(pie.pick("Gridlines", "None"))
+    }
+
+    @Test func addChartElementSetsErrorBarsTrendlinesAndUpDownBars() throws {
+        let c = ChartFixture("Column")
+        #expect(c.pick("Error Bars", "Percentage"))
+        #expect(c.chart?.series.allSatisfy { $0.errorBars?.valType == "percentage" && $0.errorBars?.value == 5 } == true, "on every series")
+        #expect(c.pick("Error Bars", "Standard Deviation"))
+        #expect(c.chart?.series.allSatisfy { $0.errorBars?.valType == "stdDev" } == true)
+        #expect(c.pick("Error Bars", "Standard Error"))
+        #expect(c.pick("Error Bars", "None"))
+        #expect(c.chart?.series.allSatisfy { $0.errorBars == nil } == true)
+        // The series picker: each trendline lists the series.
+        #expect(c.pick("Trendline", "Linear Forecast", "Series 2"))
+        let t = try #require(c.chart?.series[1].trendlines.first)
+        #expect(t.kind == .linear && t.forward == 2 && c.chart?.series[0].trendlines.isEmpty == true)
+        #expect(c.pick("Trendline", "Exponential", "Series 1"))
+        #expect(c.chart?.series[0].trendlines.first?.kind == .exp)
+        #expect(c.pick("Trendline", "Moving Average", "Series 3"))
+        #expect(c.chart?.series[2].trendlines.first == Trendline(kind: .movingAvg, period: 2, dispEq: false, dispRSqr: false))
+        #expect(c.pick("Trendline", "Linear", "Series 1"))
+        #expect(c.chart?.series[0].trendlines.map(\.kind) == [.linear], "replaces the series' trendline")
+        #expect(c.pick("Trendline", "None"))
+        #expect(c.chart?.series.allSatisfy { $0.trendlines.isEmpty } == true)
+        // An exponential trendline lists only the series whose values are all above zero.
+        _ = c.f.model.run("chart.data", ["series": [["name": "Up", "values": [1, 2, 3, 4]], ["name": "Down", "values": [2, -1, 3, 1]]]])
+        guard case .submenu(_, let exp)? = Self.titled(c.menu, "Trendline", "Exponential") else { Issue.record("no Exponential submenu"); return }
+        #expect(exp.count == 1 && Self.titled(exp, "Up") != nil)
+        // No Up/Down Bars on columns; on a line chart and a stock chart.
+        #expect(Self.titled(c.menu, "Up/Down Bars") == nil)
+        let line = ChartFixture("Line")
+        #expect(line.pick("Up/Down Bars", "Up/Down Bars"))
+        #expect(line.chart?.upDownBars == true)
+        #expect(line.pick("Up/Down Bars", "None"))
+        #expect(line.chart?.upDownBars == false)
+        let stock = ChartFixture("Stock")
+        #expect(stock.pick("Up/Down Bars", "Up/Down Bars"))
+        // A stacked column takes error bars but no trendline.
+        let stacked = ChartFixture("StackedColumn")
+        #expect(Self.titled(stacked.menu, "Trendline") == nil && Self.titled(stacked.menu, "Error Bars") != nil)
+    }
+
+    /// The inspector's Axes and Series Options controls send these, each one undo step (ChartAxisSection,
+    /// ChartSeriesSection).
+    @Test func chartInspectorControlsAreOneStepEach() throws {
+        let c = ChartFixture("Column")
+        let id: JSON = .integer(try #require(ChartElements.selected(c.f.model.session.activeDoc)).0.rawValue)
+        func options(_ p: [String: JSON]) -> Bool {
+            var o: [(String, JSON)] = [("id", id)]
+            o += p.sorted { $0.key < $1.key }
+            return c.run("chart.options", .object(JSONObject(o.map { JSONObject.Entry(key: $0.0, value: $0.1) })))
+        }
+        #expect(options(["axisTitles": ["value": "Revenue"]]) && c.chart?.axisTitles.b == "Revenue")
+        #expect(options(["axisTitles": ["category": .null]]) && c.chart?.axisTitles.a == nil)
+        #expect(options(["minorGridlines": true]) && c.chart?.minorGridlines == true)
+        #expect(options(["axisMin": 1]) && options(["axisMax": 6]) && options(["majorUnit": 0.5]))
+        #expect(c.chart?.yMin == 1 && c.chart?.yMax == 6 && c.chart?.yMajor == 0.5)
+        #expect(options(["logBase": 10]) && c.chart?.yLogBase == 10)
+        #expect(options(["logBase": .null, "axisMin": .null]) && c.chart?.yLogBase == nil && c.chart?.yMin == nil)
+        // Every number format the picker offers is accepted; "" follows the data.
+        for (_, code) in ChartElements.numberFormats {
+            #expect(options(["numberFormat": code.isEmpty ? .null : .string(code)]), "\(code)")
+            #expect(ChartElements.ownFormat(try #require(c.chart)) == code)
+        }
+        #expect(options(["reverseCategories": true]) && c.chart?.catReversed == true)
+        #expect(options(["gapWidth": 80]) && options(["overlap": -30]))
+        #expect(abs((c.chart?.gapWidth ?? 0) - 0.8) < 1e-9 && abs((c.chart?.overlap ?? 0) + 0.3) < 1e-9)
+        // The series picker's trendline and error bar choices, on series 2.
+        let s1 = try #require(c.chart?.series[1])
+        for (_, tag, t) in ChartElements.trendlineChoices where ChartElements.fits(t, try #require(c.chart), s1) {
+            #expect(options(["series": 1, "trendline": t]), "\(tag)")
+            #expect(ChartElements.trendTag(try #require(c.chart?.series[1])) == tag)
+        }
+        for e in ChartElements.errorBars {
+            #expect(options(["series": 1, "errorBars": e.errorBars]))
+            #expect(c.chart?.series[1].errorBars?.valType == e.errorBars.get("type")?.asStr)
+        }
+        #expect(options(["series": 1, "trendline": .null, "errorBars": .null]))
+        #expect(c.chart?.series[1].trendlines.isEmpty == true && c.chart?.series[1].errorBars == nil)
+        let line = ChartFixture("Line")
+        #expect(line.chart?.takesUpDownBars == true && line.chart?.takesGapWidth == false)
     }
 }

@@ -605,7 +605,7 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   gridlines (2026-11-04, AB-T-0433). deckcraft drops `raw` on every chart edit, so a save regenerated the part and
   lost what the model doesn't hold; DCPPTX now writes those fields into the kept part (its divergence 8). The
   command's reply is unchanged; a document dump shows the chart's `raw` where deckcraft's has none. `textColor`,
-  `palette`, bins, subtotals, quartiles and up/down bars still drop it. **`chart.data` keeps it too**
+  `palette`, bins, subtotals and quartiles still drop it (up/down bars did until AB-T-0436). **`chart.data` keeps it too**
   (the same day): DCPPTX writes the categories and series into the kept part and drops the workbook, whose
   cells would be stale. `DesignShowTests.editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` (ported)
   now expects the chart's drawing to stay where deckcraft's dropped every kept part.
@@ -613,6 +613,25 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   `percentArea` (DCModel's divergence). `chart.type` also clears the chart's 3-D view, wireframe and of-pie split,
   since a type from the gallery is a flat one; deckcraft's model has none of them. Test:
   `InsertCommandTests.chartTypeNamesThePercentLinesAndDropsThreeD`.
+- **`chart.options` sets what the model already had** (2026-11-05, AB-T-0436). deckcraft's model, reader and
+  writer hold axis titles, minor gridlines, the value axis's scale and format, reversed categories, gap width and
+  overlap, trendlines and error bars, but no command set them. `chart.options` takes, beside deckcraft's keys:
+  `axisTitles {category?, value?: text|null}`, `minorGridlines`, `axisMin`, `axisMax`, `majorUnit` (null for
+  automatic), `logBase` (2–1000, null for linear), `numberFormat` (an Excel code, null to follow the data),
+  `reverseCategories`, `gapWidth` (0–500 %), `overlap` (−100–100 %), and `series` (an index; every series that can
+  take it when left out) with `trendline {type, order?, period?, forward?, backward?, intercept?, equation?,
+  rSquared?, name?}|null` (replaces the series' trendlines) and `errorBars {type: stdErr|percentage|stdDev|fixedVal,
+  value?, direction?, endCap?}|null`. They are keys of `chart.options`, not a command of their own, because the
+  registry is deckcraft's list (`RegistryTests.theRegistryMatchesTheOraclesCommandList`), and its params text is
+  unchanged. Values are checked before the edit, as PowerPoint's Format pane refuses them: a minimum below the
+  maximum, a log axis above zero, axes only where the writer has them (no pie, doughnut or Office 2016 chart),
+  gap width only with bars, overlap only on flat unstacked bars, trendlines only on flat unstacked column, bar,
+  line, area and scatter series, an exponential or power one only on positive values, a moving average's period
+  below the point count. `Chart.takesAxisSettings`, `takesGapWidth`, `takesOverlap`, `takesUpDownBars`,
+  `takesTrendline(_:)` and `takesErrorBars(_:)` say so for the app's menus. None of these drops `raw`, and
+  `upDownBars` no longer does: DCPPTX writes them into the kept part (its divergence 11). Tests:
+  `InsertCommandTests.chartOptionsSetTheAxesAndBars`, `chartOptionsSetASeriesTrendlineAndErrorBars`, and
+  `chartEditsKeepThePartForElementsAndData` with the new keys.
 
 ### Tests
 

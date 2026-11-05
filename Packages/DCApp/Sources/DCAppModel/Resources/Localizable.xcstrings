@@ -4071,6 +4071,76 @@
         }
       }
     },
+    "Axis Title" : {
+      "comment" : "The text a new axis title starts with",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Achsentitel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Axis Title"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Título del eje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titre de l'axe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titolo asse"
+          }
+        }
+      }
+    },
+    "Axis Titles" : {
+      "comment" : "Add Chart Element › Axis Titles",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Achsentitel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Axis Titles"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Títulos de ejes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titres des axes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Titoli degli assi"
+          }
+        }
+      }
+    },
     "Baseline" : {
       "localizations" : {
         "de" : {
@@ -6872,6 +6942,7 @@
       }
     },
     "Currency" : {
+      "comment" : "An axis number format: $#,##0",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10049,6 +10120,41 @@
         }
       }
     },
+    "Error Bars" : {
+      "comment" : "Add Chart Element › Error Bars",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fehlerindikatoren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error Bars"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barras de error"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barres d'erreur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barre di errore"
+          }
+        }
+      }
+    },
     "Exactly" : {
       "localizations" : {
         "de" : {
@@ -10182,6 +10288,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Esci da Modifica punti"
+          }
+        }
+      }
+    },
+    "Exponential" : {
+      "comment" : "An exponential trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exponentiell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exponential"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exponencial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exponentielle"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esponenziale"
           }
         }
       }
@@ -10864,6 +11005,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Piatto"
+          }
+        }
+      }
+    },
+    "Follow Data" : {
+      "comment" : "An axis number format taken from the chart's data",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mit Quelle verknüpft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow Data"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vinculado al origen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lié à la source"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Collegato all'origine"
           }
         }
       }
@@ -15636,6 +15812,76 @@
         }
       }
     },
+    "Linear" : {
+      "comment" : "A straight-line trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Linear"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linear"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lineal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Linéaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lineare"
+          }
+        }
+      }
+    },
+    "Linear Forecast" : {
+      "comment" : "A straight-line trendline continued two periods ahead",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lineare Prognose"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linear Forecast"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Previsión lineal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prévision linéaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Previsione lineare"
+          }
+        }
+      }
+    },
     "Link…" : {
       "localizations" : {
         "de" : {
@@ -15769,6 +16015,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blocca proporzioni"
+          }
+        }
+      }
+    },
+    "Logarithmic" : {
+      "comment" : "A logarithmic trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Logarithmisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logarithmic"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Logarítmica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Logarithmique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Logaritmica"
           }
         }
       }
@@ -15982,6 +16263,7 @@
       }
     },
     "Major Gridlines" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -16764,6 +17046,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Passaggio del mouse"
+          }
+        }
+      }
+    },
+    "Moving Average" : {
+      "comment" : "A two-period moving-average trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Gleitender Durchschnitt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving Average"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Media móvil"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Moyenne mobile"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Media mobile"
           }
         }
       }
@@ -17553,7 +17870,7 @@
       }
     },
     "None" : {
-      "comment" : "No arrowheads\nNo chart title\nNo data labels on the chart\nNo gridlines on the chart\nNo legend on the chart\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
+      "comment" : "No arrowheads\nNo axis titles\nNo chart title\nNo data labels on the chart\nNo error bars\nNo gridlines on the chart\nNo legend on the chart\nNo trendlines\nNo up/down bars\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17724,6 +18041,41 @@
         }
       }
     },
+    "Number" : {
+      "comment" : "An axis number format: whole numbers",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zahl"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Número"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nombre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Numero"
+          }
+        }
+      }
+    },
     "Number must be a whole number from 1 to 16" : {
       "localizations" : {
         "de" : {
@@ -17822,6 +18174,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Numero di righe:"
+          }
+        }
+      }
+    },
+    "Number, 1 Decimal" : {
+      "comment" : "An axis number format: one decimal place",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zahl, 1 Dezimalstelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number, 1 Decimal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Número, 1 decimal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nombre, 1 décimale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Numero, 1 decimale"
           }
         }
       }
@@ -19021,6 +19408,41 @@
         }
       }
     },
+    "Percentage" : {
+      "comment" : "An axis number format: 0%\nError bars of 5 % of each value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prozentsatz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Percentage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Porcentaje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pourcentage"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Percentuale"
+          }
+        }
+      }
+    },
     "Perspective" : {
       "comment" : "A shadow",
       "localizations" : {
@@ -19637,6 +20059,41 @@
         }
       }
     },
+    "Polynomial" : {
+      "comment" : "A second-order polynomial trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Polynomisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polynomial"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Polinómica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Polynomiale"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Polinomiale"
+          }
+        }
+      }
+    },
     "Portrait" : {
       "localizations" : {
         "de" : {
@@ -19736,6 +20193,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pubblica"
+          }
+        }
+      }
+    },
+    "Power" : {
+      "comment" : "A power trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Potenz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Power"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Potencial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Puissance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Potenza"
           }
         }
       }
@@ -19975,6 +20467,216 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Diapositiva precedente"
+          }
+        }
+      }
+    },
+    "Primary Horizontal" : {
+      "comment" : "The chart's horizontal axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär horizontal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Horizontal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Horizontal primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Horizontal principal"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Orizzontale principale"
+          }
+        }
+      }
+    },
+    "Primary Major Horizontal" : {
+      "comment" : "Gridlines across the value axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär horizontal, Hauptgitter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Major Horizontal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Horizontal principal primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principal horizontal majeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principale orizzontale primaria"
+          }
+        }
+      }
+    },
+    "Primary Major Vertical" : {
+      "comment" : "Gridlines across a bar chart's value axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär vertikal, Hauptgitter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Major Vertical"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vertical principal primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principal vertical majeur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principale verticale primaria"
+          }
+        }
+      }
+    },
+    "Primary Minor Horizontal" : {
+      "comment" : "Minor gridlines across the value axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär horizontal, Hilfsgitter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Minor Horizontal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Horizontal secundario primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principal horizontal mineur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Secondaria orizzontale primaria"
+          }
+        }
+      }
+    },
+    "Primary Minor Vertical" : {
+      "comment" : "Minor gridlines across a bar chart's value axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär vertikal, Hilfsgitter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Minor Vertical"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vertical secundario primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Principal vertical mineur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Secondaria verticale primaria"
+          }
+        }
+      }
+    },
+    "Primary Vertical" : {
+      "comment" : "The chart's vertical axis",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Primär vertikal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Vertical"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vertical primario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vertical principal"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Verticale principale"
           }
         }
       }
@@ -22393,6 +23095,41 @@
         }
       }
     },
+    "Scientific" : {
+      "comment" : "An axis number format: 0.00E+00",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wissenschaftlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scientific"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Científica"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scientifique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Scientifico"
+          }
+        }
+      }
+    },
     "ScreenTip:" : {
       "localizations" : {
         "de" : {
@@ -22901,6 +23638,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tipo frase."
+          }
+        }
+      }
+    },
+    "Series %lld" : {
+      "comment" : "A chart series without a name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datenreihe %lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Series %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Serie %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Série %lld"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Serie %lld"
           }
         }
       }
@@ -25667,6 +26439,76 @@
         }
       }
     },
+    "Standard Deviation" : {
+      "comment" : "Error bars of one standard deviation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Standardabweichung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard Deviation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Desviación estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Écart type"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Deviazione standard"
+          }
+        }
+      }
+    },
+    "Standard Error" : {
+      "comment" : "Error bars of the standard error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Standardfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Error típico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Erreur type"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Errore standard"
+          }
+        }
+      }
+    },
     "Start at:" : {
       "localizations" : {
         "de" : {
@@ -27648,6 +28490,41 @@
         }
       }
     },
+    "Thousands Separator" : {
+      "comment" : "An axis number format: #,##0",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tausendertrennzeichen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thousands Separator"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Separador de miles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Séparateur de milliers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Separatore delle migliaia"
+          }
+        }
+      }
+    },
     "Tick at least one slide to insert" : {
       "localizations" : {
         "de" : {
@@ -28024,6 +28901,41 @@
         }
       }
     },
+    "Trendline" : {
+      "comment" : "Add Chart Element › Trendline",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Trendlinie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trendline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Línea de tendencia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Courbe de tendance"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Linea di tendenza"
+          }
+        }
+      }
+    },
     "Trim Media" : {
       "localizations" : {
         "de" : {
@@ -28327,6 +29239,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sblocca"
+          }
+        }
+      }
+    },
+    "Up/Down Bars" : {
+      "comment" : "Add Chart Element › Up/Down Bars\nShow the chart's up/down bars",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pos./Neg. Abweichung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up/Down Bars"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barras superiores o inferiores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barres haut/bas"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Barre crescenti/decrescenti"
           }
         }
       }

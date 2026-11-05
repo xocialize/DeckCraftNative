@@ -14,7 +14,8 @@
 // | `chart.options` dataLabels | `c:showVal` in every plot group's and series' `c:dLbls` |
 // | `chart.options` gridlines | the primary value axis's `c:majorGridlines` |
 // | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook taken out here, then linked again to the original workbook with the new cells, or to a new one (`WriteChartWorkbook.swift`) |
-// | anything else (`chart.type`, palette, text colour, bins, subtotals, up/down bars, quartiles) | none: the part is regenerated |
+// | `chart.options` axis titles, minor gridlines, axis scale and format, reversed categories, gap and overlap, up/down bars, a series' trendline and error bars | `WriteChartPatchAxes.swift` (AB-T-0436) |
+// | anything else (`chart.type`, palette, text colour, bins, subtotals, quartiles) | none: the part is regenerated |
 import CNCore
 import DCModel
 
@@ -34,6 +35,7 @@ extension PPTXWrite.Charts {
         me = labelsNormalized(me)
         let data = dataChanged(was, me)
         var axisless = false
+        var barless = false
         var patched = true
         guard root.edit("chart", { ch in
             if !PPTXRead.optEqual(was.title, me.title) { patchTitle(&ch, me.title, me) }
@@ -45,7 +47,10 @@ extension PPTXWrite.Charts {
                     patchLabels(&pa, me.dataLabels)
                 }
                 axisless = primaryValueAxis(pa) == nil
+                barless = !pa.elements.contains { $0.is("lineChart") || $0.is("stockChart") }
                 if was.gridlines != me.gridlines { patchGridlines(&pa, me.gridlines) }
+                // Axis titles and scale, gap and overlap, up/down bars, trendlines, error bars (AB-T-0436).
+                patchAxesAndSeries(&pa, was, me)
             }
         }), patched, let now = reread(root) else { return nil }
         // What the reader derives from an element the edit removed has nowhere left to stay: the title's
@@ -57,6 +62,11 @@ extension PPTXWrite.Charts {
             me.textColor = now.textColor
         }
         if axisless { me.gridlines = now.gridlines }
+        // Up/down bars need a line or stock group: `chart.options` takes them on any chart, as deckcraft's does,
+        // and the generator writes them for those groups only (AB-T-0436).
+        if barless { me.upDownBars = now.upDownBars }
+        // An axis that follows the data's number format shows the data's (`chartWithin`).
+        if me.yFormat == nil && was.yFormat != nil { me.yFormat = now.yFormat }
         // A scatter or bubble chart's categories are its x values: the generator doesn't write them either.
         if data && (me.kind == .scatter || me.kind == .bubble) { me.categories = now.categories }
         // A bubble without a size is written at size 1, as the generator writes it.

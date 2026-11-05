@@ -116,6 +116,8 @@ DCAppModel|AutoCorrect as you type,,AutoCorrect as you type,Correction automatiq
 DCAppModel|Automatic,,Automatic,Automatique,needs_review,,,
 DCAppModel|Automatic bulleted and numbered lists,,Automatic bulleted and numbered lists,Listes à puces et numérotées automatiques,needs_review,,,
 DCAppModel|Available formats:,,Available formats:,Formats disponibles :,needs_review,,,
+DCAppModel|Axis Title,,Axis Title,Titre de l'axe,needs_review,,,The text a new axis title starts with
+DCAppModel|Axis Titles,,Axis Titles,Titres des axes,needs_review,,,Add Chart Element › Axis Titles
 DCAppModel|Baseline,,Baseline,Ligne de base,needs_review,,,
 DCAppModel|Basic Cycle,,Basic Cycle,Cycle de base,needs_review,,,
 DCAppModel|Basic List,,Basic List,Liste de base,needs_review,,,
@@ -204,7 +206,7 @@ DCAppModel|Crop 10% each side,,Crop 10% each side,Rogner de 10 % de chaque côt
 DCAppModel|Crop 20% each side,,Crop 20% each side,Rogner de 20 % de chaque côté,needs_review,,,
 DCAppModel|Crop to Shape,,Crop to Shape,Rogner à la forme,needs_review,,,
 DCAppModel|Cross,,Cross,Croix,needs_review,,,
-DCAppModel|Currency,,Currency,Monétaire,needs_review,,,
+DCAppModel|Currency,,Currency,Monétaire,needs_review,,,"An axis number format: $#,##0"
 DCAppModel|Curved Segment,,Curved Segment,Segment courbe,needs_review,,,
 DCAppModel|Custom,,Custom,Personnalisé,needs_review,,,
 DCAppModel|Custom Shows,,Custom Shows,Diaporamas personnalisés,needs_review,,,
@@ -298,10 +300,12 @@ DCAppModel|Enter a zoom percent,,Enter a zoom percent,Entrez un pourcentage de z
 DCAppModel|Entrance,,Entrance,Ouverture,needs_review,,,
 DCAppModel|Equation,,Equation,Équation,needs_review,,,
 DCAppModel|Eraser,,Eraser,Gomme,needs_review,,,ink tool
+DCAppModel|Error Bars,,Error Bars,Barres d'erreur,needs_review,,,Add Chart Element › Error Bars
 DCAppModel|Exactly,,Exactly,Exactement,needs_review,,,
 DCAppModel|Exciting,,Exciting,Captivant,needs_review,,,A category of slide transitions
 DCAppModel|Exit,,Exit,Fermeture,needs_review,,,
 DCAppModel|Exit Edit Points,,Exit Edit Points,Quitter la modification des points,needs_review,,,
+DCAppModel|Exponential,,Exponential,Exponentielle,needs_review,,,An exponential trendline
 DCAppModel|Export,,Export,Exporter,needs_review,,,
 DCAppModel|Export the presentation as:,,Export the presentation as:,Exporter la présentation en tant que :,needs_review,,,
 DCAppModel|Exported %@,,Exported %@,%@ exporté,needs_review,,,
@@ -322,6 +326,7 @@ DCAppModel|Fit,,Fit,Ajuster,needs_review,,,Zoom menu: fit the slide to the windo
 DCAppModel|Fit to slide,,Fit to slide,Ajuster à la diapositive,needs_review,,,
 DCAppModel|Fixed date (empty = update automatically):,,Fixed date (empty = update automatically):,Date fixe (vide = mise à jour automatique) :,needs_review,,,
 DCAppModel|Flat,,Flat,Plat,needs_review,,,line cap
+DCAppModel|Follow Data,,Follow Data,Lié à la source,needs_review,,,An axis number format taken from the chart's data
 DCAppModel|Follow Path,,Follow Path,Suivre le chemin,needs_review,,,
 DCAppModel|Follow the layout,,Follow the layout,Suivre la disposition,needs_review,,,
 DCAppModel|Followed Hyperlink,,Followed Hyperlink,Lien hypertexte visité,needs_review,,,A theme colour slot
@@ -463,17 +468,19 @@ DCAppModel|Lighter 90%,,Lighter 90%,Plus clair 90 %,needs_review,,,A shade of a
 DCAppModel|Line Spacing Options…,,Line Spacing Options…,Options d'interligne…,needs_review,,,
 DCAppModel|Line spacing,,Line spacing,Interligne,needs_review,,,
 DCAppModel|Line spacing must be a number,,Line spacing must be a number,L'interligne doit être un nombre,needs_review,,,
+DCAppModel|Linear,,Linear,Linéaire,needs_review,,,A straight-line trendline
+DCAppModel|Linear Forecast,,Linear Forecast,Prévision linéaire,needs_review,,,A straight-line trendline continued two periods ahead
 DCAppModel|Link…,,Link…,Lien…,needs_review,,,
 DCAppModel|List,,List,Liste,needs_review,,,A category of SmartArt layouts
 DCAppModel|Lock,,Lock,Verrouiller,needs_review,,,
 DCAppModel|Lock aspect ratio,,Lock aspect ratio,Verrouiller les proportions,needs_review,,,
+DCAppModel|Logarithmic,,Logarithmic,Logarithmique,needs_review,,,A logarithmic trendline
 DCAppModel|Long Dash,,Long Dash,Tiret long,needs_review,,,A line dash
 DCAppModel|Long Dash Dot,,Long Dash Dot,Tiret long-point,needs_review,,,A line dash
 DCAppModel|Loop continuously until 'Esc',,Loop continuously until 'Esc',Exécuter en continu jusqu'à « Échap »,needs_review,,,
 DCAppModel|Loop forever,,Loop forever,Lire en boucle indéfiniment,needs_review,,,
 DCAppModel|Loose,,Loose,Large,needs_review,,,character spacing
 DCAppModel|Low,,Low,Faible,needs_review,,,Media volume
-DCAppModel|Major Gridlines,,Major Gridlines,Quadrillage principal,needs_review,,,
 DCAppModel|Manage Presentation: %@,,Manage Presentation: %@,Gérer la présentation : %@,needs_review,,,
 DCAppModel|Mark all text in the presentation as:,,Mark all text in the presentation as:,Marquer tout le texte de la présentation comme :,needs_review,,,
 DCAppModel|Mark as decorative,,Mark as decorative,Marquer comme décoratif,needs_review,,,
@@ -498,6 +505,7 @@ DCAppModel|More Contrast,,More Contrast,Plus de contraste,needs_review,,,
 DCAppModel|Motion Paths,,Motion Paths,Trajectoires,needs_review,,,
 DCAppModel|Mouse Click,,Mouse Click,Clic de souris,needs_review,,,
 DCAppModel|Mouse Over,,Mouse Over,Pointage de la souris,needs_review,,,
+DCAppModel|Moving Average,,Moving Average,Moyenne mobile,needs_review,,,A two-period moving-average trendline
 DCAppModel|Multiple,,Multiple,Multiple,needs_review,,,
 DCAppModel|Mute,,Mute,Muet,needs_review,,,Media volume
 DCAppModel|Name:,,Name:,Nom :,needs_review,,,
@@ -522,10 +530,14 @@ DCAppModel|No pictures yet,,No pictures yet,Aucune image pour l'instant,needs_re
 DCAppModel|No presentation is open.,,No presentation is open.,Aucune présentation n'est ouverte.,needs_review,,,
 DCAppModel|No themes or templates match “%@”.,,No themes or templates match “%@”.,Aucun thème ni modèle ne correspond à « %@ ».,needs_review,,,
 DCAppModel|None,,None,Aucun,needs_review,,,"No arrowheads
+No axis titles
 No chart title
 No data labels on the chart
+No error bars
 No gridlines on the chart
 No legend on the chart
+No trendlines
+No up/down bars
 Table cell margins
 no arrowheads
 no mirroring / no arrow"
@@ -534,9 +546,11 @@ character spacing"
 DCAppModel|Not saved yet,,Not saved yet,Pas encore enregistré,needs_review,,,
 DCAppModel|Notes Master,,Notes Master,Masque des pages de notes,needs_review,,,
 DCAppModel|Notes Pages,,Notes Pages,Pages de notes,needs_review,,,
+DCAppModel|Number,,Number,Nombre,needs_review,,,An axis number format: whole numbers
 DCAppModel|Number must be a whole number from 1 to 16,,Number must be a whole number from 1 to 16,Le nombre doit être un nombre entier de 1 à 16,needs_review,,,
 DCAppModel|Number of columns:,,Number of columns:,Nombre de colonnes :,needs_review,,,
 DCAppModel|Number of rows:,,Number of rows:,Nombre de lignes :,needs_review,,,
+"DCAppModel|Number, 1 Decimal",,"Number, 1 Decimal","Nombre, 1 décimale",needs_review,,,An axis number format: one decimal place
 DCAppModel|Number:,,Number:,Nombre :,needs_review,,,
 DCAppModel|Numbered,,Numbered,Numéroté,needs_review,,,
 DCAppModel|Numbering,,Numbering,Numérotation,needs_review,,,
@@ -572,6 +586,8 @@ DCAppModel|Paste or type an outline. Unindented lines become slide titles; tab-i
 DCAppModel|Pattern fill,,Pattern fill,Remplissage avec motif,needs_review,,,
 DCAppModel|Pencil,,Pencil,Crayon,needs_review,,,ink tool
 DCAppModel|Percent:,,Percent:,Pourcentage :,needs_review,,,
+DCAppModel|Percentage,,Percentage,Pourcentage,needs_review,,,"An axis number format: 0%
+Error bars of 5 % of each value"
 DCAppModel|Perspective,,Perspective,Perspective,needs_review,,,A shadow
 DCAppModel|Photo Album,,Photo Album,Album photo,needs_review,,,
 DCAppModel|Pick a graphic; type one item per line.,,Pick a graphic; type one item per line.,Choisissez un graphique ; tapez un élément par ligne.,needs_review,,,
@@ -591,9 +607,11 @@ DCAppModel|Play from Current Slide,,Play from Current Slide,Lire à partir de la
 DCAppModel|Play from Start,,Play from Start,Lire depuis le début,needs_review,,,
 DCAppModel|Play the shape's media,,Play the shape's media,Lire le média de la forme,needs_review,,,
 DCAppModel|Playback,,Playback,Lecture,needs_review,,,
+DCAppModel|Polynomial,,Polynomial,Polynomiale,needs_review,,,A second-order polynomial trendline
 DCAppModel|Portrait,,Portrait,Portrait,needs_review,,,
 DCAppModel|Position,,Position,Position,needs_review,,,
 DCAppModel|Post,,Post,Publier,needs_review,,,Button: posts the new comment
+DCAppModel|Power,,Power,Puissance,needs_review,,,A power trendline
 DCAppModel|PowerPoint Presentation (.pptx),,PowerPoint Presentation (.pptx),Présentation PowerPoint (.pptx),needs_review,,,
 DCAppModel|Presentation,,Presentation,Présentation,needs_review,,,The file name suggested when exporting an untitled presentation
 "DCAppModel|Presentations and slide shows, ported to native macOS from DeckCraft.",,"Presentations and slide shows, ported to native macOS from DeckCraft.","Présentations et diaporamas, portés en natif sur macOS depuis DeckCraft.",needs_review,,,
@@ -601,6 +619,12 @@ DCAppModel|Presented by a speaker (full screen),,Presented by a speaker (full sc
 DCAppModel|Presenter View,,Presenter View,Mode Présentateur,needs_review,,,
 DCAppModel|Previewing animations,,Previewing animations,Aperçu des animations,needs_review,,,
 DCAppModel|Previous Slide,,Previous Slide,Diapositive précédente,needs_review,,,
+DCAppModel|Primary Horizontal,,Primary Horizontal,Horizontal principal,needs_review,,,The chart's horizontal axis
+DCAppModel|Primary Major Horizontal,,Primary Major Horizontal,Principal horizontal majeur,needs_review,,,Gridlines across the value axis
+DCAppModel|Primary Major Vertical,,Primary Major Vertical,Principal vertical majeur,needs_review,,,Gridlines across a bar chart's value axis
+DCAppModel|Primary Minor Horizontal,,Primary Minor Horizontal,Principal horizontal mineur,needs_review,,,Minor gridlines across the value axis
+DCAppModel|Primary Minor Vertical,,Primary Minor Vertical,Principal vertical mineur,needs_review,,,Minor gridlines across a bar chart's value axis
+DCAppModel|Primary Vertical,,Primary Vertical,Vertical principal,needs_review,,,The chart's vertical axis
 DCAppModel|Print (220 ppi): excellent quality on most printers and screens,,Print (220 ppi): excellent quality on most printers and screens,Impression (220 ppp) : excellente qualité sur la plupart des imprimantes et écrans,needs_review,,,
 DCAppModel|Print layout:,,Print layout:,Mise en page de l'impression :,needs_review,,,
 DCAppModel|Process,,Process,Processus,needs_review,,,A category of SmartArt layouts
@@ -673,6 +697,7 @@ DCAppModel|Scale height,,Scale height,Échelle de hauteur,needs_review,,,
 DCAppModel|Scale height (%):,,Scale height (%):,Échelle de hauteur (%) :,needs_review,,,
 DCAppModel|Scale width,,Scale width,Échelle de largeur,needs_review,,,
 DCAppModel|Scale width (%):,,Scale width (%):,Échelle de largeur (%) :,needs_review,,,
+DCAppModel|Scientific,,Scientific,Scientifique,needs_review,,,An axis number format: 0.00E+00
 DCAppModel|ScreenTip:,,ScreenTip:,Info-bulle :,needs_review,,,
 DCAppModel|Search,,Search,Rechercher,needs_review,,,
 DCAppModel|Search for themes and templates,,Search for themes and templates,Rechercher des thèmes et des modèles,needs_review,,,
@@ -688,6 +713,7 @@ DCAppModel|Selected text,,Selected text,Texte sélectionné,needs_review,,,
 DCAppModel|Send Backward,,Send Backward,Reculer,needs_review,,,
 DCAppModel|Send to Back,,Send to Back,Mettre à l'arrière-plan,needs_review,,,
 DCAppModel|Sentence case.,,Sentence case.,Majuscule en début de phrase.,needs_review,,,Change Case option; keep the example casing
+DCAppModel|Series %lld,,Series %lld,Série %lld,needs_review,,,A chart series without a name
 DCAppModel|Set,,Set,Définir,needs_review,,,
 DCAppModel|Set Transparent Color: click the colour in the picture (Esc cancels),,Set Transparent Color: click the colour in the picture (Esc cancels),Définir la couleur transparente : cliquez sur la couleur dans l'image (Échap pour annuler),needs_review,,,
 DCAppModel|Set Up Slide Show,,Set Up Slide Show,Configurer le diaporama,needs_review,,,
@@ -770,6 +796,8 @@ DCAppModel|Square,,Square,Carré,needs_review,,,line cap
 DCAppModel|Square Dot,,Square Dot,Point carré,needs_review,,,A line dash
 DCAppModel|Stacked,,Stacked,Empilé,needs_review,,,text direction
 DCAppModel|Standard (4:3),,Standard (4:3),Standard (4:3),needs_review,,,
+DCAppModel|Standard Deviation,,Standard Deviation,Écart type,needs_review,,,Error bars of one standard deviation
+DCAppModel|Standard Error,,Standard Error,Erreur type,needs_review,,,Error bars of the standard error
 DCAppModel|Start at:,,Start at:,Commencer à :,needs_review,,,
 DCAppModel|Start time (s):,,Start time (s):,Heure de début (s) :,needs_review,,,
 "DCAppModel|Start: %@s, End: %@s",,"Start: %1$@s, End: %2$@s","Début : %1$@ s, fin : %2$@ s",needs_review,,,
@@ -828,6 +856,7 @@ DCAppModel|This presentation has never been saved.,,This presentation has never 
 DCAppModel|This presentation has no custom shows (Slide Show ▸ Custom Shows).,,This presentation has no custom shows (Slide Show ▸ Custom Shows).,Cette présentation n'a aucun diaporama personnalisé (Diaporama ▸ Diaporamas personnalisés).,needs_review,,,
 DCAppModel|This presentation has unsaved changes. Revert goes back to the saved file.,,This presentation has unsaved changes. Revert goes back to the saved file.,Cette présentation comporte des modifications non enregistrées. « Revenir » rétablit le fichier enregistré.,needs_review,,,
 DCAppModel|This slide has no animations,,This slide has no animations,Cette diapositive ne comporte aucune animation,needs_review,,,
+DCAppModel|Thousands Separator,,Thousands Separator,Séparateur de milliers,needs_review,,,"An axis number format: #,##0"
 DCAppModel|Tick at least one slide to insert,,Tick at least one slide to insert,Cochez au moins une diapositive à insérer,needs_review,,,
 DCAppModel|Tight,,Tight,Serré,needs_review,,,"A reflection
 character spacing"
@@ -843,6 +872,7 @@ DCAppModel|Top Left,,Top Left,En haut à gauche,needs_review,,,
 DCAppModel|Top Right,,Top Right,En haut à droite,needs_review,,,
 DCAppModel|Transparent background,,Transparent background,Arrière-plan transparent,needs_review,,,
 DCAppModel|Trellis,,Trellis,Treillis,needs_review,,,
+DCAppModel|Trendline,,Trendline,Courbe de tendance,needs_review,,,Add Chart Element › Trendline
 DCAppModel|Trim Media,,Trim Media,Découper le média,needs_review,,,
 DCAppModel|Triple,,Triple,Triple,needs_review,,,
 "DCAppModel|Type an equation in linear form (e.g. a^2+b^2=c^2, x=(-b±√(b^2-4ac))/2a).",,"Type an equation in linear form (e.g. a^2+b^2=c^2, x=(-b±√(b^2-4ac))/2a).","Tapez une équation au format linéaire (ex. a^2+b^2=c^2, x=(-b±√(b^2-4ac))/2a).",needs_review,,,
@@ -852,6 +882,8 @@ DCAppModel|URL…,,URL…,URL…,needs_review,,,
 DCAppModel|Underline,,Underline,Souligné,needs_review,,,
 DCAppModel|Ungroup,,Ungroup,Dissocier,needs_review,,,
 DCAppModel|Unlock,,Unlock,Déverrouiller,needs_review,,,
+DCAppModel|Up/Down Bars,,Up/Down Bars,Barres haut/bas,needs_review,,,"Add Chart Element › Up/Down Bars
+Show the chart's up/down bars"
 DCAppModel|Update,,Update,Mettre à jour,needs_review,,,
 DCAppModel|Update automatically,,Update automatically,Mise à jour automatique,needs_review,,,
 DCAppModel|Upward diagonal,,Upward diagonal,Diagonale montante,needs_review,,,
@@ -1139,7 +1171,7 @@ Commands|help.arrange.sendBackward,,"Move the selection one layer down, or to th
 Commands|help.arrange.sendToBack,,Put the selected objects behind everything else on the slide.,Placer les objets sélectionnés derrière tous les autres éléments de la diapositive.,needs_review,,,"What command arrange.sendToBack does, in one line: the second line of its tooltip and its VoiceOver hint"
 Commands|help.arrange.ungroup,,Split the selected group into its objects.,Séparer le groupe sélectionné en ses objets.,needs_review,,,"What command arrange.ungroup does, in one line: the second line of its tooltip and its VoiceOver hint"
 Commands|help.chart.data,,"Change the chart's categories, series and values.","Modifier les catégories, les séries et les valeurs du graphique.",needs_review,,,"What command chart.data does, in one line: the second line of its tooltip and its VoiceOver hint"
-Commands|help.chart.options,,"Show or hide the chart's title, legend, data labels and gridlines.","Afficher ou masquer le titre, la légende, les étiquettes de données et le quadrillage du graphique.",needs_review,,,"What command chart.options does, in one line: the second line of its tooltip and its VoiceOver hint"
+Commands|help.chart.options,,"Set the chart's titles, legend, labels, gridlines, axes, gaps, up/down bars, trendlines and error bars.","Définir les titres, la légende, les étiquettes, le quadrillage, les axes, les intervalles, les barres haut/bas, les courbes de tendance et les barres d'erreur du graphique.",needs_review,,,"What command chart.options does, in one line: the second line of its tooltip and its VoiceOver hint"
 Commands|help.chart.type,,Change the chart to another type and keep its data.,Changer le type du graphique en conservant ses données.,needs_review,,,"What command chart.type does, in one line: the second line of its tooltip and its VoiceOver hint"
 Commands|help.commands.list,,"List every command, with its parameters and whether it can run now.","Lister toutes les commandes, avec leurs paramètres et leur disponibilité actuelle.",needs_review,,,"What command commands.list does, in one line: the second line of its tooltip and its VoiceOver hint"
 Commands|help.comment.delete,,Remove the selected comment.,Supprimer le commentaire sélectionné.,needs_review,,,"What command comment.delete does, in one line: the second line of its tooltip and its VoiceOver hint"
@@ -2076,12 +2108,15 @@ DCApp|Apply only to this picture,,Apply only to this picture,Appliquer uniquemen
 DCApp|Apply to All,,Apply to All,Appliquer partout,needs_review,,,
 DCApp|Artistic Effects,,Artistic Effects,Effets artistiques,needs_review,,,
 DCApp|As One Object,,As One Object,Comme un seul objet,needs_review,,,
+DCApp|Auto,,Auto,Auto,needs_review,,,An axis bound or unit left for the chart to choose
 DCApp|Autofit,,Autofit,Ajustement automatique,needs_review,,,
 DCApp|Automatic,,Automatic,Automatique,needs_review,,,
+DCApp|Axes,,Axes,Axes,needs_review,,,The chart inspector's section for its axes
 DCApp|Background Styles,,Background Styles,Styles d'arrière-plan,needs_review,,,
 DCApp|Background color,,Background color,Couleur d'arrière-plan,needs_review,,,
 DCApp|Banded Columns,,Banded Columns,Colonnes à bandes,needs_review,,,
 DCApp|Banded Rows,,Banded Rows,Lignes à bandes,needs_review,,,
+DCApp|Base,,Base,Base,needs_review,,,A logarithmic axis's base
 DCApp|Begin arrow,,Begin arrow,Type de début,needs_review,,,
 DCApp|Begin size,,Begin size,Taille de début,needs_review,,,
 DCApp|Black,,Black,Noir,needs_review,,,Blank the screen to black
@@ -2102,6 +2137,7 @@ DCApp|By Paragraph,,By Paragraph,Par paragraphe,needs_review,,,
 DCApp|Cancel,,Cancel,Annuler,needs_review,,,"Password prompt: doesn't open it
 Passwords sheet: changes nothing"
 DCApp|Cap type,,Cap type,Type d'extrémité,needs_review,,,
+DCApp|Categories in Reverse Order,,Categories in Reverse Order,Abscisses en ordre inverse,needs_review,,,
 DCApp|Cell Margins,,Cell Margins,Marges de la cellule,needs_review,,,
 DCApp|Center,,Center,Centre,needs_review,,,"A shadow preset
 Position measured from the shape's centre"
@@ -2234,6 +2270,7 @@ DCApp|End size,,End size,Taille de fin,needs_review,,,
 DCApp|Enter the password to modify “%@”.,,Enter the password to modify “%@”.,Entrez le mot de passe pour modifier « %@ ».,needs_review,,,Password to modify prompt; %@ is the file name
 DCApp|Enter the password to open “%@”.,,Enter the password to open “%@”.,Entrez le mot de passe pour ouvrir « %@ ».,needs_review,,,Password prompt when opening a password-protected presentation; %@ is the file name
 DCApp|Equation…,,Equation…,Équation…,needs_review,,,
+DCApp|Error Bars,,Error Bars,Barres d'erreur,needs_review,,,
 DCApp|Exciting,,Exciting,Captivant,needs_review,,,A category of slide transitions
 DCApp|Expand %@,,Expand %@,Développer %@,needs_review,,,Unfolds the section named
 DCApp|Eyedropper,,Eyedropper,Pipette,needs_review,,,
@@ -2259,6 +2296,7 @@ DCApp|Foreground color,,Foreground color,Couleur de premier plan,needs_review,,,
 DCApp|Format,,Format,Format,needs_review,,,The inspector's Format tab (noun)
 DCApp|Format Background,,Format Background,Mettre en forme l'arrière-plan,needs_review,,,
 DCApp|Format Background…,,Format Background…,Mettre en forme l'arrière-plan…,needs_review,,,
+DCApp|Format Code,,Format Code,Code de format,needs_review,,,An Excel number format code typed by hand
 DCApp|Format Painter,,Format Painter,Reproduire la mise en forme,needs_review,,,
 DCApp|Format Painter (on),,Format Painter (on),Reproduire la mise en forme (activé),needs_review,,,
 DCApp|Format Painter (⇧⌘C): copy this formatting to the next object you click,,Format Painter (⇧⌘C): copy this formatting to the next object you click,Reproduire la mise en forme (⇧⌘C) : copier cette mise en forme sur le prochain objet sur lequel vous cliquez,needs_review,,,
@@ -2266,6 +2304,7 @@ DCApp|Format Painter options,,Format Painter options,Options de Reproduire la mi
 DCApp|Frame slides,,Frame slides,Encadrer les diapositives,needs_review,,,Print panel option
 DCApp|From,,From,À partir de,needs_review,,,Position measured from a corner or the centre
 DCApp|Full,,Full,Complet,needs_review,,,A reflection preset
+DCApp|Gap Width,,Gap Width,Largeur de l'intervalle,needs_review,,,
 DCApp|Glow,,Glow,Lumière,needs_review,,,
 DCApp|Go to slide %@,,Go to slide %@,Atteindre la diapositive %@,needs_review,,,The slide number typed so far while the show waits for Enter
 DCApp|Gradient bar,,Gradient bar,Barre de dégradé,needs_review,,,
@@ -2296,6 +2335,7 @@ DCApp|Hierarchy,,Hierarchy,Hiérarchie,needs_review,,,A SmartArt category
 DCApp|High,,High,Élevé,needs_review,,,Media volume
 DCApp|Home,,Home,Accueil,needs_review,,,Start window sidebar: the start page
 DCApp|Horizontal,,Horizontal,Horizontal,needs_review,,,
+DCApp|Horizontal Axis Title,,Horizontal Axis Title,Titre de l'axe horizontal,needs_review,,,
 DCApp|Hyperlink…,,Hyperlink…,Lien hypertexte…,needs_review,,,
 "DCApp|Icons, WordArt and More",,"Icons, WordArt and More","Icônes, WordArt et plus",needs_review,,,"The rest of the Shapes menu, under its grid"
 DCApp|Ideas for this slide,,Ideas for this slide,Idées pour cette diapositive,needs_review,,,
@@ -2340,20 +2380,25 @@ DCApp|List,,List,Liste,needs_review,,,A SmartArt category
 DCApp|Lock,,Lock,Verrouiller,needs_review,,,Verb: lock an object
 DCApp|Lock %@,,Lock %@,Verrouiller %@,needs_review,,,
 DCApp|Lock aspect ratio,,Lock aspect ratio,Verrouiller les proportions,needs_review,,,
+DCApp|Logarithmic Scale,,Logarithmic Scale,Échelle logarithmique,needs_review,,,
 DCApp|Long Dash,,Long Dash,Tiret long,needs_review,,,A line style
 DCApp|Look up,,Look up,Rechercher,needs_review,,,
 DCApp|Loop Until Next Sound,,Loop Until Next Sound,Exécuter en boucle jusqu'au son suivant,needs_review,,,
 DCApp|Loop until Stopped,,Loop until Stopped,Exécuter en boucle jusqu'à l'arrêt,needs_review,,,
 DCApp|Low,,Low,Faible,needs_review,,,Media volume
+DCApp|Major Unit,,Major Unit,Unité principale,needs_review,,,The step between the value axis's labels
 DCApp|Master Views,,Master Views,Affichages des masques,needs_review,,,
 DCApp|Material,,Material,Matériau,needs_review,,,
 DCApp|Matrix,,Matrix,Matrice,needs_review,,,A SmartArt category
+DCApp|Maximum,,Maximum,Maximum,needs_review,,,The value axis's highest value
 DCApp|Media,,Media,Média,needs_review,,,A placeholder kind
 DCApp|Medium,,Medium,Moyen,needs_review,,,Media volume
 DCApp|Merge & Cell Size,,Merge & Cell Size,Fusion et taille des cellules,needs_review,,,
 DCApp|Merge Cells,,Merge Cells,Fusionner les cellules,needs_review,,,
 DCApp|Merge Shapes,,Merge Shapes,Fusionner les formes,needs_review,,,
 DCApp|Minimize,,Minimize,Placer dans le Dock,needs_review,,,Window menu
+DCApp|Minimum,,Minimum,Minimum,needs_review,,,The value axis's lowest value
+DCApp|Minor Gridlines,,Minor Gridlines,Quadrillage secondaire,needs_review,,,
 DCApp|Mirror,,Mirror,Miroir,needs_review,,,
 DCApp|Modify,,Modify,Modifier,needs_review,,,Password to modify prompt: opens it for editing
 DCApp|More %@,,More %@,Plus de %@,needs_review,,,The button that expands a ribbon gallery
@@ -2400,7 +2445,8 @@ DCApp|No sound: %@,,No sound: %@,Aucun son : %@,needs_review,,,Under a media ba
 DCApp|No spelling problems on this slide,,No spelling problems on this slide,Aucune faute d'orthographe sur cette diapositive,needs_review,,,
 "DCApp|No synonyms for ""%@"".",,"No synonyms for ""%@"".",Aucun synonyme pour « %@ ».,needs_review,,,
 DCApp|No themes or templates match “%@”.,,No themes or templates match “%@”.,Aucun thème ni modèle ne correspond à « %@ ».,needs_review,,,Start window: an empty search; the placeholder is the search text
-DCApp|None,,None,Aucun,needs_review,,,
+DCApp|None,,None,Aucun,needs_review,,,"No error bars
+No trendline"
 DCApp|Normal,,Normal,Normal,needs_review,,,"Cell margins preset
 The Normal view (status bar button)"
 DCApp|Not a copy of this presentation: slides are matched by position.,,Not a copy of this presentation: slides are matched by position.,Ce n'est pas une copie de cette présentation : les diapositives sont associées par position.,needs_review,,,
@@ -2408,6 +2454,7 @@ DCApp|Not printed,,Not printed,Non imprimées,needs_review,,,Print panel summary
 DCApp|Notes,,Notes,Notes,needs_review,,,"Accessibility label of the speaker notes editor
 Status bar button: shows or hides the notes pane"
 DCApp|Notes Master,,Notes Master,Masque des pages de notes,needs_review,,,
+DCApp|Number Format,,Number Format,Format de nombre,needs_review,,,
 DCApp|Numbering,,Numbering,Numérotation,needs_review,,,
 DCApp|OK,,OK,OK,needs_review,,,Passwords sheet: keeps the passwords
 DCApp|Off,,Off,Désactivé,needs_review,,,Print panel summary: an option is off
@@ -2565,6 +2612,9 @@ DCApp|Selection Pane,,Selection Pane,Volet Sélection,needs_review,,,
 DCApp|Send Backward,,Send Backward,Reculer,needs_review,,,
 DCApp|Send to Back,,Send to Back,Mettre à l'arrière-plan,needs_review,,,
 DCApp|Sequence,,Sequence,Séquence,needs_review,,,
+DCApp|Series,,Series,Série,needs_review,,,Which chart series the trendline and error bars belong to
+DCApp|Series Options,,Series Options,Options des séries,needs_review,,,The chart inspector's section for its series
+DCApp|Series Overlap,,Series Overlap,Superposition des séries,needs_review,,,
 DCApp|Services,,Services,Services,needs_review,,,App menu
 DCApp|Set Transparent Color,,Set Transparent Color,Définir la couleur transparente,needs_review,,,
 DCApp|Set Up Slide Show…,,Set Up Slide Show…,Configurer le diaporama…,needs_review,,,
@@ -2680,6 +2730,7 @@ DCApp|Transform,,Transform,Transformer,needs_review,,,
 DCApp|Transition,,Transition,Transition,needs_review,,,
 DCApp|Transition to This Slide,,Transition to This Slide,Accès à cette diapositive,needs_review,,,
 DCApp|Transparency,,Transparency,Transparence,needs_review,,,
+DCApp|Trendline,,Trendline,Courbe de tendance,needs_review,,,
 DCApp|Trigger,,Trigger,Déclencheur,needs_review,,,
 DCApp|Trim…,,Trim…,Découper…,needs_review,,,
 DCApp|Try Again,,Try Again,Réessayer,needs_review,,,
@@ -2690,10 +2741,12 @@ DCApp|Unchanged,,Unchanged,Inchangé,needs_review,,,Passwords sheet: an empty fi
 DCApp|Ungroup,,Ungroup,Dissocier,needs_review,,,
 DCApp|Unlock,,Unlock,Déverrouiller,needs_review,,,
 DCApp|Unlock %@,,Unlock %@,Déverrouiller %@,needs_review,,,
+DCApp|Up/Down Bars,,Up/Down Bars,Barres haut/bas,needs_review,,,
 DCApp|Use Timings,,Use Timings,Utiliser le minutage,needs_review,,,
 DCApp|Variants,,Variants,Variantes,needs_review,,,
 DCApp|Verify,,Verify,Confirmer,needs_review,,,Passwords sheet: the field to type the password again
 DCApp|Vertical,,Vertical,Vertical,needs_review,,,
+DCApp|Vertical Axis Title,,Vertical Axis Title,Titre de l'axe vertical,needs_review,,,
 DCApp|Vertical alignment,,Vertical alignment,Alignement vertical,needs_review,,,
 DCApp|Volume,,Volume,Volume,needs_review,,,
 DCApp|Warp,,Warp,Déformation,needs_review,,,

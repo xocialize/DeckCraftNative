@@ -685,6 +685,32 @@ public enum ChartRender {
                 Radar.stockMarks(ctx, rctx, c, m, plot.x0 + band * (Double(i) + 0.5), band, i) { toAxis(false, $0) }
             }
         }
+        // A line chart's up/down bars, behind its lines: from the first series to the last in each category,
+        // hollow where it rose. The port's own (AB-T-0436); deckcraft draws a stock chart's only.
+        if c.upDownBars && [.line, .lineMarkers, .stackedLine, .percentLine].contains(c.kind) && c.threeD == nil && c.series.count >= 2 {
+            let ink = Rgba.rgb(0x40, 0x40, 0x40)
+            for i in 0 ..< ncat {
+                let vals = c.series.map { ($0.values.at(i) ?? nil) ?? 0 }
+                guard let o0 = c.series.first.flatMap({ $0.values.at(i) ?? nil }), let l0 = c.series.last.flatMap({ $0.values.at(i) ?? nil }) else { continue }
+                let total = vals.reduce(0.0) { $0 + Swift.abs($1) }.rustMax(1e-9)
+                let sum = vals.reduce(0.0, +)
+                let (o, cl): (Double, Double) = switch c.kind {
+                case .stackedLine: (o0, sum)
+                case .percentLine: (o0 / total, sum / total)
+                default: (o0, l0)
+                }
+                let x = plot.x0 + band * (slot(i) + 0.5)
+                let w = band * 0.4
+                let (y0, y1) = (toAxis(false, o.rustMax(cl)), toAxis(false, o.rustMin(cl)))
+                let r = Rect(x - w / 2, y0.rustMin(y1), x + w / 2, y1.rustMax(y0 + 1))
+                ctx.setTransform(m)
+                ctx.setPaint(.color(cl >= o ? .white : ink, 1))
+                ctx.fillRect(r)
+                ctx.setPaint(.color(ink, 1))
+                ctx.setStroke(StrokeStyle(1))
+                ctx.strokePath(rectPath(r))
+            }
+        }
         // Lines, areas, scatter: the series that aren't bars.
         var acc = [Double](repeating: 0, count: ncat)
         // A 100 % line or area plots each value as its share of the category's total over those series

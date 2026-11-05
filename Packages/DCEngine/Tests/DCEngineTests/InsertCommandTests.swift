@@ -652,7 +652,9 @@ struct InsertShapeTests {
             s.st.docRef = DocRef(d)
         }
         keep()
-        for opts in [#""title": "Q3""#, #""title": null"#, #""legend": "t""#, #""dataLabels": true"#, #""gridlines": false"#] {
+        for opts in [#""title": "Q3""#, #""title": null"#, #""legend": "t""#, #""dataLabels": true"#, #""gridlines": false"#,
+                     #""axisTitles": {"value": "V"}"#, #""minorGridlines": true"#, #""axisMax": 9"#, #""gapWidth": 50"#,
+                     #""upDownBars": true"#, #""errorBars": {"type": "stdErr"}"#, #""series": 0, "trendline": {"type": "linear"}"#] {
             s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)
             #expect(chartOf(s, id)?.raw != nil, "\(opts) keeps the part")
         }
@@ -663,6 +665,80 @@ struct InsertShapeTests {
             s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)
             #expect(chartOf(s, id)?.raw == nil, "\(opts) drops the part")
         }
+    }
+
+    /// The port's own (AB-T-0436): `chart.options` sets the axis titles, minor gridlines, the value axis's scale and
+    /// format, reversed categories, gap width and overlap, and keeps the kept part; bad values change nothing.
+    @Test func chartOptionsSetTheAxesAndBars() throws {
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "column", "title": "Sales"}"#).get("id")?.asU64)
+        s.run("chart.options", #"{"id": \#(id), "axisTitles": {"category": "Quarter", "value": "Revenue"}, "minorGridlines": true}"#)
+        var c = try #require(chartOf(s, id))
+        #expect(c.axisTitles.a == "Quarter" && c.axisTitles.b == "Revenue" && c.minorGridlines)
+        s.run("chart.options", #"{"id": \#(id), "axisTitles": {"value": null}}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.axisTitles.a == "Quarter" && c.axisTitles.b == nil, "a title left out stays")
+        s.run("chart.options", ###"{"id": \###(id), "axisMin": 0, "axisMax": 50, "majorUnit": 10, "numberFormat": "#,##0", "reverseCategories": true, "gapWidth": 80, "overlap": -20}"###)
+        c = try #require(chartOf(s, id))
+        #expect(c.yMin == 0 && c.yMax == 50 && c.yMajor == 10 && c.yFormat == "#,##0" && c.catReversed)
+        #expect(abs(c.gapWidth - 0.8) < 1e-9 && abs(c.overlap + 0.2) < 1e-9)
+        for bad in [#""axisMin": 60"#, #""majorUnit": 0"#, #""logBase": 1"#, #""gapWidth": 900"#, #""overlap": 200"#, #""axisTitles": "x""#, #""numberFormat": 5"#] {
+            #expect(s.fails("chart.options", #"{"id": \#(id), \#(bad)}"#), "\(bad)")
+        }
+        #expect(try #require(chartOf(s, id)).yMax == 50, "refused: unchanged")
+        // A log axis starts above zero.
+        #expect(s.fails("chart.options", #"{"id": \#(id), "logBase": 10}"#))
+        s.run("chart.options", #"{"id": \#(id), "axisMin": null, "axisMax": null, "majorUnit": null, "logBase": 10, "numberFormat": null}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.yMin == nil && c.yMax == nil && c.yMajor == nil && c.yLogBase == 10 && c.yFormat == nil)
+        // A pie has no axes; a line chart no gap; stacked bars no overlap.
+        let pie = try #require(s.run("insert.chart", #"{"type": "pie"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(pie), "axisTitles": {"value": "V"}}"#))
+        let line = try #require(s.run("insert.chart", #"{"type": "line"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(line), "gapWidth": 50}"#))
+        let stacked = try #require(s.run("insert.chart", #"{"type": "stackedColumn"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(stacked), "overlap": 10}"#))
+        s.run("chart.options", #"{"id": \#(stacked), "gapWidth": 20}"#)
+        #expect(abs((chartOf(s, stacked)?.gapWidth ?? 0) - 0.2) < 1e-9)
+    }
+
+    /// The port's own (AB-T-0436): `chart.options` with `trendline` or `errorBars` sets them on one series, or on
+    /// every series that can take them; PowerPoint's limits are refused.
+    @Test func chartOptionsSetASeriesTrendlineAndErrorBars() throws {
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "column"}"#).get("id")?.asU64)
+        let n = try #require(chartOf(s, id)).series.count
+        #expect(n >= 2)
+        s.run("chart.options", #"{"id": \#(id), "series": 1, "trendline": {"type": "linear", "forward": 2, "equation": true}}"#)
+        var c = try #require(chartOf(s, id))
+        #expect(c.series[0].trendlines.isEmpty)
+        #expect(c.series[1].trendlines == [Trendline(kind: .linear, forward: 2, dispEq: true, dispRSqr: false)])
+        s.run("chart.options", #"{"id": \#(id), "series": 1, "trendline": {"type": "movingAvg", "period": 3}}"#)
+        #expect(try #require(chartOf(s, id)).series[1].trendlines.map(\.kind) == [.movingAvg], "replaces")
+        s.run("chart.options", #"{"id": \#(id), "errorBars": {"type": "percentage"}}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.series.allSatisfy { $0.errorBars?.valType == "percentage" && $0.errorBars?.value == 5 && $0.errorBars?.barType == "both" })
+        s.run("chart.options", #"{"id": \#(id), "series": 0, "errorBars": {"type": "stdDev", "direction": "plus", "endCap": false}}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.series[0].errorBars == ErrorBars(barType: "plus", valType: "stdDev", value: 1, plus: [], minus: [], endCap: false))
+        #expect(c.series[1].errorBars?.valType == "percentage")
+        s.run("chart.options", #"{"id": \#(id), "trendline": null, "errorBars": null}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.series.allSatisfy { $0.trendlines.isEmpty && $0.errorBars == nil })
+        for bad in [#""series": 99, "trendline": {"type": "linear"}"#, #""series": 0"#, #""trendline": {"type": "spline"}"#,
+                    #""errorBars": {"type": "cust"}"#, #""series": 0, "trendline": {"type": "movingAvg", "period": 200}"#] {
+            #expect(s.fails("chart.options", #"{"id": \#(id), \#(bad)}"#), "\(bad)")
+        }
+        // A stacked chart takes no trendline; a pie neither trendline nor error bars.
+        let stacked = try #require(s.run("insert.chart", #"{"type": "stackedColumn"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(stacked), "series": 0, "trendline": {"type": "linear"}}"#))
+        let pie = try #require(s.run("insert.chart", #"{"type": "pie"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(pie), "series": 0, "errorBars": {"type": "stdErr"}}"#))
+        // Up/down bars on a line chart.
+        let line = try #require(s.run("insert.chart", #"{"type": "line"}"#).get("id")?.asU64)
+        #expect(try #require(chartOf(s, line)).takesUpDownBars)
+        s.run("chart.options", #"{"id": \#(line), "upDownBars": true}"#)
+        #expect(chartOf(s, line)?.upDownBars == true)
     }
 
     /// The port's own (AB-T-0434): 100 % lines and areas are types of their own, and a new type from the gallery

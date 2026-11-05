@@ -290,7 +290,7 @@ public enum CommandHelp {
         "insert.photoAlbumEdit": "Change a photo album's pictures, layout, frames or captions.",
         "insert.hyperlink": "Link the selection to a web page or to another slide.",
         "chart.data": "Change the chart's categories, series and values.",
-        "chart.options": "Show or hide the chart's title, legend, data labels and gridlines.",
+        "chart.options": "Set the chart's titles, legend, labels, gridlines, axes, gaps, up/down bars, trendlines and error bars.",
         "smartArt.nodes": "Report a diagram's lines of text and their levels.",
         "smartArt.setNodes": "Replace a diagram's text with new lines and levels.",
         "smartArt.toShapes": "Turn the diagram into a group of ordinary shapes.",

@@ -181,6 +181,8 @@ extension PPTXRead {
                 case _ where markers: kind = .lineMarkers
                 default: kind = .line
                 }
+                // A line chart's up/down bars: the port's own (AB-T-0436); deckcraft reads a stock chart's only.
+                if g.is("lineChart") && g.child("upDownBars") != nil { c.upDownBars = true }
             case "areaChart", "area3DChart":
                 kind = grouping == "stacked" ? .stackedArea : grouping == "percentStacked" ? .percentArea : .area
             case "pieChart", "pie3DChart", "ofPieChart":

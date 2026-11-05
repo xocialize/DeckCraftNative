@@ -288,6 +288,7 @@ extension of `PPTX` in `WriteMod.swift`; everything else is internal, under the 
 | `write/theme.rs` | `WriteTheme.swift` | `PPTXWrite.Themes.themeXML` |
 | — | `WriteChartexStyle.swift` | `PPTXWrite.ChartexStyle`: the style and colour style parts every `chartEx` part gets (divergence 7); DeckCraftNative's own |
 | — | `WriteChartPatch.swift` | `PPTXWrite.Charts.patchedXML`: a `chart.options` edit (title, legend, data labels, gridlines) or a `chart.data` edit (categories, series, their names and values) written into the kept chart part, with the table of which command owns which element (divergence 8); DeckCraftNative's own |
+| — | `WriteChartPatchAxes.swift` | `PPTXWrite.Charts.patchAxesAndSeries`: axis titles, minor gridlines, the value axis's scale and format, reversed categories, gap and overlap, up/down bars and each series' trendlines and error bars written into the kept chart part (divergence 11); DeckCraftNative's own |
 | — | `WriteChartWorkbook.swift` | `PPTXWrite.Charts.book`, `freshBook`, `updatedWorkbook`: the embedded workbook of a chart whose data the writer wrote, the original updated in place or a new one-sheet workbook (divergence 9); DeckCraftNative's own |
 | `write/timing.rs` | `WriteTiming.swift` | `PPTXWrite.Timing`: `transition`, `timing` and the effect builders |
 | in-file tests | `Tests/DCPPTXTests/WriteTests.swift` | `WriteDMLTests` (1), `WriteShapesTests` (1), `WriteChartRegionMapTests` (1), `WriteChartTests` (3); 4 of them read back through `PPTXRead` |
@@ -499,6 +500,24 @@ The writer calls these reader functions, with Rust's parameter and return shapes
     `c:valAx`; a title edit keeps every element (`chart-edit-sweep.py`). Those ten files, a deck of all 29 chart
     types `insert.chart` makes and a deck of every 3-D, wireframe, of-pie and secondary-axis variant validate
     against the schemas (`validate.sh`), and PowerPoint 16.114 opened all twelve without a repair prompt.
+11. **The rest of a chart's elements are edited in the kept part, and a line chart has up/down bars (2026-11-05,
+    deliberate; AB-T-0436).** `chart.options` now also sets axis titles, minor gridlines, the value axis's
+    minimum, maximum, major unit, log base and number format, reversed categories, gap width and overlap, and a
+    series' trendline and error bars (DCEngine PORT-NOTES). `WriteChartPatchAxes.swift` writes each into the kept
+    part beside divergence 8's four, so a PowerPoint chart keeps what the edit doesn't touch; its table names the
+    elements each setting owns. A replaced trendline or error bars keep the old one's `c:spPr`; a new vertical
+    axis title gets PowerPoint's `a:bodyPr rot="-5400000" vert="horz"`. Up/down bars no longer regenerate the
+    part. As before, the patched part is used only when reading it back gives the model; an axis set to follow
+    the data reads back with the data's format (often `General`). The error bars' writer is one function now
+    (`errorBars`), the generator's output unchanged. Beyond deckcraft, the reader takes a `c:lineChart`'s
+    `c:upDownBars` (it read a stock chart's only) and the generator writes them for a flat line chart of two
+    series or more, before `c:marker` (CT_LineChart); DCRender draws them. The generator also writes the primary
+    value axis's `c:majorUnit` (deckcraft writes only a secondary axis's, so a new chart lost the unit it was
+    given), and a trendline's `c:dispRSqr` and `c:dispEq` always, off or on: PowerPoint 16.114 reads a missing
+    one as on, so every trendline deckcraft writes without them showed its equation and R² there (seen on a
+    PowerPoint re-save, which wrote them `val="1"`). The reader still takes a missing one as off; a third-party
+    file without them draws without the label here and with it in PowerPoint. Tests: `WriteChartPatchTests`
+    (5 more).
 
 11. **Chart builds (2026-11-05, deliberate; AB-T-0443).** deckcraft reads `p:spTgt` without its
    `p:graphicEl`, and writes no `p:bldGraphic`, so a PowerPoint chart built By Series came back as three whole

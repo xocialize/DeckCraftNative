@@ -178,6 +178,9 @@ struct ChartFormatView: View {
                 Toggle(String(localized: "Data Labels", bundle: .module), isOn: Binding(get: { c.dataLabels }, set: { options("dataLabels", .bool($0)) }))
                 Toggle(String(localized: "Gridlines", bundle: .module), isOn: Binding(get: { c.gridlines }, set: { options("gridlines", .bool($0)) }))
             }
+            // Axis titles and scale, gap and overlap, up/down bars, trendlines and error bars (AB-T-0436).
+            if c.takesAxisSettings { ChartAxisSection(ctl: ctl, id: id, chart: c) }
+            ChartSeriesSection(ctl: ctl, id: id, chart: c)
         }
     }
 }
@@ -186,12 +189,13 @@ struct ChartFormatView: View {
 /// the title, as deleting PowerPoint's title box does.
 struct ChartTitleField: View {
     let text: String
+    var label = String(localized: "Title", bundle: .module)
     let commit: (String) -> Void
     @State private var draft: (base: String, text: String)?
     @FocusState private var focused: Bool
 
     var body: some View {
-        TextField(String(localized: "Title", bundle: .module), text: Binding(get: { InspectorText.draft(draft, text) }, set: { draft = (text, $0) }))
+        TextField(label, text: Binding(get: { InspectorText.draft(draft, text) }, set: { draft = (text, $0) }))
             .textFieldStyle(.roundedBorder)
             .focused($focused)
             .onSubmit(save)

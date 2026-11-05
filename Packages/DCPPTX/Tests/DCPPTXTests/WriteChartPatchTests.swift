@@ -88,6 +88,101 @@ import Testing
         #expect(!PPTXWrite.chartXML(e).preserved)
     }
 
+    // MARK: - Axes, gap and overlap, up/down bars, trendlines, error bars (AB-T-0436)
+
+    /// Each setting written into the kept part reads back as the model, and the data table and extension list
+    /// the model doesn't hold stay.
+    @Test func axisSettingsAreWrittenIntoThePart() throws {
+        var c = try imported()
+        c.axisTitles = Pair("Quarter", "Revenue")
+        c.minorGridlines = true
+        c.yMin = 0
+        c.yMax = 120
+        c.yMajor = 20
+        c.yFormat = "#,##0"
+        c.catReversed = true
+        let (xml, back) = try written(c)
+        #expect(same(back, c))
+        #expect(xml.contains("<c:dTable>") && xml.contains(#"<c:ext uri="{KEEP}"/>"#))
+        #expect(xml.contains(#"<c:max val="120"/><c:min val="0"/>"#) && xml.contains(#"<c:majorUnit val="20"/>"#))
+        #expect(xml.contains(#"<c:orientation val="maxMin"/>"#) && xml.contains(###"<c:numFmt formatCode="#,##0" sourceLinked="0"/>"###))
+        #expect(xml.contains(#"<a:bodyPr rot="-5400000" vert="horz"/>"#), "the vertical axis's title reads upwards")
+        // Back to automatic, on a log scale; the titles go.
+        var d = back
+        d.raw = c.raw
+        (d.yMin, d.yMax, d.yMajor, d.yFormat, d.yLogBase, d.axisTitles, d.minorGridlines, d.catReversed) = (nil, nil, nil, nil, 10, Pair(nil, nil), false, false)
+        let (xml2, back2) = try written(d)
+        // An axis that follows the data reads as the data's format, here PowerPoint's General.
+        #expect(back2.yFormat == "General")
+        d.yFormat = "General"
+        #expect(same(back2, d))
+        #expect(xml2.contains(#"<c:logBase val="10"/>"#) && !xml2.contains("<c:min ") && !xml2.contains("<c:majorUnit") && !xml2.contains("<c:minorGridlines"))
+        #expect(xml2.contains("<c:dTable>"))
+    }
+
+    @Test func gapOverlapAndUpDownBarsAreWrittenIntoThePart() throws {
+        var c = try imported()
+        c.gapWidth = 0.6
+        c.overlap = -0.25
+        let (xml, back) = try written(c)
+        #expect(same(back, c))
+        #expect(xml.contains(#"<c:gapWidth val="60"/><c:overlap val="-25"/>"#) && xml.contains("<c:dTable>"))
+        var l = try imported(.line)
+        l.upDownBars = true
+        let (xml2, back2) = try written(l)
+        #expect(back2.upDownBars && same(back2, l))
+        #expect(xml2.contains("<c:upDownBars><c:gapWidth val=\"150\"/><c:upBars/><c:downBars/></c:upDownBars><c:marker"))
+        var off = back2
+        off.upDownBars = false
+        let (xml3, back3) = try written(off)
+        #expect(!back3.upDownBars && !xml3.contains("upDownBars"))
+        // A column chart has nowhere to put them: the part stays, without them.
+        var col = try imported()
+        col.upDownBars = true
+        let (xml4, _) = try written(col)
+        #expect(!xml4.contains("upDownBars") && xml4.contains("<c:dTable>"))
+    }
+
+    @Test func aSeriesTrendlineAndErrorBarsAreWrittenIntoThePart() throws {
+        var c = try imported()
+        // PowerPoint's line formatting on the trendline and error bars the edit replaces stays.
+        let look = #"<c:spPr><a:ln w="12700"/></c:spPr>"#
+        var xml0 = try #require(c.raw)
+        xml0 = xml0.replacingOccurrences(of: "<c:cat>", with: #"<c:trendline>\#(look)<c:trendlineType val="exp"/></c:trendline><c:errBars><c:errBarType val="both"/><c:errValType val="fixedVal"/><c:noEndCap val="0"/><c:val val="1"/>\#(look)</c:errBars><c:cat>"#)
+        c = try #require(PPTXRead.readChartXML(Array(xml0.utf8)))
+        #expect(c.series.allSatisfy { $0.trendlines.first?.kind == .exp && $0.errorBars != nil })
+        c.series[1].trendlines = [Trendline(kind: .movingAvg, period: 2, dispEq: false, dispRSqr: false)]
+        c.series[0].errorBars = ErrorBars(barType: "plus", valType: "percentage", value: 5, plus: [], minus: [], endCap: true)
+        c.series[2].trendlines = []
+        c.series[2].errorBars = nil
+        let (xml, back) = try written(c)
+        #expect(same(back, c))
+        // The equation and R² switches always written: PowerPoint reads a missing one as on.
+        #expect(xml.contains(#"<c:trendline>\#(look)<c:trendlineType val="movingAvg"/><c:period val="2"/><c:dispRSqr val="0"/><c:dispEq val="0"/></c:trendline>"#))
+        #expect(xml.contains(#"<c:errBars><c:errBarType val="plus"/><c:errValType val="percentage"/><c:noEndCap val="0"/><c:val val="5"/>\#(look)</c:errBars>"#))
+        #expect(xml.contains("<c:dTable>"))
+    }
+
+    /// A line chart's up/down bars from the generator, read back (deckcraft has a stock chart's only).
+    @Test func aNewLineChartKeepsItsUpDownBars() throws {
+        var c = Chart.sample(.line)
+        c.upDownBars = true
+        let xml = text(PPTXWrite.chartXML(c).xml)
+        #expect(xml.contains("<c:upDownBars>"))
+        #expect(try #require(PPTXRead.readChartXML(Array(xml.utf8))).upDownBars)
+        #expect(!text(PPTXWrite.chartXML(Chart.sample(.line)).xml).contains("upDownBars"))
+    }
+
+    /// A new chart's major unit is written (deckcraft writes the secondary axis's only).
+    @Test func aNewChartKeepsItsMajorUnit() throws {
+        var c = Chart.sample(.column)
+        c.yMajor = 0.5
+        let xml = text(PPTXWrite.chartXML(c).xml)
+        #expect(xml.contains(#"<c:crossBetween val="between"/><c:majorUnit val="0.5"/></c:valAx>"#))
+        #expect(try #require(PPTXRead.readChartXML(Array(xml.utf8))).yMajor == 0.5)
+        #expect(!text(PPTXWrite.chartXML(Chart.sample(.column)).xml).contains("majorUnit"))
+    }
+
     // MARK: - chart.data
 
     static let book = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/package"

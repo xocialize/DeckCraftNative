@@ -274,26 +274,7 @@ extension PPTXWrite {
             let n = Swift.max(c.categories.count, s.values.count)
             let last = n + 1
             if let e = s.errorBars, g != .surface {
-                func word(_ v: String, _ ok: [String], _ d: String) -> String { ok.first { bytesEqual($0, v) } ?? d }
-                w.open0("c:errBars")
-                if g == .scatter || g == .bubble {
-                    w.val("c:errDir", "y")
-                }
-                w.val("c:errBarType", word(e.barType, ["both", "plus", "minus"], "both"))
-                let vt = word(e.valType, ["fixedVal", "percentage", "stdDev", "stdErr", "cust"], "fixedVal")
-                w.val("c:errValType", vt)
-                w.val("c:noEndCap", e.endCap ? 0 : 1)
-                if vt == "cust" {
-                    w.open0("c:plus")
-                    numLit(&w, e.plus)
-                    w.close("c:plus")
-                    w.open0("c:minus")
-                    numLit(&w, e.minus)
-                    w.close("c:minus")
-                } else if e.value.isFinite {
-                    w.val("c:val", fmtNum(e.value))
-                }
-                w.close("c:errBars")
+                errorBars(&w, e, g == .scatter || g == .bubble)
             }
             if g == .scatter || g == .bubble {
                 let xs: [Double?] = s.xValues.isEmpty ? (0 ..< s.values.count).map { Optional(Double($0 + 1)) } : s.xValues
@@ -324,6 +305,30 @@ extension PPTXWrite {
                 }
             }
             w.close("c:ser")
+        }
+
+        /// A series' value error bars (`c:errBars`); a scatter or bubble chart's say they are y bars.
+        static func errorBars(_ w: inout W, _ e: ErrorBars, _ scatterLike: Bool) {
+            func word(_ v: String, _ ok: [String], _ d: String) -> String { ok.first { bytesEqual($0, v) } ?? d }
+            w.open0("c:errBars")
+            if scatterLike {
+                w.val("c:errDir", "y")
+            }
+            w.val("c:errBarType", word(e.barType, ["both", "plus", "minus"], "both"))
+            let vt = word(e.valType, ["fixedVal", "percentage", "stdDev", "stdErr", "cust"], "fixedVal")
+            w.val("c:errValType", vt)
+            w.val("c:noEndCap", e.endCap ? 0 : 1)
+            if vt == "cust" {
+                w.open0("c:plus")
+                numLit(&w, e.plus)
+                w.close("c:plus")
+                w.open0("c:minus")
+                numLit(&w, e.minus)
+                w.close("c:minus")
+            } else if e.value.isFinite {
+                w.val("c:val", fmtNum(e.value))
+            }
+            w.close("c:errBars")
         }
 
         static func trendNum(_ v: Double?) -> Double? {
@@ -362,12 +367,10 @@ extension PPTXWrite {
             if let v = trendNum(t.intercept) {
                 w.val("c:intercept", fmtNum(v))
             }
-            if t.dispRSqr {
-                w.val("c:dispRSqr", 1)
-            }
-            if t.dispEq {
-                w.val("c:dispEq", 1)
-            }
+            // Both always, as PowerPoint writes them: it reads a missing one as on, so a trendline without them
+            // showed its equation and R² there (the port's own, AB-T-0436; deckcraft writes them only when on).
+            w.val("c:dispRSqr", t.dispRSqr ? 1 : 0)
+            w.val("c:dispEq", t.dispEq ? 1 : 0)
             w.close("c:trendline")
         }
 
@@ -589,6 +592,10 @@ extension PPTXWrite {
             w.val("c:crossAx", axCat)
             w.val("c:crosses", "autoZero")
             w.val("c:crossBetween", g == .area || g == .scatter || g == .surface ? "midCat" : "between")
+            // The major unit the model holds: the port's own (AB-T-0436); deckcraft writes the secondary axis's only.
+            if let u = c.yMajor, u.isFinite, u > 0 {
+                w.val("c:majorUnit", fmtNum(u))
+            }
             w.close("c:valAx")
             if depthAxis(c, g) {
                 seriesAxis(&w, c)
@@ -659,6 +666,15 @@ extension PPTXWrite {
                 if let t = three {
                     gapDepth(&w, t)
                 } else if g == .line {
+                    // A line chart's up/down bars, between its first and last series: the port's own (AB-T-0436);
+                    // deckcraft writes them for stock charts only.
+                    if c.upDownBars && c.series.count >= 2 {
+                        w.open0("c:upDownBars")
+                        w.val("c:gapWidth", 150)
+                        w.empty0("c:upBars")
+                        w.empty0("c:downBars")
+                        w.close("c:upDownBars")
+                    }
                     w.val("c:marker", 1)
                 }
             case .stock:

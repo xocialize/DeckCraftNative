@@ -132,6 +132,10 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
 - **100 % stacked lines and areas** (`percentLine`, `percentArea`, the port's own chart types, AB-T-0434) plot
   each value as its share of the category's total over those series, as the 100 % bars already do. 3-D charts
   are drawn flat and of-pie charts as one pie, as before.
+- **A line chart's up/down bars** (AB-T-0436): a flat line chart with `upDownBars` and two series or more gets a
+  box per category from the first series to the last (the stacked or 100 % values on those lines), behind the
+  lines, hollow where it rose and dark where it fell, as a stock chart's are drawn. deckcraft draws a stock
+  chart's only.
 
 ## Chart builds: a chart drawn part by part (AB-T-0443)
 

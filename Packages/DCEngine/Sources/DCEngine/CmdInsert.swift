@@ -1698,8 +1698,8 @@ public enum InsertCommands {
             c.subtotals = Array(Set(t.filter { $0 < n })).sorted()
         }
         if let b = p.get("upDownBars")?.asBool {
+            // Written into the kept part (`WriteChartPatch.swift`, AB-T-0436); deckcraft drops the part.
             c.upDownBars = b
-            c.raw = nil
         }
         if let q = p.get("quartiles")?.asStr {
             c.inclusiveQuartiles = eqIgnoreASCIICase(q, "inclusive")
@@ -1729,6 +1729,8 @@ public enum InsertCommands {
                 textColor = .some(c)
             }
         }
+        let axis = try AxisOptions(p)
+        let seriesOptions = try SeriesOptions(p)
         return try withChart(s, p, "chart.options") { c in
             if let t = textColor { c.textColor = t }
             applyBinOptions(&c, binCount, binSize)
@@ -1743,10 +1745,201 @@ public enum InsertCommands {
             }
             if let v = Cmd.boolParam(p, "gridlines") { c.gridlines = v }
             if let v = Cmd.strParam(p, "palette") { c.palette = v }
-            // The writer puts a title, legend, data labels or gridlines into the kept part, so it keeps
-            // what the model doesn't hold (`WriteChartPatch.swift`; deckcraft drops the part on any edit).
+            try axis.apply(&c)
+            try seriesOptions.apply(&c)
+            // The writer puts a title, legend, data labels, gridlines, axis titles, the value axis's scale and
+            // format, gap and overlap or up/down bars into the kept part, so it keeps what the model doesn't
+            // hold (`WriteChartPatch.swift`; deckcraft drops the part on any edit).
             if textColor != nil || p.get("palette") != nil { c.raw = nil }
         }
+    }
+
+    /// `chart.options`' axis and series-layout settings, the port's own (AB-T-0436): the model, reader, renderer
+    /// and writer had them, but no command set them. Parsed before the edit, so a bad value changes nothing.
+    struct AxisOptions {
+        var categoryTitle: String??
+        var valueTitle: String??
+        var minorGridlines: Bool?
+        var min: Double??
+        var max: Double??
+        var majorUnit: Double??
+        var logBase: Double??
+        var numberFormat: String??
+        var reverseCategories: Bool?
+        var gapWidth: Double?
+        var overlap: Double?
+
+        init(_ p: JSON) throws {
+            let cmd = "chart.options"
+            if let t = p.get("axisTitles") {
+                guard t.isObject else { throw Cmd.bad(cmd, "`axisTitles` is {category?: text|null, value?: text|null}") }
+                func title(_ k: String) throws -> String?? {
+                    guard let v = t.get(k) else { return nil }
+                    if v.isNull { return .some(nil) }
+                    guard let s = v.asStr else { throw Cmd.bad(cmd, "`axisTitles.\(k)` is text or null") }
+                    let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                    return .some(t.isEmpty ? nil : String(s.prefix(255)))
+                }
+                categoryTitle = try title("category")
+                valueTitle = try title("value")
+            }
+            minorGridlines = Cmd.boolParam(p, "minorGridlines")
+            reverseCategories = Cmd.boolParam(p, "reverseCategories")
+            func number(_ k: String, _ ok: (Double) -> Bool, _ what: String) throws -> Double?? {
+                guard let v = p.get(k) else { return nil }
+                if v.isNull { return .some(nil) }
+                guard let n = v.asF64, n.isFinite, ok(n) else { throw Cmd.bad(cmd, "`\(k)` is \(what), or null for automatic") }
+                return .some(n)
+            }
+            min = try number("axisMin", { Swift.abs($0) <= 1e300 }, "a number")
+            max = try number("axisMax", { Swift.abs($0) <= 1e300 }, "a number")
+            majorUnit = try number("majorUnit", { $0 > 0 && $0 <= 1e300 }, "a positive number")
+            logBase = try number("logBase", { $0 >= 2 && $0 <= 1000 }, "a base from 2 to 1000")
+            if let v = p.get("numberFormat") {
+                if v.isNull {
+                    numberFormat = .some(nil)
+                } else {
+                    guard let f = v.asStr, f.count <= 255 else { throw Cmd.bad(cmd, "`numberFormat` is an Excel format code such as #,##0 or 0%, or null to follow the data") }
+                    numberFormat = .some(f.isEmpty || f == "General" ? nil : f)
+                }
+            }
+            func percent(_ k: String, _ range: ClosedRange<Double>) throws -> Double? {
+                guard let v = p.get(k) else { return nil }
+                guard let n = v.asF64, n.isFinite, range.contains(n) else {
+                    throw Cmd.bad(cmd, "`\(k)` is a percentage from \(Int(range.lowerBound)) to \(Int(range.upperBound))")
+                }
+                return n / 100
+            }
+            gapWidth = try percent("gapWidth", 0 ... 500)
+            overlap = try percent("overlap", -100 ... 100)
+        }
+
+        var touchesAxes: Bool {
+            categoryTitle != nil || valueTitle != nil || minorGridlines != nil || min != nil || max != nil || majorUnit != nil
+                || logBase != nil || numberFormat != nil || reverseCategories != nil
+        }
+
+        func apply(_ c: inout Chart) throws {
+            let cmd = "chart.options"
+            if touchesAxes && !c.takesAxisSettings { throw Cmd.bad(cmd, "a \(c.kind.label) chart has no axes to set") }
+            if gapWidth != nil && !c.takesGapWidth { throw Cmd.bad(cmd, "gap width is a column or bar chart's") }
+            if overlap != nil && !c.takesOverlap { throw Cmd.bad(cmd, "overlap is a flat, unstacked column or bar chart's") }
+            if let t = categoryTitle { c.axisTitles.a = t }
+            if let t = valueTitle { c.axisTitles.b = t }
+            if let v = minorGridlines { c.minorGridlines = v }
+            if let v = reverseCategories { c.catReversed = v }
+            if let v = min { c.yMin = v }
+            if let v = max { c.yMax = v }
+            if let v = majorUnit { c.yMajor = v }
+            if let v = logBase { c.yLogBase = v }
+            if let v = numberFormat { c.yFormat = v }
+            if let v = gapWidth { c.gapWidth = v }
+            if let v = overlap { c.overlap = v }
+            // As PowerPoint's Format Axis refuses them.
+            if let lo = c.yMin, let hi = c.yMax, lo >= hi { throw Cmd.bad(cmd, "the axis minimum must be less than its maximum") }
+            if c.yLogBase != nil, let lo = c.yMin, lo <= 0 { throw Cmd.bad(cmd, "a logarithmic axis starts above zero") }
+        }
+    }
+
+    // MARK: - Series options
+
+    /// `chart.options`' series settings, the port's own (AB-T-0436): a series' trendline and error bars, as
+    /// PowerPoint's Add Chart Element › Trendline and Error Bars set them, asking which series. `series` is an
+    /// index; without it, every series that can take the setting. A trendline replaces the series' trendlines;
+    /// null removes them. Kept in `chart.options` because the command list is deckcraft's.
+    struct SeriesOptions {
+        var index: Int?
+        var trend: Trendline??
+        var bars: ErrorBars??
+
+        init(_ p: JSON) throws {
+            index = try Cmd.optUsizeParam(p, "series", "chart.options")
+            if let v = p.get("trendline") { trend = v.isNull ? .some(nil) : .some(try trendlineOf(v)) }
+            if let v = p.get("errorBars") { bars = v.isNull ? .some(nil) : .some(try errorBarsOf(v)) }
+            if index != nil && trend == nil && bars == nil { throw Cmd.bad("chart.options", "`series` goes with `trendline` or `errorBars`") }
+        }
+
+        func apply(_ c: inout Chart) throws {
+            guard trend != nil || bars != nil else { return }
+            let cmd = "chart.options"
+            if let i = index, i >= c.series.count { throw Cmd.bad(cmd, "`series` \(i) is not one of the chart's \(c.series.count) series") }
+            let targets = index.map { [$0] } ?? Array(c.series.indices)
+            for i in targets {
+                let ser = c.series[i]
+                if let t = trend {
+                    if let t {
+                        if c.takesTrendline(ser) {
+                            let vals = ser.values.compactMap { $0 }
+                            if t.kind == .movingAvg, Int(t.period ?? 2) >= vals.count {
+                                throw Cmd.bad(cmd, "a moving average needs more points than its period")
+                            }
+                            if t.kind == .exp || t.kind == .power, vals.contains(where: { $0 <= 0 }) {
+                                throw Cmd.bad(cmd, "an exponential or power trendline needs every value above zero")
+                            }
+                            c.series[i].trendlines = [t]
+                        } else if index != nil {
+                            throw Cmd.bad(cmd, "a \(c.seriesKind(ser).label) chart's series takes no trendline")
+                        }
+                    } else {
+                        c.series[i].trendlines = []
+                    }
+                }
+                if let b = bars {
+                    if b == nil || c.takesErrorBars(ser) {
+                        c.series[i].errorBars = b
+                    } else if index != nil {
+                        throw Cmd.bad(cmd, "a \(c.seriesKind(ser).label) chart's series takes no error bars")
+                    }
+                }
+            }
+        }
+    }
+
+    static func trendlineOf(_ v: JSON) throws -> Trendline {
+        let cmd = "chart.options"
+        guard v.isObject else { throw Cmd.bad(cmd, "`trendline` is {type, order?, period?, forward?, backward?, intercept?, equation?, rSquared?, name?} or null") }
+        let ty = Cmd.strParam(v, "type") ?? "linear"
+        guard let kind = ([TrendlineType.linear, .exp, .log, .poly, .power, .movingAvg] as [TrendlineType]).first(where: { eqIgnoreASCIICase($0.rawValue, ty) }) else {
+            throw Cmd.bad(cmd, "`trendline.type` is linear, exp, log, poly, power or movingAvg")
+        }
+        var t = Trendline.default
+        t.kind = kind
+        t.name = Cmd.strParam(v, "name").flatMap { $0.isEmpty ? nil : String($0.prefix(255)) }
+        if kind == .poly { t.order = UInt32(Swift.min(Swift.max(v.get("order")?.asU64 ?? 2, 2), 6)) }
+        if kind == .movingAvg { t.period = UInt32(Swift.min(Swift.max(v.get("period")?.asU64 ?? 2, 2), 255)) }
+        func amount(_ k: String) throws -> Double? {
+            guard let x = v.get(k), !x.isNull else { return nil }
+            guard let n = x.asF64, n.isFinite, Swift.abs(n) <= 1e12 else { throw Cmd.bad(cmd, "`trendline.\(k)` is a number") }
+            return n
+        }
+        if kind != .movingAvg {
+            t.forward = try amount("forward").flatMap { $0 > 0 ? $0 : nil }
+            t.backward = try amount("backward").flatMap { $0 > 0 ? $0 : nil }
+        }
+        if kind == .linear || kind == .exp || kind == .poly { t.intercept = try amount("intercept") }
+        t.dispEq = Cmd.boolOr(v, "equation", false) && kind != .movingAvg
+        t.dispRSqr = Cmd.boolOr(v, "rSquared", false) && kind != .movingAvg
+        return t
+    }
+
+    static func errorBarsOf(_ v: JSON) throws -> ErrorBars {
+        let cmd = "chart.options"
+        guard v.isObject else { throw Cmd.bad(cmd, "`errorBars` is {type, value?, direction?, endCap?} or null") }
+        let types = ["stdErr", "percentage", "stdDev", "fixedVal"]
+        let ty = Cmd.strParam(v, "type") ?? "stdErr"
+        guard let valType = types.first(where: { eqIgnoreASCIICase($0, ty) }) else {
+            throw Cmd.bad(cmd, "`errorBars.type` is stdErr, percentage, stdDev or fixedVal")
+        }
+        let dirs = ["both", "plus", "minus"]
+        let d = Cmd.strParam(v, "direction") ?? "both"
+        guard let barType = dirs.first(where: { eqIgnoreASCIICase($0, d) }) else { throw Cmd.bad(cmd, "`errorBars.direction` is both, plus or minus") }
+        // PowerPoint's defaults: 5 % for a percentage, one standard deviation, a fixed value of 1.
+        var value = valType == "percentage" ? 5.0 : 1.0
+        if let x = v.get("value"), !x.isNull {
+            guard let n = x.asF64, n.isFinite, n >= 0, n <= 1e12 else { throw Cmd.bad(cmd, "`errorBars.value` is a number of at least 0") }
+            value = n
+        }
+        return ErrorBars(barType: barType, valType: valType, value: value, plus: [], minus: [], endCap: Cmd.boolOr(v, "endCap", true))
     }
 
     // MARK: - SmartArt
@@ -1766,6 +1959,42 @@ public enum InsertCommands {
             nodes = SmartArtCommands.nodesFromLines((p.get("items")?.asArray ?? []).compactMap(\.asStr))
         }
         return try SmartArtCommands.insert(s, kind, nodes)
+    }
+}
+
+// MARK: - Which chart takes which setting
+
+/// The charts `chart.options`' axis, bar and series settings apply to, as PowerPoint offers
+/// them. The port's own (AB-T-0436); the app's menus and inspector ask the same questions.
+extension Chart {
+    /// Axes the axis settings go on: not a pie or doughnut, and not an Office 2016 chart, whose writer has
+    /// none of them.
+    public var takesAxisSettings: Bool { kind != .pie && kind != .doughnut && !kind.isChartex }
+
+    /// Bars whose gap width can be set (an of-pie chart's gap too).
+    public var takesGapWidth: Bool { !kind.isChartex && (series.contains { seriesKind($0).isBarLike } || ofPie != nil) }
+
+    /// Overlap is a flat, unstacked bar chart's: stacked bars overlap fully, and a 3-D bar group has none.
+    public var takesOverlap: Bool {
+        !kind.isChartex && threeD == nil && series.contains { let k = seriesKind($0); return k.isBarLike && !k.stacked }
+    }
+
+    /// Up/down bars: a stock chart's, or a flat line chart's of two series or more.
+    public var takesUpDownBars: Bool {
+        kind == .stock || (threeD == nil && series.count >= 2 && [.line, .lineMarkers, .stackedLine, .percentLine].contains(kind))
+    }
+
+    /// A trendline goes on a flat, unstacked column, bar, line, area or scatter series (`c:trendline` in the
+    /// writer's series).
+    public func takesTrendline(_ s: Series) -> Bool {
+        threeD == nil && [.column, .bar, .line, .lineMarkers, .area, .scatter].contains(seriesKind(s))
+    }
+
+    /// Error bars go on a flat column, bar, line, area, scatter or bubble series.
+    public func takesErrorBars(_ s: Series) -> Bool {
+        let k = seriesKind(s)
+        return threeD == nil && !k.isChartex
+            && (k.isBarLike || [.line, .lineMarkers, .stackedLine, .percentLine, .area, .stackedArea, .percentArea, .scatter, .bubble].contains(k))
     }
 }
 

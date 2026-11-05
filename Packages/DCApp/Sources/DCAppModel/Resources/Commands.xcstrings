@@ -8216,31 +8216,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Blenden Sie Titel, Legende, Datenbeschriftungen und Gitternetzlinien des Diagramms ein oder aus."
+            "value" : "Titel, Legende, Beschriftungen, Gitternetzlinien, Achsen, Abstände, Pos./Neg. Abweichung, Trendlinien und Fehlerindikatoren des Diagramms festlegen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show or hide the chart's title, legend, data labels and gridlines."
+            "value" : "Set the chart's titles, legend, labels, gridlines, axes, gaps, up/down bars, trendlines and error bars."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Muestre u oculte el título, la leyenda, las etiquetas de datos y las líneas de cuadrícula del gráfico."
+            "value" : "Establecer los títulos, la leyenda, las etiquetas, la cuadrícula, los ejes, los intervalos, las barras superiores o inferiores, las líneas de tendencia y las barras de error del gráfico."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Afficher ou masquer le titre, la légende, les étiquettes de données et le quadrillage du graphique."
+            "value" : "Définir les titres, la légende, les étiquettes, le quadrillage, les axes, les intervalles, les barres haut/bas, les courbes de tendance et les barres d'erreur du graphique."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mostra o nasconde il titolo, la legenda, le etichette dati e la griglia del grafico."
+            "value" : "Imposta titoli, legenda, etichette, griglia, assi, distanze, barre crescenti/decrescenti, linee di tendenza e barre di errore del grafico."
           }
         }
       }
