@@ -417,7 +417,6 @@ final class ShowOverlayView: NSView {
         let doc = st.doc
         let full = v.bounds
         let srect = ShowGeometry.slideRect(full, reading: s.reading, doc)
-        let uv = s.zoomUV
         let awake = s.pointerAwake(now)
         // The end screen's line, the blank screens and ink are the renderer's (DCShow), under this overlay. A blank
         // screen covers the media marks, as it did when it was drawn here.
