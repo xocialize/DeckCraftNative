@@ -287,7 +287,7 @@ extension of `PPTX` in `WriteMod.swift`; everything else is internal, under the 
 | `write/chart.rs` | `WriteChart.swift` | `PPTXWrite.Charts` (`chartXML`, `chartexPart`, `chartexXML`, `buildChartex`, `writeKept`…); `PPTXWrite.chartXML` (Rust `write::chart::chart_xml`, which the reader's tests call) and `PPTXWrite.nsCX` sit on `PPTXWrite` itself |
 | `write/theme.rs` | `WriteTheme.swift` | `PPTXWrite.Themes.themeXML` |
 | — | `WriteChartexStyle.swift` | `PPTXWrite.ChartexStyle`: the style and colour style parts every `chartEx` part gets (divergence 7); DeckCraftNative's own |
-| — | `WriteChartPatch.swift` | `PPTXWrite.Charts.patchedXML`: a `chart.options` edit (title, legend, data labels, gridlines) written into the kept chart part (divergence 8); DeckCraftNative's own |
+| — | `WriteChartPatch.swift` | `PPTXWrite.Charts.patchedXML`: a `chart.options` edit (title, legend, data labels, gridlines) or a `chart.data` edit (categories, series, their names and values) written into the kept chart part, with the table of which command owns which element (divergence 8); DeckCraftNative's own |
 | `write/timing.rs` | `WriteTiming.swift` | `PPTXWrite.Timing`: `transition`, `timing` and the effect builders |
 | in-file tests | `Tests/DCPPTXTests/WriteTests.swift` | `WriteDMLTests` (1), `WriteShapesTests` (1), `WriteChartRegionMapTests` (1), `WriteChartTests` (3); 4 of them read back through `PPTXRead` |
 | — | `Tests/DCPPTXTests/PPTXExportOracleTests.swift` | Export parity, schema validation and deckcraft's read-back over the 9 corpus decks |
@@ -387,13 +387,39 @@ The writer calls these reader functions, with Rust's parameter and return shapes
      formats stay; a series' deleted labels are dropped, since the series now follows the chart;
    - **gridlines:** `c:majorGridlines` added to or removed from the reader's primary value axis.
 
-   The patched part is used only when reading it back gives the model, with three exceptions for values the
-   reader derives from a removed element: a removed title's size, the text size and colour taken from a
-   removed legend, and gridlines on a chart with no value axis. Anything else, including `chart.type`,
-   `chart.data` and a part with other prefixes, goes to the generator as before. Tests:
-   `WriteChartPatchTests`; `Tools/pptx/chart-edit-sweep.py` over the review's PowerPoint fixtures, where
-   every edit keeps every element and part apart from the one it removes, and
-   `Tools/pptx/powerpoint-check.sh` opens all of them without a repair prompt.
+   `chart.data` keeps `raw` too (second half, the same day), and `Charts.patchData` writes the model's
+   series into the plot groups' `c:ser`s position by position, as the engine keeps each position's
+   formatting:
+   - **names, categories, values:** each `c:tx`, `c:cat` and `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`)
+     cache rewritten, keeping the values' number format; a reference that already holds the data keeps its
+     cache, so date or multi-level categories stay when only the values change;
+   - **ranges:** every `c:f` becomes the generator's (`Sheet1!$A$2:$A$n` for categories, a column per
+     series), since the workbook they pointed into goes;
+   - **series removed:** the extra `c:ser`s; a plot group may be left empty;
+   - **series added:** a copy of the last series, in its group, with a fresh `c:idx`/`c:order` and none of its
+     look (fill, points, labels, trendlines, error bars, its extension list and PowerPoint's unique id). A
+     scatter series without x values gets no `c:xVal`. In a combo chart the last group must be clustered
+     columns (what the model's series without a type of its own is), otherwise the part is regenerated: the
+     reader takes series in file order;
+   - **the workbook:** dropped with `c:externalData` (`Charts.withoutWorkbook`): its cells would contradict
+     the chart, and PowerPoint's Edit Data would bring the old numbers back. PowerPoint builds a new sheet from
+     the caches, as it does for a generated chart. The style, colour and drawing parts stay. Writing the new
+     data into the workbook is AB-T-0435.
+
+   `Charts.chartPart` returns the kept parts to write with the part (nil for a generated one), so
+   `chartRel` writes the style parts without the workbook. The patched part is used only when reading it
+   back gives the model, with these exceptions for values the reader derives from something no longer there:
+   a removed title's size; the text size and colour taken from a removed legend; gridlines on a chart with no
+   value axis; a scatter or bubble chart's categories (its x values: the generator doesn't write them
+   either); a new bubble's size 1, which the generator writes too; a combo series without a type of its own,
+   which is a clustered column; and the secondary axis's settings once no series is plotted on it. Anything
+   else, including `chart.type`, category levels, an Office 2016 chart and a part with other prefixes, goes to
+   the generator as before. Tests: `WriteChartPatchTests`; `Tools/pptx/chart-edit-sweep.py` over the review's
+   PowerPoint fixtures, where every edit keeps every element and part apart from the one it removes (for
+   `--data`, apart from the series' data elements and the workbook) and reads back with the data asked for,
+   and `Tools/pptx/powerpoint-check.sh` opens all of them without a repair prompt. The ported
+   `editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` still checks that the workbook goes; it now
+   also checks that the chart's drawing stays.
 
 ## Integration tests
 

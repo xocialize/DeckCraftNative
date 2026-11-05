@@ -1669,7 +1669,8 @@ public enum InsertCommands {
                     return x
                 }
             }
-            c.raw = nil
+            // The writer puts the data into the kept part and drops the workbook, so the part keeps what the
+            // model doesn't hold (`WriteChartPatch.swift`; deckcraft drops the part on any edit).
         }
     }
 

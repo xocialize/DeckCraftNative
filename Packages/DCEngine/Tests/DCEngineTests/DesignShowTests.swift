@@ -331,7 +331,11 @@ struct ChartNativeTests {
         s.st.docRef = DocRef(p)
         let back = try PPTX.import(saveBytes(s, "pptx"))
         #expect(chartOf(back)?.series.first?.values.first == 99.0)
-        #expect(chartOf(back)?.kept.parts.isEmpty ?? false, "stale source workbook must not be attached to edited chart data")
+        // deckcraft regenerates the part and keeps nothing. The port writes the data into the kept part
+        // (DCPPTX PORT-NOTES, divergence 8): the stale workbook still goes, the chart's drawing stays.
+        let parts = chartOf(back)?.kept.parts ?? []
+        #expect(!parts.contains { $0.bytes == workbook }, "stale source workbook must not be attached to edited chart data")
+        #expect(parts.contains { $0.bytes == drawing }, "the chart's drawing is kept")
     }
 }
 

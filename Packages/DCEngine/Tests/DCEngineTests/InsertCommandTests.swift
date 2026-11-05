@@ -636,9 +636,9 @@ struct InsertShapeTests {
         #expect(chartOf(s, id)?.textColor == nil)
     }
 
-    /// The port's own (AB-T-0433): a title, legend, data labels or gridlines keep the chart's kept part, which
-    /// the writer edits; a text colour or palette drops it, as deckcraft drops it on any edit.
-    @Test func chartOptionsKeepsThePartForElementsOnly() throws {
+    /// The port's own (AB-T-0433): a title, legend, data labels, gridlines or new data keep the chart's kept
+    /// part, which the writer edits; a text colour or palette drops it, as deckcraft drops it on any edit.
+    @Test func chartEditsKeepThePartForElementsAndData() throws {
         let s = session()
         let id = try #require(s.run("insert.chart", #"{"type": "column", "title": "Sales"}"#).get("id")?.asU64)
         let sid = try #require(UInt32(exactly: id).map(ShapeId.init))
@@ -656,6 +656,8 @@ struct InsertShapeTests {
             s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)
             #expect(chartOf(s, id)?.raw != nil, "\(opts) keeps the part")
         }
+        s.run("chart.data", #"{"id": \#(id), "categories": ["A", "B"], "series": [{"name": "S", "values": [1, 2]}]}"#)
+        #expect(chartOf(s, id)?.raw != nil, "chart.data keeps the part")
         for opts in [#""textColor": "accent2""#, #""palette": "colorful2""#] {
             keep()
             s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)

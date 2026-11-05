@@ -687,8 +687,8 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     packages in CraftNativeKit; its licence is now in `Acknowledgements.txt` (`Tools/acknowledgements.sh` reads a
     `LICENSE-MIT`). The installed 0.1.14 finds 0.1.15 through Check for Updates; 0.1.15 is now installed in
     `/Applications`.
-- **After 0.1.15 (unreleased, 2026-11-04): an edited chart keeps its part (AB-T-0433, first half).** Changing a
-  chart's title, legend, data labels or gridlines regenerated its whole `c:chartSpace`, as deckcraft does. That lost
+- **After 0.1.15 (unreleased, 2026-11-04): an edited chart keeps its part (AB-T-0433).** Changing a
+  chart's title, legend, data labels, gridlines or data regenerated its whole `c:chartSpace`, as deckcraft does. That lost
   what the model doesn't hold: the embedded workbook, the style and colour parts, label positions, fills, 3-D and the
   extension lists. The charts gap review found it on every PowerPoint-made chart.
   - **Now:** `chart.options` keeps the chart's original part, and the writer edits those four elements into it
@@ -701,7 +701,14 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     data labels on and off, gridlines on and off, and all four at once. `chart.type` is the positive control, and it
     fails as it should. PowerPoint opened 36 of the edited files without a repair prompt
     (`Tools/pptx/powerpoint-check.sh`). The oracle corpus is unchanged.
-  - **Next:** `chart.data` (the cached values and the `c:f` ranges), the task's second half.
+  - **`chart.data` (second half, same day):** Edit Data keeps the part too. The writer puts the categories, the
+    series' names and values, and the generator's `c:f` ranges into it, and adds or removes series. It drops
+    the embedded workbook, whose cells would contradict the chart; PowerPoint builds a new sheet from the chart,
+    as it does for ours. The style, colour and drawing parts stay. Still regenerated: adding a series to a combo
+    chart whose last group isn't clustered columns, category levels, and Office 2016 charts. `chart-edit-sweep.py
+    --data` (values, rename, add or drop a series, add or drop a category) passes on all 9 fixtures and, with
+    `--all-slides`, on every chart in `pp-types`, apart from adding a series to the two combos ending in lines.
+    `WriteChartPatchTests` has 5 more tests.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

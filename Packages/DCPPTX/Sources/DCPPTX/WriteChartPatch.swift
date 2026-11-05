@@ -1,14 +1,27 @@
 // DCPPTX — an edited chart that keeps its original part. `chart.options` (title, legend, data labels,
-// gridlines) is written into the kept `c:chartSpace` instead of regenerating it, so what the model doesn't
-// hold survives the edit: the workbook link, the style and colour parts, label positions, fills, 3-D, the
-// extension lists. The port's own (AB-T-0433): deckcraft regenerates the part on any change. The patch is
-// used only when reading it back gives the model; anything else goes to the generator, as before.
+// gridlines) and `chart.data` (categories, series names and values) are written into the kept
+// `c:chartSpace` instead of regenerating it, so what the model doesn't hold survives the edit: the style and
+// colour parts, label positions, fills, 3-D, the extension lists, and the workbook link while the data is
+// unchanged. The port's own (AB-T-0433): deckcraft regenerates the part on any change. The patch is used
+// only when reading it back gives the model; anything else goes to the generator, as before.
+//
+// Which command owns which element of the kept part:
+//
+// | Command | Elements it writes into the kept part |
+// |---|---|
+// | `chart.options` title | `c:title` (text only; its formatting stays), `c:autoTitleDeleted` |
+// | `chart.options` legend | `c:legend`, `c:legendPos` |
+// | `chart.options` dataLabels | `c:showVal` in every plot group's and series' `c:dLbls` |
+// | `chart.options` gridlines | the primary value axis's `c:majorGridlines` |
+// | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook dropped |
+// | anything else (`chart.type`, palette, text colour, bins, subtotals, up/down bars, quartiles) | none: the part is regenerated |
 import CNCore
 import DCModel
 
 extension PPTXWrite.Charts {
-    /// The kept part with the model's title, legend, data labels and gridlines written into it, or nil.
-    static func patchedXML(_ c: Chart) -> [UInt8]? {
+    /// The kept part with the model's title, legend, data labels, gridlines and data written into it, and
+    /// whether the data changed (the workbook then goes: its cells would contradict the chart); or nil.
+    static func patchedXML(_ c: Chart) -> (xml: [UInt8], data: Bool)? {
         guard let raw = c.raw, !PPTXWrite.utf8Contains(raw, PPTXWrite.nsCX), let doc = try? parseXML(raw) else { return nil }
         var root = doc.root
         // Inserted elements are written with the writer's prefixes, so the part must use them.
@@ -18,18 +31,22 @@ extension PPTXWrite.Charts {
         me.raw = nil
         me.kept = ChartKept()
         me = labelsNormalized(me)
+        let data = dataChanged(was, me)
         var axisless = false
+        var patched = true
         guard root.edit("chart", { ch in
             if !PPTXRead.optEqual(was.title, me.title) { patchTitle(&ch, me.title, me) }
             if !PPTXRead.optEqual(was.legend, me.legend) { patchLegend(&ch, me.legend) }
             ch.edit("plotArea") { pa in
-                if was.dataLabels != me.dataLabels || was.series.map(\.dataLabels) != me.series.map(\.dataLabels) {
+                if data { patched = patchData(&pa, me) }
+                // Series that both have: `chart.data` keeps each one's own labels, `chart.options` clears them.
+                if was.dataLabels != me.dataLabels || zip(was.series, me.series).contains(where: { $0.dataLabels != $1.dataLabels }) {
                     patchLabels(&pa, me.dataLabels)
                 }
                 axisless = primaryValueAxis(pa) == nil
                 if was.gridlines != me.gridlines { patchGridlines(&pa, me.gridlines) }
             }
-        }), let now = reread(root) else { return nil }
+        }), patched, let now = reread(root) else { return nil }
         // What the reader derives from an element the edit removed has nowhere left to stay: the title's
         // size, and the chart's text size and colour where it took them from the legend. Gridlines need a
         // value axis (a pie has none). PowerPoint's own text elements keep their formatting either way.
@@ -39,12 +56,30 @@ extension PPTXWrite.Charts {
             me.textColor = now.textColor
         }
         if axisless { me.gridlines = now.gridlines }
+        // A scatter or bubble chart's categories are its x values: the generator doesn't write them either.
+        if data && (me.kind == .scatter || me.kind == .bubble) { me.categories = now.categories }
+        // A bubble without a size is written at size 1, as the generator writes it.
+        if data && me.kind == .bubble {
+            for (i, s) in zip(me.series.indices, now.series) where me.series[i].sizes.isEmpty && s.sizes.allSatisfy({ $0 == 1.0 }) {
+                me.series[i].sizes = s.sizes
+            }
+        }
+        if data && me.kind == .combo {
+            // A combo chart's series without a type of its own is a clustered column (`Chart.seriesKind`).
+            for i in me.series.indices where me.series[i].kind == nil { me.series[i].kind = .column }
+            // The secondary axis's settings are read only while a series is plotted on it.
+            if !me.series.contains(where: \.secondaryAxis) {
+                (me.y2Min, me.y2Max, me.y2Major, me.y2Format, me.y2Hidden) = (now.y2Min, now.y2Max, now.y2Major, now.y2Format, now.y2Hidden)
+            }
+        }
         guard now == me else { return nil }
         // Without the parts those elements point at, PowerPoint repairs the file.
-        dropUnkeptRefs(&root, c)
+        var kept = c
+        if data { kept.kept = withoutWorkbook(c.kept) }
+        dropUnkeptRefs(&root, kept)
         var w = W.new()
         w.raw(root.toXML())
-        return w.finish()
+        return (w.finish(), data)
     }
 
     static func declares(_ e: XMLEl, _ key: String, _ ns: String) -> Bool {
@@ -203,6 +238,228 @@ extension PPTXWrite.Charts {
             // CT_ValAx: axId, scaling, delete, axPos, then majorGridlines.
             if on { a.insert(el("c:majorGridlines"), after: ["axId", "scaling", "delete", "axPos"]) }
         }
+    }
+}
+
+extension PPTXWrite.Charts {
+    // MARK: - Data
+
+    /// Whether `chart.data` changed anything: categories, levels, the series, their names or values.
+    static func dataChanged(_ a: Chart, _ b: Chart) -> Bool {
+        a.categories != b.categories || a.categoryLevels != b.categoryLevels || a.series.count != b.series.count
+            || zip(a.series, b.series).contains { x, y in
+                x.name != y.name || x.values != y.values || x.xValues != y.xValues || x.sizes != y.sizes
+            }
+    }
+
+    /// The plot groups the reader reads (`chartWithin`), whose series make the model's, in file order.
+    static let plotGroups = [
+        "barChart", "bar3DChart", "lineChart", "line3DChart", "areaChart", "area3DChart", "pieChart", "pie3DChart",
+        "ofPieChart", "doughnutChart", "scatterChart", "bubbleChart", "radarChart", "stockChart", "surfaceChart",
+        "surface3DChart",
+    ]
+
+    /// A chart's kept parts without its workbook (embedded or linked): once the data is edited, its cells
+    /// would contradict the chart, and PowerPoint's Edit Data would bring the old numbers back. PowerPoint
+    /// builds a new sheet from the chart's caches instead, as it does for a generated chart.
+    static func withoutWorkbook(_ k: ChartKept) -> ChartKept {
+        func book(_ r: ChartRel) -> Bool { hasByteSuffix(r.relType, "/package") || hasByteSuffix(r.relType, "/oleObject") }
+        var out = k
+        out.rels = k.rels.filter { !book($0) }
+        let still = Set(out.rels.map { ByteKey(OPC.norm($0.part)) })
+        let gone = Set(k.rels.filter { book($0) && !$0.external }.map { ByteKey(OPC.norm($0.part)) }).subtracting(still)
+        out.parts = k.parts.filter { !gone.contains(ByteKey(OPC.norm($0.name))) }
+        return out
+    }
+
+    /// The model's series written into the plot groups' `c:ser`s, position by position: extra ones removed,
+    /// new ones copied from the last series without its formatting. Every range is the generator's, since
+    /// the workbook they pointed into is dropped. False when there is no series to start from.
+    static func patchData(_ pa: inout XMLEl, _ me: Chart) -> Bool {
+        let groups = { (g: XMLEl) in plotGroups.contains { g.is($0) } }
+        // New series follow the last one, in its group: the reader takes series in file order. In a combo
+        // chart that group must be clustered columns, what a series without a type of its own is.
+        func columns(_ e: XMLEl) -> Bool {
+            e.is("barChart") && !PPTXRead.attrIs(e.childVal("barDir"), "bar")
+                && (e.childVal("grouping").map { bytesEqual($0, "clustered") } ?? true)
+        }
+        var template: XMLEl?
+        var lastGroup = -1
+        var lastColumns = false
+        var nextIdx = 0
+        var g = 0
+        var tooMany = false
+        var total = 0
+        for e in pa.elements where groups(e) {
+            let sers = Array(e.childrenNamed("ser"))
+            if sers.count > 1000 { tooMany = true }
+            total += sers.count
+            if let s = sers.last {
+                template = s
+                lastGroup = g
+                lastColumns = columns(e)
+            }
+            for s in sers { nextIdx = Swift.max(nextIdx, Int(s.child("idx")?.u32("val") ?? 0) + 1) }
+            g += 1
+        }
+        let adding = me.series.count > total
+        guard !tooMany, !adding || (template != nil && (me.kind != .combo || lastColumns)) else { return false }
+        var i = 0
+        g = 0
+        pa.elementsMut { e in
+            guard groups(e) else { return }
+            var out: [XMLNode] = []
+            var lastSer = -1
+            for n in e.children {
+                guard case .el(var s) = n, s.is("ser") else {
+                    out.append(n)
+                    continue
+                }
+                if i < me.series.count {
+                    setSeriesData(&s, i, me)
+                    out.append(.el(s))
+                    lastSer = out.count - 1
+                    i += 1
+                }
+            }
+            if g == lastGroup, let template {
+                var fresh: [XMLNode] = []
+                while i < me.series.count {
+                    var s = cloneSeries(template, nextIdx)
+                    nextIdx += 1
+                    setSeriesData(&s, i, me)
+                    // The model's new series has no number format of its own.
+                    for k in ["val", "yVal"] {
+                        _ = s.edit(k) { v in _ = v.edit("numRef") { r in _ = r.edit("numCache") { $0.remove("formatCode") } } }
+                    }
+                    fresh.append(.el(s))
+                    i += 1
+                }
+                out.insert(contentsOf: fresh, at: lastSer + 1)
+            }
+            e.children = out
+            g += 1
+        }
+        return i == me.series.count
+    }
+
+    /// A new series from `t`: its kind of data and nothing of its look (fill, points, labels, trendlines,
+    /// error bars, its extension list with PowerPoint's unique id).
+    static func cloneSeries(_ t: XMLEl, _ idx: Int) -> XMLEl {
+        var s = XMLEl(name: t.name, attrs: t.attrs)
+        let data = ["tx", "cat", "val", "xVal", "yVal", "bubbleSize", "invertIfNegative", "bubble3D", "shape"]
+        for case .el(let e) in t.children {
+            if e.is("idx") || e.is("order") {
+                s.children.append(.el(el(e.name, "\(idx)")))
+            } else if e.is("marker") {
+                // A line chart without markers says so on every series.
+                if PPTXRead.attrIs(e.child("symbol")?.attr("val"), "none") { s.children.append(.el(e)) }
+            } else if e.is("smooth") {
+                s.children.append(.el(el(e.name, "0")))
+            } else if data.contains(where: { e.is($0) }) {
+                s.children.append(.el(e))
+            }
+        }
+        return s
+    }
+
+    /// Series `i`'s name, categories (or x values) and values, with the generator's ranges.
+    static func setSeriesData(_ s: inout XMLEl, _ i: Int, _ me: Chart) {
+        let ser = me.series[i]
+        let last = Swift.max(me.categories.count, ser.values.count) + 1
+        let column = col(i + 1)
+        let values = "Sheet1!$\(column)$2:$\(column)$\(last)"
+        if !s.edit("tx", { setStrings(&$0, "Sheet1!$\(column)$1", [ser.name]) }) {
+            var tx = el("c:tx")
+            setStrings(&tx, "Sheet1!$\(column)$1", [ser.name])
+            s.insert(tx, after: ["idx", "order"])
+        }
+        let scatterLike = s.child("xVal") != nil || s.child("yVal") != nil
+        if scatterLike {
+            // Without x values the points are numbered 1, 2, 3…, in PowerPoint as in the model.
+            if ser.xValues.isEmpty {
+                s.remove("xVal")
+            } else {
+                setData(&s, "xVal", "Sheet1!$A$2:$A$\(last)", ser.xValues, after: ["idx", "order", "tx", "spPr", "marker", "dPt", "dLbls", "trendline", "errBars"])
+            }
+            setData(&s, "yVal", values, ser.values, after: ["xVal"])
+            if s.child("bubbleSize") != nil {
+                let c2 = col(i + 2)
+                let sizes: [Double?] = ser.sizes.isEmpty ? ser.values.map { _ in Optional(1.0) } : ser.sizes
+                setData(&s, "bubbleSize", "Sheet1!$\(c2)$2:$\(c2)$\(last)", sizes, after: ["yVal"])
+            }
+        } else {
+            let cats = "Sheet1!$A$2:$A$\(last)"
+            if !s.edit("cat", { cat in
+                if PPTXRead.stringsCapped(cat, PPTXRead.maxCachePoints) == me.categories {
+                    setRange(&cat, cats)
+                } else {
+                    var w = W.new()
+                    strCache(&w, cats, me.categories)
+                    if let r = try? parseXML(w.finish()).root { cat.children = [.el(r)] }
+                }
+            }) {
+                var cat = el("c:cat")
+                var w = W.new()
+                strCache(&w, cats, me.categories)
+                if let r = try? parseXML(w.finish()).root { cat.children = [.el(r)] }
+                s.insert(cat, after: ["idx", "order", "tx", "spPr", "invertIfNegative", "pictureOptions", "marker", "explosion", "dPt", "dLbls", "trendline", "errBars"])
+            }
+            setData(&s, "val", values, ser.values, after: ["cat"])
+        }
+    }
+
+    /// A one-string `c:tx`: the cached name in a `c:strRef`, or a literal `c:v`.
+    static func setStrings(_ tx: inout XMLEl, _ f: String, _ vals: [String]) {
+        if PPTXRead.stringsCapped(tx, PPTXRead.maxCachePoints) == vals, tx.child("strRef") != nil || tx.child("v") != nil {
+            _ = tx.edit("strRef") { setRange(&$0, f) }
+            return
+        }
+        if vals.count == 1, tx.child("v") != nil, tx.child("strRef") == nil {
+            _ = tx.edit("v") { $0.children = [.text(vals[0])] }
+            return
+        }
+        var w = W.new()
+        strCache(&w, f, vals)
+        if let r = try? parseXML(w.finish()).root { tx.children = [.el(r)] }
+    }
+
+    /// Numbers in `s`'s `name` element: the cache rewritten (keeping its number format) or, when it already
+    /// holds them, only the range.
+    static func setData(_ s: inout XMLEl, _ name: String, _ f: String, _ vals: [Double?], after: [String]) {
+        func fresh(_ format: String?) -> XMLEl? {
+            var w = W.new()
+            numCache(&w, f, vals)
+            guard var r = try? parseXML(w.finish()).root else { return nil }
+            _ = r.edit("numCache") { c in
+                if let format { _ = c.edit("formatCode") { $0.children = [.text(format)] } } else { c.remove("formatCode") }
+            }
+            return r
+        }
+        if !s.edit(name, { d in
+            var budget = PPTXRead.maxCachePoints
+            if PPTXRead.numbers(d, &budget) == vals {
+                setRange(&d, f)
+            } else if d.child("numLit") != nil {
+                var w = W.new()
+                numLit(&w, vals)
+                if let r = try? parseXML(w.finish()).root { d.children = [.el(r)] }
+            } else {
+                let format = d.child("numRef")?.child("numCache")?.child("formatCode").map(\.text)
+                if let r = fresh(format ?? "General") { d.children = [.el(r)] }
+            }
+        }) {
+            if let r = fresh("General") { s.insert(el("c:\(name)", nil, [r]), after: after) }
+        }
+    }
+
+    /// The `c:f` of a `c:strRef` or `c:numRef` inside `d` (or `d` itself); a multi-level one keeps its own.
+    static func setRange(_ d: inout XMLEl, _ f: String) {
+        if d.is("strRef") || d.is("numRef") {
+            if !d.edit("f", { $0.children = [.text(f)] }) { d.insert(el("c:f"), after: []) ; _ = d.edit("f") { $0.children = [.text(f)] } }
+            return
+        }
+        for k in ["strRef", "numRef"] { _ = d.edit(k) { setRange(&$0, f) } }
     }
 }
 

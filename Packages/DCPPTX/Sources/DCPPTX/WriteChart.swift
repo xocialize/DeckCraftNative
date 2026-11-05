@@ -581,6 +581,13 @@ extension PPTXWrite {
 
         /// The chart part XML, and whether it is the original part (so its relationships still apply).
         static func chartXML(_ c: Chart) -> (xml: [UInt8], preserved: Bool) {
+            let (xml, kept) = chartPart(c)
+            return (xml, kept != nil)
+        }
+
+        /// The chart part XML, and the kept parts to write with it: nil for a generated part, the chart's own
+        /// for an unchanged or patched one, without the workbook when its data was edited.
+        static func chartPart(_ c: Chart) -> (xml: [UInt8], kept: ChartKept?) {
             // Reuse the kept part when the chart is unchanged since it was read.
             if let raw = c.raw, !utf8Contains(raw, PPTXWrite.nsCX), let doc = try? parseXML(raw), doc.root.is("chartSpace") {
                 var root = doc.root
@@ -596,12 +603,13 @@ extension PPTXWrite {
                         dropUnkeptRefs(&keep, c)
                         var w = W.new()
                         w.raw(keep.toXML())
-                        return (w.finish(), true)
+                        return (w.finish(), c.kept)
                     }
                 }
-                // Edited by `chart.options` only: the kept part with the edit written into it (the port's own).
+                // Edited by `chart.options` or `chart.data`: the kept part with the edit written into it (the
+                // port's own).
                 if let patched = patchedXML(c) {
-                    return (patched, true)
+                    return (patched.xml, patched.data ? withoutWorkbook(c.kept) : c.kept)
                 }
             }
             var w = W.new()
@@ -675,7 +683,7 @@ extension PPTXWrite {
             }
             txPr(&w, c)
             w.close("c:chartSpace")
-            return (w.finish(), false)
+            return (w.finish(), nil)
         }
 
         /// The relationship ids of an unchanged chart that `writeKept` writes back: external ones, and

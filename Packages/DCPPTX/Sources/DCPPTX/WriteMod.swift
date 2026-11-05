@@ -175,10 +175,15 @@ enum PPTXWrite {
         func chartRel(_ o: Out, _ c: Chart) -> String {
             nChart &+= 1
             let name = "ppt/charts/chart\(nChart).xml"
-            let (xml, preserved) = Charts.chartXML(c)
+            let (xml, kept) = Charts.chartPart(c)
             pkg.xmlPart(name, ctChart, xml)
-            if preserved {
-                Charts.writeKept(&pkg, name, c, &nKept)
+            if let kept {
+                var k = c
+                k.kept = kept
+                Charts.writeKept(&pkg, name, k, &nKept)
+                if kept.parts.count < c.kept.parts.count {
+                    PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
+                }
             } else if !c.kept.parts.isEmpty {
                 PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
             }

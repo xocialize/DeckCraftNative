@@ -605,7 +605,10 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   gridlines (2026-11-04, AB-T-0433). deckcraft drops `raw` on every chart edit, so a save regenerated the part and
   lost what the model doesn't hold; DCPPTX now writes those fields into the kept part (its divergence 8). The
   command's reply is unchanged; a document dump shows the chart's `raw` where deckcraft's has none. `textColor`,
-  `palette`, bins, subtotals, quartiles and up/down bars still drop it.
+  `palette`, bins, subtotals, quartiles and up/down bars still drop it. **`chart.data` keeps it too**
+  (the same day): DCPPTX writes the categories and series into the kept part and drops the workbook, whose
+  cells would be stale. `DesignShowTests.editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` (ported)
+  now expects the chart's drawing to stay where deckcraft's dropped every kept part.
 
 ### Tests
 
