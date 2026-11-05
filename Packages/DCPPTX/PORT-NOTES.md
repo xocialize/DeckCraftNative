@@ -458,6 +458,8 @@ The writer calls these reader functions, with Rust's parameter and return shapes
    PowerPoint-shaped workbook updated in place, grown and shrunk; each fallback; a deck round trip).
    `Tools/pptx/chart-edit-sweep.py --data` now also checks that every edited chart's workbook agrees with it
    and says whether it was updated, replaced or new; `Tools/pptx/excel-check.sh` opens workbooks in Excel.
+   Excel opened all 107 workbooks of the sweep and the insert deck cleanly, and PowerPoint's Edit Data in
+   Excel shows an edited chart's new values in its original table (2026-11-05).
 
 ## Integration tests
 

@@ -726,8 +726,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     what Excel's own workbooks also carry (`xml:space` on `t`, `mc:Ignorable`). `Tools/pptx/validate.sh` now rejects
     parts that aren't well-formed (it skipped them) and knows SpreadsheetML. dccli's `convert` parity applies the
     same divergence. Full suite green apart from `aDenseShapeGradientRendersPromptly`, a timing test starved in the
-    full run that passes alone (4.8 s). **Not yet checked:** each workbook opened in Excel (`Tools/pptx/excel-check.sh`,
-    written, unrun: Excel hung at its first launch) and PowerPoint's Edit Data in Excel on an edited chart.
+    full run that passes alone (4.8 s). Excel (16.114.4) opened all 107 workbooks
+    without a repair prompt (`Tools/pptx/excel-check.sh --from-pptx`; its controls: PowerPoint's own workbook OPEN-OK,
+    the same with a renamed table column NEEDS-REPAIR). PowerPoint's Chart Design › Edit Data in Excel on the
+    values-edited pp-native chart opened Sheet1 showing the edited numbers in B2:D5, with Table1 still at A1:D5.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs
