@@ -726,6 +726,11 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     every case (slide, black, white, ink over black, end screen, end screen with ink), ink within 1 level on 0.008 %
     of channels. `ShowRendererTests` +4 (blank, ink and end screen from the renderer alone; the pacer's observe).
     519 tests green; alpha gate 24/24 in both layouts.
+  - **Then (2026-11-04): `ShowTextureSource`.** A running show as one BGRA texture a host composites: the host's display
+    loop calls `tick(now:)`, and the source draws only when the picture changed, moving `generation` (one texture is
+    enough on the host's own queue). It starts and ends its show, takes keys as the show window does, and resizes.
+    `ShowKey(keyCode:characters:)` is the show window's key mapping, now public in DCAppModel. `ShowTextureSourceTests`
+    (6): the texture equals the renderer's frame pixel for pixel. Its first host is MVS's booth preview.
   - **Then (2026-11-04): `dccli render-show`, the show's frame rate measured.** It plays a deck's show in real time
     through `ShowRenderer` into an offscreen texture and times each frame it draws (`Apps/dccli/RenderShow.swift`;
     it runs on the main thread, before the engine thread, since the coordinator is main-actor; its help page is
