@@ -726,6 +726,22 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     every case (slide, black, white, ink over black, end screen, end screen with ink), ink within 1 level on 0.008 %
     of channels. `ShowRendererTests` +4 (blank, ink and end screen from the renderer alone; the pacer's observe).
     519 tests green; alpha gate 24/24 in both layouts.
+  - **Then (2026-11-04): `dccli render-show`, the show's frame rate measured.** It plays a deck's show in real time
+    through `ShowRenderer` into an offscreen texture and times each frame it draws (`Apps/dccli/RenderShow.swift`;
+    it runs on the main thread, before the engine thread, since the coordinator is main-actor; its help page is
+    left out of the overview, which stays deckcraft-cli's). First numbers, M5 Max, release, 60 fps:
+    - **Transitions:** p50 1.7–4.1 ms and p95 ≤ 12 ms at 1080p to 4K.
+    - **1080p H.264 video:** 1.1–1.5 ms a frame.
+    - **Animated plain shapes:** 5 ms at 1080p, 19 ms at 4K.
+    - **Morph:** 39–57 ms at 1080p and 150–226 ms at 4K (`renderBlend` on the CPU every frame).
+    - **Shapes with glow, shadow and soft edges animating in:** 124 ms at 1080p and 620 ms at 4K. The moving
+      shapes' effect blurs are re-rendered on the CPU each frame.
+    - **The GPU** is never more than 7 ms.
+
+    The animated layers and Morph want GPU work (a shape rendered once into a texture, its transform and opacity
+    animated on the GPU). That matters for the show window on a 5K display as much as for a texture client.
+    `RenderShowTests` (3). The glow and video decks were built with `dccli run` (12 shapes with glow, outer shadow
+    and soft edges animated in, per slide; a full-slide 1080p30 H.264 clip); the raw data is kept with the consumer.
 
 ## CraftNativeKit (2026-11-01)
 

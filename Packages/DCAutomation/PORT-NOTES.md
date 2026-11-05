@@ -147,7 +147,7 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
 ## dccli
 
 `Apps/dccli` is deckcraft-cli on swift-argument-parser: `info`, `render`, `render-transition`, `convert`, `run`,
-`commands`, `describe`, `app`, `mcp`, `bench`, `links`, `help`, `--version`.
+`commands`, `describe`, `app`, `mcp`, `bench`, `links`, `help`, `--version`; and DeckCraftNative's own `render-show`.
 
 | Rust (`apps/deckcraft-cli/src`) | Swift (`Apps/dccli`) |
 |---|---|
@@ -155,6 +155,7 @@ pressures) give deckcraft-cli's replies, every one, and its deck's `presentation
 | `main.rs` (the subcommands) | `CLI.swift` |
 | `help.rs` | `Help.swift` |
 | `automation_args.rs` | `AutomationArgs.swift` |
+| — (DeckCraftNative's own, 2026-11-04) | `RenderShow.swift`: `render-show` plays a show in real time through DCShow's renderer into an offscreen texture and times each frame drawn. The show's coordinator is main-actor, so `DCCLI.main()` runs it on the main thread before handing other commands to the engine thread |
 | tests | `Apps/dccliTests/CLITests.swift` (in process), `ParityTests.swift`, `MCPProcessTests.swift` (the binaries) |
 
 - **ArgumentParser** holds the subcommand table and routes; each subcommand takes its arguments as they come

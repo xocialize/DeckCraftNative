@@ -173,7 +173,7 @@ let package = Package(
         .executableTarget(
             name: "dccli",
             dependencies: [
-                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"),
+                "DCEngine", "DCAutomation", "DCRender", "DCAnim", "DCMedia", "DCModel", "DCAppModel", "DCShow", .product(name: "CNCore", package: "CraftNativeKit"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "VpxSwift", package: "vpx-swift"),
             ],

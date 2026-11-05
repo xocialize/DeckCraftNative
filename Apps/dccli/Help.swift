@@ -174,6 +174,32 @@ enum Help {
     ]
 
     /// The help page of subcommand `name` (`help`, `--help` and `-h` give the overview).
+    /// DeckCraftNative's own commands: answered by `help NAME`, but left out of the overview, which stays
+    /// deckcraft-cli's byte for byte (ParityTests).
+    static let own: [HelpPage] = [
+        HelpPage(
+            name: "render-show", usage: "render-show FILE [--size WxH]... [--fps N] [--dwell S] [--steps N] [--from N] [--keep-alive S] [--json OUT]",
+            summary: "play a slide show into an offscreen texture and time its frames",
+            details: """
+            Plays FILE's slide show in real time through the show's renderer into an offscreen texture of each
+            --size, as a program drawing a show into its own texture would, and times every frame it draws: the
+            frame's draw list (with any slide it has to render), encoding, and the GPU. Display frames come at
+            --fps; the show steps forward every --dwell seconds, to its end or --steps steps. A tick where nothing
+            changed draws nothing (with --keep-alive S, at least every S seconds). Prints, for each size, the
+            frames drawn and missed and the times in milliseconds by kind of frame (still, animation, transition,
+            morph, media, end); --json writes every frame's times. DeckCraftNative's own command.
+
+              --size WxH     the texture, 1920x1080 by default; repeat it for several sizes
+              --fps N        display frames a second, 60 by default
+              --dwell S      seconds before each step forward, 1.5 by default
+              --steps N      the most steps to take, 60 by default
+              --from N       the slide to start from (index from 0)
+
+              deckcraft-cli render-show deck.pptx --size 1920x1080 --size 3840x2160 --json show.json
+            """
+        ),
+    ]
+
     static func page(_ name: String) -> String? {
         let n: String
         switch name {
@@ -181,7 +207,7 @@ enum Help {
         case "--version", "-V": n = "version"
         default: n = name
         }
-        return subcommands.first { $0.name == n }.map { "usage: deckcraft-cli \($0.usage)\n\n\($0.details)" }
+        return (subcommands + own).first { $0.name == n }.map { "usage: deckcraft-cli \($0.usage)\n\n\($0.details)" }
     }
 
     static func overview() -> String {

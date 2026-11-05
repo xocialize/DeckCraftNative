@@ -50,6 +50,13 @@ struct RenderTransitionCommand: PassthroughCommand {
     static func body(_ args: [String]) throws(CLIFailure) { try CLI.renderTransition(args) }
 }
 
+/// Answered on the main thread by `DCCLI.main()`; listed here for the subcommand table and help.
+struct RenderShowCommand: PassthroughCommand {
+    static let configuration = CommandConfiguration(commandName: "render-show", abstract: "play a slide show into an offscreen texture and time its frames", helpNames: [])
+    @Argument(parsing: .captureForPassthrough) var args: [String] = []
+    static func body(_ args: [String]) throws(CLIFailure) { throw CLIFailure("render-show runs on the main thread") }
+}
+
 struct ConvertCommand: PassthroughCommand {
     static let configuration = CommandConfiguration(commandName: "convert", abstract: "save a presentation in the format OUT's extension names", helpNames: [])
     @Argument(parsing: .captureForPassthrough) var args: [String] = []
@@ -98,7 +105,7 @@ struct DCCLI: ParsableCommand {
         commandName: "deckcraft-cli",
         abstract: "deckcraft-cli works on DeckCraft presentations (.deckcraft, .pptx) without a window.",
         subcommands: [
-            InfoCommand.self, RenderCommand.self, RenderTransitionCommand.self, ConvertCommand.self, RunCommand.self,
+            InfoCommand.self, RenderCommand.self, RenderTransitionCommand.self, RenderShowCommand.self, ConvertCommand.self, RunCommand.self,
             CommandsCommand.self, DescribeCommand.self, AppCommand.self, MCPCommand.self, BenchCommand.self, LinksCommand.self,
         ],
         helpNames: []
@@ -110,6 +117,11 @@ struct DCCLI: ParsableCommand {
         // VP9 and VP8 through libvpx, as the app has them (video posters on insert, renders of video frames).
         Media.register(externalDecoder: VpxVideoDecoder())
         let args = Array(CommandLine.arguments.dropFirst())
+        // render-show plays a slide show, whose coordinator is main-actor: it runs here, on the main thread.
+        if args.first == "render-show", !args.dropFirst().contains(where: CLI.isHelp) {
+            let code = MainActor.assumeIsolated { CLI.report { () throws(CLIFailure) in try RenderShow.run(Array(args.dropFirst())) } }
+            Darwin.exit(code)
+        }
         let code = EngineThread.onLargeStack { DCCLI.main(args) } ?? 1
         Darwin.exit(code)
     }
