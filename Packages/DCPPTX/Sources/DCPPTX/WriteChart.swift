@@ -182,14 +182,16 @@ extension PPTXWrite {
         }
 
         enum Group {
-            case bar, line, area, pie, doughnut, scatter, radar, bubble, stock
+            case bar, line, area, pie, doughnut, scatter, radar, bubble, stock, surface
         }
 
         static func groupOf(_ k: ChartType) -> Group {
             switch k {
-            case .line, .lineMarkers, .stackedLine: .line
+            case .line, .lineMarkers, .stackedLine, .percentLine: .line
             case .stock: .stock
-            case .area, .stackedArea, .surface: .area
+            case .area, .stackedArea, .percentArea: .area
+            // deckcraft writes a surface chart as an area chart (the port's own, AB-T-0434).
+            case .surface: .surface
             case .pie: .pie
             case .doughnut, .sunburst: .doughnut
             case .scatter: .scatter
@@ -260,7 +262,7 @@ extension PPTXWrite {
                     w.close("c:dPt")
                 }
             }
-            if let d = s.dataLabels {
+            if let d = s.dataLabels, g != .surface {
                 dataLabels(&w, c, d)
             }
             // After labels, before the category and value caches (ECMA-376 series content order).
@@ -271,7 +273,7 @@ extension PPTXWrite {
             }
             let n = Swift.max(c.categories.count, s.values.count)
             let last = n + 1
-            if let e = s.errorBars {
+            if let e = s.errorBars, g != .surface {
                 func word(_ v: String, _ ok: [String], _ d: String) -> String { ok.first { bytesEqual($0, v) } ?? d }
                 w.open0("c:errBars")
                 if g == .scatter || g == .bubble {
@@ -387,6 +389,121 @@ extension PPTXWrite {
 
         static let axCat: UInt32 = 50_001
         static let axVal: UInt32 = 50_002
+        /// A combo chart's secondary category and value axes, and a 3-D chart's depth (series) axis: the
+        /// port's own (AB-T-0434). deckcraft puts every series on the primary pair.
+        static let axCat2: UInt32 = 50_003
+        static let axVal2: UInt32 = 50_004
+        static let axSer: UInt32 = 50_005
+
+        /// The 3-D settings the chart is written with: a 3-D group's view (`c:bar3DChart`…). A combo is
+        /// written flat, and an of-pie chart has no 3-D form. The port's own (AB-T-0434).
+        static func threeD(_ c: Chart, _ g: Group) -> Chart3D? {
+            guard c.kind != .combo, let t = c.threeD else { return nil }
+            switch g {
+            case .bar, .line, .area, .surface: return t
+            case .pie: return c.ofPie == nil ? t : nil
+            default: return nil
+            }
+        }
+
+        /// Whether the group stands its series on a depth axis (`c:serAx`): a 3-D line or surface chart
+        /// always does, as does a contour (PowerPoint writes one); 3-D columns and areas when the chart says so.
+        static func depthAxis(_ c: Chart, _ g: Group) -> Bool {
+            if g == .surface { return true }
+            guard let t = threeD(c, g) else { return false }
+            return g == .line || ((g == .bar || g == .area) && t.depthAxis)
+        }
+
+        /// `c:view3D` (ECMA-376 §21.2.2.228): the chart's own, or PowerPoint's top-down view for a contour.
+        static func view3D(_ w: inout W, _ c: Chart, _ g: Group) {
+            if let t = threeD(c, g) {
+                w.open0("c:view3D")
+                if let v = t.rotX { w.val("c:rotX", Swift.min(Swift.max(v, -90), 90)) }
+                if let v = t.hPercent { w.val("c:hPercent", Swift.min(Swift.max(v, 5), 500)) }
+                if let v = t.rotY { w.val("c:rotY", Swift.min(v, 360)) }
+                if let v = t.depthPercent { w.val("c:depthPercent", Swift.min(Swift.max(v, 20), 2000)) }
+                if let v = t.rAngAx { w.val("c:rAngAx", v ? 1 : 0) }
+                if let v = t.perspective { w.val("c:perspective", Swift.min(v, 240)) }
+                w.close("c:view3D")
+            } else if g == .surface {
+                w.open0("c:view3D")
+                w.val("c:rotX", 90)
+                w.val("c:rotY", 0)
+                w.val("c:rAngAx", 0)
+                w.val("c:perspective", 0)
+                w.close("c:view3D")
+            }
+        }
+
+        /// A combo chart's secondary value axis on the right, and the hidden category axis it crosses, as
+        /// PowerPoint writes them for a series on the secondary axis. The port's own (AB-T-0434).
+        static func secondaryAxes(_ w: inout W, _ c: Chart) {
+            w.open0("c:valAx")
+            w.val("c:axId", axVal2)
+            w.open0("c:scaling")
+            w.val("c:orientation", "minMax")
+            if let m = c.y2Max, m.isFinite {
+                w.val("c:max", fmtNum(m))
+            }
+            if let m = c.y2Min, m.isFinite {
+                w.val("c:min", fmtNum(m))
+            }
+            w.close("c:scaling")
+            w.val("c:delete", c.y2Hidden ? 1 : 0)
+            w.val("c:axPos", "r")
+            if let f = c.y2Format, !f.isEmpty {
+                w.empty("c:numFmt", A.new().a("formatCode", f).a("sourceLinked", 0))
+            } else {
+                w.empty("c:numFmt", A.new().a("formatCode", "General").a("sourceLinked", 1))
+            }
+            w.val("c:majorTickMark", "out")
+            w.val("c:minorTickMark", "none")
+            w.val("c:tickLblPos", "nextTo")
+            txPr(&w, c)
+            w.val("c:crossAx", axCat2)
+            w.val("c:crosses", "max")
+            w.val("c:crossBetween", "between")
+            if let u = c.y2Major, u.isFinite, u > 0 {
+                w.val("c:majorUnit", fmtNum(u))
+            }
+            w.close("c:valAx")
+            w.open0("c:catAx")
+            w.val("c:axId", axCat2)
+            w.open0("c:scaling")
+            w.val("c:orientation", c.catReversed ? "maxMin" : "minMax")
+            w.close("c:scaling")
+            w.val("c:delete", 1)
+            w.val("c:axPos", "b")
+            w.empty("c:numFmt", A.new().a("formatCode", "General").a("sourceLinked", 1))
+            w.val("c:majorTickMark", "out")
+            w.val("c:minorTickMark", "none")
+            w.val("c:tickLblPos", "nextTo")
+            w.val("c:crossAx", axVal2)
+            w.val("c:crosses", "autoZero")
+            w.val("c:auto", 1)
+            w.val("c:lblAlgn", "ctr")
+            w.val("c:lblOffset", 100)
+            w.val("c:noMultiLvlLbl", 0)
+            w.close("c:catAx")
+        }
+
+        /// A 3-D chart's depth axis (`c:serAx`), as PowerPoint writes it.
+        static func seriesAxis(_ w: inout W, _ c: Chart) {
+            w.open0("c:serAx")
+            w.val("c:axId", axSer)
+            w.open0("c:scaling")
+            w.val("c:orientation", "minMax")
+            w.close("c:scaling")
+            w.val("c:delete", 0)
+            w.val("c:axPos", "b")
+            w.val("c:majorTickMark", "out")
+            w.val("c:minorTickMark", "none")
+            w.val("c:tickLblPos", "nextTo")
+            txPr(&w, c)
+            w.val("c:crossAx", axVal)
+            w.val("c:crosses", "autoZero")
+            w.close("c:serAx")
+        }
 
         static func axes(_ w: inout W, _ c: Chart, _ g: Group) {
             let horizontal = c.kind.horizontal && g == .bar
@@ -471,24 +588,32 @@ extension PPTXWrite {
             txPr(&w, c)
             w.val("c:crossAx", axCat)
             w.val("c:crosses", "autoZero")
-            w.val("c:crossBetween", g == .area || g == .scatter ? "midCat" : "between")
+            w.val("c:crossBetween", g == .area || g == .scatter || g == .surface ? "midCat" : "between")
             w.close("c:valAx")
+            if depthAxis(c, g) {
+                seriesAxis(&w, c)
+            }
         }
 
-        static func plotGroup(_ w: inout W, _ c: Chart, _ kind: ChartType, _ list: [(Int, Series)]) {
+        static func plotGroup(_ w: inout W, _ c: Chart, _ kind: ChartType, _ list: [(Int, Series)], secondary: Bool = false) {
             let g = groupOf(kind)
-            let grouping = kind.percent ? "percentStacked" : kind.stacked ? "stacked" : g == .bar ? "clustered" : "standard"
+            let three = threeD(c, g)
+            // 3-D Column and 3-D Area stand their series one behind another: grouping "standard".
+            let standard3D = three != nil && depthAxis(c, g) && !kind.stacked
+            let grouping = kind.percent ? "percentStacked" : kind.stacked ? "stacked" : g == .bar && !standard3D ? "clustered" : "standard"
             let vary = c.varyColors ? 1 : 0
+            let ofPie = g == .pie ? c.ofPie : nil
             let tag = switch g {
-            case .bar: "c:barChart"
-            case .line: "c:lineChart"
-            case .area: "c:areaChart"
-            case .pie: "c:pieChart"
+            case .bar: three != nil ? "c:bar3DChart" : "c:barChart"
+            case .line: three != nil ? "c:line3DChart" : "c:lineChart"
+            case .area: three != nil ? "c:area3DChart" : "c:areaChart"
+            case .pie: ofPie != nil ? "c:ofPieChart" : three != nil ? "c:pie3DChart" : "c:pieChart"
             case .doughnut: "c:doughnutChart"
             case .scatter: "c:scatterChart"
             case .radar: "c:radarChart"
             case .bubble: "c:bubbleChart"
             case .stock: "c:stockChart"
+            case .surface: three != nil ? "c:surface3DChart" : "c:surfaceChart"
             }
             w.open0(tag)
             switch g {
@@ -498,26 +623,44 @@ extension PPTXWrite {
             case .line, .area: w.val("c:grouping", grouping)
             case .scatter: w.val("c:scatterStyle", "lineMarker")
             case .radar: w.val("c:radarStyle", kind == .filledRadar ? "filled" : "marker")
+            case .pie where ofPie != nil: w.val("c:ofPieType", ofPie?.bar == true ? "bar" : "pie")
+            case .surface: w.val("c:wireframe", c.wireframe ? 1 : 0)
             default: break
             }
-            // `c:stockChart` has no `c:varyColors`.
-            if g != .stock {
+            // `c:stockChart` and the surface charts have no `c:varyColors`.
+            if g != .stock && g != .surface {
                 w.val("c:varyColors", vary)
             }
             for (i, s) in list {
                 series(&w, c, s, i, kind, g)
             }
-            if c.dataLabels {
+            if c.dataLabels && g != .surface {
                 dataLabels(&w, c, true)
+            }
+            func gapDepth(_ w: inout W, _ t: Chart3D) {
+                if let v = t.gapDepth { w.val("c:gapDepth", Swift.min(v, 500)) }
             }
             switch g {
             case .bar:
                 w.val("c:gapWidth", Int64(rustCast: (c.gapWidth.clamped(0.0, 5.0) * 100.0).rounded()))
-                let ov = kind.stacked ? 100 : Int64(rustCast: (c.overlap.clamped(-1.0, 1.0) * 100.0).rounded())
-                if ov != 0 {
-                    w.val("c:overlap", ov)
+                if let t = three {
+                    // `CT_Bar3DChart` has no overlap.
+                    gapDepth(&w, t)
+                    if let sh = t.shape.flatMap({ v in PPTXRead.shapes3D.first { bytesEqual($0, v) } }) {
+                        w.val("c:shape", sh)
+                    }
+                } else {
+                    let ov = kind.stacked ? 100 : Int64(rustCast: (c.overlap.clamped(-1.0, 1.0) * 100.0).rounded())
+                    if ov != 0 {
+                        w.val("c:overlap", ov)
+                    }
                 }
-            case .line: w.val("c:marker", 1)
+            case .line, .area:
+                if let t = three {
+                    gapDepth(&w, t)
+                } else if g == .line {
+                    w.val("c:marker", 1)
+                }
             case .stock:
                 w.open0("c:hiLowLines")
                 w.open0("c:spPr")
@@ -535,15 +678,46 @@ extension PPTXWrite {
                     w.empty0("c:downBars")
                     w.close("c:upDownBars")
                 }
-            case .pie: w.val("c:firstSliceAng", 0)
+            case .pie:
+                if let o = ofPie {
+                    w.val("c:gapWidth", Int64(rustCast: (c.gapWidth.clamped(0.0, 5.0) * 100.0).rounded()))
+                    if let t = o.splitType.flatMap({ v in PPTXRead.splitTypes.first { bytesEqual($0, v) } }) {
+                        w.val("c:splitType", t)
+                    }
+                    if let v = o.splitPos, v.isFinite {
+                        w.val("c:splitPos", fmtNum(v))
+                    }
+                    if !o.custom.isEmpty {
+                        w.open0("c:custSplit")
+                        for i in o.custom.prefix(1000) {
+                            w.val("c:secondPiePt", i)
+                        }
+                        w.close("c:custSplit")
+                    }
+                    if let v = o.secondSize {
+                        w.val("c:secondPieSize", Swift.min(Swift.max(v, 5), 200))
+                    }
+                    if o.seriesLines {
+                        w.empty0("c:serLines")
+                    }
+                } else if three == nil {
+                    // `CT_Pie3DChart` has no first slice angle.
+                    w.val("c:firstSliceAng", 0)
+                }
             case .doughnut:
                 w.val("c:firstSliceAng", 0)
                 w.val("c:holeSize", Int64(rustCast: (c.holeSize.clamped(0.1, 0.9) * 100.0).rounded()))
             default: break
             }
             if g != .pie && g != .doughnut {
-                w.val("c:axId", axCat)
-                w.val("c:axId", axVal)
+                w.val("c:axId", secondary ? axCat2 : axCat)
+                w.val("c:axId", secondary ? axVal2 : axVal)
+                if depthAxis(c, g) {
+                    w.val("c:axId", axSer)
+                } else if three != nil && (g == .bar || g == .area) {
+                    // PowerPoint's third id for a 3-D group without a depth axis.
+                    w.val("c:axId", 0)
+                }
             }
             w.close(tag)
         }
@@ -626,35 +800,46 @@ extension PPTXWrite {
             } else {
                 w.val("c:autoTitleDeleted", 1)
             }
+            if c.kind != .combo {
+                view3D(&w, c, groupOf(c.kind))
+            }
             w.open0("c:plotArea")
             w.empty0("c:layout")
             let indexed: [(Int, Series)] = Array(c.series.enumerated().map { ($0.offset, $0.element) })
             let main: ChartType = c.kind == .combo ? (c.series.first?.kind ?? .column) : c.kind
             if c.kind == .combo {
-                // One plot group per series type, sharing the axes.
+                // One plot group per series type and value axis. deckcraft shares one pair of axes; a series on
+                // the secondary axis gets PowerPoint's second pair (the port's own, AB-T-0434). When every series
+                // is on the secondary axis, they are all on the primary one.
                 func plotKind(_ s: Series) -> ChartType {
                     let k = s.kind ?? main
                     switch groupOf(k) {
-                    case .pie, .doughnut, .scatter, .bubble: return .column
+                    case .pie, .doughnut, .scatter, .bubble, .surface: return .column
                     default: return k
                     }
                 }
-                var kinds: [ChartType] = []
+                let twoAxes = c.series.contains(where: \.secondaryAxis) && c.series.contains { !$0.secondaryAxis }
+                func onSecondary(_ s: Series) -> Bool { twoAxes && s.secondaryAxis }
+                var groups: [(ChartType, Bool)] = []
                 for s in c.series {
-                    let k = plotKind(s)
-                    if !kinds.contains(k) {
-                        kinds.append(k)
+                    let key = (plotKind(s), onSecondary(s))
+                    if !groups.contains(where: { $0 == key }) {
+                        groups.append(key)
                     }
                 }
-                for k in kinds {
-                    let list = indexed.filter { plotKind($0.1) == k }
-                    plotGroup(&w, c, k, list)
+                for (k, sec) in groups {
+                    let list = indexed.filter { plotKind($0.1) == k && onSecondary($0.1) == sec }
+                    plotGroup(&w, c, k, list, secondary: sec)
                 }
                 axes(&w, c, .bar)
+                if twoAxes {
+                    secondaryAxes(&w, c)
+                }
             } else {
                 let plain: [ChartType] = [
                     .column, .stackedColumn, .percentColumn, .bar, .stackedBar, .percentBar, .line, .lineMarkers, .stackedLine,
-                    .area, .stackedArea, .pie, .doughnut, .scatter, .bubble, .radar, .filledRadar, .stock,
+                    .percentLine, .area, .stackedArea, .percentArea, .pie, .doughnut, .scatter, .bubble, .radar, .filledRadar,
+                    .stock, .surface,
                 ]
                 if !plain.contains(c.kind) {
                     PPTXLog.warn("pptx: \(c.kind.label) chart written as a column chart")

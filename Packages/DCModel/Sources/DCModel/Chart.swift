@@ -26,8 +26,10 @@ extension ChartType {
         case .line: "Line"
         case .lineMarkers: "Line with Markers"
         case .stackedLine: "Stacked Line"
+        case .percentLine: "100% Stacked Line"
         case .area: "Area"
         case .stackedArea: "Stacked Area"
+        case .percentArea: "100% Stacked Area"
         case .pie: "Pie"
         case .doughnut: "Doughnut"
         case .scatter: "Scatter"
@@ -55,10 +57,13 @@ extension ChartType {
     public var horizontal: Bool { [.bar, .stackedBar, .percentBar, .funnel].contains(self) }
 
     public var stacked: Bool {
-        [.stackedColumn, .stackedBar, .stackedLine, .stackedArea, .percentColumn, .percentBar].contains(self)
+        [.stackedColumn, .stackedBar, .stackedLine, .stackedArea, .percentColumn, .percentBar, .percentLine, .percentArea].contains(self)
     }
 
-    public var percent: Bool { self == .percentColumn || self == .percentBar }
+    public var percent: Bool { [.percentColumn, .percentBar, .percentLine, .percentArea].contains(self) }
+
+    /// A filled area under the line: area charts and the filled radar.
+    public var isArea: Bool { [.area, .stackedArea, .percentArea, .filledRadar].contains(self) }
 }
 
 extension TrendlineType {
@@ -145,7 +150,7 @@ extension Chart {
             holeSize: 0.5, gapWidth: 2.19, overlap: -0.27, varyColors: false, yMin: nil, yMax: nil, yMajor: nil,
             yLogBase: nil, yFormat: nil, yHidden: false, catReversed: false, y2Min: nil, y2Max: nil, y2Major: nil,
             y2Format: nil, y2Hidden: false, lang: nil, subtotals: [], categoryLevels: [], inclusiveQuartiles: false,
-            upDownBars: false, binCount: nil, binSize: nil, raw: nil, kept: ChartKept()
+            upDownBars: false, binCount: nil, binSize: nil, wireframe: false, raw: nil, kept: ChartKept()
         )
     }
 

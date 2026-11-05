@@ -1,0 +1,137 @@
+--- a/crates/model/src/chart.rs
++++ b/crates/model/src/chart.rs
+@@ -17,8 +17,12 @@
+     Line,
+     LineMarkers,
+     StackedLine,
++    /// 100 % stacked line (`c:grouping val="percentStacked"`). DeckCraftNative's own (AB-T-0434).
++    PercentLine,
+     Area,
+     StackedArea,
++    /// 100 % stacked area. DeckCraftNative's own (AB-T-0434).
++    PercentArea,
+     Pie,
+     Doughnut,
+     Scatter,
+@@ -82,8 +86,10 @@
+             ChartType::Line => "Line",
+             ChartType::LineMarkers => "Line with Markers",
+             ChartType::StackedLine => "Stacked Line",
++            ChartType::PercentLine => "100% Stacked Line",
+             ChartType::Area => "Area",
+             ChartType::StackedArea => "Stacked Area",
++            ChartType::PercentArea => "100% Stacked Area",
+             ChartType::Pie => "Pie",
+             ChartType::Doughnut => "Doughnut",
+             ChartType::Scatter => "Scatter",
+@@ -129,10 +135,12 @@
+                 | ChartType::StackedArea
+                 | ChartType::PercentColumn
+                 | ChartType::PercentBar
++                | ChartType::PercentLine
++                | ChartType::PercentArea
+         )
+     }
+     pub fn percent(self) -> bool {
+-        matches!(self, ChartType::PercentColumn | ChartType::PercentBar)
++        matches!(self, ChartType::PercentColumn | ChartType::PercentBar | ChartType::PercentLine | ChartType::PercentArea)
+     }
+ }
+ 
+@@ -389,6 +397,19 @@
+     /// A histogram's bin width (`cx:binSize`).
+     #[serde(skip_serializing_if = "Option::is_none")]
+     pub bin_size: Option<f64>,
++    /// A chart drawn in 3-D: a column, bar, line, area or pie chart with this is saved as its 3-D
++    /// group (`c:bar3DChart`…), a surface chart as `c:surface3DChart` (without it, a contour). Drawn
++    /// flat. DeckCraftNative's own (AB-T-0434).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub three_d: Option<Chart3D>,
++    /// A surface chart drawn as a wireframe (`c:wireframe`): its lines without the colour bands.
++    /// DeckCraftNative's own (AB-T-0434).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub wireframe: bool,
++    /// A pie chart whose last points are split off into a second pie or a bar (`c:ofPieChart`).
++    /// Drawn as one pie. DeckCraftNative's own (AB-T-0434).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub of_pie: Option<OfPie>,
+     /// Original chart XML part kept for round-trip of unmodelled options.
+     #[serde(skip_serializing_if = "Option::is_none")]
+     pub raw: Option<String>,
+@@ -396,6 +417,66 @@
+     /// The PPTX writer clears this before comparing modelled state. Native saves keep it too.
+     #[serde(skip_serializing_if = "ChartKept::is_empty")]
+     pub kept: ChartKept,
++}
++
++/// The 3-D view of a chart (`c:view3D`) and its plot group's depth settings. `None` fields are left
++/// out of the file, where they take the schema's defaults. DeckCraftNative's own (AB-T-0434).
++#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
++#[serde(default, rename_all = "camelCase")]
++pub struct Chart3D {
++    /// `c:rotX`: the tilt towards the viewer in degrees (-90…90).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub rot_x: Option<i32>,
++    /// `c:hPercent`: the height as a percentage of the base (5…500).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub h_percent: Option<u32>,
++    /// `c:rotY`: the turn about the vertical axis in degrees (0…360).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub rot_y: Option<u32>,
++    /// `c:depthPercent`: the depth as a percentage of the base (20…2000).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub depth_percent: Option<u32>,
++    /// `c:rAngAx`: right-angled axes instead of a perspective view.
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub r_ang_ax: Option<bool>,
++    /// `c:perspective`: the field of view (0…240, half degrees).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub perspective: Option<u32>,
++    /// The plot group's `c:gapDepth`: the gap between series in depth, in percent (0…500).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub gap_depth: Option<u32>,
++    /// A 3-D bar's `c:shape`: `box`, `cylinder`, `cone`, `coneToMax`, `pyramid`, `pyramidToMax`.
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub shape: Option<String>,
++    /// The series stand one behind another on a depth axis (`c:serAx`): 3-D Column, 3-D Area.
++    /// A 3-D line or surface chart always has one.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub depth_axis: bool,
++}
++
++/// The second plot of a pie of pie or bar of pie chart (`c:ofPieChart`): which points it takes and
++/// its size. DeckCraftNative's own (AB-T-0434).
++#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
++#[serde(default, rename_all = "camelCase")]
++pub struct OfPie {
++    /// `c:ofPieType val="bar"`: the second plot is a stacked bar; otherwise a pie.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub bar: bool,
++    /// `c:splitType`: `pos` (the last `split_pos` points), `val` (points below `split_pos`),
++    /// `percent` (points below `split_pos` % of the total), `cust` (the points in `custom`) or `auto`.
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub split_type: Option<String>,
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub split_pos: Option<f64>,
++    /// `c:custSplit`: the indices of the points in the second plot.
++    #[serde(skip_serializing_if = "Vec::is_empty")]
++    pub custom: Vec<u32>,
++    /// `c:secondPieSize`: the second plot's size as a percentage of the first (5…200).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub second_size: Option<u32>,
++    /// `c:serLines`: lines joining the split-off slice to the second plot.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub series_lines: bool,
+ }
+ 
+ /// One relationship of a chart part, with the target string as it was written.
+@@ -484,6 +565,9 @@
+             up_down_bars: false,
+             bin_count: None,
+             bin_size: None,
++            three_d: None,
++            wireframe: false,
++            of_pie: None,
+             raw: None,
+             kept: ChartKept::default(),
+         }

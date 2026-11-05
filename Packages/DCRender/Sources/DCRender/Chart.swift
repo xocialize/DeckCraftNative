@@ -280,7 +280,7 @@ public enum ChartRender {
         } else {
             legendItems = c.series.enumerated().map { i, s in
                 let k = c.seriesKind(s)
-                let line = !k.isBarLike && ![.area, .stackedArea, .filledRadar].contains(k)
+                let line = !k.isBarLike && !k.isArea
                 if line { return (s.name, .color(seriesLine(rctx, c, i, s)), nil) }
                 if k.isBarLike {
                     let paint: BarPaint = c.varyColors && c.series.count == 1 && s.fill == nil
@@ -600,17 +600,24 @@ public enum ChartRender {
         }
         // Lines, areas, scatter: the series that aren't bars.
         var acc = [Double](repeating: 0, count: ncat)
+        // A 100 % line or area plots each value as its share of the category's total over those series
+        // (the port's own, AB-T-0434; the bars do the same above).
+        let shares = c.series.filter { s in let k = c.seriesKind(s); return k.percent && !k.isBarLike }
+        let totals: [Double] = shares.isEmpty ? [] : (0 ..< ncat).map { i in
+            shares.reduce(0.0) { $0 + Swift.abs(($1.values.at(i) ?? nil) ?? 0) }.rustMax(1e-9)
+        }
         for (si, s) in c.series.enumerated() {
             let kind = c.seriesKind(s)
             if kind.isBarLike || kind == .stock { continue }
             let sec = c.onSecondary(s)
             let stacked = kind.stacked
-            let areaKind = [.area, .stackedArea, .filledRadar].contains(kind)
+            let areaKind = kind.isArea
             let col = areaKind ? seriesFill(rctx, c, si, s) : seriesLine(rctx, c, si, s)
             let seriesStats = s.errorBars.map { _ in SeriesStats.of(s.values) }
             var pts: [Point] = []
             for i in 0 ..< ncat {
-                guard let v0 = s.values.at(i) ?? nil else { continue }
+                guard let raw = s.values.at(i) ?? nil else { continue }
+                let v0 = kind.percent ? raw / (totals.at(i) ?? 1) : raw
                 var v = v0
                 if stacked {
                     let baseV = acc.at(i) ?? 0

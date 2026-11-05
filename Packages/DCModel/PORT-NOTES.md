@@ -18,6 +18,27 @@ tests: all 95 Rust `#[test]`s across the module's files, plus a check of the JSO
 - **Parity is measured by the oracle.** Every `.deckcraft` in the corpus loads, and saving it writes
   byte-identical `presentation.json` (DCFormat's `OracleRoundTripTests`).
 
+## Divergences: the port's own model fields
+
+The chart model has fields deckcraft doesn't (decision 1 of `research/DeckCraftNative-charts-gaps/review.md`:
+optional fields that serialise as before). They are a patch over deckcraft's `chart.rs`,
+`Tools/port/divergence/model-chart.patch`, which `Tools/port/generate.sh` applies to a copy of the pinned sources
+before generating, so `Types.generated.swift` stays generated and the pinned checkout is never changed. A pin
+move that touches the same lines stops the script until the patch is redone. The patched Rust is input to the
+generator only; it isn't built.
+
+- **`ChartType.percentLine` and `percentArea`** (2026-11-05, AB-T-0434): 100 % stacked line and area, which the
+  reader read as stacked. `stacked` and `percent` include them; `isArea` is new (the area kinds and filled radar).
+- **`Chart.threeD: Chart3D?`**: a chart drawn in 3-D, its `c:view3D` (`rotX`, `hPercent`, `rotY`,
+  `depthPercent`, `rAngAx`, `perspective`) and its group's `gapDepth`, `shape` and `depthAxis`.
+- **`Chart.wireframe`**: a surface chart's `c:wireframe`.
+- **`Chart.ofPie: OfPie?`**: a pie chart's second plot (`c:ofPieChart`): `bar`, `splitType`, `splitPos`,
+  `custom`, `secondSize`, `seriesLines`.
+
+Each is skipped when unset (`None`, `false`), so every deck without them writes the same `presentation.json`;
+the corpus round trip is unchanged. A deck that uses them is one deckcraft reads with the fields ignored, and
+the two new types not at all. Their behaviour is in DCPPTX (divergence 10), DCEngine and DCRender.
+
 ## File map
 
 | Rust | Swift | Notes |

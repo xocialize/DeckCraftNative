@@ -730,6 +730,36 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     without a repair prompt (`Tools/pptx/excel-check.sh --from-pptx`; its controls: PowerPoint's own workbook OPEN-OK,
     the same with a renamed table column NEEDS-REPAIR). PowerPoint's Chart Design › Edit Data in Excel on the
     values-edited pp-native chart opened Sheet1 showing the edited numbers in B2:D5, with Table1 still at A1:D5.
+- **After 0.1.15 (unreleased, 2026-11-05): the chart types we read are the ones we write (AB-T-0434).** deckcraft's
+  writer saved a surface chart as an area chart, even a new one (`dc-types` slide 20), a 100 % stacked line as stacked,
+  3-D and of-pie charts flat, and a combo's secondary-axis series on the primary axis. Since AB-T-0433 an element edit
+  keeps the original part, but anything that regenerates it (a palette or text colour, a new type, a new chart) still
+  changed the type.
+  - **Now:** the model has optional fields deckcraft's doesn't: the types `percentLine` and `percentArea`, a chart's
+    3-D view (`threeD`: `c:view3D` and the group's depth settings), `wireframe` and `ofPie` (the second plot's split).
+    They are a patch over deckcraft's `chart.rs` that `Tools/port/generate.sh` applies before generating
+    (`Tools/port/divergence/model-chart.patch`), and are left out of `presentation.json` when unset. The reader keeps
+    them, and the writer writes `c:surfaceChart` (a contour) or `c:surface3DChart`, `percentStacked` lines and areas,
+    `c:bar3DChart`, `c:line3DChart`, `c:area3DChart` and `c:pie3DChart` with their view, `c:ofPieChart` with its
+    split, and a combo's second `c:valAx` with its own plot groups. 100 % lines and areas are drawn as shares;
+    3-D charts are still drawn flat and of-pie charts as one pie. `insert.chart` and `chart.type` take the two
+    new types; `chart.type` clears the 3-D view and split. Deliberate divergences: DCModel PORT-NOTES (its
+    divergence section), DCPPTX PORT-NOTES divergence 10, DCEngine and DCRender PORT-NOTES.
+  - **Tests:** `WriteChartTypesTests` (8) and `InsertCommandTests.chartTypeNamesThePercentLinesAndDropsThreeD`. On the
+    review's PowerPoint fixtures `pp-contour`, `pp-pctline`, `pp-col3d`, `pp-barofpie` and `pp-combo2`, a palette
+    edit (which regenerates the part) now keeps `surfaceChart` with `view3D` and `wireframe`, `percentStacked`,
+    `bar3DChart` with `view3D` and `shape`, `ofPieChart` with its split settings, and two `c:valAx`; a title edit
+    keeps every element and part (`chart-edit-sweep.py`). A deck of all 29 types from `insert.chart` writes
+    `c:surfaceChart` for the surface. Those ten edited files, that deck and a deck of every 3-D, wireframe, of-pie
+    and secondary-axis variant validate against the ECMA schemas, and PowerPoint (16.114) opened all twelve without
+    a repair prompt (`Tools/pptx/powerpoint-check.sh`). The oracle corpus is unchanged (187 files match
+    `SHA256SUMS`; no corpus deck has one of these charts). The full suite passes: 2,325 tests in all 19 bundles (DCRender's parity tests
+    in release, as its PORT-NOTES runs them; in one serial debug run `aDenseShapeGradientRendersPromptly` was again
+    starved past its 20 s limit and passes alone).
+  - **Still open:** formatting the model doesn't hold (3-D floor and walls, contour band colours, of-pie connector
+    lines' look) is lost when a part is regenerated. 3-D charts aren't drawn in 3-D (out of scope in the review) and
+    the of-pie's second plot isn't drawn (decision 3: preserve now, draw it later). Stacked and 100 % areas fill each series down to the axis, so the
+    last one covers the others (as before this change).
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

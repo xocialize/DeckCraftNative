@@ -129,6 +129,9 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
 - Pattern fills sample their tile in Swift (bilinear, as vello does), because CoreGraphics area-averages
   sub-pixel cells into other colours.
 - The image cache is keyed by the media bytes' storage plus the exact adjustments, not by a hash.
+- **100 % stacked lines and areas** (`percentLine`, `percentArea`, the port's own chart types, AB-T-0434) plot
+  each value as its share of the category's total over those series, as the 100 % bars already do. 3-D charts
+  are drawn flat and of-pie charts as one pie, as before.
 
 ## Render cost: metafile clip layers and dense strokes (2026-10-31)
 

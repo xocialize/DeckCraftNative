@@ -176,13 +176,16 @@ extension PPTXRead {
                 let markers = (g.childVal("marker").map { bytesEqual($0, "1") || bytesEqual($0, "true") } ?? false)
                     && g.childrenNamed("ser").allSatisfy { s in !attrIs(s.path(["marker", "symbol"])?.attr("val"), "none") }
                 switch grouping {
-                case "stacked", "percentStacked": kind = .stackedLine
+                case "stacked": kind = .stackedLine
+                case "percentStacked": kind = .percentLine
                 case _ where markers: kind = .lineMarkers
                 default: kind = .line
                 }
             case "areaChart", "area3DChart":
-                kind = grouping == "stacked" || grouping == "percentStacked" ? .stackedArea : .area
-            case "pieChart", "pie3DChart", "ofPieChart": kind = .pie
+                kind = grouping == "stacked" ? .stackedArea : grouping == "percentStacked" ? .percentArea : .area
+            case "pieChart", "pie3DChart", "ofPieChart":
+                kind = .pie
+                if g.is("ofPieChart") { c.ofPie = ofPie(g) }
             case "doughnutChart": kind = .doughnut
             case "scatterChart": kind = .scatter
             case "bubbleChart": kind = .bubble
@@ -191,8 +194,15 @@ extension PPTXRead {
             case "stockChart":
                 c.upDownBars = g.child("upDownBars") != nil
                 kind = .stock
-            case "surfaceChart", "surface3DChart": kind = .surface
+            case "surfaceChart", "surface3DChart":
+                kind = .surface
+                c.wireframe = g.child("wireframe").map { $0.bool("val") ?? true } ?? false
             default: continue
+            }
+            // A 3-D group (the port's own, AB-T-0434): its view and depth, kept to be written back. A contour
+            // (`c:surfaceChart`) is flat whatever its view.
+            if threeDGroups.contains(where: { bytesEqual($0, name) }) {
+                c.threeD = chart3D(ch.child("view3D"), g, pa)
             }
             // A missing <c:varyColors> means "vary by point" (the schema default is true), as PowerPoint draws it.
             c.varyColors = g.childVal("varyColors").map { bytesEqual($0, "1") || bytesEqual($0, "true") } ?? true
@@ -287,6 +297,14 @@ extension PPTXRead {
         }
         guard let first = kinds.first else { return nil }
         c.kind = kinds.contains { $0 != first } ? .combo : first
+        // 3-D and of-pie settings describe a chart of one group; a combo is written flat.
+        if c.kind == .combo {
+            c.threeD = nil
+            c.ofPie = nil
+            c.wireframe = false
+        }
+        if c.kind != .surface { c.wireframe = false }
+        if c.kind != .pie { c.ofPie = nil }
         if c.kind != .combo {
             for i in c.series.indices {
                 c.series[i].kind = nil
@@ -369,6 +387,55 @@ extension PPTXRead {
         c.textColor = [valAx, catAx, legend, root].compactMap { $0 }.lazy.compactMap { textColor($0.child("txPr")) }.first
         c.titleSize = ch.child("title").flatMap { t in textSize(t.child("tx")?.child("rich")) ?? textSize(t.child("txPr")) }
         return c
+    }
+
+    /// The plot groups PowerPoint draws in 3-D (`c:surfaceChart`, a contour, is flat).
+    static let threeDGroups = ["bar3DChart", "line3DChart", "area3DChart", "pie3DChart", "surface3DChart"]
+
+    /// A whole number from a `val` that may carry a percent sign (`ST_HPercent`, `ST_GapAmount`: `100`
+    /// or `100%`), within `range`; nil when it isn't one.
+    static func percentVal(_ e: XMLEl?, _ range: ClosedRange<Int64>) -> Int64? {
+        guard var v = e?.attr("val").map({ String(rustTrim($0)) }) else { return nil }
+        if hasByteSuffix(v, "%") { v = String(v.dropLast()) }
+        guard let n = rustParseF64(v), n.isFinite else { return nil }
+        return Swift.min(Swift.max(Int64(rustCast: n.rounded()), range.lowerBound), range.upperBound)
+    }
+
+    /// The port's own (AB-T-0434): the chart's `c:view3D` and the 3-D group's depth settings.
+    static func chart3D(_ view: XMLEl?, _ g: XMLEl, _ pa: XMLEl) -> Chart3D {
+        var t = Chart3D()
+        if let v = view {
+            t.rotX = percentVal(v.child("rotX"), -90 ... 90).map { Int32(truncatingIfNeeded: $0) }
+            t.hPercent = percentVal(v.child("hPercent"), 5 ... 500).map { UInt32(truncatingIfNeeded: $0) }
+            t.rotY = percentVal(v.child("rotY"), 0 ... 360).map { UInt32(truncatingIfNeeded: $0) }
+            t.depthPercent = percentVal(v.child("depthPercent"), 20 ... 2000).map { UInt32(truncatingIfNeeded: $0) }
+            t.rAngAx = v.child("rAngAx").map { $0.bool("val") ?? true }
+            t.perspective = percentVal(v.child("perspective"), 0 ... 240).map { UInt32(truncatingIfNeeded: $0) }
+        }
+        t.gapDepth = percentVal(g.child("gapDepth"), 0 ... 500).map { UInt32(truncatingIfNeeded: $0) }
+        t.shape = g.childVal("shape").flatMap { v in shapes3D.first { bytesEqual($0, v) } }
+        // A depth axis: one of the group's axes is a `c:serAx`.
+        let serAx = Set(pa.childrenNamed("serAx").compactMap { $0.childVal("axId") }.map(ByteKey.init))
+        t.depthAxis = g.childrenNamed("axId").contains { $0.attr("val").map { serAx.contains(ByteKey($0)) } ?? false }
+        return t
+    }
+
+    /// `ST_Shape`.
+    static let shapes3D = ["box", "cylinder", "cone", "coneToMax", "pyramid", "pyramidToMax"]
+
+    /// `ST_SplitType`.
+    static let splitTypes = ["auto", "cust", "percent", "pos", "val"]
+
+    /// The port's own (AB-T-0434): a `c:ofPieChart`'s second plot.
+    static func ofPie(_ g: XMLEl) -> OfPie {
+        var o = OfPie()
+        o.bar = attrIs(g.childVal("ofPieType"), "bar")
+        o.splitType = g.childVal("splitType").flatMap { v in splitTypes.first { bytesEqual($0, v) } }
+        o.splitPos = g.childVal("splitPos").flatMap { rustParseF64($0) }.flatMap { $0.isFinite ? $0 : nil }
+        o.custom = g.child("custSplit").map { cs in Array(cs.childrenNamed("secondPiePt").prefix(1000).compactMap { $0.u32("val") }) } ?? []
+        o.secondSize = percentVal(g.child("secondPieSize"), 5 ... 200).map { UInt32(truncatingIfNeeded: $0) }
+        o.seriesLines = g.child("serLines") != nil
+        return o
     }
 
     static func trendNum(_ e: XMLEl, _ k: String) -> Double? {

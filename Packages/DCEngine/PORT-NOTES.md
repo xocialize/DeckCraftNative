@@ -609,6 +609,10 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   (the same day): DCPPTX writes the categories and series into the kept part and drops the workbook, whose
   cells would be stale. `DesignShowTests.editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` (ported)
   now expects the chart's drawing to stay where deckcraft's dropped every kept part.
+- **Chart types the port adds** (2026-11-05, AB-T-0434): `insert.chart` and `chart.type` take `percentLine` and
+  `percentArea` (DCModel's divergence). `chart.type` also clears the chart's 3-D view, wireframe and of-pie split,
+  since a type from the gallery is a flat one; deckcraft's model has none of them. Test:
+  `InsertCommandTests.chartTypeNamesThePercentLinesAndDropsThreeD`.
 
 ### Tests
 

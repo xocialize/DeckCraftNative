@@ -665,6 +665,33 @@ struct InsertShapeTests {
         }
     }
 
+    /// The port's own (AB-T-0434): 100 % lines and areas are types of their own, and a new type from the gallery
+    /// is flat, dropping the 3-D view, wireframe and of-pie split of the old one.
+    @Test func chartTypeNamesThePercentLinesAndDropsThreeD() throws {
+        #expect(InsertCommands.chartType("percentLine") == .percentLine && InsertCommands.chartType("percent_area") == .percentArea)
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "percentLine"}"#).get("id")?.asU64)
+        #expect(chartOf(s, id)?.kind == .percentLine)
+        let sid = try #require(UInt32(exactly: id).map(ShapeId.init))
+        var d = s.st.doc
+        for i in d.slides.indices {
+            withShape(&d.slides[i].shapes, sid) { sh in
+                if case .chart(var c) = sh.kind {
+                    c.threeD = Chart3D(rotX: 15)
+                    c.wireframe = true
+                    c.ofPie = OfPie(bar: true)
+                    sh.kind = .chart(c)
+                }
+            }
+        }
+        s.st.docRef = DocRef(d)
+        s.run("chart.options", #"{"id": \#(id), "title": "Kept"}"#)
+        #expect(chartOf(s, id)?.threeD != nil, "an element edit keeps the 3-D view")
+        s.run("chart.type", #"{"id": \#(id), "type": "column"}"#)
+        let c = try #require(chartOf(s, id))
+        #expect(c.kind == .column && c.threeD == nil && !c.wireframe && c.ofPie == nil)
+    }
+
     // tests.rs::format_color_on_a_selected_chart_sets_its_text_color
     @Test(.enabled(if: ported("format.color"))) func formatColorOnASelectedChartSetsItsTextColor() throws {
         let s = session()

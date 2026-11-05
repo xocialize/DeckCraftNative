@@ -1141,8 +1141,10 @@ public enum InsertCommands {
         case "line": return .line
         case "linemarkers", "linewithmarkers": return .lineMarkers
         case "stackedline": return .stackedLine
+        case "percentline": return .percentLine
         case "area": return .area
         case "stackedarea": return .stackedArea
+        case "percentarea": return .percentArea
         case "pie": return .pie
         case "doughnut", "donut": return .doughnut
         case "scatter", "xy": return .scatter
@@ -1646,6 +1648,11 @@ public enum InsertCommands {
             c.kind = k
             c.varyColors = [.pie, .doughnut, .funnel, .treemap, .sunburst, .waterfall].contains(k) || (c.series.count == 1 && c.varyColors)
             if [.waterfall, .histogram, .pareto, .boxWhisker].contains(k) { c.gridlines = true }
+            // A type from the gallery is a flat one: the 3-D view, wireframe and of-pie split described
+            // the old type (the port's own, AB-T-0434).
+            c.threeD = nil
+            c.wireframe = false
+            c.ofPie = nil
             c.raw = nil
         }
     }

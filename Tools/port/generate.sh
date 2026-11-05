@@ -10,10 +10,20 @@ repo=${here:h:h}
 # the copy SwiftPM fetched.
 : ${CRAFTNATIVEKIT:=${repo:h}/CraftNativeKit}
 [[ -f $CRAFTNATIVEKIT/Tools/port/serde2swift.py ]] || CRAFTNATIVEKIT=$repo/.build/checkouts/CraftNativeKit
-M=$DECKCRAFT_SRC/crates/model/src
+# The port's own model fields (deliberate divergences: DCModel PORT-NOTES) are patches over the pinned sources in
+# divergence/, applied to a copy; the pinned checkout is never changed. A patch that no longer applies after a pin
+# move stops the script.
+work=$(mktemp -d)
+trap 'rm -rf $work' EXIT
+mkdir -p $work/crates/model
+cp -R $DECKCRAFT_SRC/crates/model/src $work/crates/model/
+for p in $here/divergence/model-*.patch(N); do
+  patch -s -p1 -d $work --no-backup-if-mismatch < $p
+done
+M=$work/crates/model/src
 python3 -I $CRAFTNATIVEKIT/Tools/port/serde2swift.py $repo/Packages/DCModel/Sources/DCModel/Types.generated.swift \
   --module DCModel \
-  --header "deckcraft crates/model at the pin in Tools/oracle/pin.env (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors)." \
+  --header "deckcraft crates/model at the pin in Tools/oracle/pin.env (MIT OR Apache-2.0, © ArtCraft Team and the DeckCraft contributors), with Tools/port/divergence/model-*.patch." \
   --import DCColor --import DCGeometry \
   $M/lib.rs $M/style.rs $M/text.rs $M/theme.rs $M/table.rs $M/anim.rs $M/chart.rs
 print "generate: DCModel/Types.generated.swift"

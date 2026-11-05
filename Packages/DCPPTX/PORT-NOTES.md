@@ -460,6 +460,45 @@ The writer calls these reader functions, with Rust's parameter and return shapes
    and says whether it was updated, replaced or new; `Tools/pptx/excel-check.sh` opens workbooks in Excel.
    Excel opened all 107 workbooks of the sweep and the insert deck cleanly, and PowerPoint's Edit Data in
    Excel shows an edited chart's new values in its original table (2026-11-05).
+10. **The chart types the reader knows are written back (2026-11-05, deliberate; AB-T-0434).** deckcraft's
+    generator writes a surface chart as `c:areaChart` (so even a new one changes type on its first save), a 100 %
+    stacked line as stacked, 3-D groups and `c:ofPieChart` flat, and every series of a combo on one pair of axes.
+    Since divergence 8 an element edit keeps the original part, but anything that regenerates it (a palette or
+    text colour, `chart.type`, a new chart) lost the type. With DCModel's new fields (its divergence section),
+    the reader keeps them and the generator writes them, element order as in ECMA-376 §21.2.2:
+    - **surface:** `c:surfaceChart` (a contour, with PowerPoint's top-down `c:view3D`: `rotX` 90, `rotY` 0,
+      `rAngAx` 0, `perspective` 0), or `c:surface3DChart` when the chart has a 3-D view; `c:wireframe` first,
+      a depth axis (`c:serAx`, id 50005), no `c:varyColors`, and series of `tx`, `spPr`, `cat` and `val` only
+      (`CT_SurfaceSer`: no labels, markers, points, trendlines or error bars). The value axis crosses between
+      categories as an area's does (`midCat`);
+    - **100 % lines and areas:** `percentStacked` grouping and a `0%` value axis, read as `percentLine` and
+      `percentArea` where the reader made them stacked;
+    - **3-D:** a column, bar, line, area or pie chart with `threeD` is written as `c:bar3DChart`, `c:line3DChart`,
+      `c:area3DChart` or `c:pie3DChart` with its `c:view3D` (each value clamped to the schema's range) and
+      `c:gapDepth`; bars keep `c:shape` and lose `c:overlap`, a line its group `c:marker`, a pie its first slice
+      angle, as the schema has it. A depth axis (always for a line; for bars and areas when `depthAxis`, which the
+      reader sets when a group's axis is a `c:serAx`) gives grouping `standard` and a `c:serAx`; without one, 3-D
+      bars and areas get a third axis id of 0, as PowerPoint writes them. The reader keeps a view only from a 3-D
+      group, and none for a combo;
+    - **of-pie:** a pie with `ofPie` is `c:ofPieChart` with `c:ofPieType`, `c:gapWidth` (the chart's),
+      `c:splitType`, `c:splitPos`, `c:custSplit`, `c:secondPieSize` and an empty `c:serLines`; it is still drawn
+      as one pie;
+    - **a combo's secondary axis:** series with `secondaryAxis` form plot groups of their own on PowerPoint's
+      second pair of axes (`c:valAx` 50004 on the right, crossing at the maximum, with `y2Min`, `y2Max`,
+      `y2Major`, `y2Format` and `y2Hidden`; a deleted `c:catAx` 50003). Groups go by type and axis, so a column
+      series on each axis makes two `c:barChart`s. When every series is on the secondary axis they share the
+      primary pair, as before. A combo without one is written as deckcraft writes it.
+
+    Formatting the model doesn't hold (floor and walls, band formats, the connector lines' look) is still lost on
+    regeneration; an element edit keeps it (divergence 8). No corpus deck has one of these charts, so the export
+    oracle is unchanged. Tests: `WriteChartTypesTests` (each type written, read back and saved again unchanged;
+    PowerPoint-shaped plot groups read; hostile 3-D values bounded; the deck JSON without the fields as
+    before). On the review's five PowerPoint fixtures (`pp-contour`, `pp-pctline`, `pp-col3d`, `pp-barofpie`,
+    `pp-combo2`) a palette edit, which regenerates the part, now keeps `surfaceChart` with `view3D` and
+    `wireframe`, `percentStacked`, `bar3DChart` with `view3D` and `shape`, `ofPieChart` with its split, and two
+    `c:valAx`; a title edit keeps every element (`chart-edit-sweep.py`). Those ten files, a deck of all 29 chart
+    types `insert.chart` makes and a deck of every 3-D, wireframe, of-pie and secondary-axis variant validate
+    against the schemas (`validate.sh`), and PowerPoint 16.114 opened all twelve without a repair prompt.
 
 ## Integration tests
 
