@@ -56,7 +56,8 @@ struct ChartAxisSection: View {
                                                    : ["value": on ? .string(text ?? ChartElements.defaultAxisTitle) : .null]])
         }))
         if let text {
-            ChartTitleField(text: text, label: label) { t in
+            // Labelled "Title" as the chart title's field is; the switch above names the axis.
+            ChartTitleField(text: text) { t in
                 let v: JSON = t.isEmpty ? .null : .string(t)
                 run(["axisTitles": key == "category" ? ["category": v] : ["value": v]])
             }

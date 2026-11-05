@@ -135,7 +135,7 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
 - **A line chart's up/down bars** (AB-T-0436): a flat line chart with `upDownBars` and two series or more gets a
   box per category from the first series to the last (the stacked or 100 % values on those lines), behind the
   lines, hollow where it rose and dark where it fell, as a stock chart's are drawn. deckcraft draws a stock
-  chart's only.
+  chart's only. In a chart build (AB-T-0443) a box appears with its category's last series.
 
 ## Chart builds: a chart drawn part by part (AB-T-0443)
 

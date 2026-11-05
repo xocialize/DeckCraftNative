@@ -629,7 +629,7 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   line, area and scatter series, an exponential or power one only on positive values, a moving average's period
   below the point count. `Chart.takesAxisSettings`, `takesGapWidth`, `takesOverlap`, `takesUpDownBars`,
   `takesTrendline(_:)` and `takesErrorBars(_:)` say so for the app's menus. None of these drops `raw`, and
-  `upDownBars` no longer does: DCPPTX writes them into the kept part (its divergence 11). Tests:
+  `upDownBars` no longer does: DCPPTX writes them into the kept part (its divergence 12). Tests:
   `InsertCommandTests.chartOptionsSetTheAxesAndBars`, `chartOptionsSetASeriesTrendlineAndErrorBars`, and
   `chartEditsKeepThePartForElementsAndData` with the new keys.
 

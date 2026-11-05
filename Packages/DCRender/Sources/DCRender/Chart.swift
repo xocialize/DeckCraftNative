@@ -689,7 +689,8 @@ public enum ChartRender {
         // hollow where it rose. The port's own (AB-T-0436); deckcraft draws a stock chart's only.
         if c.upDownBars && [.line, .lineMarkers, .stackedLine, .percentLine].contains(c.kind) && c.threeD == nil && c.series.count >= 2 {
             let ink = Rgba.rgb(0x40, 0x40, 0x40)
-            for i in 0 ..< ncat {
+            // In a chart build, a box comes with its category's last series, when both its ends are drawn.
+            for i in 0 ..< ncat where has(c.series.count - 1, i) {
                 let vals = c.series.map { ($0.values.at(i) ?? nil) ?? 0 }
                 guard let o0 = c.series.first.flatMap({ $0.values.at(i) ?? nil }), let l0 = c.series.last.flatMap({ $0.values.at(i) ?? nil }) else { continue }
                 let total = vals.reduce(0.0) { $0 + Swift.abs($1) }.rustMax(1e-9)

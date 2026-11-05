@@ -784,6 +784,50 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Not yet:** choosing a build in the app (Animate › Effect Options has no Sequence for charts, and no engine
     command sets one); radar, stock, box-and-whisker, histogram, Pareto, waterfall and Office 2016 charts play as
     one object; a Wipe on one part reveals it whole, as for paragraphs.
+- **After 0.1.15 (unreleased, 2026-11-05): the chart settings the model already held have UI (AB-T-0436).** The
+  model, reader, renderer and writer had axis titles, minor gridlines, the value axis's scale and number format,
+  reversed categories, gap width and overlap, trendlines, error bars and up/down bars, but no command or control set
+  them (gap review item 4; rows B2, B7, B8, B10, B12, C8, C10).
+  - **Now:** `chart.options` takes `axisTitles`, `minorGridlines`, `axisMin`, `axisMax`, `majorUnit`, `logBase`,
+    `numberFormat`, `reverseCategories`, `gapWidth`, `overlap`, and `series` with `trendline` or `errorBars`. They are
+    keys of `chart.options`, not a new command, because the registry is deckcraft's list; the params text is
+    unchanged. Bad values are refused before the edit, as PowerPoint's Format pane refuses them (DCEngine PORT-NOTES).
+    Each is written into a kept chart part (`DCPPTX/WriteChartPatchAxes.swift`, DCPPTX divergence 12), so a
+    PowerPoint chart keeps everything the edit doesn't touch; up/down bars no longer regenerate the part. Chart Design
+    › Add Chart Element adds Axis Titles, Primary Minor gridlines, Error Bars (Standard Error, Percentage, Standard
+    Deviation, on every series), Trendline (Linear, Exponential, Linear Forecast, Moving Average, each a submenu of
+    the series it fits: PowerPoint asks which series, O-20, O-23) and Up/Down Bars for line and stock charts. The
+    inspector's Format › Chart has an **Axes** section (axis titles, minor gridlines, minimum, maximum, major unit,
+    log scale and base, number format, reversed categories) and **Series Options** (gap width, overlap, up/down bars,
+    and a series picker with its trendline and error bars). Each change is one undo step. Strings are in fr, it, de
+    and es, marked "needs review".
+  - **Found on the way, fixed:** deckcraft's writer omits a trendline's `c:dispRSqr`/`c:dispEq` when off, and
+    PowerPoint 16.114 reads a missing one as on, so every trendline we wrote showed its equation and R² there; both
+    are written now. The generator never wrote the primary value axis's `c:majorUnit`, so a new chart lost its unit
+    on save; it does now. A line chart's up/down bars are read, written (before `c:marker`) and drawn; deckcraft
+    had a stock chart's only. No corpus chart has any of these (checked in the decks' JSON).
+  - **Tests:** `RibbonModelTests` (3 new: Add Chart Element's axis titles and gridlines; error bars, trendlines with
+    the series picker and up/down bars; the inspector's controls, each one undo step), `InsertCommandTests` (2 new,
+    one extended), `WriteChartPatchTests` (5 new). `Tools/app/ribbon-widths.sh en languages`: 420 PASS, no failures, in en,
+    fr, it, de and es.
+  - **PowerPoint (16.114.1):** a deck of four charts made with these commands (column, bar, line, scatter) validates
+    against the ECMA schemas and opens without a repair prompt. PowerPoint re-saved it, and our reader reads the same
+    72 fields back from its file (axis titles, gridlines, bounds, unit, log base, format, reversal, gap, overlap,
+    up/down bars, each series' trendlines and error bars); PowerPoint's own differences are an `errDir` on stdErr
+    bars and a reversed bar chart's value axis moved to `axPos="t"`. `chart-edit-sweep.py` on the review's nine
+    PowerPoint fixtures, for each setting and combined: every chart keeps every element and part it doesn't own
+    (barofpie refuses axis settings as a pie should, 3-D charts refuse overlap and trendlines); up/down bars and
+    error bars on all 27 charts of `pp-types` too. PowerPoint opened all 21 edited files without a repair prompt.
+  - **Suite:** 2,355 tests in 19 bundles pass on the rebased tree (DCRender's and the transitions' parity suites
+    excluded there and run in release: `RenderParityTests` over all 18 corpus decks and `TransitionParityTests` over
+    its 4 pass). The oracle corpus is unchanged (187 files match `SHA256SUMS`).
+  - **Seen in the app** (AppProbe, Debug build): the new menu items and inspector sections; Trendline › Linear
+    Forecast › Series 2 shows as that series' trendline in the inspector; error bars, a maximum of 6 and an axis
+    title draw on the chart; one Undo takes back one switch.
+  - **Still open:** a third-party file whose trendline lacks `c:dispEq` draws without the label here and with it in
+    PowerPoint (the reader takes absence as off). A reversed bar chart's value axis is drawn at the bottom, where
+    PowerPoint moves it to the top. Display units, minor unit, crossing point, date axes and tick marks (C8's rest)
+    need model fields. Trendline legend entries are AB-T-0437.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs
