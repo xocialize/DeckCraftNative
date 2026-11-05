@@ -191,24 +191,7 @@ final class ShowWindows {
 
     /// The show's name for a key event.
     static func showKey(_ e: NSEvent) -> ShowKey {
-        switch e.keyCode {
-        case 53: return .escape
-        case 124: return .arrowRight
-        case 125: return .arrowDown
-        case 123: return .arrowLeft
-        case 126: return .arrowUp
-        case 121: return .pageDown
-        case 116: return .pageUp
-        case 115: return .home
-        case 119: return .end
-        case 36, 76: return .enter
-        case 51: return .backspace
-        case 49: return .space
-        default: break
-        }
-        guard let c = e.charactersIgnoringModifiers?.lowercased(), c.count == 1 else { return .other }
-        let k = ShowKey(name: c)
-        return k
+        ShowKey(keyCode: e.keyCode, characters: e.charactersIgnoringModifiers)
     }
 }
 

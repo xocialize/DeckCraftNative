@@ -18,6 +18,31 @@ public enum ShowKey: Equatable, Sendable {
     case digit(Character)
     case other
 
+    /// A key from a Mac key event: its virtual key code, then the characters it types ignoring modifiers. The show
+    /// window's mapping (it was `ShowWindows.showKey`'s), public so any window that drives a show maps keys the same.
+    public init(keyCode: UInt16, characters: String?) {
+        switch keyCode {
+        case 53: self = .escape
+        case 124: self = .arrowRight
+        case 125: self = .arrowDown
+        case 123: self = .arrowLeft
+        case 126: self = .arrowUp
+        case 121: self = .pageDown
+        case 116: self = .pageUp
+        case 115: self = .home
+        case 119: self = .end
+        case 36, 76: self = .enter
+        case 51: self = .backspace
+        case 49: self = .space
+        default:
+            guard let c = characters?.lowercased(), c.count == 1 else {
+                self = .other
+                return
+            }
+            self = ShowKey(name: c)
+        }
+    }
+
     /// A key by name, as the control channel's `ui.key` and egui's `Key::from_name` spell it (`key_from`).
     public init(name: String) {
         let lower = name.lowercased()
