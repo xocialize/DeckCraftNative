@@ -1735,7 +1735,9 @@ public enum InsertCommands {
             }
             if let v = Cmd.boolParam(p, "gridlines") { c.gridlines = v }
             if let v = Cmd.strParam(p, "palette") { c.palette = v }
-            c.raw = nil
+            // The writer puts a title, legend, data labels or gridlines into the kept part, so it keeps
+            // what the model doesn't hold (`WriteChartPatch.swift`; deckcraft drops the part on any edit).
+            if textColor != nil || p.get("palette") != nil { c.raw = nil }
         }
     }
 

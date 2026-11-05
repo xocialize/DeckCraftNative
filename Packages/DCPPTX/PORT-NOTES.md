@@ -287,6 +287,7 @@ extension of `PPTX` in `WriteMod.swift`; everything else is internal, under the 
 | `write/chart.rs` | `WriteChart.swift` | `PPTXWrite.Charts` (`chartXML`, `chartexPart`, `chartexXML`, `buildChartex`, `writeKept`…); `PPTXWrite.chartXML` (Rust `write::chart::chart_xml`, which the reader's tests call) and `PPTXWrite.nsCX` sit on `PPTXWrite` itself |
 | `write/theme.rs` | `WriteTheme.swift` | `PPTXWrite.Themes.themeXML` |
 | — | `WriteChartexStyle.swift` | `PPTXWrite.ChartexStyle`: the style and colour style parts every `chartEx` part gets (divergence 7); DeckCraftNative's own |
+| — | `WriteChartPatch.swift` | `PPTXWrite.Charts.patchedXML`: a `chart.options` edit (title, legend, data labels, gridlines) written into the kept chart part (divergence 8); DeckCraftNative's own |
 | `write/timing.rs` | `WriteTiming.swift` | `PPTXWrite.Timing`: `transition`, `timing` and the effect builders |
 | in-file tests | `Tests/DCPPTXTests/WriteTests.swift` | `WriteDMLTests` (1), `WriteShapesTests` (1), `WriteChartRegionMapTests` (1), `WriteChartTests` (3); 4 of them read back through `PPTXRead` |
 | — | `Tests/DCPPTXTests/PPTXExportOracleTests.swift` | Export parity, schema validation and deckcraft's read-back over the 9 corpus decks |
@@ -371,6 +372,28 @@ The writer calls these reader functions, with Rust's parameter and return shapes
    `a:ln`/`a:solidFill`/`a:noFill`. Nothing was copied from a PowerPoint-written file: the one repaired copy
    (made with the user's leave, kept in a scratch folder and deleted) blanked the whole slide and named no
    element. Checked with `Tools/pptx/powerpoint-check.sh`, which presses only Cancel and saves nothing.
+8. **An edited chart keeps its part (2026-11-04, deliberate; AB-T-0433).** deckcraft reuses a chart's
+   original XML only while the model read from it equals the current model, and its engine drops `raw` on
+   any edit, so the first edit regenerates the part. Everything the model doesn't hold is then lost without
+   a repair prompt: on six PowerPoint-saved charts, one title edit dropped the embedded workbook, the style
+   and colour parts, `c14:style`, the data table, label positions, gradient fills, 3-D, of-pie, 100 % lines
+   and a combo's secondary axis (`research/DeckCraftNative-charts-gaps/review.md`). Now `chart.options`
+   keeps `raw` for a title, legend, data labels or gridlines (it still drops it for `textColor` and
+   `palette`), and `Charts.patchedXML` writes the changed fields into the kept tree:
+   - **title:** the text replaced, each line keeping the first paragraph's and run's formatting; a new
+     title when there was none; or the title removed and `c:autoTitleDeleted` set;
+   - **legend:** `c:legendPos` set, a legend added, or removed;
+   - **data labels:** `c:showVal` set in every plot group's and series' `c:dLbls`, so positions and number
+     formats stay; a series' deleted labels are dropped, since the series now follows the chart;
+   - **gridlines:** `c:majorGridlines` added to or removed from the reader's primary value axis.
+
+   The patched part is used only when reading it back gives the model, with three exceptions for values the
+   reader derives from a removed element: a removed title's size, the text size and colour taken from a
+   removed legend, and gridlines on a chart with no value axis. Anything else, including `chart.type`,
+   `chart.data` and a part with other prefixes, goes to the generator as before. Tests:
+   `WriteChartPatchTests`; `Tools/pptx/chart-edit-sweep.py` over the review's PowerPoint fixtures, where
+   every edit keeps every element and part apart from the one it removes, and
+   `Tools/pptx/powerpoint-check.sh` opens all of them without a repair prompt.
 
 ## Integration tests
 

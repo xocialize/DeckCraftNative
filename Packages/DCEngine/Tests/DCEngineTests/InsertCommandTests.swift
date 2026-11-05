@@ -636,6 +636,33 @@ struct InsertShapeTests {
         #expect(chartOf(s, id)?.textColor == nil)
     }
 
+    /// The port's own (AB-T-0433): a title, legend, data labels or gridlines keep the chart's kept part, which
+    /// the writer edits; a text colour or palette drops it, as deckcraft drops it on any edit.
+    @Test func chartOptionsKeepsThePartForElementsOnly() throws {
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "column", "title": "Sales"}"#).get("id")?.asU64)
+        let sid = try #require(UInt32(exactly: id).map(ShapeId.init))
+        func keep() {
+            var d = s.st.doc
+            for i in d.slides.indices {
+                withShape(&d.slides[i].shapes, sid) { sh in
+                    if case .chart(var c) = sh.kind { c.raw = "<kept/>"; sh.kind = .chart(c) }
+                }
+            }
+            s.st.docRef = DocRef(d)
+        }
+        keep()
+        for opts in [#""title": "Q3""#, #""title": null"#, #""legend": "t""#, #""dataLabels": true"#, #""gridlines": false"#] {
+            s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)
+            #expect(chartOf(s, id)?.raw != nil, "\(opts) keeps the part")
+        }
+        for opts in [#""textColor": "accent2""#, #""palette": "colorful2""#] {
+            keep()
+            s.run("chart.options", #"{"id": \#(id), \#(opts)}"#)
+            #expect(chartOf(s, id)?.raw == nil, "\(opts) drops the part")
+        }
+    }
+
     // tests.rs::format_color_on_a_selected_chart_sets_its_text_color
     @Test(.enabled(if: ported("format.color"))) func formatColorOnASelectedChartSetsItsTextColor() throws {
         let s = session()

@@ -601,6 +601,11 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
 - Rust panics that a hostile value could reach are bounds instead: an SVG arc's segment count is capped at
   100,000; SmartArt's levels saturate at `u8`, its org-chart assistant clamp can't trap, and its text-size mode
   loop can't spin on NaN.
+- **`chart.options` keeps a chart's `raw` part** when it changes only the title, legend, data labels or
+  gridlines (2026-11-04, AB-T-0433). deckcraft drops `raw` on every chart edit, so a save regenerated the part and
+  lost what the model doesn't hold; DCPPTX now writes those fields into the kept part (its divergence 8). The
+  command's reply is unchanged; a document dump shows the chart's `raw` where deckcraft's has none. `textColor`,
+  `palette`, bins, subtotals, quartiles and up/down bars still drop it.
 
 ### Tests
 

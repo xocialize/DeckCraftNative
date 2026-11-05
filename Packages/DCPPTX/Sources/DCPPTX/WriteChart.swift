@@ -599,6 +599,10 @@ extension PPTXWrite {
                         return (w.finish(), true)
                     }
                 }
+                // Edited by `chart.options` only: the kept part with the edit written into it (the port's own).
+                if let patched = patchedXML(c) {
+                    return (patched, true)
+                }
             }
             var w = W.new()
             w.open("c:chartSpace", A.new().a("xmlns:c", OPC.nsC).a("xmlns:a", OPC.nsA).a("xmlns:r", OPC.nsR))

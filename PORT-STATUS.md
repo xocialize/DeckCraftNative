@@ -687,6 +687,21 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     packages in CraftNativeKit; its licence is now in `Acknowledgements.txt` (`Tools/acknowledgements.sh` reads a
     `LICENSE-MIT`). The installed 0.1.14 finds 0.1.15 through Check for Updates; 0.1.15 is now installed in
     `/Applications`.
+- **After 0.1.15 (unreleased, 2026-11-04): an edited chart keeps its part (AB-T-0433, first half).** Changing a
+  chart's title, legend, data labels or gridlines regenerated its whole `c:chartSpace`, as deckcraft does. That lost
+  what the model doesn't hold: the embedded workbook, the style and colour parts, label positions, fills, 3-D and the
+  extension lists. The charts gap review found it on every PowerPoint-made chart.
+  - **Now:** `chart.options` keeps the chart's original part, and the writer edits those four elements into it
+    (`DCPPTX/WriteChartPatch.swift`). The patched part is used only when reading it back gives the model; anything
+    else regenerates the part, as before. A text colour or palette still regenerates it, as do bins, subtotals,
+    up/down bars and quartiles. This is a deliberate divergence from deckcraft: DCPPTX PORT-NOTES, divergence 8.
+  - **Tests:** `WriteChartPatchTests` (5). `Tools/pptx/chart-edit-sweep.py` saves each file untouched and edited, then
+    compares every chart part element by element, plus the parts it points at. It passed on the review's 9
+    PowerPoint-made fixtures for each edit: a new title, a two-line title, no title, the legend at the top or removed,
+    data labels on and off, gridlines on and off, and all four at once. `chart.type` is the positive control, and it
+    fails as it should. PowerPoint opened 36 of the edited files without a repair prompt
+    (`Tools/pptx/powerpoint-check.sh`). The oracle corpus is unchanged.
+  - **Next:** `chart.data` (the cached values and the `c:f` ranges), the task's second half.
 
 ## CraftNativeKit (2026-11-01)
 
