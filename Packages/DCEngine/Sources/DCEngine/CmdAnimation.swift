@@ -395,18 +395,104 @@ public enum AnimationCommands {
             }
         }
         let path = try pathParam(p, slideExtent(s))
-        return try eachTarget(s, p) { a in
-            if let path, a.class == .path { a.path = path }
-            if let o = option {
-                // Each target takes the option in its own effect's terms; one it has no such option for
-                // keeps its own.
-                let allowed = animationInfo(a.effect, a.class)?.options ?? []
-                if let o = resolveOption(allowed, o) {
-                    if a.class == .path && path == nil { a.path = defaultPath(a.effect, o) }
-                    a.option = o
+        // The port's own keys (AB-T-0443 follow-up; DCEngine PORT-NOTES): a chart build, PowerPoint's Effect
+        // Options › Sequence for a chart, and whether it starts with the chart's background.
+        let chartBuild: ChartBuild?? = Cmd.strParam(p, "chartBuild").flatMap { b in
+            b == "asOne" ? .some(nil) : ChartBuild(rawValue: b).map { .some($0) }
+        }
+        let chartBackground = Cmd.boolParam(p, "chartBackground")
+        if chartBuild != nil || chartBackground != nil {
+            return try chartOptions(s, p, chartBuild, chartBackground) { a in
+                applyOptions(&a, option, buildMode, path)
+            }
+        }
+        return try eachTarget(s, p) { a in applyOptions(&a, option, buildMode, path) }
+    }
+
+    static func applyOptions(_ a: inout Animation, _ option: String?, _ buildMode: TextBuild?, _ path: String?) {
+        if let path, a.class == .path { a.path = path }
+        if let o = option {
+            // Each target takes the option in its own effect's terms; one it has no such option for
+            // keeps its own.
+            let allowed = animationInfo(a.effect, a.class)?.options ?? []
+            if let o = resolveOption(allowed, o) {
+                if a.class == .path && path == nil { a.path = defaultPath(a.effect, o) }
+                a.option = o
+            }
+        }
+        if let b = buildMode { a.textBuild = b }
+    }
+
+    /// `animation.options` with a chart build. A target on a chart that `takesBuild` the build gets it; one
+    /// that is a step of a file's build kept apart (`chartElement`) first joins the steps before and after it on
+    /// the same chart, which become one animation, as PowerPoint's Sequence turns them into one build. Asking
+    /// for a build no target can take is refused, as PowerPoint offers none there.
+    static func chartOptions(
+        _ s: Session, _ p: JSON, _ build: ChartBuild??, _ background: Bool?, _ also: (inout Animation) -> Void
+    ) throws -> JSON {
+        let index = try Cmd.optUsizeParam(p, "index", "animation")
+        let ids = index == nil ? try Cmd.targets(s, p) : []
+        return try s.edit { doc, sel in
+            let i = try slideIndex(doc, sel, "animation")
+            let slide = doc.slides[i]
+            func chart(_ a: Animation) -> Chart? {
+                if case .chart(let c)? = slide.shape(a.shape)?.kind { c } else { nil }
+            }
+            /// Does the build asked for (or As One Object) apply to `a`?
+            func applies(_ a: Animation) -> Bool {
+                guard let c = chart(a) else { return false }
+                switch build {
+                case .some(.some(let b)): return c.takesBuild(b)
+                case .some(.none): return true
+                case .none: return a.chartBuild != nil
                 }
             }
-            if let b = buildMode { a.textBuild = b }
+            var anims = slide.animations
+            var targeted = anims.indices.map { k in index == k || (index == nil && ids.contains(anims[k].shape)) }
+            // Join each run of kept-apart steps that a changed target is in, into its first step.
+            if build != nil {
+                var drop = Set<Int>()
+                var k = 0
+                while k < anims.count {
+                    guard anims[k].chartElement != nil else { k += 1; continue }
+                    var end = k + 1
+                    while end < anims.count, anims[end].chartElement != nil, anims[end].shape == anims[k].shape { end += 1 }
+                    if (k ..< end).contains(where: { targeted[$0] }) && applies(anims[k]) {
+                        anims[k].chartElement = nil
+                        targeted[k] = true
+                        for j in k + 1 ..< end { drop.insert(j) }
+                    }
+                    k = end
+                }
+                anims = anims.indices.filter { !drop.contains($0) }.map { anims[$0] }
+                targeted = targeted.indices.filter { !drop.contains($0) }.map { targeted[$0] }
+            }
+            var n = 0
+            var built = 0
+            for k in anims.indices where targeted[k] {
+                also(&anims[k])
+                if applies(anims[k]) {
+                    switch build {
+                    case .some(.some(let b)):
+                        anims[k].chartBuild = b
+                        anims[k].chartElement = nil
+                    case .some(.none):
+                        anims[k].chartBuild = nil
+                        anims[k].chartNoBackground = false
+                        anims[k].chartElement = nil
+                    case .none: break
+                    }
+                    if let bg = background, anims[k].chartBuild != nil { anims[k].chartNoBackground = !bg }
+                    built += 1
+                }
+                n += 1
+            }
+            if n == 0 { throw Cmd.bad("animation", "no animation to change (select an animated object or give `index`)") }
+            if case .some(.some(let b)) = build, built == 0 {
+                throw Cmd.bad("animation.options", "\(b.label) needs a chart with data that plays by parts")
+            }
+            doc.slides[i].animations = anims
+            return ["changed": .integer(n)]
         }
     }
 

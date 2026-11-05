@@ -5411,6 +5411,111 @@
         }
       }
     },
+    "By Category" : {
+      "comment" : "Animations › Effect Options › Sequence of a chart: each category in turn",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach Kategorie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Category"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Por categoría"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Par catégorie"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Per categoria"
+          }
+        }
+      }
+    },
+    "By Element in Category" : {
+      "comment" : "Animations › Effect Options › Sequence of a chart: each point, category by category",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach Element in Kategorie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Element in Category"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Por elemento de la categoría"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Par élément de catégorie"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Per elemento della categoria"
+          }
+        }
+      }
+    },
+    "By Element in Series" : {
+      "comment" : "Animations › Effect Options › Sequence of a chart: each point, series by series",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach Element in Datenreihe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Element in Series"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Por elemento de la serie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Par élément de série"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Per elemento della serie"
+          }
+        }
+      }
+    },
     "By Paragraph" : {
       "localizations" : {
         "de" : {
@@ -5441,6 +5546,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Per paragrafo"
+          }
+        }
+      }
+    },
+    "By Series" : {
+      "comment" : "Animations › Effect Options › Sequence of a chart: each series in turn",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach Datenreihe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Series"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Por serie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Par série"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Per serie"
           }
         }
       }

@@ -59,7 +59,10 @@ All three are skipped when unset, so every deck without a build writes the same 
 `ChartBuild.swift` (hand-written) has the file values and `chartBuildSteps(chart, build, background:)`, the
 step list the reader, the writer and the timeline share: the background, then each series, category or point
 (points series by series, or category by category, PowerPoint's orders), at most `maxChartBuildSteps` (1,000).
-Their behaviour is in DCPPTX (divergence 11), DCAnim and DCRender.
+`Chart.playsBuildByParts` says which kinds the renderer draws part by part (not radar, stock, box and whisker,
+histogram, Pareto, waterfall or the Office 2016 charts), and `takesBuild(_:)` which builds the app and
+`animation.options` offer: those kinds, with data and no more than the step cap. A build read from a file is kept
+on any chart. Their behaviour is in DCPPTX (divergence 11), DCAnim, DCRender, DCEngine and DCApp.
 
 ## File map
 

@@ -159,7 +159,11 @@ DCAppModel|Bullets,,Bullets,Viñetas,needs_review,,,
 DCAppModel|Bullets and Numbering,,Bullets and Numbering,Numeración y viñetas,needs_review,,,
 DCAppModel|Bullets and Numbering…,,Bullets and Numbering…,Numeración y viñetas…,needs_review,,,
 DCAppModel|By (in),,By (in),Por (pulg.),needs_review,,,
+DCAppModel|By Category,,By Category,Por categoría,needs_review,,,Animations › Effect Options › Sequence of a chart: each category in turn
+DCAppModel|By Element in Category,,By Element in Category,Por elemento de la categoría,needs_review,,,"Animations › Effect Options › Sequence of a chart: each point, category by category"
+DCAppModel|By Element in Series,,By Element in Series,Por elemento de la serie,needs_review,,,"Animations › Effect Options › Sequence of a chart: each point, series by series"
 DCAppModel|By Paragraph,,By Paragraph,Por párrafo,needs_review,,,
+DCAppModel|By Series,,By Series,Por serie,needs_review,,,Animations › Effect Options › Sequence of a chart: each series in turn
 DCAppModel|Cancel,,Cancel,Cancelar,needs_review,,,
 DCAppModel|Capitalize Each Word,,Capitalize Each Word,Poner en mayúsculas cada palabra,needs_review,,,Change Case option; each word capitalized
 DCAppModel|Capitalize first letter of sentences,,Capitalize first letter of sentences,Poner en mayúscula la primera letra de una oración,needs_review,,,
@@ -2715,6 +2719,7 @@ DCApp|Standard Colors,,Standard Colors,Colores estándar,needs_review,,,
 DCApp|Start,,Start,Inicio,needs_review,,,The start window's title (new and recent presentations)
 DCApp|Start %@,,Start %@,Inicio: %@,needs_review,,,"Context menu: set an animation's start (On Click, With Previous, After Previous)"
 DCApp|Start Automatically,,Start Automatically,Iniciar automáticamente,needs_review,,,
+DCApp|Start animation by drawing the chart background,,Start animation by drawing the chart background,Iniciar la animación dibujando el fondo del gráfico,needs_review,,,"Animate inspector: a chart build begins with the axes, gridlines and legend"
 DCApp|Status bar,,Status bar,Barra de estado,needs_review,,,Accessibility label of the document window's status bar
 DCApp|Stop,,Stop,Detener,needs_review,,,
 DCApp|Stop color,,Stop color,Color del punto,needs_review,,,

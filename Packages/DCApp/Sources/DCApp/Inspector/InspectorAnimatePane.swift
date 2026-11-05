@@ -72,10 +72,31 @@ struct AnimationsView: View {
                         ForEach(rows, id: \.0) { Text(InspectorMotion.optionLabel($0.0)).tag($0.0) }
                     }
                 }
-                Picker(String(localized: "Sequence", bundle: .module), selection: Binding(get: { InspectorMotion.textBuildId(c.textBuild) }, set: { ctl.run("animation.options", ["textBuild": .string($0)]) })) {
-                    Text("As One Object", bundle: .module).tag("asOne")
-                    Text("By Paragraph", bundle: .module).tag("byParagraph")
-                    if ![.asOne, .byParagraph].contains(c.textBuild) { Text(InspectorMotion.optionLabel(c.textBuild.rawValue)).tag(c.textBuild.rawValue) }
+                if let chart = InspectorMotion.chart(c, ctl.doc?.currentSlide) {
+                    // A chart's Sequence is a chart build (AB-T-0443).
+                    let rows = InspectorMotion.chartBuildRows(chart)
+                    let id = InspectorMotion.chartBuildId(c)
+                    Picker(String(localized: "Sequence", bundle: .module), selection: Binding(get: { id }, set: { ctl.run("animation.options", ["chartBuild": .string($0)]) })) {
+                        ForEach(rows, id: \.0) { Text($0.1).tag($0.0) }
+                        if id == "steps" {
+                            Text("Custom", bundle: .module).tag(id)
+                        } else if let b = c.chartBuild, !rows.contains(where: { $0.0 == id }) {
+                            Text(InspectorMotion.chartBuildLabel(b)).tag(id)
+                        }
+                    }
+                    .disabled(rows.count < 2 && id == "asOne")
+                    if c.chartBuild != nil {
+                        Toggle(
+                            String(localized: "Start animation by drawing the chart background", bundle: .module, comment: "Animate inspector: a chart build begins with the axes, gridlines and legend"),
+                            isOn: Binding(get: { !c.chartNoBackground }, set: { ctl.run("animation.options", ["chartBackground": .bool($0)]) })
+                        )
+                    }
+                } else {
+                    Picker(String(localized: "Sequence", bundle: .module), selection: Binding(get: { InspectorMotion.textBuildId(c.textBuild) }, set: { ctl.run("animation.options", ["textBuild": .string($0)]) })) {
+                        Text("As One Object", bundle: .module).tag("asOne")
+                        Text("By Paragraph", bundle: .module).tag("byParagraph")
+                        if ![.asOne, .byParagraph].contains(c.textBuild) { Text(InspectorMotion.optionLabel(c.textBuild.rawValue)).tag(c.textBuild.rawValue) }
+                    }
                 }
             }
         }

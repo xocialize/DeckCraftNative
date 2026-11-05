@@ -159,7 +159,11 @@ DCAppModel|Bullets,,Bullets,Aufzählungszeichen,needs_review,,,
 DCAppModel|Bullets and Numbering,,Bullets and Numbering,Aufzählungszeichen und Nummerierung,needs_review,,,
 DCAppModel|Bullets and Numbering…,,Bullets and Numbering…,Aufzählungszeichen und Nummerierung …,needs_review,,,
 DCAppModel|By (in),,By (in),Um (Zoll),needs_review,,,
+DCAppModel|By Category,,By Category,Nach Kategorie,needs_review,,,Animations › Effect Options › Sequence of a chart: each category in turn
+DCAppModel|By Element in Category,,By Element in Category,Nach Element in Kategorie,needs_review,,,"Animations › Effect Options › Sequence of a chart: each point, category by category"
+DCAppModel|By Element in Series,,By Element in Series,Nach Element in Datenreihe,needs_review,,,"Animations › Effect Options › Sequence of a chart: each point, series by series"
 DCAppModel|By Paragraph,,By Paragraph,Nach Absatz,needs_review,,,
+DCAppModel|By Series,,By Series,Nach Datenreihe,needs_review,,,Animations › Effect Options › Sequence of a chart: each series in turn
 DCAppModel|Cancel,,Cancel,Abbrechen,needs_review,,,
 DCAppModel|Capitalize Each Word,,Capitalize Each Word,Ersten Buchstaben Im Wort Groß,needs_review,,,Change Case option; each word capitalized
 DCAppModel|Capitalize first letter of sentences,,Capitalize first letter of sentences,Jeden Satz mit einem Großbuchstaben beginnen,needs_review,,,
@@ -2715,6 +2719,7 @@ DCApp|Standard Colors,,Standard Colors,Standardfarben,needs_review,,,
 DCApp|Start,,Start,Start,needs_review,,,The start window's title (new and recent presentations)
 DCApp|Start %@,,Start %@,Start: %@,needs_review,,,"Context menu: set an animation's start (On Click, With Previous, After Previous)"
 DCApp|Start Automatically,,Start Automatically,Automatisch starten,needs_review,,,
+DCApp|Start animation by drawing the chart background,,Start animation by drawing the chart background,Animation durch Zeichnen des Diagrammhintergrunds starten,needs_review,,,"Animate inspector: a chart build begins with the axes, gridlines and legend"
 DCApp|Status bar,,Status bar,Statusleiste,needs_review,,,Accessibility label of the document window's status bar
 DCApp|Stop,,Stop,Stopp,needs_review,,,
 DCApp|Stop color,,Stop color,Farbe des Stopps,needs_review,,,

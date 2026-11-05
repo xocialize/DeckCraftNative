@@ -151,7 +151,12 @@ public enum RibbonMenus {
             }
         case "animations.effectOptions":
             guard let a = RibbonModel.currentAnimation(model) else { return [] }
-            return InspectorMotion.animationEffectRows(a.effect, a.class, a.option).map { .item(InspectorMotion.optionLabel($0.0), "animation.options", ["option": .string($0.0)]) } + [
+            let options: [CommandMenuEntry] = InspectorMotion.animationEffectRows(a.effect, a.class, a.option).map { .item(InspectorMotion.optionLabel($0.0), "animation.options", ["option": .string($0.0)]) }
+            // A chart's Sequence is a chart build (AB-T-0443), a text's a text build.
+            if let chart = InspectorMotion.chart(a, model.session.activeDoc?.currentSlide) {
+                return options + [.separator] + InspectorMotion.chartBuildRows(chart).map { .item($0.1, "animation.options", ["chartBuild": .string($0.0)]) }
+            }
+            return options + [
                 .separator,
                 .item(String(localized: "As One Object", bundle: .module), "animation.options", ["textBuild": "asOne"]),
                 .item(String(localized: "By Paragraph", bundle: .module), "animation.options", ["textBuild": "byParagraph"]),

@@ -257,12 +257,7 @@ public enum ChartRender {
 
     /// Can a chart be drawn part by part for a chart build? Kinds drawn by their own code (pie charts excepted)
     /// animate as one object.
-    public static func drawsParts(_ chart: Chart) -> Bool {
-        switch chart.kind {
-        case .histogram, .pareto, .boxWhisker, .stock, .radar, .filledRadar, .funnel, .treemap, .sunburst, .regionMap, .waterfall: false
-        default: true
-        }
-    }
+    public static func drawsParts(_ chart: Chart) -> Bool { chart.playsBuildByParts }
 
     /// Draw a chart whose parts animate on their own (a chart build, AB-T-0443): each distinct state is a pass
     /// over the parts in it, in a layer with that state's opacity and offset (shape-local points). The background's

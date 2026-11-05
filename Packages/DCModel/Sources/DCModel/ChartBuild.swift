@@ -152,3 +152,21 @@ public func chartBuildSteps(_ chart: Chart, _ build: ChartBuild, background: Boo
     }
     return out
 }
+
+extension Chart {
+    /// Does the port play this chart's builds part by part? Kinds the renderer draws by their own code (pie
+    /// charts excepted: Office 2016 charts, radar, stock, box and whisker, histogram, Pareto, waterfall) play one
+    /// as one object. A build read from a file is kept on any chart; this decides what the app offers.
+    public var playsBuildByParts: Bool {
+        switch kind {
+        case .histogram, .pareto, .boxWhisker, .stock, .radar, .filledRadar, .funnel, .treemap, .sunburst, .regionMap, .waterfall: false
+        default: true
+        }
+    }
+
+    /// Can `animation.options` give an animation on this chart `build`? Only where it plays part by part and
+    /// has steps: data, and no more than `maxChartBuildSteps` of them.
+    public func takesBuild(_ build: ChartBuild) -> Bool {
+        playsBuildByParts && !chartBuildSteps(self, build, background: false).isEmpty
+    }
+}

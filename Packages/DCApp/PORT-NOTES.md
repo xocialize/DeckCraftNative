@@ -711,7 +711,7 @@ selection, `format.state`, the slide's transition and animations, the theme. Vie
 | Transitions | Transition to This Slide | inspector Animate ▸ Transition (the gallery by category, Effect Options) | `transition.set`, `transition.options` |
 | Transitions | Timing | inspector Animate ▸ Transition ▸ Sound and Timing | `transition.sound`, `transition.timing`, `transition.applyAll` |
 | Animations | Preview | inspector Animate ▸ Animations ▸ Preview | `animation.preview` |
-| Animations | Animation | inspector Animate ▸ Animations (Effect, Effect Options, Sequence) | `animation.set`, `animation.options` |
+| Animations | Animation | inspector Animate ▸ Animations (Effect, Effect Options, Sequence; on a chart the Sequence is its build, with Start animation by drawing the chart background, the port's own, AB-T-0443) | `animation.set`, `animation.options` |
 | Animations | Advanced Animation | inspector Animate ▸ Animations (Add Animation, Trigger, Animation Painter) and the Animation Pane | `animation.add`, `animation.timing`, `animation.painter`, `view.pane`, `animation.move`, `animation.remove` |
 | Animations | Timing | inspector Animate ▸ Timing (Start, Duration, Delay); the pane's context menu reorders and removes | `animation.timing`, `animation.move`, `animation.remove` |
 | Slide Show | Start Slide Show | toolbar: Play (split: Play from Start, from Current Slide, Presenter View, Set Up…); Slide Show menu | `show.start`, `show.fromStart`, `show.fromCurrent`, `show.presenter`, `app.dialog` |

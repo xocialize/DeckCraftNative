@@ -632,6 +632,16 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   `upDownBars` no longer does: DCPPTX writes them into the kept part (its divergence 12). Tests:
   `InsertCommandTests.chartOptionsSetTheAxesAndBars`, `chartOptionsSetASeriesTrendlineAndErrorBars`, and
   `chartEditsKeepThePartForElementsAndData` with the new keys.
+- **`animation.options` sets a chart build** (2026-11-05, the app side of AB-T-0443). Beside deckcraft's keys it
+  takes `chartBuild` (`asOne`, `bySeries`, `byCategory`, `bySeriesElement`, `byCategoryElement`) and
+  `chartBackground` (bool: the build starts with the chart's background; PowerPoint's "Start animation by drawing
+  the chart background"). Keys, not a command, for the same reason as `chart.options`' (the params text is
+  unchanged). A target on a chart that `takesBuild` (DCModel) gets the build; others keep theirs, and a build that
+  no target can take is refused, as PowerPoint offers no Sequence there: a shape that isn't a chart, a radar, stock,
+  box-and-whisker, histogram, Pareto, waterfall or Office 2016 chart, or a chart whose build would pass 1,000
+  steps. Choosing any Sequence for a step of a file's build kept apart (`chartElement`) joins that run of steps on
+  the chart into one animation, as PowerPoint rewrites them. `asOne` also clears `chartBackground`; an unknown name
+  changes nothing. Test: `ChartBuildCommandTests` (5).
 
 ### Tests
 

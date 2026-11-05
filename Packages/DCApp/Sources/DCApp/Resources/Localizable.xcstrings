@@ -22123,6 +22123,41 @@
         }
       }
     },
+    "Start animation by drawing the chart background" : {
+      "comment" : "Animate inspector: a chart build begins with the axes, gridlines and legend",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Animation durch Zeichnen des Diagrammhintergrunds starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start animation by drawing the chart background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Iniciar la animación dibujando el fondo del gráfico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Commencer l'animation en dessinant l'arrière-plan du graphique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Avvia l'animazione disegnando lo sfondo del grafico"
+          }
+        }
+      }
+    },
     "Status bar" : {
       "comment" : "Accessibility label of the document window's status bar",
       "localizations" : {

@@ -781,9 +781,18 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     background, then each series in turn; once played out, the frame equals the chart without a build).
     The full suite passes on AB-T-0434's main: 2,349 tests in all 19 bundles (`aDenseShapeGradientRendersPromptly`
     was again starved past its 20 s limit in the full run and passes alone).
-  - **Not yet:** choosing a build in the app (Animate › Effect Options has no Sequence for charts, and no engine
-    command sets one); radar, stock, box-and-whisker, histogram, Pareto, waterfall and Office 2016 charts play as
-    one object; a Wipe on one part reveals it whole, as for paragraphs.
+  - **Choosing a build in the app** (the same day): on a chart, Animations › Effect Options and the Animate
+    inspector's Sequence list As One Object and the builds the chart takes, and the inspector has PowerPoint's
+    "Start animation by drawing the chart background". Both run `animation.options` with the port's own keys
+    `chartBuild` and `chartBackground` (DCEngine PORT-NOTES; the command list is unchanged). Choosing a Sequence
+    for a step of a file's build kept apart joins its steps into one build. The new labels have preview
+    translations in French, Italian, German and Spanish, marked "needs review". Tests: `ChartBuildCommandTests`
+    (5) and `ChartBuildMenuTests` (3). In DeckCraftDev, the inspector's Sequence set By Series, its toggle took the
+    background off, the ribbon menu set By Element in Category and Undo went back; the deck saved from there opened
+    in PowerPoint without a repair prompt, with 12 point steps and `animBg="0"`. Full suite: 2,367 tests in 19
+    bundles pass, apart from the known `aDenseShapeGradientRendersPromptly` timing under load (it passes alone).
+  - **Not yet:** radar, stock, box-and-whisker, histogram, Pareto, waterfall and Office 2016 charts play as one
+    object, so the app offers them no build; a Wipe on one part reveals it whole, as for paragraphs.
 - **After 0.1.15 (unreleased, 2026-11-05): the chart settings the model already held have UI (AB-T-0436).** The
   model, reader, renderer and writer had axis titles, minor gridlines, the value axis's scale and number format,
   reversed categories, gap width and overlap, trendlines, error bars and up/down bars, but no command or control set

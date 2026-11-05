@@ -202,6 +202,33 @@ public enum InspectorMotion {
     /// `text_build_id`.
     public static func textBuildId(_ b: TextBuild) -> String { b.rawValue }
 
+    /// The chart an animation plays on, when its shape is one (AB-T-0443: its Sequence is a chart build).
+    public static func chart(_ a: Animation, _ slide: Slide?) -> Chart? {
+        if case .chart(let c)? = slide?.shape(a.shape)?.kind { c } else { nil }
+    }
+
+    /// Effect Options › Sequence for a chart, as PowerPoint lists it: As One Object, then each build the chart
+    /// takes (`Chart.takesBuild`), as (`animation.options` `chartBuild` value, label).
+    public static func chartBuildRows(_ chart: Chart) -> [(String, String)] {
+        [("asOne", L10n.text("As One Object"))]
+            + [ChartBuild.bySeries, .byCategory, .bySeriesElement, .byCategoryElement].filter { chart.takesBuild($0) }.map { ($0.rawValue, chartBuildLabel($0)) }
+    }
+
+    public static func chartBuildLabel(_ b: ChartBuild) -> String {
+        switch b {
+        case .bySeries: String(localized: "By Series", bundle: .module, comment: "Animations › Effect Options › Sequence of a chart: each series in turn")
+        case .byCategory: String(localized: "By Category", bundle: .module, comment: "Animations › Effect Options › Sequence of a chart: each category in turn")
+        case .bySeriesElement: String(localized: "By Element in Series", bundle: .module, comment: "Animations › Effect Options › Sequence of a chart: each point, series by series")
+        case .byCategoryElement: String(localized: "By Element in Category", bundle: .module, comment: "Animations › Effect Options › Sequence of a chart: each point, category by category")
+        }
+    }
+
+    /// The Sequence an animation on a chart shows: its build, "asOne", or "steps" for one step of a file's build
+    /// whose steps are kept apart (`chartElement`); choosing a Sequence joins them into one build again.
+    public static func chartBuildId(_ a: Animation) -> String {
+        a.chartElement != nil ? "steps" : a.chartBuild?.rawValue ?? "asOne"
+    }
+
     /// `option_label`: an animation option's name ("l" → "From Left", "fromBottom" → "From Bottom").
     public static func optionLabel(_ o: String) -> String {
         switch o {
