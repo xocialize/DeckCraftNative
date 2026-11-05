@@ -12,6 +12,7 @@
 // | `chart.options` title | `c:title` (text only; its formatting stays), `c:autoTitleDeleted` |
 // | `chart.options` legend | `c:legend`, `c:legendPos` |
 // | `chart.options` dataLabels | `c:showVal` in every plot group's and series' `c:dLbls` |
+// | `chart.options` labelPosition, labelContents, labelSeparator, labelCallout | `c:dLblPos`, the `c:show…` switches, `c:separator`, `c:showLeaderLines` (or its `c15:` twin) and the callout's `c15:spPr` in every plot group's and series' `c:dLbls` (AB-T-0438) |
 // | `chart.options` gridlines | the primary value axis's `c:majorGridlines` |
 // | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook taken out here, then linked again to the original workbook with the new cells, or to a new one (`WriteChartWorkbook.swift`) |
 // | `chart.options` axis titles, minor gridlines, axis scale and format, reversed categories, gap and overlap, up/down bars, a series' trendline and error bars | `WriteChartPatchAxes.swift` (AB-T-0436) |
@@ -45,6 +46,10 @@ extension PPTXWrite.Charts {
                 // Series that both have: `chart.data` keeps each one's own labels, `chart.options` clears them.
                 if was.dataLabels != me.dataLabels || zip(was.series, me.series).contains(where: { $0.dataLabels != $1.dataLabels }) {
                     patchLabels(&pa, me.dataLabels)
+                }
+                // Label positions and contents (AB-T-0438), into every group's and series' labels.
+                if was.labelOptions != me.labelOptions || zip(was.series, me.series).contains(where: { $0.labelOptions != $1.labelOptions }) {
+                    patchLabelOptions(&pa, me)
                 }
                 axisless = primaryValueAxis(pa) == nil
                 barless = !pa.elements.contains { $0.is("lineChart") || $0.is("stockChart") }
@@ -111,6 +116,7 @@ extension PPTXWrite.Charts {
         for i in c.series.indices where c.series[i].dataLabels == c.dataLabels {
             c.series[i].dataLabels = nil
         }
+        PPTXRead.normalizeLabelOptions(&c)
         return c
     }
 
@@ -217,6 +223,98 @@ extension PPTXWrite.Charts {
                 g.remove("dLbls")
                 g.insert(freshLabels(true), after: ["ser"])
             }
+        }
+    }
+
+    /// The `c:dLbls` children after which each one goes (CT_DLbls' Group_DLbls, then `c:extLst`).
+    static let labelSlots: [String: [String]] = [
+        "dLblPos": ["dLbl", "delete", "numFmt", "spPr", "txPr"],
+        "showLegendKey": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos"],
+        "showVal": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey"],
+        "showCatName": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey", "showVal"],
+        "showSerName": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName"],
+        "showPercent": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName", "showSerName"],
+        "separator": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName", "showSerName", "showPercent", "showBubbleSize"],
+        "showLeaderLines": ["dLbl", "delete", "numFmt", "spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName", "showSerName", "showPercent", "showBubbleSize", "separator"],
+    ]
+
+    /// Sets switch `k` of a `c:dLbls` to `on`, adding it in its place when missing.
+    static func setLabelFlag(_ d: inout XMLEl, _ k: String, _ on: Bool) {
+        let v = on ? "1" : "0"
+        if !d.edit(k, { $0.setAttr("val", v) }) { d.insert(el("c:\(k)", v), after: labelSlots[k] ?? []) }
+    }
+
+    /// One `c:dLbls` given the position and contents `o` for series of `kind`, on or off; its formatting and
+    /// whatever else it holds stay.
+    static func applyLabelOptions(_ d: inout XMLEl, _ o: LabelOptions, _ show: Bool, _ kind: ChartType, _ threeD: Bool) {
+        d.remove("dLblPos")
+        if show, let p = o.position(for: kind, threeD: threeD) { d.insert(el("c:dLblPos", p), after: labelSlots["dLblPos"] ?? []) }
+        setLabelFlag(&d, "showLegendKey", show && o.legendKey)
+        setLabelFlag(&d, "showVal", show && !o.hideValue)
+        setLabelFlag(&d, "showCatName", show && o.categoryName)
+        setLabelFlag(&d, "showSerName", show && o.seriesName)
+        setLabelFlag(&d, "showPercent", show && o.percent)
+        d.remove("separator")
+        if show, let sep = o.separator {
+            d.insert(XMLEl(name: "c:separator", children: [.text(sep)]), after: labelSlots["separator"] ?? [])
+        }
+        // Leader lines: Office 2013's switch where the labels have one (PowerPoint reads it over `c:`'s), else `c:`'s.
+        let c15Leaders = d.child("extLst")?.childrenNamed("ext").contains { $0.child("showLeaderLines") != nil } ?? false
+        if c15Leaders {
+            _ = d.edit("extLst") { x in x.elementsMut { e in _ = e.edit("showLeaderLines") { $0.setAttr("val", show && o.leaderLines ? "1" : "0") } } }
+        } else if show && o.leaderLines {
+            setLabelFlag(&d, "showLeaderLines", true)
+        } else if d.child("showLeaderLines") != nil {
+            setLabelFlag(&d, "showLeaderLines", false)
+        }
+        // The callout's shape lives in `c15:spPr` (PowerPoint's Data Callout).
+        let callout = show && o.callout
+        let hasCallout = d.child("extLst")?.childrenNamed("ext").contains { ($0.child("spPr")?.child("prstGeom")?.attr("prst")).map { hasByteSuffix($0, "Callout") } ?? false } ?? false
+        if callout && !hasCallout {
+            let shape = XMLEl(name: "c15:spPr", children: [.el(XMLEl(name: "a:prstGeom", attrs: [("prst", "wedgeRectCallout")], children: [.el(el("a:avLst"))]))])
+            if d.child("extLst")?.childrenNamed("ext").contains(where: { bytesEqual($0.attr("uri") ?? "", "{CE6537A1-D6FC-4f65-9D91-7224C49458BB}") }) == true {
+                _ = d.edit("extLst") { x in
+                    x.elementsMut { e in
+                        if bytesEqual(e.attr("uri") ?? "", "{CE6537A1-D6FC-4f65-9D91-7224C49458BB}") {
+                            if !declares(e, "xmlns:c15", PPTXWrite.Charts.c15NS) && !e.attrs.contains(where: { bytesEqual($0.key, "xmlns:c15") }) {
+                                e.setAttr("xmlns:c15", PPTXWrite.Charts.c15NS)
+                            }
+                            e.insert(shape, after: [])
+                        }
+                    }
+                }
+            } else {
+                let ext = XMLEl(name: "c:ext", attrs: [("uri", "{CE6537A1-D6FC-4f65-9D91-7224C49458BB}"), ("xmlns:c15", PPTXWrite.Charts.c15NS)], children: [.el(shape)])
+                if !d.edit("extLst", { $0.insert(ext, after: ["ext"]) }) { d.children.append(.el(XMLEl(name: "c:extLst", children: [.el(ext)]))) }
+            }
+        } else if !callout && hasCallout {
+            _ = d.edit("extLst") { x in x.elementsMut { e in if e.child("spPr")?.child("prstGeom") != nil { e.remove("spPr") } } }
+        }
+    }
+
+    /// Every plot group's and series' labels given the model's positions and contents: each series its own (else
+    /// the chart's), each group the chart's. A series with options of its own and no labels element gets one.
+    static func patchLabelOptions(_ pa: inout XMLEl, _ c: Chart) {
+        let three = c.threeD != nil
+        var si = 0
+        pa.elementsMut { g in
+            guard hasByteSuffix(g.local, "Chart") else { return }
+            var groupKind: ChartType?
+            g.elementsMut { s in
+                guard s.is("ser") else { return }
+                defer { si += 1 }
+                guard let ser = c.series.at(si) else { return }
+                let kind = c.seriesKind(ser)
+                if groupKind == nil { groupKind = kind }
+                let o = c.labelOptions(ser)
+                let show = c.seriesDataLabels(ser)
+                if s.child("dLbls") == nil {
+                    guard ser.labelOptions != nil else { return }
+                    s.insert(freshLabels(show), after: ["idx", "order", "tx", "spPr", "invertIfNegative", "pictureOptions", "marker", "explosion", "dPt"])
+                }
+                _ = s.edit("dLbls") { applyLabelOptions(&$0, o, show, kind, three) }
+            }
+            _ = g.edit("dLbls") { applyLabelOptions(&$0, c.labelOptions ?? LabelOptions(), c.dataLabels, groupKind ?? c.kind, three) }
         }
     }
 

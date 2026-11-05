@@ -1731,6 +1731,7 @@ public enum InsertCommands {
         }
         let axis = try AxisOptions(p)
         let seriesOptions = try SeriesOptions(p)
+        let labels = try LabelOptionsParams(p)
         return try withChart(s, p, "chart.options") { c in
             if let t = textColor { c.textColor = t }
             applyBinOptions(&c, binCount, binSize)
@@ -1742,7 +1743,13 @@ public enum InsertCommands {
                 c.dataLabels = v
                 // A series' own setting would otherwise keep overriding the chart-wide switch.
                 for i in c.series.indices { c.series[i].dataLabels = nil }
+                // Off is PowerPoint's None: the labels go with their position and contents (AB-T-0438).
+                if !v {
+                    c.labelOptions = nil
+                    for i in c.series.indices { c.series[i].labelOptions = nil }
+                }
             }
+            try labels.apply(&c)
             if let v = Cmd.boolParam(p, "gridlines") { c.gridlines = v }
             if let v = Cmd.strParam(p, "palette") { c.palette = v }
             try axis.apply(&c)

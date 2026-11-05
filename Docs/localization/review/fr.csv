@@ -48,6 +48,7 @@ DCAppModel|8 Spokes,,8 Spokes,8 rayons,needs_review,,,Animations › Effect Opti
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Un album photo contient au maximum 48 images ou zones de texte,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,TOUTES les images en noir et blanc,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,À propos de DeckCraftNative,needs_review,,,
+DCAppModel|Above,,Above,Au-dessus,needs_review,,,Where a chart's data labels are: above the point
 DCAppModel|Above Chart,,Above Chart,Au-dessus du graphique,needs_review,,,Where the chart title is
 DCAppModel|Accent 1,,Accent 1,Accentuation 1,needs_review,,,A theme colour slot
 DCAppModel|Accent 2,,Accent 2,Accentuation 2,needs_review,,,A theme colour slot
@@ -135,6 +136,8 @@ DCAppModel|Basic List,,Basic List,Liste de base,needs_review,,,
 DCAppModel|Basic Process,,Basic Process,Processus de base,needs_review,,,
 DCAppModel|Before (pt),,Before (pt),Avant (pt),needs_review,,,
 DCAppModel|Before text (in),,Before text (in),Avant le texte (po),needs_review,,,
+DCAppModel|Below,,Below,En dessous,needs_review,,,Where a chart's data labels are: below the point
+DCAppModel|Best Fit,,Best Fit,Ajustement optimal,needs_review,,,Where a pie chart's data labels are: wherever they fit
 DCAppModel|Bevel,,Bevel,Biseau,needs_review,,,line join
 DCAppModel|Black Pen,,Black Pen,Stylet noir,needs_review,,,
 DCAppModel|Blank Presentation,,Blank Presentation,Présentation vide,needs_review,,,
@@ -176,7 +179,8 @@ DCAppModel|Capitalize names of days,,Capitalize names of days,Majuscule aux jour
 DCAppModel|Caps,,Caps,Majuscules,needs_review,,,
 DCAppModel|Captions under pictures,,Captions under pictures,Légendes sous les images,needs_review,,,
 DCAppModel|Categories,,Categories,Catégories,needs_review,,,
-DCAppModel|Center,,Center,Centré,needs_review,,,"paragraph alignment
+DCAppModel|Center,,Center,Centré,needs_review,,,"Where a chart's data labels are: centred on the mark
+paragraph alignment
 tile alignment"
 DCAppModel|Centered,,Centered,Centré,needs_review,,,A shadow
 DCAppModel|Centimeters,,Centimeters,Centimètres,needs_review,,,
@@ -260,6 +264,7 @@ DCAppModel|Dashed horizontal,,Dashed horizontal,Horizontale en tirets,needs_revi
 DCAppModel|Dashed upward diagonal,,Dashed upward diagonal,Diagonale montante en tirets,needs_review,,,
 DCAppModel|Dashed vertical,,Dashed vertical,Verticale en tirets,needs_review,,,
 DCAppModel|Dashes,,Dashes,Tirets,needs_review,,,
+DCAppModel|Data Callout,,Data Callout,Légende de données,needs_review,,,Data labels in callout boxes showing the category and value
 DCAppModel|Data Labels,,Data Labels,Étiquettes de données,needs_review,,,
 DCAppModel|Date and Time,,Date and Time,Date et heure,needs_review,,,
 DCAppModel|Date and time,,Date and time,Date et heure,needs_review,,,
@@ -454,7 +459,9 @@ DCAppModel|Insert Table…,,Insert Table…,Insérer un tableau…,needs_review,
 DCAppModel|Insert slides from %@ after the current slide:,,Insert slides from %@ after the current slide:,Insérer les diapositives de %@ après la diapositive actuelle :,needs_review,,,
 DCAppModel|Inserted %lld slides,one,Inserted %lld slides,%lld diapositive insérée,needs_review,,,
 DCAppModel|Inserted %lld slides,other,Inserted %lld slides,%lld diapositives insérées,needs_review,,,
+DCAppModel|Inside Base,,Inside Base,Base intérieure,needs_review,,,Where a chart's data labels are: inside the bar's base
 DCAppModel|Inside Borders,,Inside Borders,Bordures intérieures,needs_review,,,
+DCAppModel|Inside End,,Inside End,Bord intérieur,needs_review,,,Where a chart's data labels are: inside the bar's end
 DCAppModel|Inside Horizontal Border,,Inside Horizontal Border,Bordure horizontale intérieure,needs_review,,,
 DCAppModel|Inside Vertical Border,,Inside Vertical Border,Bordure verticale intérieure,needs_review,,,
 "DCAppModel|Inspect Presentation: before you share it, check it for things people with disabilities might find hard to read.",,"Inspect Presentation: before you share it, check it for things people with disabilities might find hard to read.","Inspecter la présentation : avant de la partager, vérifiez qu'elle ne contient rien que des personnes en situation de handicap pourraient avoir du mal à lire.",needs_review,,,
@@ -478,7 +485,8 @@ DCAppModel|Large grid,,Large grid,Grande grille,needs_review,,,
 DCAppModel|Last Slide,,Last Slide,Dernière diapositive,needs_review,,,
 DCAppModel|Last Slide Viewed,,Last Slide Viewed,Dernière diapositive affichée,needs_review,,,
 DCAppModel|Layout,,Layout,Disposition,needs_review,,,
-DCAppModel|Left,,Left,Gauche,needs_review,,,"Where a chart's legend is
+DCAppModel|Left,,Left,Gauche,needs_review,,,"Where a chart's data labels are: left of the point
+Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Bordure gauche,needs_review,,,
@@ -610,6 +618,7 @@ DCAppModel|Outline (.txt),,Outline (.txt),Plan (.txt),needs_review,,,
 DCAppModel|Outline/RTF (.rtf),,Outline/RTF (.rtf),Plan/RTF (.rtf),needs_review,,,
 DCAppModel|Outlined diamond,,Outlined diamond,Losange contour,needs_review,,,
 DCAppModel|Outside Borders,,Outside Borders,Bordures extérieures,needs_review,,,
+DCAppModel|Outside End,,Outside End,Bord extérieur,needs_review,,,Where a chart's data labels are: past the bar's end
 DCAppModel|Oval,,Oval,Ovale,needs_review,,,arrowhead kind
 DCAppModel|Oval ends,,Oval ends,Extrémités ovales,needs_review,,,
 DCAppModel|PDF document (.pdf),,PDF document (.pdf),Document PDF (.pdf),needs_review,,,
@@ -717,7 +726,8 @@ DCAppModel|Reuse Slides…,,Reuse Slides…,Réutiliser des diapositives…,need
 DCAppModel|Revert,,Revert,Revenir,needs_review,,,
 DCAppModel|Review,,Review,Révision,needs_review,,,
 DCAppModel|Ribbon,,Ribbon,Ruban,needs_review,,,
-DCAppModel|Right,,Right,Droite,needs_review,,,"Where a chart's legend is
+DCAppModel|Right,,Right,Droite,needs_review,,,"Where a chart's data labels are: right of the point
+Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Bordure droite,needs_review,,,

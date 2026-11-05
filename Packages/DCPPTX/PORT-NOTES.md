@@ -545,6 +545,17 @@ The writer calls these reader functions, with Rust's parameter and return shapes
     writer), nothing when it has no stops. The reader takes a `c:bubbleChart`'s `c:bubbleScale` (0–300 %) and
     `c:sizeRepresents` into `Chart.bubbleScale`/`bubbleSizeWidth`, and the generator writes them back after the
     series when set (unset, nothing, as deckcraft writes). Tests: `WriteChartFillsTests` (2).
+14. **Data label positions and contents (2026-11-05, deliberate; AB-T-0438).** deckcraft reads and writes a
+    `c:dLbls`' `c:showVal` alone, so PowerPoint's `c:dLblPos`, name and percentage switches, separator and callouts
+    were lost when the part was regenerated, and labels showing a name without the value read as off. The reader
+    takes each plot group's and series' `c:dLbls` into `LabelOptions` (`c:dLblPos`, `c:showSerName`,
+    `c:showCatName`, `c:showPercent`, `c:showLegendKey`, `c:separator`, `c:showLeaderLines` or Office 2013's
+    `c15:showLeaderLines`, and a `c15:spPr` callout geometry), equal ones normalised to nil so a chart without them
+    reads as before; labels show when any of the value, names or percentage do. The generator writes them in
+    Group_DLbls order, a position only where the group takes it (no Outside End on stacked bars, none on a
+    doughnut), and a Data Callout as a white box with a grey outline plus `c15:spPr` with `wedgeRectCallout`;
+    defaults write what deckcraft writes. `patchLabelOptions` edits them into every group's and series' labels of a
+    kept part, keeping their formatting and extensions. Tests: `WriteChartLabelsTests` (5).
 
 ## Integration tests
 

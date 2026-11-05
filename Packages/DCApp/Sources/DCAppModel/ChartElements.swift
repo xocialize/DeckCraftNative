@@ -39,12 +39,44 @@ public enum ChartElements {
             .submenu(String(localized: "Legend", bundle: .module), legends.map { l in
                 .item(l.label, "chart.options", ["id": shape, "legend": l.code.map(JSON.string) ?? .null])
             }),
-            .submenu(String(localized: "Data Labels", bundle: .module), [
-                .item(String(localized: "None", bundle: .module, comment: "No data labels on the chart"), "chart.options", ["id": shape, "dataLabels": false]),
-                .item(String(localized: "Show", bundle: .module, comment: "Show the chart's data labels"), "chart.options", ["id": shape, "dataLabels": true]),
-            ]),
+            .submenu(String(localized: "Data Labels", bundle: .module), dataLabels(shape, chart)),
             .submenu(String(localized: "Gridlines", bundle: .module), gridlines(shape, chart)),
         ] + axisAndSeriesMenus(id, chart)
+    }
+
+    // MARK: - Data labels (AB-T-0438)
+
+    /// A data label position's name in the menus, as PowerPoint names it.
+    public static func labelPositionName(_ p: String) -> String {
+        switch p {
+        case "ctr": String(localized: "Center", bundle: .module, comment: "Where a chart's data labels are: centred on the mark")
+        case "inEnd": String(localized: "Inside End", bundle: .module, comment: "Where a chart's data labels are: inside the bar's end")
+        case "inBase": String(localized: "Inside Base", bundle: .module, comment: "Where a chart's data labels are: inside the bar's base")
+        case "outEnd": String(localized: "Outside End", bundle: .module, comment: "Where a chart's data labels are: past the bar's end")
+        case "bestFit": String(localized: "Best Fit", bundle: .module, comment: "Where a pie chart's data labels are: wherever they fit")
+        case "l": String(localized: "Left", bundle: .module, comment: "Where a chart's data labels are: left of the point")
+        case "r": String(localized: "Right", bundle: .module, comment: "Where a chart's data labels are: right of the point")
+        case "t": String(localized: "Above", bundle: .module, comment: "Where a chart's data labels are: above the point")
+        case "b": String(localized: "Below", bundle: .module, comment: "Where a chart's data labels are: below the point")
+        default: p
+        }
+    }
+
+    /// Add Chart Element › Data Labels: None, then the positions the chart's series take (PowerPoint's five on a
+    /// clustered column chart: Center, Inside End, Inside Base, Outside End, Data Callout), or Show where a chart's
+    /// labels have no position (an area, doughnut or radar chart).
+    static func dataLabels(_ shape: JSON, _ c: Chart) -> [CommandMenuEntry] {
+        let none: CommandMenuEntry = .item(String(localized: "None", bundle: .module, comment: "No data labels on the chart"), "chart.options", ["id": shape, "dataLabels": false])
+        let positions = c.labelPositions
+        if positions.isEmpty {
+            return [none, .item(String(localized: "Show", bundle: .module, comment: "Show the chart's data labels"), "chart.options", ["id": shape, "dataLabels": true])]
+        }
+        return [none] + positions.map {
+            .item(labelPositionName($0), "chart.options", ["id": shape, "dataLabels": true, "labelPosition": .string($0), "labelCallout": false])
+        } + [
+            .item(String(localized: "Data Callout", bundle: .module, comment: "Data labels in callout boxes showing the category and value"), "chart.options",
+                  ["id": shape, "dataLabels": true, "labelCallout": true, "labelContents": ["categoryName": true, "value": true]]),
+        ]
     }
 
     // MARK: - Axis titles, gridlines, error bars, trendlines, up/down bars (AB-T-0436)

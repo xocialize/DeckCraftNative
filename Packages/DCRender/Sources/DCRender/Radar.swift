@@ -102,7 +102,7 @@ public enum Radar {
             if c.seriesDataLabels(s) {
                 for (i, q) in pts.enumerated() {
                     guard let v = s.values.at(i) ?? nil else { continue }
-                    let t = c.dataLabel(s, v)
+                    let t = c.labelText(s, i, v)
                     R.label(ctx, rctx, m, t, Rect(q.x - 40, q.y - base * 1.4, q.x + 40, q.y - base * 0.2), base * 0.9, .center, .bottom, textCol, false)
                 }
             }

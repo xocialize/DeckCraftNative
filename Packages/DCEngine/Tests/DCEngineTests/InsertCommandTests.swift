@@ -667,6 +667,49 @@ struct InsertShapeTests {
         }
     }
 
+    /// The port's own (AB-T-0438): `chart.options` places the data labels and sets what they show; a position the
+    /// chart's series don't take, or labels showing nothing, change nothing.
+    @Test func chartOptionsPlaceTheDataLabels() throws {
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "column"}"#).get("id")?.asU64)
+        s.run("chart.options", #"{"id": \#(id), "labelPosition": "outEnd"}"#)
+        var c = try #require(chartOf(s, id))
+        #expect(c.dataLabels && c.labelOptions?.position == "outEnd", "a position turns the labels on")
+        s.run("chart.options", #"{"id": \#(id), "labelContents": {"seriesName": true, "value": false}, "labelSeparator": " | "}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.labelOptions == LabelOptions(position: "outEnd", seriesName: true, hideValue: true, separator: " | "))
+        #expect(c.labelText(c.series[0], 1, 2.8) == "Series 1")
+        s.run("chart.options", #"{"id": \#(id), "labelContents": {"categoryName": true, "value": true}}"#)
+        c = try #require(chartOf(s, id))
+        #expect(c.labelText(c.series[0], 1, 2.8) == "Series 1 | Q2 | 2.8")
+        for bad in [#""labelPosition": "l""#, #""labelPosition": "middle""#, #""labelContents": {"seriesName": 1}"#, #""labelContents": "all""#,
+                    #""labelContents": {"seriesName": false, "categoryName": false, "value": false}"#, #""labelCallout": "yes""#] {
+            #expect(s.fails("chart.options", #"{"id": \#(id), \#(bad)}"#), "\(bad)")
+        }
+        #expect(try #require(chartOf(s, id)).labelOptions?.position == "outEnd", "refused: unchanged")
+        s.run("chart.options", #"{"id": \#(id), "labelPosition": null, "labelContents": {"seriesName": false, "categoryName": false}, "labelSeparator": null}"#)
+        #expect(try #require(chartOf(s, id)).labelOptions == nil, "back to the defaults")
+        s.run("chart.options", #"{"id": \#(id), "labelCallout": true}"#)
+        #expect(try #require(chartOf(s, id)).labelOptions?.callout == true)
+        s.run("chart.options", #"{"id": \#(id), "dataLabels": false}"#)
+        c = try #require(chartOf(s, id))
+        #expect(!c.dataLabels && c.labelOptions == nil, "off takes the options too")
+        // Each chart type's own positions; a stacked column has no Outside End, an area none at all.
+        let stacked = try #require(s.run("insert.chart", #"{"type": "stackedColumn"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(stacked), "labelPosition": "outEnd"}"#))
+        let line = try #require(s.run("insert.chart", #"{"type": "line"}"#).get("id")?.asU64)
+        s.run("chart.options", #"{"id": \#(line), "labelPosition": "t"}"#)
+        #expect(chartOf(s, line)?.labelOptions?.position == "t")
+        let area = try #require(s.run("insert.chart", #"{"type": "area"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(area), "labelPosition": "ctr"}"#))
+        s.run("chart.options", #"{"id": \#(area), "labelContents": {"seriesName": true}}"#)
+        #expect(chartOf(s, area)?.labelOptions?.seriesName == true)
+        let pie = try #require(s.run("insert.chart", #"{"type": "pie"}"#).get("id")?.asU64)
+        s.run("chart.options", #"{"id": \#(pie), "labelPosition": "bestFit", "labelContents": {"percent": true, "value": false}}"#)
+        c = try #require(chartOf(s, pie))
+        #expect(c.labelText(c.series[0], 0, 4.2, share: 0.25) == "25%")
+    }
+
     /// The port's own (AB-T-0436): `chart.options` sets the axis titles, minor gridlines, the value axis's scale and
     /// format, reversed categories, gap width and overlap, and keeps the kept part; bad values change nothing.
     @Test func chartOptionsSetTheAxesAndBars() throws {

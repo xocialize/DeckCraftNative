@@ -36,6 +36,11 @@ generator only; it isn't built.
   `custom`, `secondSize`, `seriesLines`.
 - **`Chart.bubbleScale: Double?` and `Chart.bubbleSizeWidth`** (AB-T-0437): a bubble chart's `c:bubbleScale`
   (percent of the default size) and `c:sizeRepresents val="w"` (sizes give the bubble's width, not its area).
+- **`LabelOptions`, `Chart.labelOptions` and `Series.labelOptions`** (AB-T-0438): where data labels sit
+  (`c:dLblPos`) and what they show (series name, category name, value, percentage, legend key, leader lines,
+  separator, PowerPoint's Data Callout), a plot group's and a series' own. `dataLabels` still says whether they
+  show. Hand-written beside them (`Chart.swift`): `LabelOptions.positions(_:threeD:)` (the positions each chart type
+  takes, as PowerPoint offers them), `Chart.labelOptions(_:)`, `labelPositions` and `labelText(_:_:_:share:)`.
 
 Each is skipped when unset (`None`, `false`), so every deck without them writes the same `presentation.json`;
 the corpus round trip is unchanged. A deck that uses them is one deckcraft reads with the fields ignored, and

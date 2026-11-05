@@ -546,3 +546,40 @@ let solidRed = Rgba.rgb(255, 0, 0)
         return n
     }
 }
+
+// The port's own (AB-T-0438): data label positions and contents are drawn.
+@Suite struct ChartLabelRenderTests {
+    private func render(_ c: Chart) -> RenderImage { renderDeck(deckOf([shapeOf(1, Xfrm(40, 40, 480, 270), .chart(c))])) }
+
+    private func labelled(_ kind: ChartType, _ o: LabelOptions?) -> Chart {
+        var c = Chart.sample(kind)
+        c.dataLabels = true
+        c.labelOptions = o
+        return c
+    }
+
+    @Test func unsetPositionsDrawAsDeckcraftDraws() {
+        // Outside End is where deckcraft puts a column's label; the corpus keeps its pixels.
+        #expect(render(labelled(.column, nil)) == render(labelled(.column, LabelOptions(position: "outEnd"))))
+    }
+
+    @Test func positionsAndContentsMoveAndChangeTheLabels() {
+        let out = render(labelled(.column, LabelOptions(position: "outEnd")))
+        for o in [LabelOptions(position: "inBase"), LabelOptions(position: "ctr"), LabelOptions(position: "inEnd"),
+                  LabelOptions(seriesName: true), LabelOptions(legendKey: true), LabelOptions(callout: true)] {
+            #expect(render(labelled(.column, o)) != out, "\(o)")
+        }
+    }
+
+    @Test func lineAndScatterPointsGetLabels() {
+        for kind in [ChartType.line, .scatter] {
+            var off = labelled(kind, nil)
+            off.dataLabels = false
+            #expect(render(labelled(kind, nil)) != render(off), "\(kind): deckcraft draws none")
+        }
+        var area = labelled(.area, nil)
+        let shown = render(area)
+        area.dataLabels = false
+        #expect(shown == render(area), "an area's labels have no place yet")
+    }
+}

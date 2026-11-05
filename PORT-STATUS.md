@@ -875,6 +875,32 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Tests:** `WriteChartFillsTests` (2), `ChartBubbleAndLegendTests` (3). The oracle corpus is unchanged.
   - **Not yet:** an area or line series draws its gradient's first stop; a bubble's data labels, 3-D bubbles and
     `c:showNegBubbles` (negative sizes draw nothing); PowerPoint pads the y axis for bubbles as well, we pad x only.
+- **After 0.1.15 (unreleased, 2026-11-05): data label positions and contents (AB-T-0438).** Labels were on or off;
+  a position PowerPoint wrote (`c:dLblPos outEnd`) was lost on the first edit that regenerated the part, and labels
+  showing a name without the value read as off (gap review item 6; rows B4, B5; O-18, O-27).
+  - **Now:** `LabelOptions` (DCModel patch) on the chart and on each series: position, series name, category name,
+    value, percentage, legend key, leader lines, separator and Data Callout. The reader takes them from every
+    `c:dLbls` (Office 2013's `c15:showLeaderLines` and callout shape too); the generator writes them where the
+    group takes them; a kept part is edited in place (`WriteChartPatch.swift`). `chart.options` takes
+    `labelPosition`, `labelContents`, `labelSeparator` and `labelCallout` (DCEngine PORT-NOTES). Add Chart Element
+    › Data Labels offers PowerPoint's choices for the chart: None, Center, Inside End, Inside Base, Outside End and
+    Data Callout on a clustered column chart; Left, Right, Above, Below on lines; Best Fit on pies; None and Show
+    where labels have no position. DCRender draws positions, contents, keys and callouts, and line, scatter and
+    bubble labels (deckcraft draws none). 7 new strings in fr, it, de and es, marked "needs review".
+  - **Checked:** `pp-elements` keeps `dLblPos outEnd` on all three `c:dLbls` after a title edit (patched), a
+    palette edit and `chart.type` (regenerated), and renders its labels outside the bars as PowerPoint's PDF does.
+    A position, contents with a separator, and a callout are written into PowerPoint's part with every other
+    element kept (`chart-edit-sweep.py` PASS). PowerPoint 16.114 opened those seven edited files and two decks of
+    every position, content and callout without a repair prompt, and its PDF of the decks shows each label where we
+    put it (Inside End, Inside Base, Above with series names and our separator, Data Callout boxes, pie labels
+    outside with category and percentage). Schema: the regenerated and new files validate; the patched ones fail
+    only on PowerPoint's own `c15` extension content, as the unedited file does.
+  - **Tests:** `WriteChartLabelsTests` (5), `InsertCommandTests.chartOptionsPlaceTheDataLabels`,
+    `RibbonModelTests.dataLabelsSubmenuOffersThePositions` (and the Add Chart Element count), `ChartLabelRenderTests`
+    (3). DCPPTX, DCModel, DCFormat and DCEngine suites pass; the oracle corpus is unchanged.
+  - **Not yet:** a Format pane for the contents and separator (AB-T-0444; the keys are there); per-point labels
+    (`c:dLbl`); leader lines are kept but not drawn; PowerPoint puts a pie's callouts inside the slices and breaks
+    an outside pie label onto two lines, we draw them outside on one; an area chart's labels aren't drawn.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

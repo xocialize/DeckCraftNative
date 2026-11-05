@@ -1759,6 +1759,41 @@
         }
       }
     },
+    "Above" : {
+      "comment" : "Where a chart's data labels are: above the point",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Über"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Above"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Encima"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Au-dessus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sopra"
+          }
+        }
+      }
+    },
     "Above Chart" : {
       "comment" : "Where the chart title is",
       "localizations" : {
@@ -4730,6 +4765,76 @@
         }
       }
     },
+    "Below" : {
+      "comment" : "Where a chart's data labels are: below the point",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Unter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Below"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Debajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "En dessous"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sotto"
+          }
+        }
+      }
+    },
+    "Best Fit" : {
+      "comment" : "Where a pie chart's data labels are: wherever they fit",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Optimale Anpassung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best Fit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajuste perfecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajustement optimal"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adattamento ottimale"
+          }
+        }
+      }
+    },
     "Bevel" : {
       "comment" : "line join",
       "localizations" : {
@@ -6000,7 +6105,7 @@
       }
     },
     "Center" : {
-      "comment" : "paragraph alignment\ntile alignment",
+      "comment" : "Where a chart's data labels are: centred on the mark\nparagraph alignment\ntile alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8773,6 +8878,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Trattini"
+          }
+        }
+      }
+    },
+    "Data Callout" : {
+      "comment" : "Data labels in callout boxes showing the category and value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datenlegende"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Callout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Llamada de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Légende de données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Callout dati"
           }
         }
       }
@@ -15391,6 +15531,41 @@
         }
       }
     },
+    "Inside Base" : {
+      "comment" : "Where a chart's data labels are: inside the bar's base",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Basis innerhalb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inside Base"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Base interior"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Base intérieure"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Interno base"
+          }
+        }
+      }
+    },
     "Inside Borders" : {
       "localizations" : {
         "de" : {
@@ -15421,6 +15596,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bordi interni"
+          }
+        }
+      }
+    },
+    "Inside End" : {
+      "comment" : "Where a chart's data labels are: inside the bar's end",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ende innerhalb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inside End"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Extremo interno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bord intérieur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Interno estremità"
           }
         }
       }
@@ -16210,7 +16420,7 @@
       }
     },
     "Left" : {
-      "comment" : "Where a chart's legend is\ntext box inset\ntile alignment",
+      "comment" : "Where a chart's data labels are: left of the point\nWhere a chart's legend is\ntext box inset\ntile alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -20227,6 +20437,41 @@
         }
       }
     },
+    "Outside End" : {
+      "comment" : "Where a chart's data labels are: past the bar's end",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ende außerhalb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outside End"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Extremo externo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bord extérieur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Esterno estremità"
+          }
+        }
+      }
+    },
     "Oval" : {
       "comment" : "arrowhead kind",
       "localizations" : {
@@ -23849,7 +24094,7 @@
       }
     },
     "Right" : {
-      "comment" : "Where a chart's legend is\ntext box inset\ntile alignment",
+      "comment" : "Where a chart's data labels are: right of the point\nWhere a chart's legend is\ntext box inset\ntile alignment",
       "localizations" : {
         "de" : {
           "stringUnit" : {

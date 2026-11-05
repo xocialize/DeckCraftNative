@@ -335,8 +335,9 @@ final class AcceptingHost: AppHost {
         // Chart Title, Legend, Data Labels, Gridlines; Axis Titles, Error Bars, Trendline (AB-T-0436).
         #expect(menu.count == 7)
         let items = Self.items(menu)
-        // Trendline: None, then four types each listing the three series.
-        #expect(items.count == 2 + 5 + 2 + 3 + 3 + 4 + (1 + 4 * 3) && items.allSatisfy { $0.id == "chart.options" })
+        // Data Labels: None, four positions and Data Callout (AB-T-0438). Trendline: None, then four types each
+        // listing the three series.
+        #expect(items.count == 2 + 5 + 6 + 3 + 3 + 4 + (1 + 4 * 3) && items.allSatisfy { $0.id == "chart.options" })
         func chart() throws -> Chart { try #require(ChartElements.selected(f.model.session.activeDoc)).1 }
         func pick(_ key: String, _ value: JSON) throws {
             let ref = try #require(items.first { $0.params[key] == value }, "\(key) \(value)")
@@ -358,6 +359,43 @@ final class AcceptingHost: AppHost {
         _ = f.model.run("chart.options", ["title": "Sales"])
         let keep = Self.items(RibbonMenus.entries("chartDesign.addElement", f.model)).compactMap { $0.params["title"]?.asStr }
         #expect(keep == ["Sales"])
+    }
+
+    // Add Chart Element › Data Labels: PowerPoint's five on a clustered column chart (Center, Inside End, Inside Base,
+    // Outside End, Data Callout), the positions each chart type takes, and Show where labels have none (AB-T-0438).
+    @Test func dataLabelsSubmenuOffersThePositions() throws {
+        let c = ChartFixture("Column")
+        let labels = try #require(Self.titled(c.menu, "Data Labels"))
+        guard case .submenu(_, let entries) = labels else { Issue.record("Data Labels is a submenu"); return }
+        let titles = entries.compactMap { if case .item(let t, _, _) = $0 { t } else { nil } }
+        #expect(titles == ["None", "Center", "Inside End", "Inside Base", "Outside End", "Data Callout"])
+        func run(_ title: String) throws {
+            let e = try #require(entries.first { if case .item(let t, _, _) = $0 { t == title } else { false } })
+            guard case .item(_, let ref, _) = e else { return }
+            #expect(throws: Never.self) { try c.f.model.run(ref.id, ref.params).get() }
+        }
+        try run("Outside End")
+        #expect(c.chart?.dataLabels == true && c.chart?.labelOptions?.position == "outEnd")
+        try run("Inside Base")
+        #expect(c.chart?.labelOptions?.position == "inBase")
+        try run("Data Callout")
+        #expect(c.chart?.labelOptions?.callout == true && c.chart?.labelOptions?.categoryName == true)
+        try run("Center")
+        #expect(c.chart?.labelOptions?.callout == false && c.chart?.labelOptions?.position == "ctr")
+        try run("None")
+        #expect(c.chart?.dataLabels == false && c.chart?.labelOptions == nil, "None takes the position and contents too")
+        // Each type's own positions.
+        func positions(_ type: String) -> [String] {
+            let x = ChartFixture(type)
+            guard case .submenu(_, let e)? = Self.titled(x.menu, "Data Labels") else { return [] }
+            return Self.items(e).compactMap { $0.params["labelPosition"]?.asStr }
+        }
+        #expect(positions("StackedColumn") == ["ctr", "inEnd", "inBase"], "no Outside End on stacked bars")
+        #expect(positions("Line") == ["ctr", "l", "r", "t", "b"])
+        #expect(positions("Pie") == ["ctr", "inEnd", "outEnd", "bestFit"])
+        let area = ChartFixture("Area")
+        guard case .submenu(_, let a)? = Self.titled(area.menu, "Data Labels") else { Issue.record("Data Labels"); return }
+        #expect(Self.items(a).map { $0.params["dataLabels"]?.asBool } == [false, true], "None and Show")
     }
 
     // MARK: - AB-T-0436: axis titles, minor gridlines, error bars, trendlines, up/down bars, the inspector's axis

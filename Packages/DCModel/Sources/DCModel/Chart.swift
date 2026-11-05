@@ -815,3 +815,58 @@ extension Chart {
         return build(paths.enumerated().map { ($0.offset, $0.element[...]) })
     }
 }
+
+// MARK: - Data label position and contents (AB-T-0438)
+
+extension LabelOptions {
+    /// The `c:dLblPos` values a series of `kind` takes, as PowerPoint offers them (ECMA-376 §21.2.3.14 and the
+    /// groups that accept a `c:dLblPos`): clustered bars Center, Inside End, Inside Base, Outside End; stacked bars
+    /// the first three; lines, scatter and bubbles Center, Left, Right, Above, Below; a pie Center, Inside End,
+    /// Outside End, Best Fit. A doughnut, area, radar, surface or Office 2016 chart, and any 3-D chart, takes none.
+    public static func positions(_ kind: ChartType, threeD: Bool = false) -> [String] {
+        if threeD { return [] }
+        switch kind {
+        case .column, .bar: return ["ctr", "inEnd", "inBase", "outEnd"]
+        case .stackedColumn, .percentColumn, .stackedBar, .percentBar: return ["ctr", "inEnd", "inBase"]
+        case .line, .lineMarkers, .stackedLine, .percentLine, .scatter, .bubble, .stock: return ["ctr", "l", "r", "t", "b"]
+        case .pie: return ["ctr", "inEnd", "outEnd", "bestFit"]
+        default: return []
+        }
+    }
+
+    /// The position as written, when series of `kind` take it.
+    public func position(for kind: ChartType, threeD: Bool = false) -> String? {
+        position.flatMap { p in LabelOptions.positions(kind, threeD: threeD).first { $0 == p } }
+    }
+
+    /// Whether the labels show anything (`c:showVal` alone, the schema's default contents, unless hidden).
+    public var showsSomething: Bool { !hideValue || seriesName || categoryName || percent }
+}
+
+extension Chart {
+    /// Series `s`'s label options: its own, else the chart's, else the defaults (the value alone).
+    public func labelOptions(_ s: Series) -> LabelOptions {
+        s.labelOptions ?? labelOptions ?? LabelOptions()
+    }
+
+    /// Positions every series of the chart takes (a combo's groups must all take one).
+    public var labelPositions: [String] {
+        let kinds = series.isEmpty ? [kind] : series.map(seriesKind)
+        guard let first = kinds.first else { return [] }
+        let three = threeD != nil
+        return LabelOptions.positions(first, threeD: three).filter { p in kinds.allSatisfy { LabelOptions.positions($0, threeD: three).contains(p) } }
+    }
+
+    /// The text of point `i`'s data label of series `s` with value `v`: the series name, category name, value and
+    /// percentage it shows, joined by its separator (", " unset), as PowerPoint composes them. `share` is the
+    /// point's share of a pie's total.
+    public func labelText(_ s: Series, _ i: Int, _ v: Double, share: Double? = nil) -> String {
+        let o = labelOptions(s)
+        var parts: [String] = []
+        if o.seriesName && !s.name.isEmpty { parts.append(s.name) }
+        if o.categoryName, let cat = categories.at(i) { parts.append(cat) }
+        if !o.hideValue { parts.append(dataLabel(s, v)) }
+        if o.percent, let f = share, f.isFinite { parts.append(NumFmt.format("0%", f, lang)) }
+        return parts.joined(separator: o.separator ?? ", ")
+    }
+}

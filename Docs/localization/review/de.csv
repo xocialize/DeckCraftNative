@@ -48,6 +48,7 @@ DCAppModel|8 Spokes,,8 Spokes,8 Speichen,needs_review,,,Animations › Effect Op
 DCAppModel|A photo album holds at most 48 pictures or text boxes,,A photo album holds at most 48 pictures or text boxes,Ein Fotoalbum enthält höchstens 48 Bilder oder Textfelder,needs_review,,,
 DCAppModel|ALL pictures black and white,,ALL pictures black and white,ALLE Bilder schwarzweiß,needs_review,,,
 DCAppModel|About DeckCraftNative,,About DeckCraftNative,Über DeckCraftNative,needs_review,,,
+DCAppModel|Above,,Above,Über,needs_review,,,Where a chart's data labels are: above the point
 DCAppModel|Above Chart,,Above Chart,Über Diagramm,needs_review,,,Where the chart title is
 DCAppModel|Accent 1,,Accent 1,Akzent 1,needs_review,,,A theme colour slot
 DCAppModel|Accent 2,,Accent 2,Akzent 2,needs_review,,,A theme colour slot
@@ -135,6 +136,8 @@ DCAppModel|Basic List,,Basic List,Einfache Liste,needs_review,,,
 DCAppModel|Basic Process,,Basic Process,Einfacher Prozess,needs_review,,,
 DCAppModel|Before (pt),,Before (pt),Vor (pt),needs_review,,,
 DCAppModel|Before text (in),,Before text (in),Vor Text (Zoll),needs_review,,,
+DCAppModel|Below,,Below,Unter,needs_review,,,Where a chart's data labels are: below the point
+DCAppModel|Best Fit,,Best Fit,Optimale Anpassung,needs_review,,,Where a pie chart's data labels are: wherever they fit
 DCAppModel|Bevel,,Bevel,Abgeschrägt,needs_review,,,line join
 DCAppModel|Black Pen,,Black Pen,Schwarzer Stift,needs_review,,,
 DCAppModel|Blank Presentation,,Blank Presentation,Leere Präsentation,needs_review,,,
@@ -176,7 +179,8 @@ DCAppModel|Capitalize names of days,,Capitalize names of days,Wochentage immer g
 DCAppModel|Caps,,Caps,Großschreibung,needs_review,,,
 DCAppModel|Captions under pictures,,Captions under pictures,Beschriftungen unter Bildern,needs_review,,,
 DCAppModel|Categories,,Categories,Kategorien,needs_review,,,
-DCAppModel|Center,,Center,Zentriert,needs_review,,,"paragraph alignment
+DCAppModel|Center,,Center,Zentriert,needs_review,,,"Where a chart's data labels are: centred on the mark
+paragraph alignment
 tile alignment"
 DCAppModel|Centered,,Centered,Zentriert,needs_review,,,A shadow
 DCAppModel|Centimeters,,Centimeters,Zentimeter,needs_review,,,
@@ -260,6 +264,7 @@ DCAppModel|Dashed horizontal,,Dashed horizontal,Gestrichelt horizontal,needs_rev
 DCAppModel|Dashed upward diagonal,,Dashed upward diagonal,Gestrichelt diagonal nach oben,needs_review,,,
 DCAppModel|Dashed vertical,,Dashed vertical,Gestrichelt vertikal,needs_review,,,
 DCAppModel|Dashes,,Dashes,Strichtyp,needs_review,,,
+DCAppModel|Data Callout,,Data Callout,Datenlegende,needs_review,,,Data labels in callout boxes showing the category and value
 DCAppModel|Data Labels,,Data Labels,Datenbeschriftungen,needs_review,,,
 DCAppModel|Date and Time,,Date and Time,Datum und Uhrzeit,needs_review,,,
 DCAppModel|Date and time,,Date and time,Datum und Uhrzeit,needs_review,,,
@@ -454,7 +459,9 @@ DCAppModel|Insert Table…,,Insert Table…,Tabelle einfügen …,needs_review,,
 DCAppModel|Insert slides from %@ after the current slide:,,Insert slides from %@ after the current slide:,Folien aus %@ nach der aktuellen Folie einfügen:,needs_review,,,
 DCAppModel|Inserted %lld slides,one,Inserted %lld slides,%lld Folie eingefügt,needs_review,,,
 DCAppModel|Inserted %lld slides,other,Inserted %lld slides,%lld Folien eingefügt,needs_review,,,
+DCAppModel|Inside Base,,Inside Base,Basis innerhalb,needs_review,,,Where a chart's data labels are: inside the bar's base
 DCAppModel|Inside Borders,,Inside Borders,Innere Rahmenlinien,needs_review,,,
+DCAppModel|Inside End,,Inside End,Ende innerhalb,needs_review,,,Where a chart's data labels are: inside the bar's end
 DCAppModel|Inside Horizontal Border,,Inside Horizontal Border,Innere horizontale Rahmenlinie,needs_review,,,
 DCAppModel|Inside Vertical Border,,Inside Vertical Border,Innere vertikale Rahmenlinie,needs_review,,,
 "DCAppModel|Inspect Presentation: before you share it, check it for things people with disabilities might find hard to read.",,"Inspect Presentation: before you share it, check it for things people with disabilities might find hard to read.","Präsentation prüfen: Prüfen Sie sie vor dem Teilen auf Inhalte, die Menschen mit Behinderungen schwer lesen können.",needs_review,,,
@@ -478,7 +485,8 @@ DCAppModel|Large grid,,Large grid,Großes Raster,needs_review,,,
 DCAppModel|Last Slide,,Last Slide,Letzte Folie,needs_review,,,
 DCAppModel|Last Slide Viewed,,Last Slide Viewed,Zuletzt angezeigte Folie,needs_review,,,
 DCAppModel|Layout,,Layout,Layout,needs_review,,,
-DCAppModel|Left,,Left,Links,needs_review,,,"Where a chart's legend is
+DCAppModel|Left,,Left,Links,needs_review,,,"Where a chart's data labels are: left of the point
+Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Left Border,,Left Border,Rahmenlinie links,needs_review,,,
@@ -610,6 +618,7 @@ DCAppModel|Outline (.txt),,Outline (.txt),Gliederung (.txt),needs_review,,,
 DCAppModel|Outline/RTF (.rtf),,Outline/RTF (.rtf),Gliederung/RTF (.rtf),needs_review,,,
 DCAppModel|Outlined diamond,,Outlined diamond,Umrandete Raute,needs_review,,,
 DCAppModel|Outside Borders,,Outside Borders,Rahmenlinien außen,needs_review,,,
+DCAppModel|Outside End,,Outside End,Ende außerhalb,needs_review,,,Where a chart's data labels are: past the bar's end
 DCAppModel|Oval,,Oval,Ovaler Pfeil,needs_review,,,arrowhead kind
 DCAppModel|Oval ends,,Oval ends,Ovale Enden,needs_review,,,
 DCAppModel|PDF document (.pdf),,PDF document (.pdf),PDF-Dokument (.pdf),needs_review,,,
@@ -717,7 +726,8 @@ DCAppModel|Reuse Slides…,,Reuse Slides…,Folien wiederverwenden …,needs_rev
 DCAppModel|Revert,,Revert,Zurücksetzen,needs_review,,,
 DCAppModel|Review,,Review,Überprüfen,needs_review,,,
 DCAppModel|Ribbon,,Ribbon,Menüband,needs_review,,,
-DCAppModel|Right,,Right,Rechts,needs_review,,,"Where a chart's legend is
+DCAppModel|Right,,Right,Rechts,needs_review,,,"Where a chart's data labels are: right of the point
+Where a chart's legend is
 text box inset
 tile alignment"
 DCAppModel|Right Border,,Right Border,Rahmenlinie rechts,needs_review,,,

@@ -38,7 +38,18 @@
      }
  }
  
-@@ -389,6 +397,27 @@
+@@ -245,6 +253,10 @@
+     /// `c:errBars` on the values (y bars; a bar chart's run along its value axis).
+     #[serde(skip_serializing_if = "Option::is_none")]
+     pub error_bars: Option<ErrorBars>,
++    /// This series' data label position and contents (`c:ser/c:dLbls`) where they differ from the
++    /// chart's. DeckCraftNative's own (AB-T-0438).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub label_options: Option<LabelOptions>,
+ }
+ 
+ /// Error bars (`c:errBars`): how far each point's bar reaches below and above it.
+@@ -389,6 +401,31 @@
      /// A histogram's bin width (`cx:binSize`).
      #[serde(skip_serializing_if = "Option::is_none")]
      pub bin_size: Option<f64>,
@@ -63,10 +74,14 @@
 +    /// DeckCraftNative's own (AB-T-0437).
 +    #[serde(skip_serializing_if = "std::ops::Not::not")]
 +    pub bubble_size_width: bool,
++    /// The data labels' position and contents (a plot group's `c:dLbls`); whether they show is
++    /// `data_labels`. DeckCraftNative's own (AB-T-0438).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub label_options: Option<LabelOptions>,
      /// Original chart XML part kept for round-trip of unmodelled options.
      #[serde(skip_serializing_if = "Option::is_none")]
      pub raw: Option<String>,
-@@ -396,6 +425,66 @@
+@@ -396,8 +433,104 @@
      /// The PPTX writer clears this before comparing modelled state. Native saves keep it too.
      #[serde(skip_serializing_if = "ChartKept::is_empty")]
      pub kept: ChartKept,
@@ -107,6 +122,42 @@
 +    pub depth_axis: bool,
 +}
 +
++/// Where data labels sit and what they show (ECMA-376 `c:dLbls`). Unset fields are the schema's
++/// defaults: the chart type's own position, the value alone, no separator. DeckCraftNative's own
++/// (AB-T-0438).
++#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
++#[serde(default, rename_all = "camelCase")]
++pub struct LabelOptions {
++    /// `c:dLblPos`: `ctr`, `inEnd`, `inBase`, `outEnd`, `bestFit`, `l`, `r`, `t` or `b`.
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub position: Option<String>,
++    /// `c:showSerName`.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub series_name: bool,
++    /// `c:showCatName`.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub category_name: bool,
++    /// `c:showVal` off while the labels show something else.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub hide_value: bool,
++    /// `c:showPercent` (pie and doughnut charts).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub percent: bool,
++    /// `c:showLegendKey`: the series' key beside the label.
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub legend_key: bool,
++    /// Leader lines from a moved label to its point (`c:showLeaderLines`, or Office 2013's
++    /// `c15:showLeaderLines` on charts other than pies).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub leader_lines: bool,
++    /// `c:separator` between the contents; unset is ", ".
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub separator: Option<String>,
++    /// Drawn in a callout shape (PowerPoint's Data Callout: `c15:spPr` with a `wedgeRectCallout`).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub callout: bool,
+ }
+ 
 +/// The second plot of a pie of pie or bar of pie chart (`c:ofPieChart`): which points it takes and
 +/// its size. DeckCraftNative's own (AB-T-0434).
 +#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -130,10 +181,12 @@
 +    /// `c:serLines`: lines joining the split-off slice to the second plot.
 +    #[serde(skip_serializing_if = "std::ops::Not::not")]
 +    pub series_lines: bool,
- }
- 
++}
++
  /// One relationship of a chart part, with the target string as it was written.
-@@ -484,6 +573,9 @@
+ #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+ #[serde(rename_all = "camelCase")]
+@@ -484,6 +617,9 @@
              up_down_bars: false,
              bin_count: None,
              bin_size: None,

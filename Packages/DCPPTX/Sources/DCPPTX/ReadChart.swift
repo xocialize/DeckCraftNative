@@ -231,8 +231,11 @@ extension PPTXRead {
             // `<c:showVal/>` without a val attribute means true, as in the schema's default.
             // The setting belongs to this plot group: a group that asks for no labels keeps them
             // off, even when another group of a combo chart asks for them (#868).
-            let groupLabels = g.path(["dLbls", "showVal"]).map { $0.bool("val") ?? true }
+            // Labels that show a series or category name or a percentage without the value show too (the port's
+            // own, AB-T-0438: deckcraft reads `c:showVal` alone).
+            let groupLabels = g.child("dLbls").flatMap(labelsShown)
             if groupLabels == true { c.dataLabels = true }
+            if let d = g.child("dLbls"), c.labelOptions == nil { c.labelOptions = labelOptions(d) }
             kinds.append(kind)
             let valAxis = groupValAxis(g)
             let secondary = valAxis != nil && !optEqual(valAxis, primaryVal)
@@ -247,12 +250,13 @@ extension PPTXRead {
                 ser.kind = kind
                 ser.secondaryAxis = secondary
                 // `<c:showVal/>` without a val attribute means true, as in the schema's default.
-                if let d = s.child("dLbls")?.child("showVal").map({ $0.bool("val") ?? true }) {
+                if let d = s.child("dLbls").flatMap(labelsShown) {
                     ser.dataLabels = d
                 } else if groupLabels == false {
                     // The group asks for no labels and the series does not say otherwise.
                     ser.dataLabels = false
                 }
+                ser.labelOptions = s.child("dLbls").map(labelOptions)
                 for t in s.childrenNamed("trendline").prefix(16) {
                     if let t = trendline(t) { ser.trendlines.append(t) }
                 }
@@ -302,6 +306,7 @@ extension PPTXRead {
             c.title = c.series.first.map(\.name).flatMap { $0.isEmpty ? nil : $0 }
         }
         guard let first = kinds.first else { return nil }
+        normalizeLabelOptions(&c)
         c.kind = kinds.contains { $0 != first } ? .combo : first
         // 3-D and of-pie settings describe a chart of one group; a combo is written flat.
         if c.kind == .combo {
@@ -400,6 +405,47 @@ extension PPTXRead {
 
     /// A whole number from a `val` that may carry a percent sign (`ST_HPercent`, `ST_GapAmount`: `100`
     /// or `100%`), within `range`; nil when it isn't one.
+    /// Whether a `c:dLbls` shows its labels: any of the value, series name, category name or percentage
+    /// (`<c:showVal/>` without a val attribute means true, as in the schema's default); nil when it says nothing.
+    static func labelsShown(_ d: XMLEl) -> Bool? {
+        let flags = ["showVal", "showSerName", "showCatName", "showPercent"].compactMap { d.child($0).map { $0.bool("val") ?? true } }
+        return flags.isEmpty ? nil : flags.contains(true)
+    }
+
+    /// Every `c:dLblPos` value (ST_DLblPos).
+    static let labelPositions = ["bestFit", "b", "ctr", "inBase", "inEnd", "l", "outEnd", "r", "t"]
+
+    /// A `c:dLbls`'s position and contents (the port's own, AB-T-0438). Leader lines are Office 2013's
+    /// `c15:showLeaderLines` where it gives them (PowerPoint writes `c:showLeaderLines val="0"` beside it on charts
+    /// other than pies), and a callout is `c15:spPr`'s callout geometry.
+    static func labelOptions(_ d: XMLEl) -> LabelOptions {
+        func on(_ k: String) -> Bool { d.child(k).map { $0.bool("val") ?? true } ?? false }
+        var o = LabelOptions()
+        o.position = d.childVal("dLblPos").flatMap { p in labelPositions.first { bytesEqual($0, p) } }
+        o.seriesName = on("showSerName")
+        o.categoryName = on("showCatName")
+        o.percent = on("showPercent")
+        o.legendKey = on("showLegendKey")
+        o.hideValue = !(d.child("showVal").map { $0.bool("val") ?? true } ?? false) && (o.seriesName || o.categoryName || o.percent)
+        o.separator = d.child("separator").map { $0.text }
+        o.leaderLines = on("showLeaderLines")
+        for ext in d.child("extLst").map({ Array($0.childrenNamed("ext")) }) ?? [] {
+            if let l = ext.child("showLeaderLines") { o.leaderLines = l.bool("val") ?? true }
+            if let g = ext.child("spPr")?.child("prstGeom")?.attr("prst"), hasByteSuffix(g, "Callout") { o.callout = true }
+        }
+        return o
+    }
+
+    /// Label options that say what the defaults say are nil, and a series' equal to the chart's are nil
+    /// (`Chart.labelOptions(_:)` resolves them), so a chart without positions or contents reads as before.
+    static func normalizeLabelOptions(_ c: inout Chart) {
+        if c.labelOptions == LabelOptions() { c.labelOptions = nil }
+        for i in c.series.indices where (c.series[i].labelOptions ?? c.labelOptions) == c.labelOptions
+            || (c.labelOptions == nil && c.series[i].labelOptions == LabelOptions()) {
+            c.series[i].labelOptions = nil
+        }
+    }
+
     static func percentVal(_ e: XMLEl?, _ range: ClosedRange<Int64>) -> Int64? {
         guard var v = e?.attr("val").map({ String(rustTrim($0)) }) else { return nil }
         if hasByteSuffix(v, "%") { v = String(v.dropLast()) }

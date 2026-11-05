@@ -264,8 +264,9 @@ extension PPTXWrite {
                     w.close("c:dPt")
                 }
             }
-            if let d = s.dataLabels, g != .surface {
-                dataLabels(&w, c, d)
+            // A series' own labels: its switch, or position and contents of its own (AB-T-0438).
+            if g != .surface, s.dataLabels != nil || s.labelOptions != nil {
+                dataLabels(&w, c, c.seriesDataLabels(s), c.labelOptions(s), kind)
             }
             // After labels, before the category and value caches (ECMA-376 series content order).
             if g == .bar || g == .line || g == .area || g == .scatter {
@@ -376,21 +377,57 @@ extension PPTXWrite {
             w.close("c:trendline")
         }
 
-        static func dataLabels(_ w: inout W, _ c: Chart, _ show: Bool) {
+        /// A `c:dLbls`: on or off, with the position (where series of `kind` take it) and contents of `o` (the
+        /// port's own, AB-T-0438; deckcraft writes the value switch alone). Defaults write what deckcraft writes.
+        static func dataLabels(_ w: inout W, _ c: Chart, _ show: Bool, _ o: LabelOptions, _ kind: ChartType) {
             w.open0("c:dLbls")
+            if show && o.callout {
+                // PowerPoint's Data Callout: a white box with a grey outline, its callout shape in `c15:spPr`.
+                w.open0("c:spPr")
+                DML.solid(&w, .scheme(.bg1))
+                w.open0("a:ln")
+                DML.solid(&w, .rgb(.rgb(0xA6, 0xA6, 0xA6)))
+                w.close("a:ln")
+                w.close("c:spPr")
+            }
             txPr(&w, c)
+            if show, let p = o.position(for: kind, threeD: c.threeD != nil) {
+                w.val("c:dLblPos", p)
+            }
             for (n, v) in [
-                ("c:showLegendKey", false),
-                ("c:showVal", show),
-                ("c:showCatName", false),
-                ("c:showSerName", false),
-                ("c:showPercent", false),
+                ("c:showLegendKey", show && o.legendKey),
+                ("c:showVal", show && !o.hideValue),
+                ("c:showCatName", show && o.categoryName),
+                ("c:showSerName", show && o.seriesName),
+                ("c:showPercent", show && o.percent),
                 ("c:showBubbleSize", false),
             ] {
                 w.val(n, v ? 1 : 0)
             }
+            if show, let sep = o.separator {
+                w.open0("c:separator")
+                w.text(sep)
+                w.close("c:separator")
+            }
+            if show && o.leaderLines {
+                w.val("c:showLeaderLines", 1)
+            }
+            if show && o.callout {
+                w.open0("c:extLst")
+                w.open("c:ext", A.new().a("uri", "{CE6537A1-D6FC-4f65-9D91-7224C49458BB}").a("xmlns:c15", c15NS))
+                w.open0("c15:spPr")
+                w.open("a:prstGeom", A.new().a("prst", "wedgeRectCallout"))
+                w.empty0("a:avLst")
+                w.close("a:prstGeom")
+                w.close("c15:spPr")
+                w.close("c:ext")
+                w.close("c:extLst")
+            }
             w.close("c:dLbls")
         }
+
+        /// Office 2013's chart extensions ([MS-ODRAWXML]).
+        static let c15NS = "http://schemas.microsoft.com/office/drawing/2012/chart"
 
         static let axCat: UInt32 = 50_001
         static let axVal: UInt32 = 50_002
@@ -644,7 +681,7 @@ extension PPTXWrite {
                 series(&w, c, s, i, kind, g)
             }
             if c.dataLabels && g != .surface {
-                dataLabels(&w, c, true)
+                dataLabels(&w, c, true, c.labelOptions ?? LabelOptions(), kind)
             }
             func gapDepth(_ w: inout W, _ t: Chart3D) {
                 if let v = t.gapDepth { w.val("c:gapDepth", Swift.min(v, 500)) }

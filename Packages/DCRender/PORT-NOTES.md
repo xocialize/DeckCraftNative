@@ -146,6 +146,13 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
   palette's colour; a line or marker takes its first stop. The legend lists each trendline after the series with
   a dashed key in its ink and PowerPoint's automatic name ("Linear (North)", "Expon.", "Log.", "Poly.",
   "Power", "2 per. Mov. Avg.") or its own `c:name`.
+- **Data label positions and contents** (AB-T-0438). A label shows the series name, category name, value and
+  percentage its options ask for, joined by their separator (`Chart.labelText`), with the series' key before it
+  and in a white callout box pointing at its mark for a Data Callout. Bars place it at Center, Inside End, Inside
+  Base or Outside End (and past the end of a negative bar); unset or Outside End is deckcraft's place, so the
+  corpus draws as before. Line, scatter and bubble points get labels (deckcraft draws none), right of the point
+  unless placed Center, Left, Above or Below; an area's stay undrawn. A pie places them along the radius, outside
+  it reading away from the centre. Checked beside PowerPoint's PDF of the same deck.
 
 ## Chart builds: a chart drawn part by part (AB-T-0443)
 

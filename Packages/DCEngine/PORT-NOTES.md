@@ -642,6 +642,15 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   steps. Choosing any Sequence for a step of a file's build kept apart (`chartElement`) joins that run of steps on
   the chart into one animation, as PowerPoint rewrites them. `asOne` also clears `chartBackground`; an unknown name
   changes nothing. Test: `ChartBuildCommandTests` (5).
+- **`chart.options` places the data labels and sets what they show** (2026-11-05, AB-T-0438; `CmdChartLabels.swift`).
+  deckcraft's labels are on or off. New keys: `labelPosition` (`ctr`, `inEnd`, `inBase`, `outEnd`, `bestFit`, `l`,
+  `r`, `t`, `b`, or null for the chart type's own), `labelContents {seriesName?, categoryName?, value?, percent?,
+  legendKey?, leaderLines?}`, `labelSeparator` (text up to 255 characters, null for ", ") and `labelCallout`
+  (PowerPoint's Data Callout). Any of them turns the labels on and sets `Chart.labelOptions` for every series (the
+  series' own go, as `dataLabels` clears theirs); `dataLabels: false` is PowerPoint's None and takes the options
+  too. A position the chart's series don't all take (`Chart.labelPositions`: no Outside End on stacked bars, none on
+  an area, doughnut, radar or 3-D chart) and labels that would show nothing are refused before anything changes.
+  None of them drops `raw`. Tests: `InsertCommandTests.chartOptionsPlaceTheDataLabels`.
 
 ### Tests
 

@@ -439,12 +439,24 @@ public enum ChartRender {
                 ctx.strokePath(p)
                 if c.seriesDataLabels(s) {
                     let mid = a0 + sweep / 2
-                    let lp = Point(cen.x + r * 0.65 * cos(mid), cen.y + r * 0.65 * sin(mid))
-                    // On the slices themselves: white, unless the chart's text was given a colour.
-                    label(
-                        ctx, rctx, m, c.dataLabel(s, v), Rect(lp.x - 30, lp.y - 10, lp.x + 30, lp.y + 10), base, .center, .middle,
-                        c.textColor != nil ? textCol : .white, false
-                    )
+                    let o = c.labelOptions(s)
+                    let pos = o.position(for: c.kind)
+                    // Along the radius by position (AB-T-0438); unset, deckcraft's two thirds out.
+                    let k = switch pos { case "ctr": 0.5; case "inEnd": 0.8; case "outEnd": 1.12; default: 0.65 }
+                    let lp = Point(cen.x + r * k * cos(mid), cen.y + r * k * sin(mid))
+                    let outside = k > 1 || o.callout
+                    let text = c.labelText(s, i, v, share: v / total)
+                    let col = c.textColor != nil || outside ? textCol : .white
+                    if outside {
+                        // Outside the pie: the label reads away from the centre.
+                        let right = cos(mid) >= 0
+                        let at = o.callout ? Point(cen.x + r * 1.1 * cos(mid), cen.y + r * 1.1 * sin(mid)) : lp
+                        let box = Rect(right ? at.x : at.x - 200, at.y - base, right ? at.x + 200 : at.x, at.y + base)
+                        dataLabel(ctx, rctx, m, c, s, 0, i, text, box, right ? .left : .right, .middle, base, col, Point(cen.x + r * 0.95 * cos(mid), cen.y + r * 0.95 * sin(mid)))
+                    } else {
+                        // On the slices themselves: white, unless the chart's text was given a colour.
+                        dataLabel(ctx, rctx, m, c, s, 0, i, text, Rect(lp.x - 30, lp.y - 10, lp.x + 30, lp.y + 10), .center, .middle, base, col, nil)
+                    }
                 }
                 a0 += sweep
             }
@@ -688,8 +700,7 @@ public enum ChartRender {
                         }
                     }
                     if let t = barDataLabel(c, s, i) {
-                        let lr = horiz ? Rect(r.x1 + 2, r.y0, r.x1 + 40, r.y1) : Rect(r.x0 - 10, r.y0 - base * 1.4, r.x1 + 10, r.y0)
-                        label(ctx, rctx, m, t, lr, base * 0.9, horiz ? .left : .center, horiz ? .middle : .bottom, textCol, false)
+                        barLabel(ctx, rctx, m, c, s, si, i, t, r, horiz, v < 0, base, textCol)
                     }
                 }
             }
@@ -747,6 +758,13 @@ public enum ChartRender {
                 ctx.setStroke(StrokeStyle(ow))
                 ctx.strokePath(circlePath(q, r))
             }
+        }
+        // A line, scatter or bubble point's data label (the port's own, AB-T-0438: deckcraft draws none); an area's
+        // stay unlabelled, as PowerPoint places an area's labels without a position.
+        func pointLabelOf(_ si: Int, _ s: Series, _ kind: ChartType, _ i: Int, _ q: Point) {
+            guard !kind.isArea, c.seriesDataLabels(s), let v = s.values.at(i) ?? nil else { return }
+            let gap = kind == .bubble ? (bubble.radius(s, i) ?? 0) : [.lineMarkers, .scatter].contains(kind) || s.marker != nil ? 3.5 : 0
+            pointLabel(ctx, rctx, m, c, s, si, i, c.labelText(s, i, v), q, gap, base * 0.9, textCol)
         }
         for (si, s) in c.series.enumerated() {
             let kind = c.seriesKind(s)
@@ -821,6 +839,7 @@ public enum ChartRender {
                     ctx.setPaint(.color(col, 1))
                     for (j, q) in pts.enumerated() where has(si, cats[j]) { ctx.fillPath(circlePath(q, 3.5)) }
                 }
+                for (j, q) in pts.enumerated() where has(si, cats[j]) { pointLabelOf(si, s, kind, cats[j], q) }
                 continue
             }
             if only != nil && !cats.contains(where: { has(si, $0) }) { continue }
@@ -847,6 +866,7 @@ public enum ChartRender {
                 ctx.setPaint(.color(col, 1))
                 for q in pts { ctx.fillPath(circlePath(q, 3.5)) }
             }
+            for (j, q) in pts.enumerated() { pointLabelOf(si, s, kind, cats[j], q) }
         }
         // A category position (0-based, fractional) as a slot, the way `slot` places the bars.
         let slotAt = { (x: Double) -> Double in backwards ? Double(ncat) - 1 - x + fwd : x + back }
@@ -902,7 +922,7 @@ public enum ChartRender {
     /// an explicit zero does.
     static func barDataLabel(_ c: Chart, _ s: Series, _ i: Int) -> String? {
         guard c.seriesDataLabels(s), let v = s.values.at(i) ?? nil else { return nil }
-        return c.dataLabel(s, v)
+        return c.labelText(s, i, v)
     }
 
     /// A corner of `plot` whose box stays clear of `pts` (the drawn trendline).
@@ -1199,6 +1219,138 @@ extension ChartRender {
             s.trendlines.prefix(8).enumerated().map { ti, t in
                 (trendlineName(t, s.name), BarPaint.line(trendInk.at(ti % trendInk.count) ?? .rgb(0x22, 0x22, 0x22), [6, 3.5]), nil)
             }
+        }
+    }
+}
+
+// MARK: - Data label position and contents (AB-T-0438)
+
+extension ChartRender {
+    /// The size a label's text takes, estimated as the legend estimates its entries.
+    static func labelExtent(_ text: String, _ size: Double) -> (Double, Double) {
+        let lines = rustLines(text)
+        let widest = Double(lines.map(\.unicodeScalars.count).max() ?? 0)
+        return (widest * size * 0.55, Double(Swift.max(lines.count, 1)) * size * 1.25)
+    }
+
+    /// One data label of series `s` (index `si`, point `i`): `text` placed in `box` by `align` and `anchor`, with
+    /// the series' legend key before it when its options show one, and in PowerPoint's Data Callout box pointing
+    /// at `target` when they ask for one.
+    static func dataLabel(
+        _ ctx: Canvas, _ rctx: Resolve.Ctx, _ m: Affine, _ c: Chart, _ s: Series, _ si: Int, _ i: Int, _ text: String, _ box: Rect,
+        _ align: Align, _ anchor: Anchor, _ size: Double, _ col: Rgba, _ target: Point?
+    ) {
+        let o = c.labelOptions(s)
+        if !o.legendKey && !o.callout {
+            label(ctx, rctx, m, text, box, size, align, anchor, col, false)
+            return
+        }
+        let (tw, th) = labelExtent(text, size)
+        let key = o.legendKey ? size * 0.6 : 0
+        let gap = key > 0 ? size * 0.3 : 0
+        let w = tw + key + gap
+        let x0 = align == .left ? box.x0 : align == .right ? box.x1 - w : box.center.x - w / 2
+        let y0 = anchor == .top ? box.y0 : anchor == .bottom ? box.y1 - th : box.center.y - th / 2
+        if o.callout {
+            let pad = size * 0.3
+            let r = Rect(x0 - pad, y0 - pad, x0 + w + pad, y0 + th + pad)
+            var p = rectPath(r)
+            if let t = target, !r.contains(t) {
+                // The pointer leaves the box's side nearest the point.
+                let half = Swift.min(r.width, r.height) * 0.2
+                var tri = BezPath()
+                if t.y > r.y1 || t.y < r.y0 {
+                    let y = t.y > r.y1 ? r.y1 : r.y0
+                    let x = t.x.clamped(r.x0 + half, r.x1 - half)
+                    tri.moveTo(Point(x - half, y))
+                    tri.lineTo(t)
+                    tri.lineTo(Point(x + half, y))
+                } else {
+                    let x = t.x > r.x1 ? r.x1 : r.x0
+                    let y = t.y.clamped(r.y0 + half, r.y1 - half)
+                    tri.moveTo(Point(x, y - half))
+                    tri.lineTo(t)
+                    tri.lineTo(Point(x, y + half))
+                }
+                tri.closePath()
+                p.extend(tri.elements)
+            }
+            ctx.setTransform(m)
+            ctx.setPaint(.color(.white, 1))
+            ctx.fillPath(p)
+            ctx.setPaint(.color(.rgb(0xA6, 0xA6, 0xA6), 1))
+            ctx.setStroke(StrokeStyle(0.75))
+            ctx.strokePath(p)
+        }
+        if key > 0 {
+            let k = Rect(x0, y0 + (th - key) / 2, x0 + key, y0 + (th + key) / 2)
+            fillWith(ctx, rctx, c.varyColors && c.series.count == 1 ? .color(seriesColor(rctx, c, i)) : paintOf(rctx, s.fill, seriesColor(rctx, c, si)), k, m)
+        }
+        let tx = x0 + key + gap
+        label(ctx, rctx, m, text, Rect(tx, y0, tx + tw + size, y0 + th), size, .left, .top, o.callout ? textCol(c, rctx) : col, false)
+    }
+
+    static func textCol(_ c: Chart, _ rctx: Resolve.Ctx) -> Rgba { rctx.color(c.textColor ?? defaultTextColor(), nil) }
+
+    /// A bar's data label by its position: outside or inside its value end, centred, or inside its base. Unset,
+    /// deckcraft's place (above a column, after a bar), kept for the corpus.
+    static func barLabel(
+        _ ctx: Canvas, _ rctx: Resolve.Ctx, _ m: Affine, _ c: Chart, _ s: Series, _ si: Int, _ i: Int, _ text: String, _ r: Rect,
+        _ horiz: Bool, _ negative: Bool, _ base: Double, _ col: Rgba
+    ) {
+        let size = base * 0.9
+        let o = c.labelOptions(s)
+        // Outside End is where deckcraft puts every label (above a column, after a bar); a negative bar's or a
+        // callout's is placed past its own end.
+        var pos = o.position(for: c.seriesKind(s), threeD: c.threeD != nil) ?? (o.callout ? "outEnd" : nil)
+        if pos == "outEnd" && !negative && !o.callout { pos = nil }
+        let (tw, th) = labelExtent(text, size)
+        let lift = o.callout ? size * 0.9 : 0
+        if horiz {
+            // The value end is on the right (the left for a negative bar).
+            let (endX, baseX) = negative ? (r.x0, r.x1) : (r.x1, r.x0)
+            let out = negative ? -1.0 : 1.0
+            let target = Point(endX, r.center.y)
+            switch pos {
+            case "ctr": dataLabel(ctx, rctx, m, c, s, si, i, text, r, .center, .middle, size, col, nil)
+            case "inEnd": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(endX - out * (tw + size * 2) , r.y0, endX - out * 2, r.y1).abs, negative ? .left : .right, .middle, size, col, nil)
+            case "inBase": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(baseX + out * 2, r.y0, baseX + out * (tw + size * 2), r.y1).abs, negative ? .right : .left, .middle, size, col, nil)
+            case "outEnd":
+                dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(endX + out * (2 + lift), r.y0, endX + out * (tw + size * 2 + lift), r.y1).abs, negative ? .right : .left, .middle, size, col, target)
+            default: dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(r.x1 + 2, r.y0, r.x1 + 40, r.y1), .left, .middle, size, col, nil)
+            }
+        } else {
+            let (endY, baseY) = negative ? (r.y1, r.y0) : (r.y0, r.y1)
+            let out = negative ? 1.0 : -1.0
+            let target = Point(r.center.x, endY)
+            let wide = Rect(r.center.x - tw / 2 - size * 2, 0, r.center.x + tw / 2 + size * 2, 0)
+            switch pos {
+            case "ctr": dataLabel(ctx, rctx, m, c, s, si, i, text, r, .center, .middle, size, col, nil)
+            case "inEnd": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(wide.x0, endY, wide.x1, endY - out * (th + 2)).abs, .center, negative ? .bottom : .top, size, col, nil)
+            case "inBase": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(wide.x0, baseY, wide.x1, baseY + out * (th + 2)).abs, .center, negative ? .top : .bottom, size, col, nil)
+            case "outEnd":
+                dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(wide.x0, endY + out * (2 + lift), wide.x1, endY + out * (th + 2 + lift)).abs, .center, negative ? .top : .bottom, size, col, target)
+            default: dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(r.x0 - 10, r.y0 - base * 1.4, r.x1 + 10, r.y0), .center, .bottom, size, col, nil)
+            }
+        }
+    }
+
+    /// A line, scatter or bubble point's data label by its position: centred on it, left, right, above or
+    /// below; PowerPoint's default is to the right.
+    static func pointLabel(
+        _ ctx: Canvas, _ rctx: Resolve.Ctx, _ m: Affine, _ c: Chart, _ s: Series, _ si: Int, _ i: Int, _ text: String, _ q: Point,
+        _ gapR: Double, _ size: Double, _ col: Rgba
+    ) {
+        let o = c.labelOptions(s)
+        let (tw, th) = labelExtent(text, size)
+        let g = gapR + size * 0.3 + (o.callout ? size * 0.6 : 0)
+        let w = tw + size * 2
+        switch o.position(for: c.seriesKind(s), threeD: c.threeD != nil) ?? (o.callout ? "t" : "r") {
+        case "ctr": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - w, q.y - th, q.x + w, q.y + th), .center, .middle, size, col, nil)
+        case "l": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - g - w, q.y - th, q.x - g, q.y + th), .right, .middle, size, col, q)
+        case "t": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - w, q.y - g - th, q.x + w, q.y - g), .center, .bottom, size, col, q)
+        case "b": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - w, q.y + g, q.x + w, q.y + g + th), .center, .top, size, col, q)
+        default: dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x + g, q.y - th, q.x + g + w, q.y + th), .left, .middle, size, col, q)
         }
     }
 }
