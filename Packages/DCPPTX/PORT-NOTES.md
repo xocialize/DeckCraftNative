@@ -288,6 +288,7 @@ extension of `PPTX` in `WriteMod.swift`; everything else is internal, under the 
 | `write/theme.rs` | `WriteTheme.swift` | `PPTXWrite.Themes.themeXML` |
 | — | `WriteChartexStyle.swift` | `PPTXWrite.ChartexStyle`: the style and colour style parts every `chartEx` part gets (divergence 7); DeckCraftNative's own |
 | — | `WriteChartPatch.swift` | `PPTXWrite.Charts.patchedXML`: a `chart.options` edit (title, legend, data labels, gridlines) or a `chart.data` edit (categories, series, their names and values) written into the kept chart part, with the table of which command owns which element (divergence 8); DeckCraftNative's own |
+| — | `WriteChartWorkbook.swift` | `PPTXWrite.Charts.book`, `freshBook`, `updatedWorkbook`: the embedded workbook of a chart whose data the writer wrote, the original updated in place or a new one-sheet workbook (divergence 9); DeckCraftNative's own |
 | `write/timing.rs` | `WriteTiming.swift` | `PPTXWrite.Timing`: `transition`, `timing` and the effect builders |
 | in-file tests | `Tests/DCPPTXTests/WriteTests.swift` | `WriteDMLTests` (1), `WriteShapesTests` (1), `WriteChartRegionMapTests` (1), `WriteChartTests` (3); 4 of them read back through `PPTXRead` |
 | — | `Tests/DCPPTXTests/PPTXExportOracleTests.swift` | Export parity, schema validation and deckcraft's read-back over the 9 corpus decks |
@@ -401,10 +402,10 @@ The writer calls these reader functions, with Rust's parameter and return shapes
      scatter series without x values gets no `c:xVal`. In a combo chart the last group must be clustered
      columns (what the model's series without a type of its own is), otherwise the part is regenerated: the
      reader takes series in file order;
-   - **the workbook:** dropped with `c:externalData` (`Charts.withoutWorkbook`): its cells would contradict
-     the chart, and PowerPoint's Edit Data would bring the old numbers back. PowerPoint builds a new sheet from
-     the caches, as it does for a generated chart. The style, colour and drawing parts stay. Writing the new
-     data into the workbook is AB-T-0435.
+   - **the workbook:** taken out with `c:externalData` (`Charts.withoutWorkbook`): its cells would contradict
+     the chart, and PowerPoint's Edit Data would bring the old numbers back. The style, colour and drawing
+     parts stay. Since divergence 9 the writer links the original updated with the new data, or a new
+     workbook, instead.
 
    `Charts.chartPart` returns the kept parts to write with the part (nil for a generated one), so
    `chartRel` writes the style parts without the workbook. The patched part is used only when reading it
@@ -418,8 +419,45 @@ The writer calls these reader functions, with Rust's parameter and return shapes
    PowerPoint fixtures, where every edit keeps every element and part apart from the one it removes (for
    `--data`, apart from the series' data elements and the workbook) and reads back with the data asked for,
    and `Tools/pptx/powerpoint-check.sh` opens all of them without a repair prompt. The ported
-   `editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` still checks that the workbook goes; it now
-   also checks that the chart's drawing stays.
+   `editingChartAfterNativeReopenDoesNotExportAStaleWorkbook` still checks that the stale workbook goes; it
+   now also checks that the chart's drawing stays.
+9. **A chart whose data the writer wrote has an embedded workbook (2026-11-05, deliberate; AB-T-0435).**
+   deckcraft writes none: not for a new chart, and an edit drops the original's. PowerPoint then builds a
+   sheet from the caches when asked to edit the data (O-31), so formulas, other sheets and formatting a user
+   had are lost, and a new chart has nothing behind it. Now `Charts.chartPart` says when the data was written
+   from the model (`fresh`: a generated part, or one patched by `chart.data`), and `chartRel` links that part
+   to a workbook at `ppt/embeddings/Microsoft_Excel_WorksheetN.xlsx` (N the chart's), with
+   `<c:externalData r:id=…><c:autoUpdate val="0"/>` after `c:txPr`, as PowerPoint writes it:
+   - **the cells** are what the part's own ranges (`c:f`) and caches say (`Charts.rangeClaims`). Only the
+     generator's ranges are read (one column of `Sheet1`); a part with others gets no workbook, with a
+     warning. A range that would contradict an earlier one moves to a free column and its `c:f` follows:
+     deckcraft gives every scatter series' x values column A, and a bubble series' sizes the next series'
+     y column;
+   - **the original, updated** when the chart had a workbook package whose ranges were the generator's for
+     the chart as read (PowerPoint's own layout: the review's seven PowerPoint-made fixtures all are): the
+     chart's cells set (numbers, inline strings; a cell keeps its style, loses its formula), cells only the
+     old ranges covered cleared, a table over the data resized with its columns named from the header row,
+     the calculation chain dropped, `fullCalcOnLoad` set so formulas reading the cells recalculate. Other
+     sheets, other cells, shared strings, styles and the theme stay. A cell the data grows into is
+     overwritten, as PowerPoint's Edit Data would;
+   - **a new workbook** otherwise (`Charts.newWorkbook`: `Sheet1`, inline strings, a minimal style part, no
+     table), with a warning when it replaces an original: ranges in another layout, an OLE object, a shared or
+     array formula over the cells, a table not at A1 or with a totals row or calculated column, a header that
+     can't name a column, or a package that doesn't read.
+
+   An Office 2016 chart's fallback gets none (the `chartEx` part carries the data), and `chartEx` parts are
+   unchanged: they still go without a workbook once edited. Untouched and `chart.options`-patched parts keep
+   theirs as before. The export oracle applies the divergence to deckcraft's package (`expectedWorkbooks`:
+   each plain chart Swift links is deckcraft's run through `Charts.freshBook`, byte for byte, and the others
+   must be exactly the `chartEx` fallbacks); deckcraft reads the package back to its own model apart from the
+   workbook it keeps. Three ported tests changed: `chartsRoundTrip` compares the kept workbook's bytes (it is
+   renamed `keptN` on the next save, as every kept part is), `plainChartHasNoStyleParts` allows the workbook
+   relationship, and `anEditedChartDoesNotWriteAStaleWorkbook` checks that the workbook written holds the
+   edit; `IntegrationChartEmbedTests` strips the written workbook before adding its own. Tests:
+   `WriteChartWorkbookTests` (every plain type's workbook agrees with its ranges; clashing ranges move; a
+   PowerPoint-shaped workbook updated in place, grown and shrunk; each fallback; a deck round trip).
+   `Tools/pptx/chart-edit-sweep.py --data` now also checks that every edited chart's workbook agrees with it
+   and says whether it was updated, replaced or new; `Tools/pptx/excel-check.sh` opens workbooks in Excel.
 
 ## Integration tests
 

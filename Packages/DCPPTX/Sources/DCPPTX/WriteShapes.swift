@@ -398,7 +398,7 @@ extension PPTXWrite {
                     // The kept workbook belongs to the `chartEx` part; the fallback has none.
                     plain.kept = ChartKept()
                 }
-                let rid = x.chartRel(o, plain)
+                let rid = x.chartRel(o, plain, workbook: ex == nil)
                 frameOpen(&w, x, o, id, s)
                 w.open("a:graphicData", A.new().a("uri", "http://schemas.openxmlformats.org/drawingml/2006/chart"))
                 w.empty("c:chart", A.new().a("xmlns:c", OPC.nsC).a("r:id", rid))

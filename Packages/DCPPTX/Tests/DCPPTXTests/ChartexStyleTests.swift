@@ -191,10 +191,11 @@ private func styleTargets(_ pkg: [UInt8], _ chartex: String) throws -> (style: S
         #expect(colors.elements.contains { $0.is("schemeClr") })
     }
 
-    /// Plain charts keep deckcraft's package: no style parts.
+    /// Plain charts keep deckcraft's package: no style parts. Their one relationship is the workbook the port
+    /// adds (AB-T-0435).
     @Test func plainChartHasNoStyleParts() throws {
         let pkg = try PPTX.export(chartDeck(.column))
-        #expect(rels(pkg, "ppt/charts/chart1.xml").isEmpty)
+        #expect(rels(pkg, "ppt/charts/chart1.xml").map(\.ty) == [PPTXWrite.Charts.rtPackage])
         #expect(IT.part(pkg, "ppt/charts/style1.xml") == nil)
     }
 

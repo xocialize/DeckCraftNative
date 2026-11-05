@@ -95,18 +95,53 @@ private func expectedDivergences(_ theirs: [String: [UInt8]]) -> [String: [UInt8
     return out
 }
 
-/// A model read by deckcraft without the `kept` sidecars that hold only the style parts Swift adds to a
-/// `chartEx` part (`expectedDivergences`).
+/// The second divergence (AB-T-0435): a plain chart written from the model is linked to a workbook holding its
+/// data (`PPTXWrite.Charts.freshBook`), as PowerPoint writes one; an Office 2016 chart's fallback is not. Applied
+/// to the charts Swift linked to a workbook (`mine`); the others must be exactly the `chartEx` fallbacks.
+private func expectedWorkbooks(_ theirs: [String: [UInt8]], _ mine: [String: [UInt8]], _ name: String) -> [String: [UInt8]] {
+    var out = theirs
+    let charts = theirs.keys.compactMap { k in k.wholeMatch(of: /ppt\/charts\/chart(\d+)\.xml/).flatMap { Int($0.1) } }.sorted()
+    let chartex = theirs.keys.filter { $0.wholeMatch(of: /ppt\/charts\/chartEx\d+\.xml/) != nil }.count
+    guard var types = theirs["[Content_Types].xml"].map({ String(decoding: $0, as: UTF8.self) }) else { return out }
+    var without = 0
+    for n in charts {
+        let chart = "ppt/charts/chart\(n).xml", book = "ppt/embeddings/Microsoft_Excel_Worksheet\(n).xlsx"
+        guard mine[book] != nil else {
+            without += 1
+            continue
+        }
+        guard let xml = theirs[chart], let (linked, data) = PPTXWrite.Charts.freshBook(xml, "rId1") else {
+            Issue.record("\(name): \(chart) gets no workbook")
+            continue
+        }
+        out[chart] = linked
+        out[book] = data
+        out["ppt/charts/_rels/chart\(n).xml.rels"] = RelsOut(items: [("rId1", PPTXWrite.Charts.rtPackage, "../embeddings/Microsoft_Excel_Worksheet\(n).xlsx", false)]).toXML()
+        let own = #"<Override PartName="/\#(chart)" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>"#
+        types = types.replacingOccurrences(of: own, with: own + #"<Override PartName="/\#(book)" ContentType="\#(PPTXWrite.Charts.ctWorkbook)"/>"#)
+    }
+    #expect(without == chartex, "\(name): \(without) plain charts without a workbook, \(chartex) chartEx fallbacks")
+    out["[Content_Types].xml"] = Array(types.utf8)
+    return out
+}
+
+/// A model read by deckcraft without the `kept` sidecars that hold only the parts Swift adds: a `chartEx`
+/// part's style parts (`expectedDivergences`) and a chart's workbook (`expectedWorkbooks`), and without the
+/// workbook's link in the chart XML deckcraft keeps.
 private func withoutAddedStyle(_ v: Any) -> Any {
     let added: Set<String> = [
         "http://schemas.microsoft.com/office/2011/relationships/chartStyle",
         "http://schemas.microsoft.com/office/2011/relationships/chartColorStyle",
+        PPTXWrite.Charts.rtPackage,
     ]
     if let a = v as? [Any] { return a.map(withoutAddedStyle) }
     guard var d = v as? [String: Any] else { return v }
     if let kept = d["kept"] as? [String: Any], let rels = kept["rels"] as? [[String: Any]], !rels.isEmpty,
        rels.allSatisfy({ ($0["relType"] as? String).map(added.contains) ?? false }) {
         d["kept"] = nil
+        if let raw = d["raw"] as? String {
+            d["raw"] = raw.replacingOccurrences(of: #"<c:externalData r:id="rId1"><c:autoUpdate val="0"/></c:externalData>"#, with: "")
+        }
     }
     return d.mapValues(withoutAddedStyle)
 }
@@ -118,7 +153,7 @@ private func withoutAddedStyle(_ v: Any) -> Any {
         let deck = try DeckFormat.load(bytes(#require(deckFile(name, "deckcraft"))))
         let mine = try parts(PPTX.export(deck))
         let oracle = try parts(bytes(#require(deckFile(name, "pptx"))))
-        let theirs = expectedDivergences(oracle)
+        let theirs = expectedWorkbooks(expectedDivergences(oracle), mine, name)
         #expect(Set(mine.keys) == Set(theirs.keys), "\(name): parts \(Set(mine.keys).symmetricDifference(theirs.keys).sorted())")
         for k in Set(mine.keys).intersection(theirs.keys).sorted() {
             let a = mine[k] ?? [], b = theirs[k] ?? []
@@ -126,7 +161,10 @@ private func withoutAddedStyle(_ v: Any) -> Any {
         }
         // The allow-list stays narrow: only the parts it names differ from deckcraft's.
         let changed = Set(theirs.keys).filter { theirs[$0] != oracle[$0] }
-        #expect(changed.allSatisfy { $0 == "[Content_Types].xml" || ChartexStyleExpected.isAdded($0) }, "\(name): \(changed.sorted())")
+        let workbook = { (k: String) in
+            k.wholeMatch(of: /ppt\/charts\/(_rels\/)?chart\d+\.xml(\.rels)?/) != nil || k.wholeMatch(of: /ppt\/embeddings\/Microsoft_Excel_Worksheet\d+\.xlsx/) != nil
+        }
+        #expect(changed.allSatisfy { $0 == "[Content_Types].xml" || ChartexStyleExpected.isAdded($0) || workbook($0) }, "\(name): \(changed.sorted())")
     }
 
     /// What Swift writes validates against ECMA-376 Transitional (markup compatibility applied, Office

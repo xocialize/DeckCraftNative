@@ -182,7 +182,7 @@ let package = Package(
         .testTarget(
             name: "dccliTests",
             dependencies: [
-                "dccli", "DCAutomation", "DCEngine", "DCRender", "DCModel", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport",
+                "dccli", "DCAutomation", "DCEngine", "DCRender", "DCModel", "DCPPTX", .product(name: "CNCore", package: "CraftNativeKit"), .product(name: "CNZip", package: "CraftNativeKit"), "DCTestSupport",
                 .product(name: "MCP", package: "swift-sdk"),
             ],
             path: "Apps/dccliTests"

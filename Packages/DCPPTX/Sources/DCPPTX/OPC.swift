@@ -546,6 +546,12 @@ struct PackageOut {
         files.append((name, data, true))
     }
 
+    /// Add a part with its content type override, deflated or stored (a part that is a zip already).
+    mutating func part(_ name: String, _ contentType: String, _ data: [UInt8], compress: Bool) {
+        overrides.append(("/" + name, contentType))
+        files.append((name, data, compress))
+    }
+
     mutating func rels(_ part: String, _ rels: RelsOut) {
         if rels.items.isEmpty { return }
         let path = OPC.relsPath(part)

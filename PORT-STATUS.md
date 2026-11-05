@@ -709,6 +709,22 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     --data` (values, rename, add or drop a series, add or drop a category) passes on all 9 fixtures and, with
     `--all-slides`, on every chart in `pp-types`, apart from adding a series to the two combos ending in lines.
     `WriteChartPatchTests` has 5 more tests.
+- **After 0.1.15 (unreleased, 2026-11-05): a chart's data has a workbook behind it (AB-T-0435).** Every chart
+  PowerPoint makes embeds an Excel workbook holding its data. deckcraft writes none, and since AB-T-0433 an edit to the
+  data dropped the original's: PowerPoint's Edit Data then rebuilt a sheet from the chart, losing a user's formulas,
+  other sheets and formatting.
+  - **Now:** a chart whose data the writer wrote (new, regenerated, or edited by `chart.data`) is linked to a workbook
+    (`DCPPTX/WriteChartWorkbook.swift`). An original in PowerPoint's layout is updated in place: the chart's cells set,
+    cells it no longer reads cleared, its table resized and renamed, Excel told to recalculate; other sheets, cells and
+    formatting stay. Anything else gets a new one-sheet workbook of the chart's data, with a warning when it replaces
+    an original. Office 2016 charts are unchanged. A deliberate divergence from deckcraft: DCPPTX PORT-NOTES,
+    divergence 9; the export oracle applies it to deckcraft's packages.
+  - **Tests:** `WriteChartWorkbookTests` (6, one over 20 chart types). `chart-edit-sweep.py --data` now checks that each
+    edited chart's workbook agrees with it: on the 9 PowerPoint fixtures, 7 originals were updated in place and 2
+    charts that had none got one, in every mode. PowerPoint opened all 56 edited files and a deck of 13 charts
+    made by `insert.chart` without a repair prompt. All 107 workbooks in them validate against SpreadsheetML apart from
+    what Excel's own workbooks also carry (`xml:space` on `t`, `mc:Ignorable`). `Tools/pptx/validate.sh` now rejects
+    parts that aren't well-formed (it skipped them) and knows SpreadsheetML.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

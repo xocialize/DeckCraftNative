@@ -614,12 +614,15 @@ private func rtWithSlide1(_ bytes: [UInt8], _ xml: String) throws -> [UInt8] {
             }
             #expect(b.raw != nil)
         }
-        // Second export reuses the kept chart XML unchanged.
+        // Second export reuses the kept chart XML unchanged. The port writes each chart a workbook
+        // (AB-T-0435), kept like PowerPoint's under a fresh name (`keptN`): its bytes stay.
         let r = try IT.round(q)
         for (sa, sb) in zip(q.slides[4].shapes, r.slides[4].shapes) {
             if case .chart(var a) = sa.kind, case .chart(var b) = sb.kind {
+                #expect(!a.kept.parts.isEmpty && a.kept.parts.map(\.bytes) == b.kept.parts.map(\.bytes), "\(sa.name)")
                 a.raw = nil
                 b.raw = nil
+                (a.kept, b.kept) = (ChartKept(), ChartKept())
                 #expect(a == b)
             }
         }

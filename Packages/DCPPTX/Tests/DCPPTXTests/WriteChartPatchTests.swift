@@ -108,7 +108,8 @@ import Testing
     }
 
     private func patched(_ c: Chart) throws -> (xml: String, back: Chart, kept: ChartKept) {
-        let (out, kept) = PPTXWrite.Charts.chartPart(c)
+        let p = PPTXWrite.Charts.chartPart(c)
+        let (out, kept) = (p.xml, p.kept)
         let k = try #require(kept, "patched, not regenerated")
         return (text(out), try #require(PPTXRead.readChartXML(out)), k)
     }

@@ -22,6 +22,7 @@ typeset -A schema=(
   http://schemas.openxmlformats.org/drawingml/2006/chart $xsd/dml-chart.xsd
   http://schemas.openxmlformats.org/drawingml/2006/diagram $xsd/dml-diagram.xsd
   http://schemas.openxmlformats.org/drawingml/2006/chartDrawing $xsd/dml-chartDrawing.xsd
+  http://schemas.openxmlformats.org/spreadsheetml/2006/main $xsd/sml.xsd
   http://schemas.openxmlformats.org/officeDocument/2006/extended-properties $xsd/shared-documentPropertiesExtended.xsd
   http://schemas.openxmlformats.org/officeDocument/2006/custom-properties $xsd/shared-documentPropertiesCustom.xsd
   http://schemas.openxmlformats.org/package/2006/content-types $opc/opc-contentTypes.xsd
@@ -44,6 +45,13 @@ for pkg in "$@"; do
   unzip -q -o "$pkg" -d $tmp 2> /dev/null || { print "$pkg: not a zip"; rc=1; rm -rf $tmp; continue }
   for part in $tmp/**/*.(xml|rels)(.N) $tmp/\[Content_Types\].xml(N); do
     rel=${part#$tmp/}
+    # A part that doesn't parse has no namespace either: report it, never skip it.
+    if ! out=$(xmllint --noout --nonet $part 2>&1); then
+      print "$pkg: $rel: NOT WELL-FORMED"
+      print -r -- "$out" | sed -e "s|$tmp/||" | head -3 | sed 's/^/    /'
+      rc=1
+      continue
+    fi
     # The root element's namespace: its prefix's declaration, or the default one.
     root=$(xmllint --xpath 'concat(namespace-uri(/*), "")' $part 2> /dev/null)
     s=${schema[$root]:-}

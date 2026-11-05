@@ -581,13 +581,15 @@ extension PPTXWrite {
 
         /// The chart part XML, and whether it is the original part (so its relationships still apply).
         static func chartXML(_ c: Chart) -> (xml: [UInt8], preserved: Bool) {
-            let (xml, kept) = chartPart(c)
-            return (xml, kept != nil)
+            let p = chartPart(c)
+            return (p.xml, p.kept != nil)
         }
 
         /// The chart part XML, and the kept parts to write with it: nil for a generated part, the chart's own
-        /// for an unchanged or patched one, without the workbook when its data was edited.
-        static func chartPart(_ c: Chart) -> (xml: [UInt8], kept: ChartKept?) {
+        /// for an unchanged or patched one, without the workbook when its data was edited. `fresh`: the data
+        /// was written from the model (generated, or patched by `chart.data`), so it needs a workbook of its own
+        /// (`WriteChartWorkbook.swift`).
+        static func chartPart(_ c: Chart) -> (xml: [UInt8], kept: ChartKept?, fresh: Bool) {
             // Reuse the kept part when the chart is unchanged since it was read.
             if let raw = c.raw, !utf8Contains(raw, PPTXWrite.nsCX), let doc = try? parseXML(raw), doc.root.is("chartSpace") {
                 var root = doc.root
@@ -603,13 +605,13 @@ extension PPTXWrite {
                         dropUnkeptRefs(&keep, c)
                         var w = W.new()
                         w.raw(keep.toXML())
-                        return (w.finish(), c.kept)
+                        return (w.finish(), c.kept, false)
                     }
                 }
                 // Edited by `chart.options` or `chart.data`: the kept part with the edit written into it (the
                 // port's own).
                 if let patched = patchedXML(c) {
-                    return (patched.xml, patched.data ? withoutWorkbook(c.kept) : c.kept)
+                    return (patched.xml, patched.data ? withoutWorkbook(c.kept) : c.kept, patched.data)
                 }
             }
             var w = W.new()
@@ -683,7 +685,7 @@ extension PPTXWrite {
             }
             txPr(&w, c)
             w.close("c:chartSpace")
-            return (w.finish(), nil)
+            return (w.finish(), nil, true)
         }
 
         /// The relationship ids of an unchanged chart that `writeKept` writes back: external ones, and

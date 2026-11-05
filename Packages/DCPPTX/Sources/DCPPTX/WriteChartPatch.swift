@@ -1,8 +1,8 @@
 // DCPPTX — an edited chart that keeps its original part. `chart.options` (title, legend, data labels,
 // gridlines) and `chart.data` (categories, series names and values) are written into the kept
 // `c:chartSpace` instead of regenerating it, so what the model doesn't hold survives the edit: the style and
-// colour parts, label positions, fills, 3-D, the extension lists, and the workbook link while the data is
-// unchanged. The port's own (AB-T-0433): deckcraft regenerates the part on any change. The patch is used
+// colour parts, label positions, fills, 3-D, the extension lists, and the workbook (updated with the new
+// data by `WriteChartWorkbook.swift`, AB-T-0435). The port's own (AB-T-0433): deckcraft regenerates the part on any change. The patch is used
 // only when reading it back gives the model; anything else goes to the generator, as before.
 //
 // Which command owns which element of the kept part:
@@ -13,14 +13,15 @@
 // | `chart.options` legend | `c:legend`, `c:legendPos` |
 // | `chart.options` dataLabels | `c:showVal` in every plot group's and series' `c:dLbls` |
 // | `chart.options` gridlines | the primary value axis's `c:majorGridlines` |
-// | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook dropped |
+// | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook taken out here, then linked again to the original workbook with the new cells, or to a new one (`WriteChartWorkbook.swift`) |
 // | anything else (`chart.type`, palette, text colour, bins, subtotals, up/down bars, quartiles) | none: the part is regenerated |
 import CNCore
 import DCModel
 
 extension PPTXWrite.Charts {
     /// The kept part with the model's title, legend, data labels, gridlines and data written into it, and
-    /// whether the data changed (the workbook then goes: its cells would contradict the chart); or nil.
+    /// whether the data changed (the workbook link then goes here: `chartRel` links the updated or new workbook,
+    /// `WriteChartWorkbook.swift`); or nil.
     static func patchedXML(_ c: Chart) -> (xml: [UInt8], data: Bool)? {
         guard let raw = c.raw, !PPTXWrite.utf8Contains(raw, PPTXWrite.nsCX), let doc = try? parseXML(raw) else { return nil }
         var root = doc.root
@@ -260,8 +261,8 @@ extension PPTXWrite.Charts {
     ]
 
     /// A chart's kept parts without its workbook (embedded or linked): once the data is edited, its cells
-    /// would contradict the chart, and PowerPoint's Edit Data would bring the old numbers back. PowerPoint
-    /// builds a new sheet from the chart's caches instead, as it does for a generated chart.
+    /// would contradict the chart, and PowerPoint's Edit Data would bring the old numbers back. The writer
+    /// links the original updated with the new data, or a new workbook, instead (`WriteChartWorkbook.swift`).
     static func withoutWorkbook(_ k: ChartKept) -> ChartKept {
         func book(_ r: ChartRel) -> Bool { hasByteSuffix(r.relType, "/package") || hasByteSuffix(r.relType, "/oleObject") }
         var out = k
@@ -273,8 +274,8 @@ extension PPTXWrite.Charts {
     }
 
     /// The model's series written into the plot groups' `c:ser`s, position by position: extra ones removed,
-    /// new ones copied from the last series without its formatting. Every range is the generator's, since
-    /// the workbook they pointed into is dropped. False when there is no series to start from.
+    /// new ones copied from the last series without its formatting. Every range is the generator's: the
+    /// workbook is written to that layout (`WriteChartWorkbook.swift`). False when there is no series to start from.
     static func patchData(_ pa: inout XMLEl, _ me: Chart) -> Bool {
         let groups = { (g: XMLEl) in plotGroups.contains { g.is($0) } }
         // New series follow the last one, in its group: the reader takes series in file order. In a combo
@@ -463,7 +464,7 @@ extension PPTXWrite.Charts {
     }
 }
 
-fileprivate extension XMLEl {
+extension XMLEl {
     /// Calls `body` on the first child element named `local`, in place; false when there is none.
     @discardableResult
     mutating func edit(_ local: String, _ body: (inout XMLEl) -> Void) -> Bool {

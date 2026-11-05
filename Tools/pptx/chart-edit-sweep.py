@@ -13,8 +13,10 @@ colours). A FAIL line names what the edit lost; the exit status is the number of
 
 `--data` runs `chart.data` with each chart's own data changed that way (from `slide.inspect`), checks
 that the saved file reads back with that data, and leaves the series' data elements (`c:tx`, `c:cat`,
-`c:val`, …), the workbook and its `c:externalData` out of the comparison: an edit replaces those (the
-workbook would contradict the chart). A dropped series is left out of the untouched file's counts.
+`c:val`, …), the workbook and its `c:externalData` out of the comparison: an edit replaces those. Each
+edited chart must then link a workbook whose Sheet1 cells agree with the chart's ranges and caches
+(AB-T-0435); PASS counts them: the original updated, replaced by a new one, or new where there was none. A dropped series is left out
+of the untouched file's counts.
 
 The inputs are never changed. PowerPoint-saved fixtures stay outside git (DeckCraftNative's rule), so
 this takes paths rather than shipping files. Open the kept results with Tools/pptx/powerpoint-check.sh.
@@ -169,6 +171,96 @@ def charts(path, removes=(), plain=False):
     return out
 
 
+S = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+P = "http://schemas.openxmlformats.org/package/2006/relationships"
+
+
+def rels_of(z, part):
+    """A part's relationships in a zip: id → (type's last segment, resolved target)."""
+    d, f = os.path.split(part)
+    rp = os.path.join(d, "_rels", f + ".rels")
+    out = {}
+    if rp not in z.namelist():
+        return out
+    for r in ET.fromstring(z.read(rp)).iter(f"{{{P}}}Relationship"):
+        t = r.get("Target", "")
+        out[r.get("Id")] = (r.get("Type", "").rsplit("/", 1)[-1],
+                            t.lstrip("/") if t.startswith("/") else os.path.normpath(os.path.join(d, t)))
+    return out
+
+
+def fallbacks(z):
+    """Chart parts an Office 2016 chart's fallback draws (they carry no workbook)."""
+    out = set()
+    for n in z.namelist():
+        if not re.fullmatch(r"ppt/slides/slide\d+\.xml", n):
+            continue
+        rels = rels_of(z, n)
+        for fb in re.findall(r"<mc:Fallback>.*?</mc:Fallback>", z.read(n).decode(), re.S):
+            for rid in re.findall(r'<c:chart\b[^>]*r:id="([^"]+)"', fb):
+                if rid in rels:
+                    out.add(rels[rid][1])
+    return out
+
+
+def book_of(z, chart):
+    """The chart's embedded workbook: (its part names, Sheet1's cells as A1 → text), or None."""
+    root = ET.fromstring(z.read(chart))
+    link = root.find(f"{{{C}}}externalData")
+    rel = rels_of(z, chart).get(link.get(f"{{{R}}}id")) if link is not None else None
+    if not rel or rel[0] != "package" or rel[1] not in z.namelist():
+        return None
+    b = zipfile.ZipFile(io.BytesIO(z.read(rel[1])))
+    wb = "xl/workbook.xml"
+    sheets = {s.get("name"): s.get(f"{{{R}}}id") for s in ET.fromstring(b.read(wb)).iter(f"{{{S}}}sheet")}
+    sheet = rels_of(b, wb).get(sheets.get("Sheet1"), (None, None))[1]
+    sst = []
+    if "xl/sharedStrings.xml" in b.namelist():
+        sst = ["".join(t.text or "" for t in si.iter(f"{{{S}}}t")) for si in ET.fromstring(b.read("xl/sharedStrings.xml")).iter(f"{{{S}}}si")]
+    cells = {}
+    for c in ET.fromstring(b.read(sheet)).iter(f"{{{S}}}c") if sheet else []:
+        v = c.find(f"{{{S}}}v")
+        t = c.get("t")
+        if t == "inlineStr":
+            cells[c.get("r")] = "".join(x.text or "" for x in c.iter(f"{{{S}}}t"))
+        elif t == "s" and v is not None:
+            cells[c.get("r")] = sst[int(v.text)]
+        elif v is not None:
+            cells[c.get("r")] = v.text
+    return set(b.namelist()), cells
+
+
+def book_problems(z, chart):
+    """What the chart's workbook says differently from the chart's caches."""
+    got = book_of(z, chart)
+    if got is None:
+        return ["no workbook"]
+    _, cells = got
+    bad = []
+    root = ET.fromstring(z.read(chart))
+    for ser in root.iter(f"{{{C}}}ser"):
+        for k in DATA:
+            for ref in ser.findall(f"{{{C}}}{k}/*"):
+                f = ref.find(f"{{{C}}}f")
+                m = re.fullmatch(r"Sheet1!\$([A-Z]+)\$(\d+)(?::\$\1\$(\d+))?", (f.text or "").strip()) if f is not None else None
+                if m is None:
+                    continue
+                col, r1, r2 = m.group(1), int(m.group(2)), int(m.group(3) or m.group(2))
+                pts = {int(p.get("idx")): p.findtext(f"{{{C}}}v") for p in ref.iter(f"{{{C}}}pt")}
+                for r in range(r1, r2 + 1):
+                    want, have = pts.get(r - r1), cells.get(f"{col}{r}")
+                    same = want == have
+                    if not same and want is not None and have is not None:
+                        try:
+                            same = abs(float(want) - float(have)) < 1e-9
+                        except ValueError:
+                            pass
+                    if not same:
+                        bad.append(f"{col}{r} {have!r}≠{want!r}")
+    return bad
+
+
 def main(argv):
     cmd = 'chart.options={"title":"Edited"}'
     keep = None
@@ -228,6 +320,7 @@ def main(argv):
                 removes.append("gridlines")
         a, b = charts(plain, removes, plain=True), charts(edited, removes)
         lost = []
+        books = []
         for (n, ca, ra), (_, cb, rb) in zip(a, b):
             for k in sorted(set(ca) | set(cb)):
                 if cb[k] < ca[k]:
@@ -249,11 +342,26 @@ def main(argv):
                     got["categories"] = want["categories"]
                 if got != want:
                     lost.append(f"slide {sl} chart {i} reads back {json.dumps(got)[:160]}")
+        if mode:
+            # Each edited chart links a workbook that agrees with it: the original updated, or a new one.
+            with zipfile.ZipFile(plain) as zp, zipfile.ZipFile(edited) as ze:
+                skip = fallbacks(ze)
+                for n in sorted(x for x in ze.namelist() if re.fullmatch(r"ppt/charts/chart\d+\.xml", x) and x not in skip):
+                    # An untouched chart is written back as it was, with or without a workbook.
+                    if n in zp.namelist() and zp.read(n) == ze.read(n):
+                        continue
+                    bad = book_problems(ze, n)
+                    if bad:
+                        lost.append(f"{n.rsplit('/', 1)[-1]} workbook: " + ", ".join(bad[:4]))
+                        continue
+                    was, now = book_of(zp, n) if n in zp.namelist() else None, book_of(ze, n)
+                    books.append("new" if not was else "updated" if was[0] - {"xl/calcChain.xml"} <= now[0] else "replaced")
         if lost:
             fails += 1
             print(f"FAIL  {stem}: " + "; ".join(lost[:12]) + (" …" if len(lost) > 12 else ""))
         else:
-            print(f"PASS  {stem}: {len(a)} chart(s), {sum(sum(c.values()) for _, c, _ in a)} elements and every part kept")
+            note = f"; workbooks {', '.join(f'{v} {k}' for k, v in sorted(collections.Counter(books).items()))}" if books else ""
+            print(f"PASS  {stem}: {len(a)} chart(s), {sum(sum(c.values()) for _, c, _ in a)} elements and every part kept{note}")
     print(f"{len(files)} files, {fails} failures; results in {work}")
     return min(fails, 250)
 

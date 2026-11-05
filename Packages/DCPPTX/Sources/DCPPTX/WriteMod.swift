@@ -172,20 +172,41 @@ enum PPTXWrite {
             return o.rels.addNew(rtChartex, OPC.relative(o.name, name), false)
         }
 
-        func chartRel(_ o: Out, _ c: Chart) -> String {
+        /// A chart part and its relationship from `o`. `workbook`: false for an Office 2016 chart's fallback,
+        /// which has none (the `chartEx` part carries the data).
+        func chartRel(_ o: Out, _ c: Chart, workbook: Bool = true) -> String {
             nChart &+= 1
             let name = "ppt/charts/chart\(nChart).xml"
-            let (xml, kept) = Charts.chartPart(c)
-            pkg.xmlPart(name, ctChart, xml)
-            if let kept {
+            let part = Charts.chartPart(c)
+            var xml = part.xml
+            // A chart whose data was written from the model gets a workbook holding it (the port's own,
+            // `WriteChartWorkbook.swift`): the original updated, or a new one.
+            var book: (id: String, name: String)?
+            if part.fresh && workbook {
+                let id = Charts.freeRelId(Set((part.kept?.rels ?? []).map(\.id)))
+                if let b = Charts.book(xml, c, id) {
+                    xml = b.xml
+                    book = (id, "ppt/embeddings/Microsoft_Excel_Worksheet\(nChart).xlsx")
+                    pkg.xmlPart(name, ctChart, xml)
+                    pkg.part("ppt/embeddings/Microsoft_Excel_Worksheet\(nChart).xlsx", Charts.ctWorkbook, b.book, compress: false)
+                } else {
+                    pkg.xmlPart(name, ctChart, xml)
+                    if !c.kept.parts.isEmpty {
+                        PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
+                    }
+                }
+            } else {
+                pkg.xmlPart(name, ctChart, xml)
+            }
+            var rels = RelsOut()
+            if let kept = part.kept {
                 var k = c
                 k.kept = kept
-                Charts.writeKept(&pkg, name, k, &nKept)
-                if kept.parts.count < c.kept.parts.count {
-                    PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
-                }
-            } else if !c.kept.parts.isEmpty {
-                PPTXLog.warn("pptx: chart data changed; the embedded workbook was not written back")
+                rels = Charts.writeKept(&pkg, name, k, &nKept)
+            }
+            if let book {
+                rels.items.append((book.id, Charts.rtPackage, OPC.relative(name, book.name), false))
+                pkg.rels(name, rels)
             }
             return o.rels.addNew("chart", OPC.relative(o.name, name), false)
         }

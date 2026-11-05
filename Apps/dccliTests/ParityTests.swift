@@ -4,6 +4,7 @@
 import CoreGraphics
 import CNCore
 import DCEngine
+@testable import DCPPTX
 import DCRender
 import DCTestSupport
 import Foundation
@@ -244,7 +245,10 @@ struct ParityTests {
                 .replacing(/<Override PartName="\/ppt\/charts\/(style|colors)\d+\.xml" ContentType="application\/vnd\.ms-office\.chart(color)?style\+xml"\/>/, with: "")
             ours["[Content_Types].xml"] = Array(t.utf8)
         }
-        #expect(Set(ours.keys) == Set(theirs.keys), "\(name).pptx parts")
+        // The other (PORT-NOTES divergence 9): a plain chart links a workbook of its data. DCPPTX's
+        // PPTXExportOracleTests check the same; here deckcraft's chart becomes what Swift links.
+        theirs = withWorkbooks(theirs, ours, name)
+        #expect(Set(ours.keys) == Set(theirs.keys), "\(name).pptx parts \(Set(ours.keys).symmetricDifference(theirs.keys).sorted())")
         for (k, v) in theirs where ours[k] != v { Issue.record("\(name).pptx: part \(k) differs") }
         // .pptx → .deckcraft: the same presentation and media.
         let back = dir.appending(path: "\(name).from-pptx.deckcraft")
@@ -564,4 +568,34 @@ struct ClosedStdoutTests {
         #expect(out.code != 0, "a stdout error other than a closed pipe returned success")
         #expect(out.stderr.contains("can't write to stdout"))
     }
+}
+
+/// deckcraft's package with each plain chart linked to the workbook Swift writes for it (`expectedWorkbooks` in
+/// DCPPTX's PPTXExportOracleTests): the chart gains `c:externalData`, its rels and the workbook part. A chart
+/// left without one must be a `chartEx` part's fallback.
+private func withWorkbooks(_ theirs: [String: [UInt8]], _ ours: [String: [UInt8]], _ name: String) -> [String: [UInt8]] {
+    var out = theirs
+    let charts = theirs.keys.compactMap { k in k.wholeMatch(of: /ppt\/charts\/chart(\d+)\.xml/).flatMap { Int($0.1) } }.sorted()
+    let chartex = theirs.keys.filter { $0.wholeMatch(of: /ppt\/charts\/chartEx\d+\.xml/) != nil }.count
+    guard var types = theirs["[Content_Types].xml"].map({ String(decoding: $0, as: UTF8.self) }) else { return out }
+    var without = 0
+    for n in charts {
+        let chart = "ppt/charts/chart\(n).xml", book = "ppt/embeddings/Microsoft_Excel_Worksheet\(n).xlsx"
+        guard ours[book] != nil else {
+            without += 1
+            continue
+        }
+        guard let xml = theirs[chart], let (linked, data) = PPTXWrite.Charts.freshBook(xml, "rId1") else {
+            Issue.record("\(name): \(chart) gets no workbook")
+            continue
+        }
+        out[chart] = linked
+        out[book] = data
+        out["ppt/charts/_rels/chart\(n).xml.rels"] = RelsOut(items: [("rId1", PPTXWrite.Charts.rtPackage, "../embeddings/Microsoft_Excel_Worksheet\(n).xlsx", false)]).toXML()
+        let own = #"<Override PartName="/\#(chart)" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>"#
+        types = types.replacingOccurrences(of: own, with: own + #"<Override PartName="/\#(book)" ContentType="\#(PPTXWrite.Charts.ctWorkbook)"/>"#)
+    }
+    #expect(without == chartex, "\(name): \(without) plain charts without a workbook, \(chartex) chartEx fallbacks")
+    out["[Content_Types].xml"] = Array(types.utf8)
+    return out
 }

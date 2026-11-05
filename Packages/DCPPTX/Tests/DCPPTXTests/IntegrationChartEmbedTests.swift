@@ -24,7 +24,28 @@ private func chartDeck(_ kind: ChartType) throws -> Presentation {
 }
 
 private func chartPPTX() throws -> [UInt8] {
-    try PPTX.export(chartDeck(.pie))
+    try withoutWrittenWorkbook(PPTX.export(chartDeck(.pie)))
+}
+
+/// The package without the workbook the port writes for a chart (AB-T-0435), so the tests below add their
+/// own as deckcraft's do.
+private func withoutWrittenWorkbook(_ bytes: [UInt8]) throws -> [UInt8] {
+    let link = #"<c:externalData r:id="rId1"><c:autoUpdate val="0"/></c:externalData>"#
+    let override = #"<Override PartName="/ppt/embeddings/Microsoft_Excel_Worksheet1.xlsx" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>"#
+    var out: [(name: String, data: [UInt8])] = []
+    for (name, data) in try IT.entries(bytes) {
+        if name == embed || name == "ppt/charts/_rels/chart1.xml.rels" { continue }
+        let text = String(decoding: data, as: UTF8.self)
+        if name == "ppt/charts/chart1.xml" {
+            #expect(text.has(link))
+            out.append((name, Array(text.replacen(link, "", 1).utf8)))
+        } else if name == "[Content_Types].xml" {
+            out.append((name, Array(text.replacen(override, "", 1).utf8)))
+        } else {
+            out.append((name, data))
+        }
+    }
+    return try IT.zip(out)
 }
 
 /// Add an embedded workbook and point the chart part at it, the way PowerPoint writes a chart.
@@ -117,7 +138,8 @@ private func textOf(_ parts: [(name: String, data: [UInt8])], _ name: String) th
         #expect(xml.has("externalData"), "\(xml)")
     }
 
-    // Rust: it/chart_embed.rs::an_edited_chart_does_not_write_a_stale_workbook
+    // Rust: it/chart_embed.rs::an_edited_chart_does_not_write_a_stale_workbook. deckcraft writes no workbook
+    // for the edited chart; the port writes one holding the edited data (AB-T-0435), never the stale bytes.
     @Test func anEditedChartDoesNotWriteAStaleWorkbook() throws {
         let src = try withWorkbook(chartPPTX())
         var p = try PPTX.import(src)
@@ -131,10 +153,13 @@ private func textOf(_ parts: [(name: String, data: [UInt8])], _ name: String) th
         chart.series[0].values[0] = 99.0
         p.slides[0].shapes[i].kind = .chart(chart)
         let saved = try IT.entries(PPTX.export(p))
-        #expect(saved.allSatisfy { !$0.name.hasPrefix("ppt/embeddings/") }, "a stale workbook was written after the chart changed")
+        let books = saved.filter { $0.name.hasPrefix("ppt/embeddings/") }
+        #expect(books.map(\.name) == [embed] && books.allSatisfy { $0.data != workbook }, "a stale workbook was written after the chart changed")
         let xmlData = try #require(saved.first { $0.name.hasPrefix("ppt/charts/chart") && $0.name.hasSuffix(".xml") }?.data, "chart xml")
         let xml = String(decoding: xmlData, as: UTF8.self)
-        #expect(!xml.has("externalData"), "\(xml)")
+        #expect(xml.has(#"<c:externalData r:id="rId1">"#), "\(xml)")
+        let sheet = try IT.entries(try #require(books.first?.data)).first { $0.name == "xl/worksheets/sheet1.xml" }?.data
+        #expect(sheet.map { String(decoding: $0, as: UTF8.self).has(#"<c r="B2"><v>99</v></c>"#) } ?? false)
     }
 
     /// A chart whose relationships reach parts named like the ones the writer generates
@@ -157,7 +182,7 @@ private func textOf(_ parts: [(name: String, data: [UInt8])], _ name: String) th
         pic.kind = .picture(fill: PictureFill(media: img))
         slide.shapes.append(pic)
         p.slides.append(slide)
-        let base = try PPTX.export(p)
+        let base = try withoutWrittenWorkbook(PPTX.export(p))
         #expect(try IT.entries(base).contains { $0.name == "ppt/media/image1.png" && $0.data == picture })
 
         // The chart's own relationships reach the slide picture's part and a drawing whose
