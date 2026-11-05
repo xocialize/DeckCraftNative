@@ -50,6 +50,7 @@ import Testing
         #expect(shapes.filter { $0.1 == "insert.icon" }.count == Icons.icons.count)
         let charts = Self.payloads(ToolbarCatalog.menu(for: ToolbarCatalog.chart))
         #expect(charts.count == ChartMenu.types.joined().count)
+        #expect(charts.contains { $0.0 == "100% Stacked Bar" && $0.1 == "insert.chart" }, "a subtype inside its family's submenu")
     }
 
     @Test func toolbarIdentifiersAndQuickAccessItems() {

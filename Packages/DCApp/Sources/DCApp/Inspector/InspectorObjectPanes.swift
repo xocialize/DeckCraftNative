@@ -142,7 +142,8 @@ struct TableFormatView: View {
 
 // MARK: - Chart
 
-// The chart types are `ChartMenu` (DCAppModel/CommandMenus.swift), which Insert Chart's menu uses too.
+// The chart types are `ChartMenu` (DCAppModel/CommandMenus.swift), grouped into the same families as Insert Chart's
+// and Change Chart Type's menus.
 
 struct ChartFormatView: View {
     let ctl: InspectorController
@@ -153,9 +154,10 @@ struct ChartFormatView: View {
             Picker(String(localized: "Chart Type", bundle: .module), selection: Binding(get: { chart?.1.kind.rawValue ?? "" }, set: { k in
                 if let id = chart?.0, let t = ChartType(rawValue: k) { ctl.run("chart.type", ["id": .integer(id.rawValue), "type": .string(ChartMenu.param(t))]) }
             })) {
-                ForEach(Array(ChartMenu.types.enumerated()), id: \.offset) { i, group in
-                    if i > 0 { Divider() }
-                    ForEach(group, id: \.self) { Text($0.label).tag($0.rawValue) }
+                ForEach(ChartMenu.families, id: \.name) { family in
+                    Section(family.name) {
+                        ForEach(family.types, id: \.self) { Text(ChartMenu.label($0)).tag($0.rawValue) }
+                    }
                 }
             }
             Button(String(localized: "Edit Data…", bundle: .module)) { ctl.run("app.dialog", ["id": "chartData"]) }

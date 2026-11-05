@@ -32,6 +32,10 @@ DCAppModel|1 Slide,,1 Slide,1 diapositiva,needs_review,,,
 DCAppModel|1 picture,,1 picture,1 imagen,needs_review,,,
 DCAppModel|1 picture with title,,1 picture with title,1 imagen con título,needs_review,,,
 DCAppModel|1.5 lines,,1.5 lines,"1,5 líneas",needs_review,,,
+DCAppModel|100% Stacked Area,,100% Stacked Area,Área 100% apilada,needs_review,,,A chart type
+DCAppModel|100% Stacked Bar,,100% Stacked Bar,Barra 100% apilada,needs_review,,,A chart type (horizontal bars)
+DCAppModel|100% Stacked Column,,100% Stacked Column,Columna 100% apilada,needs_review,,,A chart type
+DCAppModel|100% Stacked Line,,100% Stacked Line,Línea 100% apilada,needs_review,,,A chart type
 DCAppModel|2 pictures,,2 pictures,2 imágenes,needs_review,,,
 DCAppModel|2 pictures with title,,2 pictures with title,2 imágenes con título,needs_review,,,
 DCAppModel|4 pictures,,4 pictures,4 imágenes,needs_review,,,
@@ -99,6 +103,7 @@ DCAppModel|Applies to this presentation's theme colours.,,Applies to this presen
 DCAppModel|Apply,,Apply,Aplicar,needs_review,,,
 DCAppModel|Apply to All,,Apply to All,Aplicar a todo,needs_review,,,
 DCAppModel|Apply to:,,Apply to:,Aplicar a:,needs_review,,,
+DCAppModel|Area,,Area,Área,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Arrange,,Arrange,Organizar,needs_review,,,
 DCAppModel|Arrow,,Arrow,Flecha,needs_review,,,arrowhead kind
 DCAppModel|Arrow at end,,Arrow at end,Flecha al final,needs_review,,,
@@ -118,6 +123,7 @@ DCAppModel|Automatic bulleted and numbered lists,,Automatic bulleted and numbere
 DCAppModel|Available formats:,,Available formats:,Formatos disponibles:,needs_review,,,
 DCAppModel|Axis Title,,Axis Title,Título del eje,needs_review,,,The text a new axis title starts with
 DCAppModel|Axis Titles,,Axis Titles,Títulos de ejes,needs_review,,,Add Chart Element › Axis Titles
+DCAppModel|Bar,,Bar,Barra,needs_review,,,A chart family in Insert Chart and Change Chart Type (horizontal bars)
 DCAppModel|Baseline,,Baseline,Línea base,needs_review,,,
 DCAppModel|Basic Cycle,,Basic Cycle,Ciclo básico,needs_review,,,
 DCAppModel|Basic List,,Basic List,Lista básica,needs_review,,,
@@ -141,11 +147,13 @@ vertical text alignment"
 DCAppModel|Bottom Border,,Bottom Border,Borde inferior,needs_review,,,
 DCAppModel|Bottom Left,,Bottom Left,Inferior izquierda,needs_review,,,
 DCAppModel|Bottom Right,,Bottom Right,Inferior derecha,needs_review,,,
+DCAppModel|Box and Whisker,,Box and Whisker,Cajas y bigotes,needs_review,,,A chart type
 DCAppModel|Brightness %@,,Brightness %@,Brillo %@,needs_review,,,
 DCAppModel|Bring Forward,,Bring Forward,Traer adelante,needs_review,,,
 DCAppModel|Bring to Front,,Bring to Front,Traer al frente,needs_review,,,
 DCAppModel|Browsed at a kiosk (full screen),,Browsed at a kiosk (full screen),Examinada en exposición (pantalla completa),needs_review,,,
 DCAppModel|Browsed by an individual (window),,Browsed by an individual (window),Examinada de forma individual (ventana),needs_review,,,
+DCAppModel|Bubble,,Bubble,Burbuja,needs_review,,,A chart type: X Y points drawn as circles sized by a third value
 DCAppModel|Bulleted,,Bulleted,Con viñetas,needs_review,,,
 DCAppModel|Bullets,,Bullets,Viñetas,needs_review,,,
 DCAppModel|Bullets and Numbering,,Bullets and Numbering,Numeración y viñetas,needs_review,,,
@@ -183,9 +191,13 @@ DCAppModel|Clear All,,Clear All,Borrar todo,needs_review,,,
 DCAppModel|Click a symbol to insert it at the insertion point.,,Click a symbol to insert it at the insertion point.,Haga clic en un símbolo para insertarlo en el punto de inserción.,needs_review,,,
 DCAppModel|Close,,Close,Cerrar,needs_review,,,
 DCAppModel|Close Path,,Close Path,Cerrar trazado,needs_review,,,
+DCAppModel|Clustered Bar,,Clustered Bar,Barra agrupada,needs_review,,,A chart type (horizontal bars)
+DCAppModel|Clustered Column,,Clustered Column,Columna agrupada,needs_review,,,A chart type
 DCAppModel|Color,,Color,Color,needs_review,,,
 DCAppModel|Color:,,Color:,Color:,needs_review,,,
+DCAppModel|Column,,Column,Columna,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Columns,,Columns,Columnas,needs_review,,,
+DCAppModel|Combo,,Combo,Cuadro combinado,needs_review,,,A chart family in Insert Chart and Change Chart Type: columns with a line
 DCAppModel|Comment,,Comment,Comentario,needs_review,,,
 DCAppModel|Comments,,Comments,Comentarios,needs_review,,,
 DCAppModel|Company,,Company,Empresa,needs_review,,,
@@ -275,6 +287,7 @@ DCAppModel|Dotted,,Dotted,Punteado,needs_review,,,
 DCAppModel|Dotted diamond,,Dotted diamond,Rombos punteados,needs_review,,,
 DCAppModel|Dotted grid,,Dotted grid,Cuadrícula punteada,needs_review,,,
 DCAppModel|Double,,Double,Doble,needs_review,,,line compound type
+DCAppModel|Doughnut,,Doughnut,Anillo,needs_review,,,A chart type
 DCAppModel|Downward diagonal,,Downward diagonal,Diagonal hacia abajo,needs_review,,,
 DCAppModel|Draw,,Draw,Dibujar,needs_review,,,The Draw tools menu
 DCAppModel|Draw Table,,Draw Table,Dibujar tabla,needs_review,,,
@@ -316,6 +329,8 @@ DCAppModel|Eyedropper: click the slide (Esc cancels),,Eyedropper: click the slid
 DCAppModel|Fade in (s):,,Fade in (s):,Fundido de entrada (s):,needs_review,,,
 DCAppModel|Fade out (s):,,Fade out (s):,Fundido de salida (s):,needs_review,,,
 DCAppModel|Fill & Line,,Fill & Line,Relleno y línea,needs_review,,,
+DCAppModel|Filled Map,,Filled Map,Mapa coroplético,needs_review,,,A chart type: regions coloured by value
+DCAppModel|Filled Radar,,Filled Radar,Radial relleno,needs_review,,,A chart type
 DCAppModel|Find Next,,Find Next,Buscar siguiente,needs_review,,,
 DCAppModel|Find and Replace,,Find and Replace,Buscar y reemplazar,needs_review,,,
 DCAppModel|Find what:,,Find what:,Buscar:,needs_review,,,
@@ -356,6 +371,7 @@ DCAppModel|From top left,,From top left,Desde arriba a la izquierda,needs_review
 DCAppModel|From top right,,From top right,Desde arriba a la derecha,needs_review,,,
 DCAppModel|Full,,Full,Completa,needs_review,,,A reflection
 DCAppModel|Full Page Slides,,Full Page Slides,Diapositivas en página completa,needs_review,,,
+DCAppModel|Funnel,,Funnel,Embudo,needs_review,,,A chart type
 DCAppModel|General,,General,General,needs_review,,,
 DCAppModel|GitHub's request limit was reached. Try again after %@.,,GitHub's request limit was reached. Try again after %@.,Se alcanzó el límite de solicitudes de GitHub. Vuelva a intentarlo después de %@.,needs_review,,,
 DCAppModel|GitHub's request limit was reached. Try again later.,,GitHub's request limit was reached. Try again later.,Se alcanzó el límite de solicitudes de GitHub. Vuelva a intentarlo más tarde.,needs_review,,,
@@ -390,10 +406,12 @@ DCAppModel|Height,,Height,Alto,needs_review,,,
 DCAppModel|Height (%@):,,Height (%@):,Alto (%@):,needs_review,,,
 DCAppModel|Height (in):,,Height (in):,Alto (pulg.):,needs_review,,,
 DCAppModel|Hidden slides: %llu,,Hidden slides: %llu,Diapositivas ocultas: %llu,needs_review,,,
-DCAppModel|Hierarchy,,Hierarchy,Jerarquía,needs_review,,,A category of SmartArt layouts
+DCAppModel|Hierarchy,,Hierarchy,Jerarquía,needs_review,,,"A category of SmartArt layouts
+A chart family in Insert Chart and Change Chart Type: treemap and sunburst"
 DCAppModel|High,,High,Alto,needs_review,,,Media volume
 DCAppModel|Highlight click,,Highlight click,Resaltar al hacer clic,needs_review,,,
 DCAppModel|Highlighter,,Highlighter,Marcador de resaltado,needs_review,,,ink tool
+DCAppModel|Histogram,,Histogram,Histograma,needs_review,,,A chart type
 DCAppModel|Horizontal,,Horizontal,Horizontal,needs_review,,,"picture fill mirror
 text direction"
 DCAppModel|Horizontal (in):,,Horizontal (in):,Horizontal (pulg.):,needs_review,,,
@@ -465,9 +483,11 @@ DCAppModel|Lighter 60%,,Lighter 60%,Más claro 60%,needs_review,,,A shade of a t
 DCAppModel|Lighter 75%,,Lighter 75%,Más claro 75%,needs_review,,,A shade of a theme colour
 DCAppModel|Lighter 80%,,Lighter 80%,Más claro 80%,needs_review,,,A shade of a theme colour
 DCAppModel|Lighter 90%,,Lighter 90%,Más claro 90%,needs_review,,,A shade of a theme colour
+DCAppModel|Line,,Line,Línea,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Line Spacing Options…,,Line Spacing Options…,Opciones de interlineado…,needs_review,,,
 DCAppModel|Line spacing,,Line spacing,Interlineado,needs_review,,,
 DCAppModel|Line spacing must be a number,,Line spacing must be a number,El interlineado debe ser un número,needs_review,,,
+DCAppModel|Line with Markers,,Line with Markers,Línea con marcadores,needs_review,,,A chart type
 DCAppModel|Linear,,Linear,Lineal,needs_review,,,A straight-line trendline
 DCAppModel|Linear Forecast,,Linear Forecast,Previsión lineal,needs_review,,,A straight-line trendline continued two periods ahead
 DCAppModel|Link…,,Link…,Vínculo…,needs_review,,,
@@ -578,6 +598,7 @@ DCAppModel|PNG images (current slide),,PNG images (current slide),Imágenes PNG 
 DCAppModel|Page Setup…,,Page Setup…,Configurar página…,needs_review,,,
 DCAppModel|Paragraph,,Paragraph,Párrafo,needs_review,,,
 DCAppModel|Paragraph…,,Paragraph…,Párrafo…,needs_review,,,
+DCAppModel|Pareto,,Pareto,Pareto,needs_review,,,A chart type
 DCAppModel|Pass pictures to insert.photoAlbum,,Pass pictures to insert.photoAlbum,Pase imágenes a insert.photoAlbum,needs_review,,,
 DCAppModel|Paste,,Paste,Pegar,needs_review,,,
 DCAppModel|Paste Formatting,,Paste Formatting,Pegar formato,needs_review,,,
@@ -598,6 +619,7 @@ DCAppModel|Picture from File…,,Picture from File…,Imagen desde archivo…,ne
 DCAppModel|Picture layout,,Picture layout,Diseño de las imágenes,needs_review,,,
 DCAppModel|Picture or texture fill,,Picture or texture fill,Relleno con imagen o textura,needs_review,,,
 DCAppModel|Pictures in album,,Pictures in album,Imágenes del álbum,needs_review,,,
+DCAppModel|Pie,,Pie,Circular,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Placeholder colour,,Placeholder colour,Color del marcador de posición,needs_review,,,A theme colour slot
 DCAppModel|Plaid,,Plaid,Tela escocesa,needs_review,,,
 DCAppModel|Plain,,Plain,Sin formato,needs_review,,,Table styles without colours
@@ -633,6 +655,7 @@ DCAppModel|Properties,,Properties,Propiedades,needs_review,,,
 DCAppModel|Punctuation,,Punctuation,Puntuación,needs_review,,,
 DCAppModel|Purple,,Purple,Púrpura,needs_review,,,A standard colour
 DCAppModel|Pyramid,,Pyramid,Pirámide,needs_review,,,A category of SmartArt layouts
+DCAppModel|Radar,,Radar,Radial,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Recolor,,Recolor,Volver a colorear,needs_review,,,
 DCAppModel|Rectangle,,Rectangle,Rectángulo,needs_review,,,
 DCAppModel|Red,,Red,Rojo,needs_review,,,A standard colour
@@ -697,6 +720,7 @@ DCAppModel|Scale height,,Scale height,Escalar alto,needs_review,,,
 DCAppModel|Scale height (%):,,Scale height (%):,Escalar alto (%):,needs_review,,,
 DCAppModel|Scale width,,Scale width,Escalar ancho,needs_review,,,
 DCAppModel|Scale width (%):,,Scale width (%):,Escalar ancho (%):,needs_review,,,
+DCAppModel|Scatter,,Scatter,Dispersión,needs_review,,,A chart type: X Y points
 DCAppModel|Scientific,,Scientific,Científica,needs_review,,,An axis number format: 0.00E+00
 DCAppModel|ScreenTip:,,ScreenTip:,Información en pantalla:,needs_review,,,
 DCAppModel|Search,,Search,Buscar,needs_review,,,
@@ -795,14 +819,20 @@ DCAppModel|Sphere,,Sphere,Esfera,needs_review,,,
 DCAppModel|Square,,Square,Cuadrado,needs_review,,,line cap
 DCAppModel|Square Dot,,Square Dot,Punto cuadrado,needs_review,,,A line dash
 DCAppModel|Stacked,,Stacked,Apilado,needs_review,,,text direction
+DCAppModel|Stacked Area,,Stacked Area,Área apilada,needs_review,,,A chart type
+DCAppModel|Stacked Bar,,Stacked Bar,Barra apilada,needs_review,,,A chart type (horizontal bars)
+DCAppModel|Stacked Column,,Stacked Column,Columna apilada,needs_review,,,A chart type
+DCAppModel|Stacked Line,,Stacked Line,Línea apilada,needs_review,,,A chart type
 DCAppModel|Standard (4:3),,Standard (4:3),Estándar (4:3),needs_review,,,
 DCAppModel|Standard Deviation,,Standard Deviation,Desviación estándar,needs_review,,,Error bars of one standard deviation
 DCAppModel|Standard Error,,Standard Error,Error típico,needs_review,,,Error bars of the standard error
 DCAppModel|Start at:,,Start at:,Comenzar en:,needs_review,,,
 DCAppModel|Start time (s):,,Start time (s):,Tiempo de inicio (s):,needs_review,,,
 "DCAppModel|Start: %@s, End: %@s",,"Start: %1$@s, End: %2$@s","Inicio: %1$@ s, fin: %2$@ s",needs_review,,,
+DCAppModel|Statistical,,Statistical,Estadístico,needs_review,,,"A chart family in Insert Chart and Change Chart Type: histogram, Pareto, box and whisker"
 DCAppModel|Stealth,,Stealth,Furtiva,needs_review,,,arrowhead kind
 DCAppModel|Stealth end,,Stealth end,Extremo furtivo,needs_review,,,
+DCAppModel|Stock,,Stock,Cotizaciones,needs_review,,,A chart family in Insert Chart and Change Chart Type (high-low-close)
 DCAppModel|Stop,,Stop,Detener,needs_review,,,
 DCAppModel|Straight Point,,Straight Point,Punto de línea recta,needs_review,,,
 DCAppModel|Straight Segment,,Straight Segment,Segmento recto,needs_review,,,
@@ -813,7 +843,9 @@ DCAppModel|Subject,,Subject,Asunto,needs_review,,,
 DCAppModel|Subscript,,Subscript,Subíndice,needs_review,,,
 DCAppModel|Subtle,,Subtle,Sutil,needs_review,,,A category of slide transitions
 DCAppModel|Summary Zoom,,Summary Zoom,Zoom de resumen,needs_review,,,
+DCAppModel|Sunburst,,Sunburst,Proyección solar,needs_review,,,A chart type
 DCAppModel|Superscript,,Superscript,Superíndice,needs_review,,,
+DCAppModel|Surface,,Surface,Superficie,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Swedish,,Swedish,Sueco,needs_review,,,
 DCAppModel|Symbol,,Symbol,Símbolo,needs_review,,,
 DCAppModel|System,,System,Sistema,needs_review,,,
@@ -871,6 +903,7 @@ DCAppModel|Top Border,,Top Border,Borde superior,needs_review,,,
 DCAppModel|Top Left,,Top Left,Superior izquierda,needs_review,,,
 DCAppModel|Top Right,,Top Right,Superior derecha,needs_review,,,
 DCAppModel|Transparent background,,Transparent background,Fondo transparente,needs_review,,,
+DCAppModel|Treemap,,Treemap,Rectángulos,needs_review,,,A chart type
 DCAppModel|Trellis,,Trellis,Enrejado,needs_review,,,
 DCAppModel|Trendline,,Trendline,Línea de tendencia,needs_review,,,Add Chart Element › Trendline
 DCAppModel|Trim Media,,Trim Media,Recortar multimedia,needs_review,,,
@@ -899,6 +932,8 @@ DCAppModel|Very loose,,Very loose,Muy expandido,needs_review,,,
 DCAppModel|Very tight,,Very tight,Muy comprimido,needs_review,,,
 DCAppModel|Video from File…,,Video from File…,Vídeo desde archivo…,needs_review,,,
 DCAppModel|Warp,,Warp,Deformar,needs_review,,,
+DCAppModel|Waterfall,,Waterfall,Cascada,needs_review,,,A chart type
+DCAppModel|Waterfall and Funnel,,Waterfall and Funnel,Cascada y embudo,needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Wave,,Wave,Onda,needs_review,,,
 DCAppModel|Wavy,,Wavy,Ondulado,needs_review,,,
 DCAppModel|Weave,,Weave,Entramado,needs_review,,,
@@ -921,6 +956,7 @@ DCAppModel|With Previous,,With Previous,Con la anterior,needs_review,,,
 DCAppModel|With:,,With:,Con:,needs_review,,,
 DCAppModel|WordArt,,WordArt,WordArt,needs_review,,,
 DCAppModel|WordArt style %lld,,WordArt style %lld,Estilo de WordArt %lld,needs_review,,,
+DCAppModel|X Y (Scatter),,X Y (Scatter),Dispersión (X Y),needs_review,,,A chart family in Insert Chart and Change Chart Type
 DCAppModel|Yellow,,Yellow,Amarillo,needs_review,,,A standard colour
 DCAppModel|Your name (comments):,,Your name (comments):,Su nombre (comentarios):,needs_review,,,
 DCAppModel|Zig zag,,Zig zag,Zigzag,needs_review,,,

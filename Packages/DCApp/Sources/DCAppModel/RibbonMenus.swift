@@ -242,12 +242,7 @@ public enum RibbonMenus {
         // Chart Design (`chart.rs`): the chart's type, for the first selected shape.
         case "chartDesign.changeType":
             guard let first = doc?.selection.shapes.first else { return [] }
-            var out: [CommandMenuEntry] = []
-            for (i, group) in ChartMenu.types.enumerated() {
-                if i > 0 { out.append(.separator) }
-                out += group.map { .item($0.label, "chart.type", ["id": .integer(first.rawValue), "type": .string(ChartMenu.param($0))]) }
-            }
-            return out
+            return ChartMenu.entries("chart.type", ["id": .integer(first.rawValue)])
         case "chartDesign.addElement":
             guard let (id, chart) = ChartElements.selected(doc) else { return [] }
             return ChartElements.menu(id, chart)

@@ -39,12 +39,88 @@ public indirect enum CommandMenuEntry: Sendable, Equatable {
     }
 }
 
-/// The chart types of Insert Chart and Change Chart Type (`chart_menu_types`): the main ones, then the
-/// Office 2016 types not already listed.
+/// The chart types of Insert Chart and Change Chart Type, grouped into families the way PowerPoint's gallery groups
+/// its subtypes (our own labels, no icons). deckcraft's `chart_menu_types` lists `ChartType::MAIN` and the Office
+/// 2016 types, 15 of the 28 it models; this lists every type the engine can insert (AB-T-0440). `regionMap` stays
+/// out: it is kept and drawn from a file, but making one needs an online map service.
 public enum ChartMenu {
-    public static var types: [[ChartType]] { [ChartType.main, ChartType.office2016.filter { !ChartType.main.contains($0) }] }
+    /// A family: one submenu, or one item when it has a single type.
+    public struct Family: Sendable, Equatable {
+        public let name: String
+        public let types: [ChartType]
+    }
+
+    public static var families: [Family] {
+        [
+            Family(name: String(localized: "Column", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.column, .stackedColumn, .percentColumn]),
+            Family(name: String(localized: "Bar", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type (horizontal bars)"), types: [.bar, .stackedBar, .percentBar]),
+            Family(name: String(localized: "Line", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.line, .stackedLine, .percentLine, .lineMarkers]),
+            Family(name: String(localized: "Area", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.area, .stackedArea, .percentArea]),
+            Family(name: String(localized: "Pie", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.pie, .doughnut]),
+            Family(name: String(localized: "X Y (Scatter)", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.scatter, .bubble]),
+            Family(name: String(localized: "Radar", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.radar, .filledRadar]),
+            Family(name: String(localized: "Stock", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type (high-low-close)"), types: [.stock]),
+            Family(name: String(localized: "Surface", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.surface]),
+            Family(name: String(localized: "Hierarchy", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type: treemap and sunburst"), types: [.treemap, .sunburst]),
+            Family(name: String(localized: "Statistical", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type: histogram, Pareto, box and whisker"), types: [.histogram, .pareto, .boxWhisker]),
+            Family(name: String(localized: "Waterfall and Funnel", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type"), types: [.waterfall, .funnel]),
+            Family(name: String(localized: "Combo", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type: columns with a line"), types: [.combo]),
+        ]
+    }
+
+    /// The families' types, in menu order.
+    public static var types: [[ChartType]] { families.map(\.types) }
+
     /// Rust's `{:?}` of the type, the parameter deckcraft passes.
     public static func param(_ k: ChartType) -> String { k.rawValue.prefix(1).uppercased() + k.rawValue.dropFirst() }
+
+    /// The type's name in the menus (`ChartType.label` is the engine's English name).
+    public static func label(_ k: ChartType) -> String {
+        switch k {
+        case .column: String(localized: "Clustered Column", bundle: .module, comment: "A chart type")
+        case .stackedColumn: String(localized: "Stacked Column", bundle: .module, comment: "A chart type")
+        case .percentColumn: String(localized: "100% Stacked Column", bundle: .module, comment: "A chart type")
+        case .bar: String(localized: "Clustered Bar", bundle: .module, comment: "A chart type (horizontal bars)")
+        case .stackedBar: String(localized: "Stacked Bar", bundle: .module, comment: "A chart type (horizontal bars)")
+        case .percentBar: String(localized: "100% Stacked Bar", bundle: .module, comment: "A chart type (horizontal bars)")
+        case .line: String(localized: "Line", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type")
+        case .lineMarkers: String(localized: "Line with Markers", bundle: .module, comment: "A chart type")
+        case .stackedLine: String(localized: "Stacked Line", bundle: .module, comment: "A chart type")
+        case .percentLine: String(localized: "100% Stacked Line", bundle: .module, comment: "A chart type")
+        case .area: String(localized: "Area", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type")
+        case .stackedArea: String(localized: "Stacked Area", bundle: .module, comment: "A chart type")
+        case .percentArea: String(localized: "100% Stacked Area", bundle: .module, comment: "A chart type")
+        case .pie: String(localized: "Pie", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type")
+        case .doughnut: String(localized: "Doughnut", bundle: .module, comment: "A chart type")
+        case .scatter: String(localized: "Scatter", bundle: .module, comment: "A chart type: X Y points")
+        case .bubble: String(localized: "Bubble", bundle: .module, comment: "A chart type: X Y points drawn as circles sized by a third value")
+        case .radar: String(localized: "Radar", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type")
+        case .filledRadar: String(localized: "Filled Radar", bundle: .module, comment: "A chart type")
+        case .stock: String(localized: "Stock", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type (high-low-close)")
+        case .surface: String(localized: "Surface", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type")
+        case .histogram: String(localized: "Histogram", bundle: .module, comment: "A chart type")
+        case .pareto: String(localized: "Pareto", bundle: .module, comment: "A chart type")
+        case .boxWhisker: String(localized: "Box and Whisker", bundle: .module, comment: "A chart type")
+        case .waterfall: String(localized: "Waterfall", bundle: .module, comment: "A chart type")
+        case .funnel: String(localized: "Funnel", bundle: .module, comment: "A chart type")
+        case .treemap: String(localized: "Treemap", bundle: .module, comment: "A chart type")
+        case .sunburst: String(localized: "Sunburst", bundle: .module, comment: "A chart type")
+        case .regionMap: String(localized: "Filled Map", bundle: .module, comment: "A chart type: regions coloured by value")
+        case .combo: String(localized: "Combo", bundle: .module, comment: "A chart family in Insert Chart and Change Chart Type: columns with a line")
+        }
+    }
+
+    /// The families as menu entries, each type running `command` with `params` plus its `type`.
+    public static func entries(_ command: String, _ params: JSON = .emptyObject) -> [CommandMenuEntry] {
+        families.map { f in
+            let items: [CommandMenuEntry] = f.types.map { k in
+                var p = params
+                p.set("type", .string(param(k)))
+                return .item(label(k), command, p)
+            }
+            return f.types.count == 1 ? (items.first ?? .separator) : .submenu(f.name, items)
+        }
+    }
 }
 
 public enum CommandMenus {
@@ -130,14 +206,7 @@ public enum CommandMenus {
         ]
     }
 
-    static var chart: [CommandMenuEntry] {
-        var out: [CommandMenuEntry] = []
-        for (i, group) in ChartMenu.types.enumerated() {
-            if i > 0 { out.append(.separator) }
-            out += group.map { .item($0.label, "insert.chart", ["type": .string(ChartMenu.param($0))]) }
-        }
-        return out
-    }
+    static var chart: [CommandMenuEntry] { ChartMenu.entries("insert.chart") }
 
     static var picture: [CommandMenuEntry] {
         [

@@ -293,6 +293,39 @@ final class AcceptingHost: AppHost {
         #expect(RibbonNumber.number(10.5) == "10.5" && RibbonNumber.number(12) == "12" && RibbonNumber.number(2.25) == "2.25")
     }
 
+    // Insert Chart and Change Chart Type list every type the engine models but the filled map, in families like
+    // PowerPoint's gallery (AB-T-0440); each item inserts or changes to its own type.
+    @Test func chartMenusListEveryModelledType() throws {
+        let all: [ChartType] = [
+            .column, .stackedColumn, .percentColumn, .bar, .stackedBar, .percentBar, .line, .lineMarkers, .stackedLine,
+            .percentLine, .area, .stackedArea, .percentArea, .pie, .doughnut, .scatter, .bubble, .radar, .filledRadar,
+            .stock, .surface, .histogram, .pareto, .boxWhisker, .waterfall, .funnel, .treemap, .sunburst, .combo,
+        ]
+        let listed = ChartMenu.types.flatMap { $0 }
+        #expect(Set(listed) == Set(all) && listed.count == all.count, "each once")
+        #expect(!listed.contains(.regionMap))
+        #expect(ChartMenu.families.allSatisfy { !$0.name.isEmpty && !$0.types.isEmpty })
+        let insert = CommandMenus.entries(.chart)
+        #expect(insert.count == ChartMenu.families.count, "one entry per family")
+        #expect(insert.contains { if case .submenu(_, let sub) = $0 { sub.count == 3 } else { false } })
+        let f = Fixture()
+        func kind() -> ChartType? { ChartElements.selected(f.model.session.activeDoc)?.1.kind }
+        for ref in Self.items(insert) {
+            #expect(ref.id == "insert.chart")
+            _ = f.model.run(ref.id, ref.params)
+            let want = InsertCommands.chartType(ref.params["type"]?.asStr ?? "")
+            #expect(kind() == want, "insert \(want)")
+        }
+        let change = Self.items(RibbonMenus.entries("chartDesign.changeType", f.model))
+        #expect(change.count == all.count && change.allSatisfy { $0.id == "chart.type" })
+        for ref in change {
+            _ = f.model.run(ref.id, ref.params)
+            let want = InsertCommands.chartType(ref.params["type"]?.asStr ?? "")
+            #expect(kind() == want, "change to \(want)")
+        }
+        #expect(all.allSatisfy { !ChartMenu.label($0).isEmpty })
+    }
+
     // Chart Design › Add Chart Element: each item is one `chart.options` change to the selected chart.
     @Test func addChartElementChangesTheChart() throws {
         let f = Fixture()

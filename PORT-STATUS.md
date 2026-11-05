@@ -828,6 +828,23 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     PowerPoint (the reader takes absence as off). A reversed bar chart's value axis is drawn at the bottom, where
     PowerPoint moves it to the top. Display units, minor unit, crossing point, date axes and tick marks (C8's rest)
     need model fields. Trendline legend entries are AB-T-0437.
+- **After 0.1.15 (unreleased, 2026-11-05): Insert Chart and Change Chart Type list every type we model (AB-T-0440).**
+  The menus listed deckcraft's 15 (`ChartType.MAIN` and the Office 2016 types) of the 29 the engine inserts; stacked
+  and 100 % columns, bars, lines and areas, line with markers, bubble, filled radar, stock, surface and combo were
+  only reachable from a file or a script (gap review item 8; rows A1, A3; O-11).
+  - **Now:** `ChartMenu.families` groups them like PowerPoint's gallery, with our own labels and no icons: Column, Bar,
+    Line, Area, Pie, X Y (Scatter), Radar and Hierarchy, Statistical, Waterfall and Funnel as submenus; Stock, Surface
+    and Combo as single items. Insert Chart (toolbar and ribbon split), Chart Design › Change Chart Type and the
+    inspector's Chart Type picker (a section per family) share it. The filled map stays out (kept and drawn from a
+    file; making one needs an online map service). The type names are localized in the menus now (they were
+    English in every language): 35 strings in fr, it, de and es, marked "needs review".
+  - **Tests:** `RibbonModelTests.chartMenusListEveryModelledType` (every type once; each Insert Chart item inserts
+    its type and each Change Chart Type item changes to it), `InspectorToolbarTests` (a subtype inside its family's
+    submenu). `Tools/app/ribbon-widths.sh en languages`: 420 PASS, no failures. Seen in the app (AppProbe, French):
+    the Insert Chart menu shows the 13 families.
+  - **Not yet:** a new bubble chart has no sizes, so its bubbles are all one size until Edit Data can set them
+    (AB-T-0441); the subtypes PowerPoint has and the model doesn't (stacked lines with markers, open-high-low-close
+    and volume stocks, wireframe and 3-D surfaces, the 3-D and of-pie variants, the other combos) aren't listed.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs
