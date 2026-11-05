@@ -724,7 +724,10 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
     charts that had none got one, in every mode. PowerPoint opened all 56 edited files and a deck of 13 charts
     made by `insert.chart` without a repair prompt. All 107 workbooks in them validate against SpreadsheetML apart from
     what Excel's own workbooks also carry (`xml:space` on `t`, `mc:Ignorable`). `Tools/pptx/validate.sh` now rejects
-    parts that aren't well-formed (it skipped them) and knows SpreadsheetML.
+    parts that aren't well-formed (it skipped them) and knows SpreadsheetML. dccli's `convert` parity applies the
+    same divergence. Full suite green apart from `aDenseShapeGradientRendersPromptly`, a timing test starved in the
+    full run that passes alone (4.8 s). **Not yet checked:** each workbook opened in Excel (`Tools/pptx/excel-check.sh`,
+    written, unrun: Excel hung at its first launch) and PowerPoint's Edit Data in Excel on an edited chart.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs
