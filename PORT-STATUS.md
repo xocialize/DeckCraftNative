@@ -901,6 +901,27 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Not yet:** a Format pane for the contents and separator (AB-T-0444; the keys are there); per-point labels
     (`c:dLbl`); leader lines are kept but not drawn; PowerPoint puts a pie's callouts inside the slices and breaks
     an outside pie label onto two lines, we draw them outside on one; an area chart's labels aren't drawn.
+- **After 0.1.15 (unreleased, 2026-11-05): a chart's data table (AB-T-0439).** PowerPoint's Data Table (With or No
+  Legend Keys) wasn't modelled: lost on the first regenerating edit and never drawn (gap review item 7; row B6;
+  O-19, O-36, O-38).
+  - **Now:** `Chart.dataTable` (DCModel patch: keys and the three borders) is read, written after the axes and
+    edited in a kept part (DCPPTX divergence 15); `chart.options` takes `dataTable` (DCEngine PORT-NOTES); Add
+    Chart Element › Data Table offers None, With Legend Keys and No Legend Keys on charts that take one (column,
+    line, area, stock and their combos). DCRender draws it under the plot in the category labels' place, with the
+    series' keys and names left of the plot. 3 new strings in fr, it, de and es, marked "needs review".
+  - **Checked:** `pp-elements` keeps `c:dTable` after a title edit and a keys change (patched, every other element
+    kept), and after a palette edit and `chart.type` Line (regenerated); its render shows the table with legend keys
+    under the plot as PowerPoint's PDF does. PowerPoint 16.114 opened those, the edit that removes the table, and a
+    deck of four tables (column with keys, line without keys or column borders, stacked area without outline, a
+    combo) without a repair prompt; its PDF of that deck draws the same tables. SSIMULACRA2 against PowerPoint's
+    PDF of `pp-elements` went from −67.8 to −85.8 with the table drawn (both have it; ours moves the plot further),
+    another sign the metric doesn't measure this comparison.
+  - **Tests:** `WriteChartDataTableTests` (3), `InsertCommandTests.chartOptionsSetADataTable`,
+    `RibbonModelTests.dataTableSubmenuAddsAndRemovesTheTable` (and the Add Chart Element count),
+    `ChartDataTableRenderTests`. The oracle corpus is unchanged.
+  - **Not yet:** PowerPoint lists a stacked area's series bottom-up in the table, we list them in order; the
+    table's own fill, line and text formatting are kept but not drawn; no table under horizontal bars (not offered;
+    whether PowerPoint offers one there wasn't checked).
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

@@ -332,12 +332,13 @@ final class AcceptingHost: AppHost {
         #expect(RibbonMenus.entries("chartDesign.addElement", f.model).isEmpty, "no chart selected")
         _ = f.model.run("insert.chart", ["type": "Column"])
         let menu = RibbonMenus.entries("chartDesign.addElement", f.model)
-        // Chart Title, Legend, Data Labels, Gridlines; Axis Titles, Error Bars, Trendline (AB-T-0436).
-        #expect(menu.count == 7)
+        // Chart Title, Legend, Data Labels, Data Table (AB-T-0439), Gridlines; Axis Titles, Error Bars, Trendline
+        // (AB-T-0436).
+        #expect(menu.count == 8)
         let items = Self.items(menu)
         // Data Labels: None, four positions and Data Callout (AB-T-0438). Trendline: None, then four types each
         // listing the three series.
-        #expect(items.count == 2 + 5 + 6 + 3 + 3 + 4 + (1 + 4 * 3) && items.allSatisfy { $0.id == "chart.options" })
+        #expect(items.count == 2 + 5 + 6 + 3 + 3 + 3 + 4 + (1 + 4 * 3) && items.allSatisfy { $0.id == "chart.options" })
         func chart() throws -> Chart { try #require(ChartElements.selected(f.model.session.activeDoc)).1 }
         func pick(_ key: String, _ value: JSON) throws {
             let ref = try #require(items.first { $0.params[key] == value }, "\(key) \(value)")
@@ -396,6 +397,17 @@ final class AcceptingHost: AppHost {
         let area = ChartFixture("Area")
         guard case .submenu(_, let a)? = Self.titled(area.menu, "Data Labels") else { Issue.record("Data Labels"); return }
         #expect(Self.items(a).map { $0.params["dataLabels"]?.asBool } == [false, true], "None and Show")
+    }
+
+    // Add Chart Element › Data Table: None, With Legend Keys, No Legend Keys, where the chart takes one (AB-T-0439).
+    @Test func dataTableSubmenuAddsAndRemovesTheTable() throws {
+        let c = ChartFixture("Column")
+        #expect(c.pick("Data Table", "With Legend Keys") && c.chart?.dataTable == .default)
+        #expect(c.pick("Data Table", "No Legend Keys") && c.chart?.dataTable?.keys == false)
+        #expect(c.pick("Data Table", "None") && c.chart?.dataTable == nil)
+        for type in ["Pie", "Bar", "Scatter"] {
+            #expect(Self.titled(ChartFixture(type).menu, "Data Table") == nil, "\(type) takes no data table")
+        }
     }
 
     // MARK: - AB-T-0436: axis titles, minor gridlines, error bars, trendlines, up/down bars, the inspector's axis

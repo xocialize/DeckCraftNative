@@ -40,6 +40,7 @@ public enum ChartElements {
                 .item(l.label, "chart.options", ["id": shape, "legend": l.code.map(JSON.string) ?? .null])
             }),
             .submenu(String(localized: "Data Labels", bundle: .module), dataLabels(shape, chart)),
+        ] + (chart.takesDataTable ? [dataTableMenu(shape)] : []) + [
             .submenu(String(localized: "Gridlines", bundle: .module), gridlines(shape, chart)),
         ] + axisAndSeriesMenus(id, chart)
     }
@@ -77,6 +78,16 @@ public enum ChartElements {
             .item(String(localized: "Data Callout", bundle: .module, comment: "Data labels in callout boxes showing the category and value"), "chart.options",
                   ["id": shape, "dataLabels": true, "labelCallout": true, "labelContents": ["categoryName": true, "value": true]]),
         ]
+    }
+
+    /// Add Chart Element › Data Table, as PowerPoint offers it (AB-T-0439).
+    static func dataTableMenu(_ shape: JSON) -> CommandMenuEntry {
+        .submenu(String(localized: "Data Table", bundle: .module, comment: "Add Chart Element › Data Table: a table of the chart's values under it"), [
+            .item(String(localized: "None", bundle: .module, comment: "No data table under the chart"), "chart.options", ["id": shape, "dataTable": .null]),
+            .item(String(localized: "With Legend Keys", bundle: .module, comment: "A data table whose rows start with the series' legend keys"), "chart.options",
+                  ["id": shape, "dataTable": ["keys": true]]),
+            .item(String(localized: "No Legend Keys", bundle: .module, comment: "A data table without legend keys"), "chart.options", ["id": shape, "dataTable": ["keys": false]]),
+        ])
     }
 
     // MARK: - Axis titles, gridlines, error bars, trendlines, up/down bars (AB-T-0436)

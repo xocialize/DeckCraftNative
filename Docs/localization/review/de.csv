@@ -266,6 +266,7 @@ DCAppModel|Dashed vertical,,Dashed vertical,Gestrichelt vertikal,needs_review,,,
 DCAppModel|Dashes,,Dashes,Strichtyp,needs_review,,,
 DCAppModel|Data Callout,,Data Callout,Datenlegende,needs_review,,,Data labels in callout boxes showing the category and value
 DCAppModel|Data Labels,,Data Labels,Datenbeschriftungen,needs_review,,,
+DCAppModel|Data Table,,Data Table,Datentabelle,needs_review,,,Add Chart Element › Data Table: a table of the chart's values under it
 DCAppModel|Date and Time,,Date and Time,Datum und Uhrzeit,needs_review,,,
 DCAppModel|Date and time,,Date and time,Datum und Uhrzeit,needs_review,,,
 DCAppModel|Decimal,,Decimal,Dezimal,needs_review,,,
@@ -568,6 +569,7 @@ DCAppModel|New show name:,,New show name:,Name der neuen Präsentation:,needs_re
 DCAppModel|Next Slide,,Next Slide,Nächste Folie,needs_review,,,
 DCAppModel|No Border,,No Border,Kein Rahmen,needs_review,,,
 DCAppModel|No Glow,,No Glow,Kein Leuchten,needs_review,,,
+DCAppModel|No Legend Keys,,No Legend Keys,Ohne Legendensymbole,needs_review,,,A data table without legend keys
 DCAppModel|No Reflection,,No Reflection,Keine Spiegelung,needs_review,,,
 DCAppModel|No Shadow,,No Shadow,Kein Schatten,needs_review,,,
 DCAppModel|No Soft Edges,,No Soft Edges,Keine weichen Kanten,needs_review,,,
@@ -581,6 +583,7 @@ DCAppModel|None,,None,Keine,needs_review,,,"No arrowheads
 No axis titles
 No chart title
 No data labels on the chart
+No data table under the chart
 No error bars
 No gridlines on the chart
 No legend on the chart
@@ -986,6 +989,7 @@ DCAppModel|Width (pixels):,,Width (pixels):,Breite (Pixel):,needs_review,,,
 DCAppModel|Width: enter %@ to %@ pixels,,Width: enter %1$@ to %2$@ pixels,Breite: %1$@ bis %2$@ Pixel eingeben,needs_review,,,
 DCAppModel|Window layout:,,Window layout:,Fensterlayout:,needs_review,,,
 DCAppModel|With,,With,Durch,needs_review,,,
+DCAppModel|With Legend Keys,,With Legend Keys,Mit Legendensymbolen,needs_review,,,A data table whose rows start with the series' legend keys
 DCAppModel|With Previous,,With Previous,Mit Vorherigem,needs_review,,,
 DCAppModel|With:,,With:,Mit:,needs_review,,,
 DCAppModel|WordArt,,WordArt,WordArt,needs_review,,,

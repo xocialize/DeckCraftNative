@@ -583,3 +583,22 @@ let solidRed = Rgba.rgb(255, 0, 0)
         #expect(shown == render(area), "an area's labels have no place yet")
     }
 }
+
+// The port's own (AB-T-0439): a data table under the plot.
+@Suite struct ChartDataTableRenderTests {
+    private func render(_ c: Chart) -> RenderImage { renderDeck(deckOf([shapeOf(1, Xfrm(40, 40, 480, 270), .chart(c))])) }
+
+    @Test func aDataTableIsDrawnWhereTheChartTakesOne() {
+        var c = Chart.sample(.column)
+        let plain = render(c)
+        c.dataTable = .default
+        let keyed = render(c)
+        #expect(keyed != plain)
+        c.dataTable?.keys = false
+        #expect(render(c) != keyed, "the keys are drawn")
+        var pie = Chart.sample(.pie)
+        let flat = render(pie)
+        pie.dataTable = .default
+        #expect(render(pie) == flat, "not under a pie")
+    }
+}

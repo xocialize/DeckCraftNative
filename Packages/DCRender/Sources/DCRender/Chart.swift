@@ -513,11 +513,15 @@ public enum ChartRender {
             let vals = sec ? axisTicks(sc) : primaryTicks
             return Double(vals.map { c.axisLabel(sec, $0).unicodeScalars.count }.max() ?? 1) * base * 0.55 + base * 0.6
         }
-        let gutter = horiz ? base * 4.5 : c.yHidden ? base * 0.5 : clampSoft(labelW(false, (min, max, step)), base * 1.5, area.width * 0.3)
+        // A data table under the plot takes the category labels' place, its series names left of the plot (the port's
+        // own, AB-T-0439).
+        let table = horiz || boxes != nil ? nil : c.dataTable.flatMap { t in c.takesDataTable ? DataTableLayout(c, t, base) : nil }
+        let gutter0 = horiz ? base * 4.5 : c.yHidden ? base * 0.5 : clampSoft(labelW(false, (min, max, step)), base * 1.5, area.width * 0.3)
+        let gutter = table.map { gutter0.rustMax($0.nameWidth.rustMin(area.width * 0.4)) } ?? gutter0
         let gutterR = second.flatMap { c.y2Hidden ? nil : $0 }.map { clampSoft(labelW(true, $0), base * 1.5, area.width * 0.3) } ?? 0
         let plot = horiz
             ? Rect(area.x0 + gutter, area.y0, area.x1, area.y1 - base * 1.6)
-            : Rect(area.x0 + gutter, area.y0, area.x1 - gutterR, area.y1 - base * 1.8)
+            : Rect(area.x0 + gutter, area.y0, area.x1 - gutterR, area.y1 - (table.map { $0.height.rustMin(area.height * 0.6) } ?? base * 1.8))
         if bg, let f = c.plotFill {
             PaintFill.fillPath(ctx, rctx, f, nil, rectPath(plot), plot, m, .norm, 1, rctx.pres)
         }
@@ -608,7 +612,10 @@ public enum ChartRender {
         }
         // Category labels: wrapped onto two lines when they don't fit their band (long date ranges).
         let wraps = !horiz && c.categories.contains { Double($0.unicodeScalars.count) * base * 0.5 > band }
-        if bg && xscale == nil {
+        if bg, let t = table {
+            t.draw(ctx, rctx, c, m, plot, band, slot, ncat, gutter, textCol)
+        }
+        if bg && xscale == nil && table == nil {
             for (i, name) in c.categories.enumerated() {
                 let mid = horiz ? plot.y0 + band * (slot(i) + 0.5) : plot.x0 + band * (slot(i) + 0.5)
                 if horiz {
@@ -1351,6 +1358,105 @@ extension ChartRender {
         case "t": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - w, q.y - g - th, q.x + w, q.y - g), .center, .bottom, size, col, q)
         case "b": dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x - w, q.y + g, q.x + w, q.y + g + th), .center, .top, size, col, q)
         default: dataLabel(ctx, rctx, m, c, s, si, i, text, Rect(q.x + g, q.y - th, q.x + g + w, q.y + th), .left, .middle, size, col, q)
+        }
+    }
+}
+
+// MARK: - Data table (AB-T-0439)
+
+extension ChartRender {
+    /// A data table under the plot, as PowerPoint draws `c:dTable`: a header row of category names under the plot's
+    /// bands, then a row per series with its key and name left of the plot and its values under their categories,
+    /// in grey lines (the outline, and the rows' and columns' borders when the table shows them).
+    struct DataTableLayout {
+        let table: DataTable
+        let rowHeight: Double
+        let rows: Int
+        let nameWidth: Double
+        let base: Double
+
+        init(_ c: Chart, _ t: DataTable, _ base: Double) {
+            table = t
+            self.base = base
+            rowHeight = base * 1.45
+            rows = 1 + Swift.min(c.series.count, 64)
+            let widest = Double(c.series.prefix(64).map { $0.name.unicodeScalars.count }.max() ?? 0)
+            nameWidth = widest * base * 0.55 + base * (t.keys ? 2.2 : 0.8)
+        }
+
+        var height: Double { rowHeight * Double(rows) + base * 0.3 }
+
+        func draw(
+            _ ctx: Canvas, _ rctx: Resolve.Ctx, _ c: Chart, _ m: Affine, _ plot: Rect, _ band: Double, _ slot: (Int) -> Double, _ ncat: Int,
+            _ gutter: Double, _ textCol: Rgba
+        ) {
+            let top = plot.y1
+            let left = plot.x0 - nameWidth.rustMin(gutter)
+            func y(_ r: Int) -> Double { top + rowHeight * Double(r) }
+            let bottom = y(rows)
+            let size = base * 0.85
+            // The header: each category's name under its band.
+            for i in 0 ..< ncat {
+                guard let name = c.categories.at(i) else { continue }
+                let x = plot.x0 + band * slot(i)
+                label(ctx, rctx, m, name, Rect(x, y(0), x + band, y(1)), size, .center, .middle, textCol, false)
+            }
+            for (si, s) in c.series.prefix(rows - 1).enumerated() {
+                let r = si + 1
+                var nameX = left + base * 0.3
+                if table.keys {
+                    // Bars and areas a filled key, lines a short line, as PowerPoint draws them.
+                    let k = c.seriesKind(s)
+                    let key = base * 0.55
+                    let ky = (y(r) + y(r + 1) - key) / 2
+                    if k.isBarLike || k.isArea {
+                        let paint: BarPaint = k.isBarLike ? paintOf(rctx, s.fill, seriesColor(rctx, c, si)) : .color(seriesFill(rctx, c, si, s))
+                        fillWith(ctx, rctx, paint, Rect(nameX, ky, nameX + key, ky + key), m)
+                        nameX += key + base * 0.35
+                    } else {
+                        // `BarPaint.line` runs from 0.4 of the key's width before it to its end.
+                        let w = base * 1.1 / 1.4
+                        fillWith(ctx, rctx, .line(seriesLine(rctx, c, si, s), []), Rect(nameX + w * 0.4, ky, nameX + w * 1.4, ky + key), m)
+                        nameX += base * 1.1 + base * 0.35
+                    }
+                }
+                label(ctx, rctx, m, s.name, Rect(nameX, y(r), plot.x0 - base * 0.2, y(r + 1)), size, .left, .middle, textCol, false)
+                for i in 0 ..< ncat {
+                    guard let v = s.values.at(i) ?? nil else { continue }
+                    let x = plot.x0 + band * slot(i)
+                    label(ctx, rctx, m, c.dataLabel(s, v), Rect(x, y(r), x + band, y(r + 1)), size, .center, .middle, textCol, false)
+                }
+            }
+            var lines = BezPath()
+            if table.horizontal {
+                for r in 1 ..< rows {
+                    lines.moveTo(Point(left, y(r)))
+                    lines.lineTo(Point(plot.x1, y(r)))
+                }
+            }
+            if table.vertical {
+                // Between the categories (from the plot's bottom), and the name column's edge (from the series rows).
+                for i in 1 ..< Swift.max(ncat, 1) {
+                    let x = plot.x0 + band * Double(i)
+                    lines.moveTo(Point(x, top))
+                    lines.lineTo(Point(x, bottom))
+                }
+                lines.moveTo(Point(plot.x0, top))
+                lines.lineTo(Point(plot.x0, bottom))
+            }
+            if table.outline {
+                lines.moveTo(Point(plot.x0, top))
+                lines.lineTo(Point(plot.x1, top))
+                lines.lineTo(Point(plot.x1, bottom))
+                lines.lineTo(Point(left, bottom))
+                lines.lineTo(Point(left, y(1)))
+                lines.lineTo(Point(plot.x0, y(1)))
+                lines.lineTo(Point(plot.x0, top))
+            }
+            ctx.setTransform(m)
+            ctx.setPaint(.color(.rgb(0xD9, 0xD9, 0xD9), 1))
+            ctx.setStroke(StrokeStyle(0.75))
+            ctx.strokePath(lines)
         }
     }
 }

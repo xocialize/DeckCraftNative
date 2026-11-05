@@ -153,6 +153,11 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
   corpus draws as before. Line, scatter and bubble points get labels (deckcraft draws none), right of the point
   unless placed Center, Left, Above or Below; an area's stay undrawn. A pie places them along the radius, outside
   it reading away from the centre. Checked beside PowerPoint's PDF of the same deck.
+- **A data table under the plot** (AB-T-0439, `DataTableLayout`): it takes the category labels' place, a header
+  row of category names under the plot's bands and a row per series with its key (a filled square, or a short line
+  for a line series) and name left of the plot, which moves right to make room; values in the series' number
+  format; grey borders as the table asks. Drawn on charts that take one (not horizontal bars or box charts).
+  Checked beside PowerPoint's PDF of the same deck.
 
 ## Chart builds: a chart drawn part by part (AB-T-0443)
 

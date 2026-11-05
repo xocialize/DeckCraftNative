@@ -651,6 +651,11 @@ the deck's `presentation` exactly, and every picture in the saved deck by its pi
   too. A position the chart's series don't all take (`Chart.labelPositions`: no Outside End on stacked bars, none on
   an area, doughnut, radar or 3-D chart) and labels that would show nothing are refused before anything changes.
   None of them drops `raw`. Tests: `InsertCommandTests.chartOptionsPlaceTheDataLabels`.
+- **`chart.options` adds a data table** (2026-11-05, AB-T-0439; `CmdChartLabels.swift`). `dataTable {keys?,
+  horizontal?, vertical?, outline?}` (booleans; left out, PowerPoint's With Legend Keys: all on) or null for none.
+  Refused on a chart that takes none (`Chart.takesDataTable`: a flat column, line, area or stock chart or a combo
+  of them, not a horizontal bar, pie, scatter or Office 2016 chart). `chart.type` drops the table when the new type
+  takes none. It doesn't drop `raw`. Tests: `InsertCommandTests.chartOptionsSetADataTable`.
 
 ### Tests
 

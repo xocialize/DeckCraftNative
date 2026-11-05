@@ -870,3 +870,23 @@ extension Chart {
         return parts.joined(separator: o.separator ?? ", ")
     }
 }
+
+// MARK: - Data table (AB-T-0439)
+
+extension DataTable {
+    /// PowerPoint's Data Table › With Legend Keys: every line and the keys.
+    public static var `default`: DataTable { DataTable(keys: true, horizontal: true, vertical: true, outline: true) }
+}
+
+extension Chart {
+    /// A data table goes under a flat chart with a category axis along the bottom: column, line, area and stock
+    /// charts and their combos, as PowerPoint offers it (not on a pie, doughnut, scatter, bubble, radar, surface,
+    /// horizontal bar, 3-D or Office 2016 chart).
+    public var takesDataTable: Bool {
+        guard threeD == nil, !series.isEmpty else { return false }
+        return series.allSatisfy { s in
+            let k = seriesKind(s)
+            return [.column, .stackedColumn, .percentColumn, .line, .lineMarkers, .stackedLine, .percentLine, .area, .stackedArea, .percentArea, .stock].contains(k)
+        }
+    }
+}

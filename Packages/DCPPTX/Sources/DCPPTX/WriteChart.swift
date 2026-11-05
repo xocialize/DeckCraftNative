@@ -426,6 +426,17 @@ extension PPTXWrite {
             w.close("c:dLbls")
         }
 
+        /// A `c:dTable` (AB-T-0439), its text in the chart's text colour when it has one.
+        static func dataTable(_ w: inout W, _ c: Chart, _ t: DataTable) {
+            w.open0("c:dTable")
+            w.val("c:showHorzBorder", t.horizontal ? 1 : 0)
+            w.val("c:showVertBorder", t.vertical ? 1 : 0)
+            w.val("c:showOutline", t.outline ? 1 : 0)
+            w.val("c:showKeys", t.keys ? 1 : 0)
+            txPr(&w, c)
+            w.close("c:dTable")
+        }
+
         /// Office 2013's chart extensions ([MS-ODRAWXML]).
         static let c15NS = "http://schemas.microsoft.com/office/drawing/2012/chart"
 
@@ -913,6 +924,10 @@ extension PPTXWrite {
                 if g != .pie && g != .doughnut {
                     axes(&w, c, g)
                 }
+            }
+            // After the axes, before the plot's fill (CT_PlotArea). The port's own (AB-T-0439).
+            if let t = c.dataTable {
+                dataTable(&w, c, t)
             }
             if let f = c.plotFill {
                 spPr(&w, f, nil)

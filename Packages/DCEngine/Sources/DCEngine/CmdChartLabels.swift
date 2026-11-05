@@ -94,3 +94,40 @@ extension InsertCommands {
         static let all = ["ctr", "inEnd", "inBase", "outEnd", "bestFit", "l", "r", "t", "b"]
     }
 }
+
+extension InsertCommands {
+    /// `chart.options` `dataTable`: `{keys?, horizontal?, vertical?, outline?}` (booleans; left out, PowerPoint's
+    /// With Legend Keys: all on) or null for none. The port's own (AB-T-0439); refused on a chart that takes no data
+    /// table (`Chart.takesDataTable`).
+    struct DataTableParam {
+        var table: DataTable??
+
+        init(_ p: JSON) throws {
+            let cmd = "chart.options"
+            guard let v = p.get("dataTable") else { return }
+            if v.isNull {
+                table = .some(nil)
+                return
+            }
+            guard v.isObject else { throw Cmd.bad(cmd, "`dataTable` is an object ({keys?, horizontal?, vertical?, outline?}) or null") }
+            var t = DataTable.default
+            for k in ["keys", "horizontal", "vertical", "outline"] {
+                guard let x = v.get(k) else { continue }
+                guard let b = x.asBool else { throw Cmd.bad(cmd, "`dataTable.\(k)` is true or false") }
+                switch k {
+                case "keys": t.keys = b
+                case "horizontal": t.horizontal = b
+                case "vertical": t.vertical = b
+                default: t.outline = b
+                }
+            }
+            table = .some(t)
+        }
+
+        func apply(_ c: inout Chart) throws {
+            guard let t = table else { return }
+            if t != nil && !c.takesDataTable { throw Cmd.bad("chart.options", "a data table goes under a column, line, area or stock chart") }
+            c.dataTable = t
+        }
+    }
+}

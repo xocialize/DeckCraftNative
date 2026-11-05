@@ -1653,6 +1653,8 @@ public enum InsertCommands {
             c.threeD = nil
             c.wireframe = false
             c.ofPie = nil
+            // A data table stays where the new type takes one (AB-T-0439).
+            if !c.takesDataTable { c.dataTable = nil }
             c.raw = nil
         }
     }
@@ -1732,6 +1734,7 @@ public enum InsertCommands {
         let axis = try AxisOptions(p)
         let seriesOptions = try SeriesOptions(p)
         let labels = try LabelOptionsParams(p)
+        let table = try DataTableParam(p)
         return try withChart(s, p, "chart.options") { c in
             if let t = textColor { c.textColor = t }
             applyBinOptions(&c, binCount, binSize)
@@ -1750,6 +1753,7 @@ public enum InsertCommands {
                 }
             }
             try labels.apply(&c)
+            try table.apply(&c)
             if let v = Cmd.boolParam(p, "gridlines") { c.gridlines = v }
             if let v = Cmd.strParam(p, "palette") { c.palette = v }
             try axis.apply(&c)

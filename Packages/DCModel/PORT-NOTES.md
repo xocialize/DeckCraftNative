@@ -41,6 +41,9 @@ generator only; it isn't built.
   separator, PowerPoint's Data Callout), a plot group's and a series' own. `dataLabels` still says whether they
   show. Hand-written beside them (`Chart.swift`): `LabelOptions.positions(_:threeD:)` (the positions each chart type
   takes, as PowerPoint offers them), `Chart.labelOptions(_:)`, `labelPositions` and `labelText(_:_:_:share:)`.
+- **`DataTable` and `Chart.dataTable`** (AB-T-0439): a data table under the plot (`c:dTable`): its keys and its
+  horizontal, vertical and outline borders. `DataTable.default` (hand-written, Rust's manual `impl Default`) is
+  PowerPoint's With Legend Keys; `Chart.takesDataTable` says which charts take one.
 
 Each is skipped when unset (`None`, `false`), so every deck without them writes the same `presentation.json`;
 the corpus round trip is unchanged. A deck that uses them is one deckcraft reads with the fields ignored, and

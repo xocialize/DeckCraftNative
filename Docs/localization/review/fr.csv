@@ -266,6 +266,7 @@ DCAppModel|Dashed vertical,,Dashed vertical,Verticale en tirets,needs_review,,,
 DCAppModel|Dashes,,Dashes,Tirets,needs_review,,,
 DCAppModel|Data Callout,,Data Callout,Légende de données,needs_review,,,Data labels in callout boxes showing the category and value
 DCAppModel|Data Labels,,Data Labels,Étiquettes de données,needs_review,,,
+DCAppModel|Data Table,,Data Table,Table de données,needs_review,,,Add Chart Element › Data Table: a table of the chart's values under it
 DCAppModel|Date and Time,,Date and Time,Date et heure,needs_review,,,
 DCAppModel|Date and time,,Date and time,Date et heure,needs_review,,,
 DCAppModel|Decimal,,Decimal,Décimal,needs_review,,,
@@ -568,6 +569,7 @@ DCAppModel|New show name:,,New show name:,Nom du nouveau diaporama :,needs_revi
 DCAppModel|Next Slide,,Next Slide,Diapositive suivante,needs_review,,,
 DCAppModel|No Border,,No Border,Aucune bordure,needs_review,,,
 DCAppModel|No Glow,,No Glow,Aucune lumière,needs_review,,,
+DCAppModel|No Legend Keys,,No Legend Keys,Sans symboles de légende,needs_review,,,A data table without legend keys
 DCAppModel|No Reflection,,No Reflection,Aucune réflexion,needs_review,,,
 DCAppModel|No Shadow,,No Shadow,Aucune ombre,needs_review,,,
 DCAppModel|No Soft Edges,,No Soft Edges,Aucune bordure adoucie,needs_review,,,
@@ -581,6 +583,7 @@ DCAppModel|None,,None,Aucun,needs_review,,,"No arrowheads
 No axis titles
 No chart title
 No data labels on the chart
+No data table under the chart
 No error bars
 No gridlines on the chart
 No legend on the chart
@@ -986,6 +989,7 @@ DCAppModel|Width (pixels):,,Width (pixels):,Largeur (pixels) :,needs_review,,,
 DCAppModel|Width: enter %@ to %@ pixels,,Width: enter %1$@ to %2$@ pixels,Largeur : entrez une valeur de %1$@ à %2$@ pixels,needs_review,,,
 DCAppModel|Window layout:,,Window layout:,Disposition de la fenêtre :,needs_review,,,
 DCAppModel|With,,With,Avec,needs_review,,,
+DCAppModel|With Legend Keys,,With Legend Keys,Avec symboles de légende,needs_review,,,A data table whose rows start with the series' legend keys
 DCAppModel|With Previous,,With Previous,Avec la précédente,needs_review,,,
 DCAppModel|With:,,With:,Avec :,needs_review,,,
 DCAppModel|WordArt,,WordArt,WordArt,needs_review,,,

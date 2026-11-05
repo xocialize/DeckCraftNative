@@ -12,6 +12,7 @@
 // | `chart.options` title | `c:title` (text only; its formatting stays), `c:autoTitleDeleted` |
 // | `chart.options` legend | `c:legend`, `c:legendPos` |
 // | `chart.options` dataLabels | `c:showVal` in every plot group's and series' `c:dLbls` |
+// | `chart.options` dataTable | `c:dTable`: its four switches, or added or removed (AB-T-0439) |
 // | `chart.options` labelPosition, labelContents, labelSeparator, labelCallout | `c:dLblPos`, the `c:show…` switches, `c:separator`, `c:showLeaderLines` (or its `c15:` twin) and the callout's `c15:spPr` in every plot group's and series' `c:dLbls` (AB-T-0438) |
 // | `chart.options` gridlines | the primary value axis's `c:majorGridlines` |
 // | `chart.data` | every series' `c:tx`, `c:cat`, `c:val` (`c:xVal`, `c:yVal`, `c:bubbleSize`): caches and `c:f`; series added or removed; `c:externalData` and the workbook taken out here, then linked again to the original workbook with the new cells, or to a new one (`WriteChartWorkbook.swift`) |
@@ -51,6 +52,7 @@ extension PPTXWrite.Charts {
                 if was.labelOptions != me.labelOptions || zip(was.series, me.series).contains(where: { $0.labelOptions != $1.labelOptions }) {
                     patchLabelOptions(&pa, me)
                 }
+                if was.dataTable != me.dataTable { patchDataTable(&pa, me.dataTable) }
                 axisless = primaryValueAxis(pa) == nil
                 barless = !pa.elements.contains { $0.is("lineChart") || $0.is("stockChart") }
                 if was.gridlines != me.gridlines { patchGridlines(&pa, me.gridlines) }
@@ -315,6 +317,27 @@ extension PPTXWrite.Charts {
                 _ = s.edit("dLbls") { applyLabelOptions(&$0, o, show, kind, three) }
             }
             _ = g.edit("dLbls") { applyLabelOptions(&$0, c.labelOptions ?? LabelOptions(), c.dataLabels, groupKind ?? c.kind, three) }
+        }
+    }
+
+    // MARK: - Data table (AB-T-0439)
+
+    /// The plot area's data table: its switches set (its formatting stays), added after the axes, or removed.
+    static func patchDataTable(_ pa: inout XMLEl, _ t: DataTable?) {
+        guard let t else {
+            pa.remove("dTable")
+            return
+        }
+        let flags = [("showHorzBorder", t.horizontal), ("showVertBorder", t.vertical), ("showOutline", t.outline), ("showKeys", t.keys)]
+        if pa.child("dTable") == nil {
+            pa.insert(el("c:dTable", nil, flags.map { el("c:\($0.0)", $0.1 ? "1" : "0") }), after: ["layout", "areaChart", "area3DChart", "lineChart", "line3DChart", "stockChart", "radarChart", "scatterChart", "pieChart", "pie3DChart", "doughnutChart", "barChart", "bar3DChart", "ofPieChart", "surfaceChart", "surface3DChart", "bubbleChart", "valAx", "catAx", "dateAx", "serAx"])
+            return
+        }
+        _ = pa.edit("dTable") { d in
+            for (i, (k, on)) in flags.enumerated() {
+                let v = on ? "1" : "0"
+                if !d.edit(k, { $0.setAttr("val", v) }) { d.insert(el("c:\(k)", v), after: flags.prefix(i).map(\.0)) }
+            }
         }
     }
 

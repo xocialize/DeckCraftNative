@@ -710,6 +710,29 @@ struct InsertShapeTests {
         #expect(c.labelText(c.series[0], 0, 4.2, share: 0.25) == "25%")
     }
 
+    /// The port's own (AB-T-0439): `chart.options` adds, changes and removes a data table where the chart takes one.
+    @Test func chartOptionsSetADataTable() throws {
+        let s = session()
+        let id = try #require(s.run("insert.chart", #"{"type": "column"}"#).get("id")?.asU64)
+        s.run("chart.options", #"{"id": \#(id), "dataTable": {}}"#)
+        #expect(chartOf(s, id)?.dataTable == .default, "PowerPoint's With Legend Keys")
+        s.run("chart.options", #"{"id": \#(id), "dataTable": {"keys": false, "vertical": false}}"#)
+        #expect(chartOf(s, id)?.dataTable == DataTable(keys: false, horizontal: true, vertical: false, outline: true))
+        for bad in [#""dataTable": true"#, #""dataTable": {"keys": "no"}"#] {
+            #expect(s.fails("chart.options", #"{"id": \#(id), \#(bad)}"#), "\(bad)")
+        }
+        // A type that takes no table drops it.
+        s.run("chart.type", #"{"id": \#(id), "type": "Line"}"#)
+        #expect(chartOf(s, id)?.dataTable != nil, "a line chart keeps it")
+        s.run("chart.type", #"{"id": \#(id), "type": "Pie"}"#)
+        #expect(chartOf(s, id)?.dataTable == nil)
+        #expect(s.fails("chart.options", #"{"id": \#(id), "dataTable": {}}"#), "none under a pie")
+        let bar = try #require(s.run("insert.chart", #"{"type": "bar"}"#).get("id")?.asU64)
+        #expect(s.fails("chart.options", #"{"id": \#(bar), "dataTable": {}}"#), "none beside horizontal bars")
+        s.run("chart.options", #"{"id": \#(id), "dataTable": null}"#)
+        #expect(chartOf(s, id)?.dataTable == nil)
+    }
+
     /// The port's own (AB-T-0436): `chart.options` sets the axis titles, minor gridlines, the value axis's scale and
     /// format, reversed categories, gap width and overlap, and keeps the kept part; bad values change nothing.
     @Test func chartOptionsSetTheAxesAndBars() throws {

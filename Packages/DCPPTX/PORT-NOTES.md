@@ -556,6 +556,11 @@ The writer calls these reader functions, with Rust's parameter and return shapes
     doughnut), and a Data Callout as a white box with a grey outline plus `c15:spPr` with `wedgeRectCallout`;
     defaults write what deckcraft writes. `patchLabelOptions` edits them into every group's and series' labels of a
     kept part, keeping their formatting and extensions. Tests: `WriteChartLabelsTests` (5).
+15. **A chart's data table (2026-11-05, deliberate; AB-T-0439).** deckcraft doesn't model `c:dTable`, so a
+    PowerPoint chart's table was lost when the part was regenerated, and never drawn. The reader takes it into
+    `Chart.dataTable` (a missing switch is off); the generator writes it after the axes with the chart's text
+    colour; `patchDataTable` sets its switches in a kept part (its formatting stays), adds it after the axes, or
+    removes it. Tests: `WriteChartDataTableTests` (3).
 
 ## Integration tests
 

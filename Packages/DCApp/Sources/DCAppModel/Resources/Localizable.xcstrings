@@ -8951,6 +8951,41 @@
         }
       }
     },
+    "Data Table" : {
+      "comment" : "Add Chart Element › Data Table: a table of the chart's values under it",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datentabelle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Table"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabla de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Table de données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tabella dati"
+          }
+        }
+      }
+    },
     "Date and Time" : {
       "localizations" : {
         "de" : {
@@ -19138,6 +19173,41 @@
         }
       }
     },
+    "No Legend Keys" : {
+      "comment" : "A data table without legend keys",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ohne Legendensymbole"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Legend Keys"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sin claves de leyenda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sans symboles de légende"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Senza chiavi legenda"
+          }
+        }
+      }
+    },
     "No Reflection" : {
       "localizations" : {
         "de" : {
@@ -19445,7 +19515,7 @@
       }
     },
     "None" : {
-      "comment" : "No arrowheads\nNo axis titles\nNo chart title\nNo data labels on the chart\nNo error bars\nNo gridlines on the chart\nNo legend on the chart\nNo trendlines\nNo up/down bars\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
+      "comment" : "No arrowheads\nNo axis titles\nNo chart title\nNo data labels on the chart\nNo data table under the chart\nNo error bars\nNo gridlines on the chart\nNo legend on the chart\nNo trendlines\nNo up/down bars\nTable cell margins\nno arrowheads\nno mirroring / no arrow",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -32677,6 +32747,41 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Con"
+          }
+        }
+      }
+    },
+    "With Legend Keys" : {
+      "comment" : "A data table whose rows start with the series' legend keys",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mit Legendensymbolen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With Legend Keys"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Con claves de leyenda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Avec symboles de légende"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Con chiavi legenda"
           }
         }
       }

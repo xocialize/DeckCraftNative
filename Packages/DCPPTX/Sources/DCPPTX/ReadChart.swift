@@ -129,6 +129,12 @@ extension PPTXRead {
         c.legendOverlay = ch.child("legend")?.child("overlay")?.bool("val") ?? false
         c.chartFill = simpleFill(root.child("spPr"))
         c.plotFill = simpleFill(pa.child("spPr"))
+        // A data table under the plot (the port's own, AB-T-0439). The schema's switches have no default; a missing
+        // one is off, as PowerPoint draws it.
+        c.dataTable = pa.child("dTable").map { t in
+            func on(_ k: String) -> Bool { t.child(k).map { $0.bool("val") ?? true } ?? false }
+            return DataTable(keys: on("showKeys"), horizontal: on("showHorzBorder"), vertical: on("showVertBorder"), outline: on("showOutline"))
+        }
 
         var kinds: [ChartType] = []
         // The value axis the first plot group uses is the primary one; a group on another value axis

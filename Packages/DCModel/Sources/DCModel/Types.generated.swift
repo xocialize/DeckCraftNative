@@ -4267,13 +4267,16 @@ public struct Chart: Sendable, Equatable {
     /// The data labels' position and contents (a plot group's `c:dLbls`); whether they show is
     /// `data_labels`. DeckCraftNative's own (AB-T-0438).
     public var labelOptions: LabelOptions?
+    /// A data table under the plot (`c:dTable`): the series' values by category. DeckCraftNative's
+    /// own (AB-T-0439).
+    public var dataTable: DataTable?
     /// Original chart XML part kept for round-trip of unmodelled options.
     public var raw: String?
     /// Package parts the original chart still points at (embedded workbook, styles, drawings).
     /// The PPTX writer clears this before comparing modelled state. Native saves keep it too.
     public var kept: ChartKept
 
-    public init(kind: ChartType, title: String? = nil, categories: [String], series: [Series], legend: String? = nil, legendOverlay: Bool, textSize: Double? = nil, titleSize: Double? = nil, dataLabels: Bool, gridlines: Bool, minorGridlines: Bool, axisTitles: Pair<String?, String?>, style: UInt32, palette: String, plotFill: Fill? = nil, chartFill: Fill? = nil, textColor: ColorRef? = nil, holeSize: Double, gapWidth: Double, overlap: Double, varyColors: Bool, yMin: Double? = nil, yMax: Double? = nil, yMajor: Double? = nil, yLogBase: Double? = nil, yFormat: String? = nil, yHidden: Bool, catReversed: Bool, y2Min: Double? = nil, y2Max: Double? = nil, y2Major: Double? = nil, y2Format: String? = nil, y2Hidden: Bool, lang: String? = nil, subtotals: [Int], categoryLevels: [[String]], inclusiveQuartiles: Bool, upDownBars: Bool, binCount: UInt32? = nil, binSize: Double? = nil, threeD: Chart3D? = nil, wireframe: Bool, ofPie: OfPie? = nil, bubbleScale: Double? = nil, bubbleSizeWidth: Bool, labelOptions: LabelOptions? = nil, raw: String? = nil, kept: ChartKept) {
+    public init(kind: ChartType, title: String? = nil, categories: [String], series: [Series], legend: String? = nil, legendOverlay: Bool, textSize: Double? = nil, titleSize: Double? = nil, dataLabels: Bool, gridlines: Bool, minorGridlines: Bool, axisTitles: Pair<String?, String?>, style: UInt32, palette: String, plotFill: Fill? = nil, chartFill: Fill? = nil, textColor: ColorRef? = nil, holeSize: Double, gapWidth: Double, overlap: Double, varyColors: Bool, yMin: Double? = nil, yMax: Double? = nil, yMajor: Double? = nil, yLogBase: Double? = nil, yFormat: String? = nil, yHidden: Bool, catReversed: Bool, y2Min: Double? = nil, y2Max: Double? = nil, y2Major: Double? = nil, y2Format: String? = nil, y2Hidden: Bool, lang: String? = nil, subtotals: [Int], categoryLevels: [[String]], inclusiveQuartiles: Bool, upDownBars: Bool, binCount: UInt32? = nil, binSize: Double? = nil, threeD: Chart3D? = nil, wireframe: Bool, ofPie: OfPie? = nil, bubbleScale: Double? = nil, bubbleSizeWidth: Bool, labelOptions: LabelOptions? = nil, dataTable: DataTable? = nil, raw: String? = nil, kept: ChartKept) {
         self.kind = kind
         self.title = title
         self.categories = categories
@@ -4320,6 +4323,7 @@ public struct Chart: Sendable, Equatable {
         self.bubbleScale = bubbleScale
         self.bubbleSizeWidth = bubbleSizeWidth
         self.labelOptions = labelOptions
+        self.dataTable = dataTable
         self.raw = raw
         self.kept = kept
     }
@@ -4374,6 +4378,7 @@ extension Chart: JSONCodable {
         o.putIfPresent("bubbleScale", bubbleScale)
         o.put("bubbleSizeWidth", bubbleSizeWidth, skipIf: !bubbleSizeWidth)
         o.putIfPresent("labelOptions", labelOptions)
+        o.putIfPresent("dataTable", dataTable)
         o.putIfPresent("raw", raw)
         o.put("kept", kept, skipIf: kept.isEmpty)
         return .object(o)
@@ -4382,7 +4387,7 @@ extension Chart: JSONCodable {
     public init(fromJSON json: JSON) throws(JSONDecodeError) {
         let f = try JSONFields(json, "Chart")
         let d = Chart.default
-        self.init(kind: try f.get("kind", default: d.kind), title: try f.get("title", default: d.title), categories: try f.get("categories", default: d.categories), series: try f.get("series", default: d.series), legend: try f.get("legend", default: d.legend), legendOverlay: try f.get("legendOverlay", default: d.legendOverlay), textSize: try f.get("textSize", default: d.textSize), titleSize: try f.get("titleSize", default: d.titleSize), dataLabels: try f.get("dataLabels", default: d.dataLabels), gridlines: try f.get("gridlines", default: d.gridlines), minorGridlines: try f.get("minorGridlines", default: d.minorGridlines), axisTitles: try f.get("axisTitles", default: d.axisTitles), style: try f.get("style", default: d.style), palette: try f.get("palette", default: d.palette), plotFill: try f.get("plotFill", default: d.plotFill), chartFill: try f.get("chartFill", default: d.chartFill), textColor: try f.get("textColor", default: d.textColor), holeSize: try f.get("holeSize", default: d.holeSize), gapWidth: try f.get("gapWidth", default: d.gapWidth), overlap: try f.get("overlap", default: d.overlap), varyColors: try f.get("varyColors", default: d.varyColors), yMin: try f.get("yMin", default: d.yMin), yMax: try f.get("yMax", default: d.yMax), yMajor: try f.get("yMajor", default: d.yMajor), yLogBase: try f.get("yLogBase", default: d.yLogBase), yFormat: try f.get("yFormat", default: d.yFormat), yHidden: try f.get("yHidden", default: d.yHidden), catReversed: try f.get("catReversed", default: d.catReversed), y2Min: try f.get("y2Min", default: d.y2Min), y2Max: try f.get("y2Max", default: d.y2Max), y2Major: try f.get("y2Major", default: d.y2Major), y2Format: try f.get("y2Format", default: d.y2Format), y2Hidden: try f.get("y2Hidden", default: d.y2Hidden), lang: try f.get("lang", default: d.lang), subtotals: try f.get("subtotals", default: d.subtotals), categoryLevels: try f.get("categoryLevels", default: d.categoryLevels), inclusiveQuartiles: try f.get("inclusiveQuartiles", default: d.inclusiveQuartiles), upDownBars: try f.get("upDownBars", default: d.upDownBars), binCount: try f.get("binCount", default: d.binCount), binSize: try f.get("binSize", default: d.binSize), threeD: try f.get("threeD", default: d.threeD), wireframe: try f.get("wireframe", default: d.wireframe), ofPie: try f.get("ofPie", default: d.ofPie), bubbleScale: try f.get("bubbleScale", default: d.bubbleScale), bubbleSizeWidth: try f.get("bubbleSizeWidth", default: d.bubbleSizeWidth), labelOptions: try f.get("labelOptions", default: d.labelOptions), raw: try f.get("raw", default: d.raw), kept: try f.get("kept", default: d.kept))
+        self.init(kind: try f.get("kind", default: d.kind), title: try f.get("title", default: d.title), categories: try f.get("categories", default: d.categories), series: try f.get("series", default: d.series), legend: try f.get("legend", default: d.legend), legendOverlay: try f.get("legendOverlay", default: d.legendOverlay), textSize: try f.get("textSize", default: d.textSize), titleSize: try f.get("titleSize", default: d.titleSize), dataLabels: try f.get("dataLabels", default: d.dataLabels), gridlines: try f.get("gridlines", default: d.gridlines), minorGridlines: try f.get("minorGridlines", default: d.minorGridlines), axisTitles: try f.get("axisTitles", default: d.axisTitles), style: try f.get("style", default: d.style), palette: try f.get("palette", default: d.palette), plotFill: try f.get("plotFill", default: d.plotFill), chartFill: try f.get("chartFill", default: d.chartFill), textColor: try f.get("textColor", default: d.textColor), holeSize: try f.get("holeSize", default: d.holeSize), gapWidth: try f.get("gapWidth", default: d.gapWidth), overlap: try f.get("overlap", default: d.overlap), varyColors: try f.get("varyColors", default: d.varyColors), yMin: try f.get("yMin", default: d.yMin), yMax: try f.get("yMax", default: d.yMax), yMajor: try f.get("yMajor", default: d.yMajor), yLogBase: try f.get("yLogBase", default: d.yLogBase), yFormat: try f.get("yFormat", default: d.yFormat), yHidden: try f.get("yHidden", default: d.yHidden), catReversed: try f.get("catReversed", default: d.catReversed), y2Min: try f.get("y2Min", default: d.y2Min), y2Max: try f.get("y2Max", default: d.y2Max), y2Major: try f.get("y2Major", default: d.y2Major), y2Format: try f.get("y2Format", default: d.y2Format), y2Hidden: try f.get("y2Hidden", default: d.y2Hidden), lang: try f.get("lang", default: d.lang), subtotals: try f.get("subtotals", default: d.subtotals), categoryLevels: try f.get("categoryLevels", default: d.categoryLevels), inclusiveQuartiles: try f.get("inclusiveQuartiles", default: d.inclusiveQuartiles), upDownBars: try f.get("upDownBars", default: d.upDownBars), binCount: try f.get("binCount", default: d.binCount), binSize: try f.get("binSize", default: d.binSize), threeD: try f.get("threeD", default: d.threeD), wireframe: try f.get("wireframe", default: d.wireframe), ofPie: try f.get("ofPie", default: d.ofPie), bubbleScale: try f.get("bubbleScale", default: d.bubbleScale), bubbleSizeWidth: try f.get("bubbleSizeWidth", default: d.bubbleSizeWidth), labelOptions: try f.get("labelOptions", default: d.labelOptions), dataTable: try f.get("dataTable", default: d.dataTable), raw: try f.get("raw", default: d.raw), kept: try f.get("kept", default: d.kept))
     }
 }
 
@@ -4445,6 +4450,45 @@ extension Chart3D: JSONCodable {
         let f = try JSONFields(json, "Chart3D")
         let d = Chart3D.default
         self.init(rotX: try f.get("rotX", default: d.rotX), hPercent: try f.get("hPercent", default: d.hPercent), rotY: try f.get("rotY", default: d.rotY), depthPercent: try f.get("depthPercent", default: d.depthPercent), rAngAx: try f.get("rAngAx", default: d.rAngAx), perspective: try f.get("perspective", default: d.perspective), gapDepth: try f.get("gapDepth", default: d.gapDepth), shape: try f.get("shape", default: d.shape), depthAxis: try f.get("depthAxis", default: d.depthAxis))
+    }
+}
+
+// MARK: DataTable (chart.rs)
+
+/// A chart's data table (ECMA-376 `c:dTable`): which of its lines show and whether each series'
+/// row starts with its legend key. DeckCraftNative's own (AB-T-0439).
+public struct DataTable: Sendable, Equatable {
+    /// `c:showKeys`.
+    public var keys: Bool
+    /// `c:showHorzBorder`.
+    public var horizontal: Bool
+    /// `c:showVertBorder`.
+    public var vertical: Bool
+    /// `c:showOutline`.
+    public var outline: Bool
+
+    public init(keys: Bool, horizontal: Bool, vertical: Bool, outline: Bool) {
+        self.keys = keys
+        self.horizontal = horizontal
+        self.vertical = vertical
+        self.outline = outline
+    }
+}
+
+extension DataTable: JSONCodable {
+    public func toJSON() -> JSON {
+        var o = JSONObject()
+        o.put("keys", keys)
+        o.put("horizontal", horizontal)
+        o.put("vertical", vertical)
+        o.put("outline", outline)
+        return .object(o)
+    }
+
+    public init(fromJSON json: JSON) throws(JSONDecodeError) {
+        let f = try JSONFields(json, "DataTable")
+        let d = DataTable.default
+        self.init(keys: try f.get("keys", default: d.keys), horizontal: try f.get("horizontal", default: d.horizontal), vertical: try f.get("vertical", default: d.vertical), outline: try f.get("outline", default: d.outline))
     }
 }
 
