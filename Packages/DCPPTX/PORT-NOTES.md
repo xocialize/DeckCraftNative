@@ -538,6 +538,13 @@ The writer calls these reader functions, with Rust's parameter and return shapes
     PowerPoint re-save, which wrote them `val="1"`). The reader still takes a missing one as off; a third-party
     file without them draws without the label here and with it in PowerPoint. Tests: `WriteChartPatchTests`
     (5 more).
+13. **Gradient series fills and a bubble chart's scale are written as read (2026-11-05, deliberate; AB-T-0437).**
+    deckcraft's chart writer (`simple_fill`) writes a gradient as its first stop's solid fill, so any edit that
+    regenerates the part (palette, text colour, `chart.type`) turned PowerPoint's gradient columns flat; the
+    generator now writes `a:gradFill` with the stops, direction, path and tile it read (`DML.gradient`, the shapes'
+    writer), nothing when it has no stops. The reader takes a `c:bubbleChart`'s `c:bubbleScale` (0–300 %) and
+    `c:sizeRepresents` into `Chart.bubbleScale`/`bubbleSizeWidth`, and the generator writes them back after the
+    series when set (unset, nothing, as deckcraft writes). Tests: `WriteChartFillsTests` (2).
 
 ## Integration tests
 

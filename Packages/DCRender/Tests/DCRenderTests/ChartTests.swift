@@ -483,3 +483,66 @@ let solidRed = Rgba.rgb(255, 0, 0)
         #expect(count(plain, white) > count(coloured, white), "the labels were white before")
     }
 }
+
+// The port's own (AB-T-0437): bubbles sized by `sizes`, and trendline legend entries.
+@Suite struct ChartBubbleAndLegendTests {
+    @Test func bubblesScaleByAreaFromTheLargestSize() {
+        var c = Chart.sample(.bubble)
+        c.series[0].sizes = [4, 1, nil, -2]
+        c.series[1].sizes = [1, 1, 1, 1]
+        c.series[2].sizes = []
+        let plot = Rect(0, 0, 400, 200)
+        let b = ChartRender.BubbleScale(c, plot)
+        // A quarter of the shorter side across at 100 %: radius 25 for the largest size (4).
+        #expect(b.radius(c.series[0], 0) == 25)
+        #expect(b.radius(c.series[0], 1) == 12.5, "a quarter of the area: half the radius")
+        #expect(b.radius(c.series[0], 2) == nil && b.radius(c.series[0], 3) == nil, "missing and negative sizes draw nothing")
+        #expect(b.radius(c.series[2], 0) == 25 * (1.0 / 4).squareRoot(), "no sizes: size 1 for every point")
+        c.bubbleScale = 200
+        c.bubbleSizeWidth = true
+        let w = ChartRender.BubbleScale(c, plot)
+        #expect(w.radius(c.series[0], 0) == 50 && w.radius(c.series[0], 1) == 12.5, "sizeRepresents w: by width")
+        #expect(w.padding(400) == 0.125)
+        c.bubbleScale = .infinity
+        #expect(ChartRender.BubbleScale(c, plot).radius(c.series[0], 0) == 75, "kept within 300 %")
+        #expect(ChartRender.BubbleScale(c, Rect(0, 0, 0, 0)).radius(c.series[0], 0) == nil)
+    }
+
+    @Test func aBubbleChartDrawsCirclesNotLines() {
+        let c = Chart.sample(.bubble)
+        let bubbles = render(c)
+        var lines = c
+        lines.kind = .scatter
+        // The scatter's marks are 3.5-point dots; the bubbles cover far more of the plot.
+        #expect(inked(bubbles) > inked(render(lines)) * 3)
+    }
+
+    @Test func trendlinesHaveLegendEntries() {
+        var c = Chart.sample(.column)
+        c.series[0].trendlines = [Trendline.default]
+        var avg = Trendline.default
+        avg.kind = .movingAvg
+        avg.period = 3
+        var named = Trendline.default
+        named.name = "Fit"
+        c.series[1].trendlines = [avg, named]
+        let names = ChartRender.trendlineLegend(c).map(\.0)
+        #expect(names == ["Linear (Series 1)", "3 per. Mov. Avg. (Series 2)", "Fit"])
+    }
+
+    private func render(_ c: Chart) -> RenderImage {
+        renderDeck(deckOf([shapeOf(1, Xfrm(40, 40, 480, 270), .chart(c))]))
+    }
+
+    /// Pixels darker than light grey: the marks, the text and the axis.
+    private func inked(_ img: RenderImage) -> Int {
+        var n = 0
+        for y in 0 ..< img.height {
+            for x in 0 ..< img.width {
+                let p = pixelAt(img, x, y)
+                if p[0] < 200 || p[1] < 200 || p[2] < 200 { n += 1 }
+            }
+        }
+        return n
+    }
+}

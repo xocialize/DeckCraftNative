@@ -28,12 +28,13 @@ public enum ChartRender {
         }
     }
 
-    /// A series' one colour (lines, areas, markers): its solid fill, a pattern's foreground, else the
-    /// palette's.
+    /// A series' one colour (lines, areas, markers): its solid fill, a pattern's foreground, a gradient's first
+    /// stop (the port's own, AB-T-0437: deckcraft takes the palette's), else the palette's.
     static func seriesFill(_ ctx: Resolve.Ctx, _ c: Chart, _ i: Int, _ s: Series?) -> Rgba {
         switch s?.fill {
         case .solid(let cc)?: ctx.color(cc, nil)
         case .pattern(let p)?: ctx.color(p.fg, nil)
+        case .gradient(let g)? where !g.stops.isEmpty: ctx.color(g.stops[0].color, nil)
         default: seriesColor(ctx, c, i)
         }
     }
@@ -45,6 +46,11 @@ public enum ChartRender {
         case pattern(String, Rgba, Rgba)
         /// `a:noFill`: only the outline, if any, shows.
         case nothing
+        /// A gradient laid out over each bar's own box, as PowerPoint draws a series' `a:gradFill` (the port's
+        /// own, AB-T-0437; deckcraft paints the palette's colour).
+        case gradient(Gradient)
+        /// A legend key drawn as a short line (a trendline's): its colour and dash pattern.
+        case line(Rgba, [Double])
     }
 
     /// The paint of fill `f` as a bar or legend key draws it; the palette's `fallback` when the file gives
@@ -54,19 +60,31 @@ public enum ChartRender {
         case .solid(let cc)?: .color(ctx.color(cc, nil))
         case .pattern(let p)?: .pattern(p.preset, ctx.color(p.fg, nil), ctx.color(p.bg, nil))
         case .none_?: .nothing
+        case .gradient(let g)? where !g.stops.isEmpty: .gradient(g)
         default: .color(fallback)
         }
     }
 
-    /// Fill `r` (in the space `m` maps to the output) with `p`.
-    static func fillWith(_ c: Canvas, _ p: BarPaint, _ r: Rect, _ m: Affine) {
+    /// Fill `r` (in the space `m` maps to the output) with `p`; with `path`, that shape laid out over `r` (a
+    /// bubble).
+    static func fillWith(_ c: Canvas, _ rctx: Resolve.Ctx, _ p: BarPaint, _ r: Rect, _ m: Affine, _ path: BezPath? = nil) {
         switch p {
         case .color(let col):
             c.setTransform(m)
             c.setPaint(.color(col, 1))
-            c.fillRect(r)
+            if let path { c.fillPath(path) } else { c.fillRect(r) }
         case .pattern(let name, let fg, let bg):
-            Pattern.fill(c, name, fg, bg, 1, rectPath(r), m)
+            Pattern.fill(c, name, fg, bg, 1, path ?? rectPath(r), m)
+        case .gradient(let g):
+            PaintFill.fillPath(c, rctx, .gradient(g), nil, path ?? rectPath(r), r, m, .norm, 1, rctx.pres)
+        case .line(let col, let dashes):
+            var l = BezPath()
+            l.moveTo(Point(r.x0 - r.width * 0.4, r.center.y))
+            l.lineTo(Point(r.x1, r.center.y))
+            c.setTransform(m)
+            c.setPaint(.color(col, 1))
+            c.setStroke(dashes.isEmpty ? StrokeStyle(1.6) : StrokeStyle(1.6).withDashes(0, dashes))
+            c.strokePath(l)
         case .nothing:
             break
         }
@@ -170,7 +188,8 @@ public enum ChartRender {
 
     /// A scatter or bubble chart's value x axis (min, max, major unit): one scale over every series' x
     /// values, from zero when they're all positive. nil for other charts and when there are no x values.
-    static func valueXScale(_ c: Chart, _ maxIntervals: Int) -> (Double, Double, Double)? {
+    /// `pad`: a bubble chart's room for its largest bubble, as a fraction of the axis added past the data.
+    static func valueXScale(_ c: Chart, _ maxIntervals: Int, _ pad: Double = 0) -> (Double, Double, Double)? {
         if c.series.isEmpty || !c.series.allSatisfy({ [.scatter, .bubble].contains(c.seriesKind($0)) }) { return nil }
         var range: (Double, Double)?
         for s in c.series {
@@ -179,7 +198,8 @@ public enum ChartRender {
             }
         }
         guard let (lo, hi) = range else { return nil }
-        return axisScale(lo.rustMin(0), hi, nil, nil, nil, maxIntervals, false)
+        let grow = pad > 0 && pad < 0.45 ? (hi - lo.rustMin(0)) * pad / (1 - 2 * pad) : 0
+        return axisScale(lo.rustMin(0), hi + grow, nil, nil, nil, maxIntervals, false)
     }
 
     /// Where the legend goes for `c:legendPos`, and the plot area left over. `size` is the legend block
@@ -369,7 +389,7 @@ public enum ChartRender {
                     return (s.name, paint, barOutline(rctx, s))
                 }
                 return (s.name, .color(seriesFill(rctx, c, i, s)), nil)
-            }
+            } + trendlineLegend(c)
         }
         if let pos = c.legend, !legendItems.isEmpty {
             let vertical = ["l", "r", "tr"].contains(pos)
@@ -385,7 +405,7 @@ public enum ChartRender {
                 let tw = Double(name.unicodeScalars.count) * base * 0.55 + base
                 defer { if vertical { y += base * 1.5 } else { x += tw + base * 0.6 } }
                 if !bg { continue }
-                fillWith(ctx, paint, key, m)
+                fillWith(ctx, rctx, paint, key, m)
                 if let (oc, ow) = outline, ow > 0 {
                     ctx.setTransform(m)
                     ctx.setPaint(.color(oc, 1))
@@ -571,7 +591,7 @@ public enum ChartRender {
         let slot = { (i: Int) -> Double in backwards ? Double(Swift.max(ncat - (i + 1), 0)) + fwd : Double(i) + back }
         // Scatter and bubble charts have a value x axis: one scale over every series' x values, with its own
         // tick labels in place of category names.
-        let xscale = horiz ? nil : valueXScale(c, Int(rustCast: (plot.width / (base * 2.5)).rounded(.down).clamped(2, 12)))
+        let xscale = horiz ? nil : valueXScale(c, Int(rustCast: (plot.width / (base * 2.5)).rounded(.down).clamped(2, 12)), BubbleScale(c, plot).padding(plot.width))
         let toX = { (v: Double) -> Double? in xscale.map { plot.x0 + (v - $0.0) / positiveSpan($0.1 - $0.0) * plot.width } }
         if bg, let sc = xscale {
             for v in axisTicks(sc) {
@@ -648,7 +668,7 @@ public enum ChartRender {
                     let paint: BarPaint = waterfall
                         ? .color(seriesColor(rctx, c, c.subtotals.contains(i) ? 2 : b < a ? 1 : 0))
                         : barPaint(rctx, c, si, i, s)
-                    fillWith(ctx, paint, r, m)
+                    fillWith(ctx, rctx, paint, r, m)
                     if !waterfall, let (oc, ow) = barOutline(rctx, s), ow > 0 {
                         ctx.setTransform(m)
                         ctx.setPaint(.color(oc, 1))
@@ -720,6 +740,19 @@ public enum ChartRender {
         let totals: [Double] = shares.isEmpty ? [] : (0 ..< ncat).map { i in
             shares.reduce(0.0) { $0 + Swift.abs(($1.values.at(i) ?? nil) ?? 0) }.rustMax(1e-9)
         }
+        // A bubble chart's circles (the port's own, AB-T-0437; deckcraft draws its points as a line with markers).
+        let bubble = BubbleScale(c, plot)
+        func drawBubble(_ si: Int, _ s: Series, _ i: Int, _ q: Point) {
+            guard let r = bubble.radius(s, i) else { return }
+            let box = Rect(q.x - r, q.y - r, q.x + r, q.y + r)
+            fillWith(ctx, rctx, paintOf(rctx, s.fill, seriesColor(rctx, c, si)), box, m, circlePath(q, r))
+            if let (oc, ow) = barOutline(rctx, s), ow > 0 {
+                ctx.setTransform(m)
+                ctx.setPaint(.color(oc, 1))
+                ctx.setStroke(StrokeStyle(ow))
+                ctx.strokePath(circlePath(q, r))
+            }
+        }
         for (si, s) in c.series.enumerated() {
             let kind = c.seriesKind(s)
             if kind.isBarLike || kind == .stock { continue }
@@ -776,7 +809,7 @@ public enum ChartRender {
                     }
                     ctx.setPaint(.color(col, 0.85))
                     ctx.fillPath(a)
-                } else if kind != .scatter {
+                } else if kind != .scatter && kind != .bubble {
                     let lw = (s.line?.width.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? 2.25).clamped(0.25, 20)
                     var p = BezPath()
                     for j in pts.indices.dropFirst() where has(si, cats[j]) {
@@ -787,7 +820,9 @@ public enum ChartRender {
                     ctx.setStroke(StrokeStyle(lw).withJoin(.round).withCaps(.round))
                     ctx.strokePath(p)
                 }
-                if [.lineMarkers, .scatter, .bubble].contains(kind) {
+                if kind == .bubble {
+                    for (j, q) in pts.enumerated() where has(si, cats[j]) { drawBubble(si, s, cats[j], q) }
+                } else if [.lineMarkers, .scatter].contains(kind) {
                     ctx.setPaint(.color(col, 1))
                     for (j, q) in pts.enumerated() where has(si, cats[j]) { ctx.fillPath(circlePath(q, 3.5)) }
                 }
@@ -805,13 +840,15 @@ public enum ChartRender {
                 }
                 ctx.setPaint(.color(col, 0.85))
                 ctx.fillPath(a)
-            } else if kind != .scatter {
+            } else if kind != .scatter && kind != .bubble {
                 let lw = (s.line?.width.flatMap { $0.isFinite && $0 > 0 ? $0 : nil } ?? 2.25).clamped(0.25, 20)
                 ctx.setPaint(.color(col, 1))
                 ctx.setStroke(StrokeStyle(lw).withJoin(.round).withCaps(.round))
                 ctx.strokePath(p)
             }
-            if [.lineMarkers, .scatter, .bubble].contains(kind) {
+            if kind == .bubble {
+                for (j, q) in pts.enumerated() { drawBubble(si, s, cats[j], q) }
+            } else if [.lineMarkers, .scatter].contains(kind) {
                 ctx.setPaint(.color(col, 1))
                 for q in pts { ctx.fillPath(circlePath(q, 3.5)) }
             }
@@ -1107,4 +1144,66 @@ private func trimEnd(_ s: String) -> String {
 
 private func trimStart(_ s: String) -> String {
     String(String.UnicodeScalarView(s.unicodeScalars.drop { $0.properties.isWhitespace }))
+}
+
+extension ChartRender {
+    /// A bubble chart's sizing (ECMA-376 §21.2.2.22 `c:bubbleScale`, §21.2.2.200 `c:sizeRepresents`): the largest
+    /// size over the chart's bubble series gets a bubble a quarter as wide as the plot's shorter side at 100 %, as
+    /// PowerPoint draws it; others scale by area (or by width with `sizeRepresents="w"`). Zero, negative and missing
+    /// sizes draw nothing (`c:showNegBubbles` is off by default); a series with no sizes at all draws every bubble at
+    /// the largest size. The port's own (AB-T-0437).
+    struct BubbleScale {
+        let maxSize: Double
+        let maxRadius: Double
+        let byWidth: Bool
+
+        init(_ c: Chart, _ plot: Rect) {
+            var top = 0.0
+            for s in c.series where c.seriesKind(s) == .bubble {
+                if s.sizes.isEmpty { top = top.rustMax(1) }
+                for v in s.sizes.compactMap({ $0 }) where v.isFinite && v > 0 { top = top.rustMax(v) }
+            }
+            maxSize = top
+            let scale = (c.bubbleScale ?? 100).clamped(0, 300) / 100
+            maxRadius = top > 0 ? plot.width.rustMin(plot.height).rustMax(0) * 0.125 * scale : 0
+            byWidth = c.bubbleSizeWidth
+        }
+
+        /// Point `i`'s radius, or nil when it draws no bubble.
+        func radius(_ s: Series, _ i: Int) -> Double? {
+            let v: Double? = s.sizes.isEmpty ? 1 : (s.sizes.at(i) ?? nil)
+            guard let v, v.isFinite, v > 0, maxSize > 0, maxRadius > 0 else { return nil }
+            let f = (v / maxSize).rustMin(1)
+            return maxRadius * (byWidth ? f : f.squareRoot())
+        }
+
+        /// The x axis' room for the largest bubble: its radius as a fraction of `width`.
+        func padding(_ width: Double) -> Double {
+            width > 0 && maxRadius > 0 ? maxRadius / width : 0
+        }
+    }
+
+    /// PowerPoint's automatic name for a trendline ("Linear (North)"), or its own name.
+    static func trendlineName(_ t: Trendline, _ series: String) -> String {
+        if let n = t.name, !n.isEmpty { return n }
+        let kind: String = switch t.kind {
+        case .linear: "Linear"
+        case .exp: "Expon."
+        case .log: "Log."
+        case .poly: "Poly."
+        case .power: "Power"
+        case .movingAvg: "\(t.period ?? 2) per. Mov. Avg."
+        }
+        return "\(kind) (\(series))"
+    }
+
+    /// The legend's trendline entries, after the series', as PowerPoint lists them: each a dashed line in the
+    /// trendline's ink (the port's own, AB-T-0437).
+    static func trendlineLegend(_ c: Chart) -> [(String, BarPaint, (Rgba, Double)?)] {
+        c.series.flatMap { s in
+            s.trendlines.prefix(8).enumerated().map { ti, t in
+                (trendlineName(t, s.name), BarPaint.line(trendInk.at(ti % trendInk.count) ?? .rgb(0x22, 0x22, 0x22), [6, 3.5]), nil)
+            }
+        }
+    }
 }

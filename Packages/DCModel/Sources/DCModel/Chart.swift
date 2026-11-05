@@ -150,7 +150,7 @@ extension Chart {
             holeSize: 0.5, gapWidth: 2.19, overlap: -0.27, varyColors: false, yMin: nil, yMax: nil, yMajor: nil,
             yLogBase: nil, yFormat: nil, yHidden: false, catReversed: false, y2Min: nil, y2Max: nil, y2Major: nil,
             y2Format: nil, y2Hidden: false, lang: nil, subtotals: [], categoryLevels: [], inclusiveQuartiles: false,
-            upDownBars: false, binCount: nil, binSize: nil, wireframe: false, raw: nil, kept: ChartKept()
+            upDownBars: false, binCount: nil, binSize: nil, wireframe: false, bubbleSizeWidth: false, raw: nil, kept: ChartKept()
         )
     }
 

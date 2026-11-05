@@ -34,6 +34,8 @@ generator only; it isn't built.
 - **`Chart.wireframe`**: a surface chart's `c:wireframe`.
 - **`Chart.ofPie: OfPie?`**: a pie chart's second plot (`c:ofPieChart`): `bar`, `splitType`, `splitPos`,
   `custom`, `secondSize`, `seriesLines`.
+- **`Chart.bubbleScale: Double?` and `Chart.bubbleSizeWidth`** (AB-T-0437): a bubble chart's `c:bubbleScale`
+  (percent of the default size) and `c:sizeRepresents val="w"` (sizes give the bubble's width, not its area).
 
 Each is skipped when unset (`None`, `false`), so every deck without them writes the same `presentation.json`;
 the corpus round trip is unchanged. A deck that uses them is one deckcraft reads with the fields ignored, and

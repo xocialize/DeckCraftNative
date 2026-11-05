@@ -190,7 +190,11 @@ extension PPTXRead {
                 if g.is("ofPieChart") { c.ofPie = ofPie(g) }
             case "doughnutChart": kind = .doughnut
             case "scatterChart": kind = .scatter
-            case "bubbleChart": kind = .bubble
+            case "bubbleChart":
+                kind = .bubble
+                // The bubbles' scale and what a size measures (the port's own, AB-T-0437).
+                c.bubbleScale = g.childVal("bubbleScale").flatMap { rustParseF64(rustTrim($0)) }.flatMap { $0.isFinite ? $0.clamped(0.0, 300.0) : nil }
+                c.bubbleSizeWidth = attrIs(g.childVal("sizeRepresents"), "w")
             case "radarChart":
                 kind = attrIs(g.childVal("radarStyle"), "filled") ? .filledRadar : .radar
             case "stockChart":

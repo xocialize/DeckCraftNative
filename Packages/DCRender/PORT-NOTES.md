@@ -136,6 +136,16 @@ swift test -c release -Xswiftc -enable-testing --filter RenderParityTests --scra
   box per category from the first series to the last (the stacked or 100 % values on those lines), behind the
   lines, hollow where it rose and dark where it fell, as a stock chart's are drawn. deckcraft draws a stock
   chart's only. In a chart build (AB-T-0443) a box appears with its category's last series.
+- **Bubbles, gradient series fills and trendline legend entries** (AB-T-0437). deckcraft draws a bubble chart
+  as lines with markers and ignores `sizes`; `ChartRender.BubbleScale` draws each point as a circle whose area
+  (or width, `c:sizeRepresents="w"`) is its size over the chart's largest, the largest a quarter as wide as the
+  plot's shorter side at `c:bubbleScale` 100 %, as PowerPoint draws them (measured on its PDF of `dc-types`
+  slide 16); zero, negative and missing sizes draw nothing, and a series with no sizes draws every point at the
+  largest size. The x axis gets room for the largest bubble. A gradient series fill (`BarPaint.gradient`) is laid
+  out over each bar's own box, legend key and bubble with `PaintFill.fillPath`, where deckcraft paints the
+  palette's colour; a line or marker takes its first stop. The legend lists each trendline after the series with
+  a dashed key in its ink and PowerPoint's automatic name ("Linear (North)", "Expon.", "Log.", "Poly.",
+  "Power", "2 per. Mov. Avg.") or its own `c:name`.
 
 ## Chart builds: a chart drawn part by part (AB-T-0443)
 

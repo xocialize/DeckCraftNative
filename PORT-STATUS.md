@@ -845,6 +845,27 @@ moves). Dispositions and their reasons are in [PLAN.md](PLAN.md) §3.
   - **Not yet:** a new bubble chart has no sizes, so its bubbles are all one size until Edit Data can set them
     (AB-T-0441); the subtypes PowerPoint has and the model doesn't (stacked lines with markers, open-high-low-close
     and volume stocks, wireframe and 3-D surfaces, the 3-D and of-pie variants, the other combos) aren't listed.
+- **After 0.1.15 (unreleased, 2026-11-05): bubbles, gradient series fills and trendline legend entries
+  (AB-T-0437).** A bubble chart drew as lines with markers and ignored its sizes; a gradient series fill (PowerPoint's
+  chart styles use them) drew in the palette's colour and was written back as its first stop's solid colour; a
+  trendline had no legend entry (gap review item 5; rows A7, C4, B10; O-38).
+  - **Now:** bubbles are circles sized by area (or width, `c:sizeRepresents`), the largest a quarter of the plot's
+    shorter side at `c:bubbleScale` 100 %, with room on the x axis; the scale and size measure are model fields
+    (`Chart.bubbleScale`, `bubbleSizeWidth`; DCModel patch), read and written back. Gradient series fills draw per
+    bar, legend key and bubble, and the generator writes `a:gradFill` as read (DCPPTX divergence 13). Each
+    trendline gets a legend entry after the series, with PowerPoint's automatic name ("Linear (North)").
+  - **Checked:** our `pp-elements` render now shows the green gradient columns and "Linear (North)" as PowerPoint's
+    PDF does, and `dc-types` slide 16 the bubbles. SSIMULACRA2 against PowerPoint's PDF (960 px): `pp-elements`
+    −84.5 → −67.8, slide 16 −96.7 → −124.1. The corpus floor of 88 is for our render against deckcraft's and
+    can't be met against PowerPoint: its chart text is smaller and its plot laid out differently, and our 26 chart
+    slides of `dc-types` score −63 to −323 against it (slide 16 now sits beside the column charts' −113 and
+    −124; the circles cover more area than the lines did, so a small offset costs more). After a title edit
+    (patched part), a palette edit and `chart.type` (both regenerated), `pp-elements` keeps both series'
+    `a:gradFill`, identical to PowerPoint's. PowerPoint opened those three, `pp-types` with every chart
+    regenerated, and a bubble chart with `bubbleScale` 150 and `sizeRepresents="w"`, without a repair prompt.
+  - **Tests:** `WriteChartFillsTests` (2), `ChartBubbleAndLegendTests` (3). The oracle corpus is unchanged.
+  - **Not yet:** an area or line series draws its gradient's first stop; a bubble's data labels, 3-D bubbles and
+    `c:showNegBubbles` (negative sizes draw nothing); PowerPoint pads the y axis for bubbles as well, we pad x only.
 - **After 0.1.15 (unreleased, 2026-11-04): the show's renderer is its own public target, `DCShow`.** Until now the
   show's drawing was internal to DCApp (`ShowStage`, `ShowMetal`), so only the show window could draw a show. A
   consumer (the first is MVS's Marquee Presentation, which plays a deck inside another app's Metal compositor) needs

@@ -38,7 +38,7 @@
      }
  }
  
-@@ -389,6 +397,19 @@
+@@ -389,6 +397,27 @@
      /// A histogram's bin width (`cx:binSize`).
      #[serde(skip_serializing_if = "Option::is_none")]
      pub bin_size: Option<f64>,
@@ -55,10 +55,18 @@
 +    /// Drawn as one pie. DeckCraftNative's own (AB-T-0434).
 +    #[serde(skip_serializing_if = "Option::is_none")]
 +    pub of_pie: Option<OfPie>,
++    /// A bubble chart's bubbles as a percentage of their default size (`c:bubbleScale`, 0–300 %);
++    /// unset is 100 %. DeckCraftNative's own (AB-T-0437).
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub bubble_scale: Option<f64>,
++    /// A bubble's size value gives its width, not its area (`c:sizeRepresents val="w"`).
++    /// DeckCraftNative's own (AB-T-0437).
++    #[serde(skip_serializing_if = "std::ops::Not::not")]
++    pub bubble_size_width: bool,
      /// Original chart XML part kept for round-trip of unmodelled options.
      #[serde(skip_serializing_if = "Option::is_none")]
      pub raw: Option<String>,
-@@ -396,6 +417,66 @@
+@@ -396,6 +425,66 @@
      /// The PPTX writer clears this before comparing modelled state. Native saves keep it too.
      #[serde(skip_serializing_if = "ChartKept::is_empty")]
      pub kept: ChartKept,
@@ -125,7 +133,7 @@
  }
  
  /// One relationship of a chart part, with the target string as it was written.
-@@ -484,6 +565,9 @@
+@@ -484,6 +573,9 @@
              up_down_bars: false,
              bin_count: None,
              bin_size: None,

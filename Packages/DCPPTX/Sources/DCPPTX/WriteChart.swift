@@ -47,8 +47,10 @@ extension PPTXWrite {
                 w.close("a:bgClr")
                 w.close("a:pattFill")
             case .gradient(let g):
-                if let s = g.stops.first {
-                    DML.solid(&w, s.color)
+                // Written as read: stops, direction, path and tile (the port's own, AB-T-0437; deckcraft writes
+                // the first stop as a solid fill). Without stops there is nothing to write.
+                if !g.stops.isEmpty {
+                    DML.gradient(&w, g)
                 }
             case .picture, .group, .background:
                 break
@@ -723,6 +725,15 @@ extension PPTXWrite {
             case .doughnut:
                 w.val("c:firstSliceAng", 0)
                 w.val("c:holeSize", Int64(rustCast: (c.holeSize.clamped(0.1, 0.9) * 100.0).rounded()))
+            case .bubble:
+                // The bubbles' scale and what a size measures, as read (the port's own, AB-T-0437); unset, the
+                // schema's defaults (100 %, area) and nothing written, as deckcraft writes.
+                if let v = c.bubbleScale, v.isFinite {
+                    w.val("c:bubbleScale", Int64(rustCast: v.clamped(0.0, 300.0).rounded()))
+                }
+                if c.bubbleSizeWidth {
+                    w.val("c:sizeRepresents", "w")
+                }
             default: break
             }
             if g != .pie && g != .doughnut {
