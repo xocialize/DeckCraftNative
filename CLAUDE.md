@@ -53,5 +53,5 @@ When upstream moves:
 - **Shared tree.** Parallel sessions working in the same tree build with their own `--scratch-path`
   (`.build-<name>/`, gitignored). Each owns a disjoint set of files and keeps the shared build green.
 
-- `/Volumes/Satechi` is nearly full, so cargo's output goes to `~/Library/Caches/DeckCraftNative/cargo-target`.
+- Cargo's output goes to `~/Library/Caches/DeckCraftNative/cargo-target`, off the project's volume; the oracle tests look for the binaries there (or in `CARGO_TARGET_DIR`).
 - Homebrew's `rustup` is keg-only. `oracle.sh` puts `/opt/homebrew/opt/rustup/bin` on `PATH` itself.

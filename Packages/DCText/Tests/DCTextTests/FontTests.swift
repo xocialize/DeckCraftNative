@@ -12,10 +12,12 @@ import Synchronization
 @testable import DCText
 import Testing
 
-/// deckcraft's test fixture fonts (`crates/<crate>/tests/fixtures/<name>`), if the checkout is there.
-func deckcraftFixture(_ crate: String, _ name: String) -> [UInt8]? {
-    let root = ProcessInfo.processInfo.environment["DECKCRAFT_DIR"].map { URL(filePath: $0) }
-        ?? URL(filePath: "/Volumes/Satechi/Development/research/deckcraft")
+/// deckcraft's test fixture fonts (`crates/<crate>/tests/fixtures/<name>`), if the checkout is there: at
+/// `DECKCRAFT_DIR` when set, else `deckcraft` beside `DeckCraftNative/`, found from this file's path.
+func deckcraftFixture(_ crate: String, _ name: String, file: String = #filePath) -> [UInt8]? {
+    // <DeckCraftNative>/Packages/DCText/Tests/DCTextTests/FontTests.swift: six up is the folder both checkouts are in.
+    let beside = (0..<6).reduce(URL(filePath: file)) { url, _ in url.deletingLastPathComponent() }.appending(path: "deckcraft")
+    let root = ProcessInfo.processInfo.environment["DECKCRAFT_DIR"].map { URL(filePath: $0) } ?? beside
     return (try? Data(contentsOf: root.appending(path: "crates/\(crate)/tests/fixtures/\(name)"))).map { [UInt8]($0) }
 }
 
